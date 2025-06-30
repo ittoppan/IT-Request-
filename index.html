@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบแจ้งซ่อมองค์กร</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5/dist/full.css" rel="stylesheet" type="text/css" />
+    
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
+
+    <script src="https://static.line-scdn.net/liff/sdk/v2/liff.js"></script>
+</head>
+<body class="bg-base-200 min-h-screen flex items-start justify-center p-4">
+    <div class="container mx-auto p-4 max-w-xl">
+        <h1 class="text-4xl font-bold text-center mb-6 text-primary">แจ้งซ่อมอุปกรณ์</h1>
+
+        <div id="loading" class="loading-spinner flex flex-col items-center justify-center p-8 hidden">
+            <span class="loading loading-spinner loading-lg text-primary mx-auto block"></span>
+            <p class="text-center text-gray-500 mt-4">กำลังโหลด...</p>
+        </div>
+
+        <div id="login-section" class="hidden text-center card bg-base-100 shadow-xl p-8">
+            <p class="text-lg mb-6">กรุณาล็อกอินด้วย LINE เพื่อดำเนินการต่อ</p>
+            <button id="line-login-button" class="btn btn-primary btn-lg w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="inline-block w-6 h-6 mr-2"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2.037 17.518c-.456-.002-.857-.043-1.205-.122-.387-.089-1.026-.289-1.026-.289l-.023-.007c-.495-.145-.985-.436-1.378-.857-.393-.42-.69-.933-.87-1.517-.089-.289-.136-.595-.144-.911.002-.596.166-1.161.472-1.636.305-.474.747-.841 1.258-1.096.069-.034.137-.066.205-.098.393-.186.793-.321 1.202-.405.393-.081.794-.122 1.196-.122.95 0 1.834.186 2.648.557.813.372 1.488.89 2.023 1.545.535.656.91 1.411 1.125 2.266.216.855.267 1.777.155 2.768-.113.992-.472 1.884-1.077 2.678-.604.793-1.4 1.413-2.383 1.859-.495.228-1.01.408-1.536.536-.26.065-.515.118-.767.164zm-1.666-4.664c.264.004.528.02.793.048.271.027.545.064.819.108.274.043.548.1.819.166.271.064.54.148.803.242.36.128.71.293 1.042.495.334.202.64.444.918.72.276.275.503.593.684.953.18.358.303.754.368 1.185.064.43.047.868-.05 1.31-.098.442-.294.856-.588 1.24-.296.382-.676.72-.998.983-.323.262-.733.472-1.139.627-.406.155-.838.261-1.282.316-.444.055-.898.058-1.353-.008-.456-.065-.897-.202-1.317-.41-.42-.207-.803-.48-1.144-.82-.34-.34-.633-.746-.877-1.187-.243-.442-.423-.926-.543-1.44-.12-.516-.17-1.054-.152-1.597.018-.542.128-1.076.326-1.583.197-.506.476-.98.837-1.416.36-.434.782-.82 1.258-1.146.474-.325.992-.602 1.545-.835z"/></svg>
+                เข้าสู่ระบบด้วย LINE
+            </button>
+        </div>
+
+        <div id="form-section" class="hidden card bg-base-100 shadow-xl p-8">
+            <div class="profile-info flex items-center mb-6 p-4 bg-base-200 rounded-lg">
+                <div class="avatar online mr-4">
+                    <div class="w-16 h-16 rounded-full overflow-hidden">
+                        <img id="profile-pic" src="" alt="Profile Picture" class="w-full h-full object-cover hidden">
+                    </div>
+                </div>
+                <div>
+                    <span id="display-name" class="text-xl font-semibold text-neutral"></span>
+                    <p class="text-sm text-gray-500">ข้อมูลผู้แจ้งจาก LINE</p>
+                </div>
+            </div>
+            
+            <form id="repair-form">
+                <input type="hidden" id="line-user-id" name="line_user_id">
+                <input type="hidden" id="line-display-name" name="line_display_name">
+                <input type="hidden" id="line-profile-picture" name="line_profile_picture">
+
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text">ชื่อผู้แจ้ง:</span>
+                    </label>
+                    <input type="text" id="reporter_name" name="reporter_name" placeholder="ชื่อจาก LINE" class="input input-bordered w-full" required readonly />
+                </div>
+
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text">แผนก/ที่ตั้ง:</span>
+                    </label>
+                    <input type="text" id="department" name="department" placeholder="เช่น แผนก IT, ชั้น 3 อาคาร A" class="input input-bordered w-full" required />
+                </div>
+
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text">ประเภทปัญหา:</span>
+                    </label>
+                    <select id="issue_type" name="issue_type" class="select select-bordered w-full" required>
+                        <option value="">-- เลือกประเภทปัญหา --</option>
+                        <option value="ไฟฟ้า">ไฟฟ้า</option>
+                        <option value="ประปา">ประปา</option>
+                        <option value="IT">IT (คอมพิวเตอร์, เครือข่าย)</option>
+                        <option value="เครื่องปรับอากาศ">เครื่องปรับอากาศ</option>
+                        <option value="อาคาร/สถานที่">อาคาร/สถานที่</option>
+                        <option value="อื่นๆ">อื่นๆ</option>
+                    </select>
+                </div>
+
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text">รายละเอียดปัญหา:</span>
+                    </label>
+                    <textarea id="description" name="description" rows="5" placeholder="อธิบายปัญหาให้ละเอียดที่สุด" class="textarea textarea-bordered h-24 w-full" required></textarea>
+                </div>
+
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text">ระดับความเร่งด่วน:</span>
+                    </label>
+                    <select id="urgency" name="urgency" class="select select-bordered w-full" required>
+                        <option value="ต่ำ">ต่ำ</option>
+                        <option value="ปานกลาง">ปานกลาง</option>
+                        <option value="สูง">สูง</option>
+                        <option value="วิกฤต">วิกฤต (หยุดงาน, อันตราย)</option>
+                    </select>
+                </div>
+
+                <div class="form-control mb-6">
+                    <label class="label">
+                        <span class="label-text">อัปโหลดรูปภาพ (ไม่บังคับ):</span>
+                    </label>
+                    <input type="file" id="image_upload" name="image_upload" accept="image/*" class="file-input file-input-bordered w-full" />
+                    <p class="text-sm text-gray-500 mt-2">การอัปโหลดรูปภาพจะใช้เวลาสักครู่</p>
+                    
+                    <div id="image-preview-container" class="hidden mt-4">
+                        <img id="image-preview" src="#" alt="Image Preview" class="max-w-full h-auto rounded-lg shadow-md mb-2" style="max-height: 200px; object-fit: contain;">
+                        <div class="flex items-center justify-between">
+                            <span id="image-file-name" class="text-sm text-gray-600 truncate mr-2"></span>
+                            <button type="button" id="clear-image-button" class="btn btn-sm btn-ghost btn-circle">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg w-full submit-button">ส่งแจ้งซ่อม</button>
+            </form>
+
+            <div id="status-message" class="alert hidden mt-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="status-text"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
