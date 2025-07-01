@@ -110,3 +110,79 @@
 
 </body>
 </html>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1. Initialize LIFF
+        liff.init({ liffId: "2007374280-GEYwyNdl" }) // << ใส่ LIFF ID ของคุณ
+            .then(() => {
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                } else {
+                    // 2. ดึงข้อมูลโปรไฟล์ LINE
+                    liff.getProfile()
+                        .then(profile => {
+                            document.getElementById('lineUserID').value = profile.userId;
+                            document.getElementById('lineDisplayName').value = profile.displayName;
+                            document.getElementById('lineProfilePicture').value = profile.pictureUrl;
+                            // ตั้งชื่อผู้แจ้งเป็นชื่อ LINE อัตโนมัติ แต่ยังให้แก้ไขได้
+                            document.getElementById('reporterName').value = profile.displayName;
+                        })
+                        .catch(err => console.error(err));
+                }
+            })
+            .catch(err => console.error(err));
+
+        // 3. ดักจับการกดปุ่ม
+        const form = document.querySelector('.card-body');
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // ป้องกันการรีเฟรชหน้า
+            
+            // 4. รวบรวมข้อมูลจากฟอร์ม
+            const formData = {
+                lineUserID: document.getElementById('lineUserID').value,
+                lineDisplayName: document.getElementById('lineDisplayName').value,
+                lineProfilePicture: document.getElementById('lineProfilePicture').value,
+                reporterName: document.getElementById('reporterName').value,
+                branch: document.getElementById('branch').value,
+                department: document.getElementById('department').value,
+                issueType: document.getElementById('issueType').value,
+                description: document.getElementById('description').value,
+                urgency: document.getElementById('urgency').value,
+                // การจัดการไฟล์รูปภาพจะต้องทำแยกต่างหาก
+                // ในตัวอย่างนี้จะส่งค่าว่างไปก่อน
+                imageURL: "" 
+            };
+
+            // ตรวจสอบว่ากรอกข้อมูลครบหรือไม่
+            if (!formData.reporterName || formData.branch === 'เลือกสาขา' || !formData.description) {
+                alert('กรุณากรอกข้อมูลที่จำเป็น: ชื่อผู้แจ้ง, สาขา, และรายละเอียดปัญหา');
+                return;
+            }
+
+            // 5. ส่งข้อมูลไปยัง n8n Webhook
+            const webhookUrl = 'YOUR_N8N_WEBHOOK_PRODUCTION_URL'; // << ใส่ URL จาก n8n
+            
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('ส่งเรื่องแจ้งซ่อมสำเร็จ!');
+                    // ปิด LIFF App หลังจากส่งสำเร็จ
+                    liff.closeWindow();
+                } else {
+                    throw new Error('เกิดข้อผิดพลาดในการส่งข้อมูล');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
+            });
+        });
+    });
+</script>
