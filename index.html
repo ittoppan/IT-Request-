@@ -161,7 +161,7 @@
             }
 
             // 5. ส่งข้อมูลไปยัง n8n Webhook
-            const webhookUrl = 'YOUR_N8N_WEBHOOK_PRODUCTION_URL'; // << ใส่ URL จาก n8n
+            const webhookUrl = 'http://localhost:5678/webhook/ec682d42-c09a-4cab-af53-ec7965c965a8'; // << ใส่ URL จาก n8n
             
             fetch(webhookUrl, {
                 method: 'POST',
