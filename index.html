@@ -251,7 +251,7 @@
         
         // >>> **สำคัญมาก: แทนที่ด้วย URL จริงของ Google Apps Script Web App ของคุณที่ Deploy แล้ว**
         // ตัวอย่าง: 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec'
-        const googleAppsScriptUrl = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'; // <<< **อย่าลืมเปลี่ยนตรงนี้!**
+        const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec'; // <<< **อย่าลืมเปลี่ยนตรงนี้!**
 
         // Initialize LIFF
         async function initializeLiff() {
@@ -280,9 +280,7 @@
                 document.getElementById('lineDisplayName').value = profile.displayName;
                 document.getElementById('linePictureUrl').value = profile.pictureUrl || '';
                 
-                // Auto-fill name if empty
-                if (!document.getElementById('fullName').value) {
-                    document.getElementById('fullName').value = profile.displayName;
+           
                 }
             } catch (error) {
                 console.error('LIFF initialization failed:', error);
