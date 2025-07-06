@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบฟอร์มแจ้งซ่อม IT</title>
+    <script src="https://static.line-scdn.net/liff/sdk/v2/liff.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>แบบฟอร์มแจ้งซ่อม IT</h1>
+    <form id="repairForm" method="POST" enctype="multipart/form-data">
+        <input type="hidden" id="lineUserId" name="lineUserId" value="">
+        <input type="hidden" id="lineDisplayName" name="lineDisplayName" value="">
+
+        <label for="fullName">ชื่อ-นามสกุล:</label>
+        <input type="text" id="fullName" name="fullName" required><br>
+
+        <label for="department">แผนก:</label>
+        <input type="text" id="department" name="department" required><br>
+
+        <label for="officePhone">เบอร์โทรสำนักงาน:</label>
+        <input type="tel" id="officePhone" name="officePhone" required><br>
+
+        <label for="problemType">ประเภทของปัญหา:</label>
+        <select id="problemType" name="problemType" required>
+            <option value="">เลือกประเภทปัญหา</option>
+            <option value="คอมพิวเตอร์">คอมพิวเตอร์</option>
+            <option value="เครื่องพิมพ์">เครื่องพิมพ์</option>
+            <option value="เครือข่าย/อินเทอร์เน็ต">เครือข่าย/อินเทอร์เน็ต</option>
+            <option value="ซอฟต์แวร์">ซอฟต์แวร์</option>
+            <option value="ฮาร์ดแวร์">ฮาร์ดแวร์</option>
+            <option value="อื่นๆ">อื่นๆ</option>
+        </select><br>
+
+        <label for="problemDetails">รายละเอียดของปัญหา:</label>
+        <textarea id="problemDetails" name="problemDetails" rows="6" required></textarea><br>
+
+        <label for="repairImage">รูปภาพของปัญหา:</label>
+        <input type="file" id="repairImage" name="repairImage" accept="image/*"><br>
+
+        <button type="submit">ส่งแจ้งซ่อม</button>
+        <div id="statusMessage"></div>
+        <div id="errorMessage"></div>
+    </form>
+
+    <script src="script.js"></script>
+</body>
+</html>
