@@ -82,9 +82,7 @@
     <div class="form-container w-full max-w-2xl bg-white">
         <div class="header-gradient text-white p-6 md:p-8 text-center">
             <div class="flex justify-center mb-4">
-                <div class="bg-white/20 p-4 rounded-full">
-                    <i class="fas fa-tools text-3xl text-white animate-bounce"></i>
-                </div>
+                <img id="profilePicture" src="https://via.placeholder.com/96/CCCCCC/FFFFFF?text=PROFILE" alt="รูปโปรไฟล์" class="w-24 h-24 rounded-full border-4 border-white/50 object-cover">
             </div>
             <h1 class="text-2xl md:text-3xl font-semibold mb-2">แบบฟอร์มแจ้งซ่อม IT</h1>
             <p class="opacity-90">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อให้เราสามารถช่วยเหลือคุณได้อย่างรวดเร็ว</p>
@@ -229,7 +227,7 @@
                                     </p>
                                     <p class="text-xs text-gray-500">PNG, JPG, PDF (สูงสุด 5MB)</p>
                                 </div>
-                                <input id="fileInput" type="file" class="file-upload-input" accept="image/*,.pdf" multiple>
+                                <input id="fileInput" type="file" name="fileUpload" class="file-upload-input" accept="image/*,.pdf" multiple>
                             </label>
                         </div>
                         <div id="fileList" class="mt-2 space-y-2"></div>
@@ -247,32 +245,31 @@
 
     <script>
         // LIFF ID ของคุณ
-        const liffId = '2007374280-GEYwyNdl'; 
+        const liffId = '2007374280-GEYwyNdl'; // <<< **ตรวจสอบว่าเป็น LIFF ID ที่ถูกต้องของคุณ**
         
         // >>> **สำคัญมาก: แทนที่ด้วย URL จริงของ Google Apps Script Web App ของคุณที่ Deploy แล้ว**
-        // ตัวอย่าง: 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec'
         const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec'; // <<< **อย่าลืมเปลี่ยนตรงนี้!**
 
         // Initialize LIFF
         async function initializeLiff() {
             try {
-                await liff.init({ liffId: liffId }); 
+                await liff.init({ liffId: liffId });
                 
                 if (!liff.isLoggedIn()) {
                     Swal.fire({
                         title: 'กรุณาเข้าสู่ระบบ LINE',
                         text: 'คุณต้องเข้าสู่ระบบ LINE เพื่อใช้งานฟอร์มแจ้งซ่อมนี้',
                         icon: 'info',
-                        showCancelButton: false, 
+                        showCancelButton: false,
                         confirmButtonColor: '#2563eb',
                         confirmButtonText: 'เข้าสู่ระบบ LINE',
-                        allowOutsideClick: false 
+                        allowOutsideClick: false
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            liff.login(); 
+                            liff.login();
                         }
                     });
-                    return; 
+                    return;
                 }
                 
                 const profile = await liff.getProfile();
@@ -280,11 +277,15 @@
                 document.getElementById('lineDisplayName').value = profile.displayName;
                 document.getElementById('linePictureUrl').value = profile.pictureUrl || '';
                 
-           
+                // *** ส่วนเพิ่มเติม: แสดงรูปโปรไฟล์ ***
+                const profilePictureElement = document.getElementById('profilePicture');
+                if (profile.pictureUrl) {
+                    profilePictureElement.src = profile.pictureUrl;
                 }
+                // **********************************
+
             } catch (error) {
                 console.error('LIFF initialization failed:', error);
-                // แสดงข้อความผิดพลาดที่ชัดเจนขึ้น หาก LIFF init ไม่สำเร็จ (เช่น Liff ID ผิด)
                 Swal.fire({
                     title: 'เกิดข้อผิดพลาด',
                     text: `ไม่สามารถเริ่มต้น LIFF ได้: ${error.message || 'กรุณาตรวจสอบการตั้งค่า LIFF ID'}`,
@@ -333,7 +334,7 @@
             const fileInput = document.getElementById('fileInput');
             const fileListDiv = document.getElementById('fileList');
             if (fileListDiv.children.length === 0) {
-                fileInput.value = ''; 
+                fileInput.value = '';
             }
         }
         
@@ -349,7 +350,7 @@
                     confirmButtonColor: '#2563eb',
                     confirmButtonText: 'ตกลง'
                 });
-                return; 
+                return;
             }
             
             Swal.fire({
@@ -364,7 +365,7 @@
             const formData = new FormData(this);
             
             // --- ส่งข้อมูลไปยัง Google Apps Script Web App ---
-            fetch(googleAppsScriptUrl, { 
+            fetch(googleAppsScriptUrl, {
                 method: 'POST',
                 body: formData
             })
@@ -376,10 +377,10 @@
                         throw new Error(`HTTP error! Status: ${response.status}. Response: ${response.statusText}`);
                     });
                 }
-                return response.json(); 
+                return response.json();
             })
             .then(data => {
-                Swal.close(); 
+                Swal.close();
                 if (data.status === 'success') {
                     Swal.fire({
                         title: 'ส่งแบบฟอร์มสำเร็จ!',
@@ -390,8 +391,8 @@
                         allowOutsideClick: false
                     }).then(() => {
                         document.getElementById('repairForm').reset();
-                        document.getElementById('fileList').innerHTML = ''; 
-                        initializeLiff(); 
+                        document.getElementById('fileList').innerHTML = '';
+                        initializeLiff(); // Re-initialize to clear profile pic if needed, or simply re-assign if still logged in
                     });
                 } else {
                     Swal.fire({
@@ -404,7 +405,7 @@
                 }
             })
             .catch(error => {
-                Swal.close(); 
+                Swal.close();
                 console.error('Error submitting form:', error);
                 Swal.fire({
                     title: 'เกิดข้อผิดพลาด!',
@@ -418,7 +419,7 @@
 
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            initializeLiff(); 
+            initializeLiff();
         });
     </script>
 </body>
