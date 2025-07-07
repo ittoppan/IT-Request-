@@ -14,9 +14,7 @@
         :root {
             --primary-color: #2563eb;
             --primary-dark: #1d4ed8;
-            --secondary-color: #f59e0b;
             --dark-color: #1e293b;
-            --light-color: #f8fafc;
         }
         
         body {
@@ -25,9 +23,8 @@
         }
         
         .form-container {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
             border-radius: 1rem;
-            overflow: hidden;
         }
         
         .header-gradient {
@@ -36,56 +33,41 @@
         
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        }
+        
+        .profile-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+        
+        .file-item {
             transition: all 0.3s ease;
         }
         
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        .file-item:hover {
+            background-color: #f3f4f6;
         }
         
-        .input-focus:focus {
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
-            border-color: var(--primary-color);
+        .spinner {
+            animation: spin 1s linear infinite;
         }
         
-        .file-upload {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .file-upload-input {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-        
-        .animate-bounce {
-            animation: bounce 2s infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-5px);
-            }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 md:p-8">
+<body class="min-h-screen flex items-center justify-center p-4">
     <div class="form-container w-full max-w-2xl bg-white">
         <div class="header-gradient text-white p-6 md:p-8 text-center">
             <div class="flex justify-center mb-4">
-                <img id="profilePicture" src="https://via.placeholder.com/96/CCCCCC/FFFFFF?text=PROFILE" alt="รูปโปรไฟล์" class="w-24 h-24 rounded-full border-4 border-white/50 object-cover">
+                <img id="profilePicture" src="https://via.placeholder.com/96/CCCCCC/FFFFFF?text=PROFILE" 
+                     alt="รูปโปรไฟล์" class="profile-img">
             </div>
             <h1 class="text-2xl md:text-3xl font-semibold mb-2">แบบฟอร์มแจ้งซ่อม IT</h1>
-            <p class="opacity-90">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อให้เราสามารถช่วยเหลือคุณได้อย่างรวดเร็ว</p>
+            <p class="opacity-90">กรุณากรอกข้อมูลให้ครบถ้วน</p>
         </div>
         
         <div class="p-6 md:p-8">
@@ -102,67 +84,32 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล</label>
-                            <div class="relative">
-                                <input type="text" id="fullName" name="fullName" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition duration-200"
-                                    placeholder="เช่น สมชาย ใจดี">
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                    <i class="fas fa-user text-gray-400"></i>
-                                </div>
-                            </div>
+                            <input type="text" id="fullName" name="fullName" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                         </div>
                         
                         <div>
                             <label for="department" class="block text-sm font-medium text-gray-700 mb-1">แผนก</label>
-                            <div class="relative">
-                                <input type="text" id="department" name="department" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition duration-200"
-                                    placeholder="เช่น แผนกบัญชี">
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                    <i class="fas fa-building text-gray-400"></i>
-                                </div>
-                            </div>
+                            <input type="text" id="department" name="department" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="office" class="block text-sm font-medium text-gray-700 mb-1">สำนักงาน</label>
-                            <div class="relative">
-                                <select id="office" name="office" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg appearance-none focus:outline-none input-focus transition duration-200 bg-white">
-                                    <option value="" disabled selected>เลือกสำนักงาน</option>
-                                    <option value="สำนักงานรังสิต">สำนักงานรังสิต</option>
-                                    <option value="สำนักงานระยอง">สำนักงานระยอง</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                    <i class="fas fa-map-marker-alt text-gray-400"></i>
-                                </div>
-                            </div>
+                            <select id="office" name="office" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="" disabled selected>เลือกสำนักงาน</option>
+                                <option value="สำนักงานรังสิต">สำนักงานรังสิต</option>
+                                <option value="สำนักงานระยอง">สำนักงานระยอง</option>
+                            </select>
                         </div>
                         
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">เบอร์ติดต่อ</label>
-                            <div class="relative">
-                                <input type="tel" id="phone" name="phone" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition duration-200"
-                                    placeholder="เช่น 02-1234567">
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                    <i class="fas fa-phone text-gray-400"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">อีเมล (ถ้ามี)</label>
-                        <div class="relative">
-                            <input type="email" id="email" name="email"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition duration-200"
-                                placeholder="เช่น example@company.com">
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <i class="fas fa-envelope text-gray-400"></i>
-                            </div>
+                            <input type="tel" id="phone" name="phone" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
                 </div>
@@ -174,28 +121,19 @@
                     
                     <div>
                         <label for="problemType" class="block text-sm font-medium text-gray-700 mb-1">ประเภทปัญหา</label>
-                        <div class="relative">
-                            <select id="problemType" name="problemType" required
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg appearance-none focus:outline-none input-focus transition duration-200 bg-white">
-                                <option value="" disabled selected>เลือกประเภทปัญหา</option>
-                                <option value="hardware">อุปกรณ์ฮาร์ดแวร์</option>
-                                <option value="software">ซอฟต์แวร์/โปรแกรม</option>
-                                <option value="network">ระบบเครือข่าย</option>
-                                <option value="email">อีเมล</option>
-                                <option value="printer">เครื่องพิมพ์/สแกนเนอร์</option>
-                                <option value="other">อื่นๆ</option>
-                            </select>
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <i class="fas fa-chevron-down text-gray-400"></i>
-                            </div>
-                        </div>
+                        <select id="problemType" name="problemType" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="" disabled selected>เลือกประเภทปัญหา</option>
+                            <option value="hardware">อุปกรณ์ฮาร์ดแวร์</option>
+                            <option value="software">ซอฟต์แวร์/โปรแกรม</option>
+                            <option value="network">ระบบเครือข่าย</option>
+                        </select>
                     </div>
                     
                     <div>
                         <label for="problemDetails" class="block text-sm font-medium text-gray-700 mb-1">รายละเอียดปัญหา</label>
                         <textarea id="problemDetails" name="problemDetails" rows="4" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition duration-200"
-                            placeholder="อธิบายปัญหาที่พบให้ละเอียดที่สุด เช่น อาการที่พบ, ข้อความแจ้งเตือน, เวลาเกิดปัญหา"></textarea>
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
                     </div>
                     
                     <div>
@@ -218,24 +156,23 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">แนบไฟล์ประกอบ (ถ้ามี)</label>
-                        <div class="file-upload flex items-center justify-center w-full">
-                            <label for="fileInput" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition duration-200">
-                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                                    <p class="mb-2 text-sm text-gray-500">
-                                        <span class="font-semibold">คลิกเพื่ออัพโหลด</span> หรือลากไฟล์มาวางที่นี่
-                                    </p>
-                                    <p class="text-xs text-gray-500">PNG, JPG, PDF (สูงสุด 5MB)</p>
-                                </div>
-                                <input id="fileInput" type="file" name="fileUpload" class="file-upload-input" accept="image/*,.pdf" multiple>
-                            </label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                            <div id="fileDropArea" class="flex flex-col items-center justify-center py-8">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p class="mb-2 text-sm text-gray-500">ลากไฟล์มาวางที่นี่หรือคลิกเพื่อเลือกไฟล์</p>
+                                <p class="text-xs text-gray-500">รองรับ PNG, JPG, PDF (ไม่เกิน 5MB)</p>
+                                <input type="file" id="fileInput" name="fileUpload" class="hidden" multiple accept="image/*,.pdf">
+                                <button type="button" id="selectFilesBtn" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                    เลือกไฟล์
+                                </button>
+                            </div>
+                            <div id="fileList" class="space-y-2 mt-4"></div>
                         </div>
-                        <div id="fileList" class="mt-2 space-y-2"></div>
                     </div>
                 </div>
                 
                 <div class="pt-4">
-                    <button type="submit" class="btn-primary text-white font-medium py-3 px-6 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <button type="submit" id="submitBtn" class="btn-primary text-white font-medium py-3 px-6 rounded-lg w-full">
                         <i class="fas fa-paper-plane mr-2"></i>ส่งแบบฟอร์มแจ้งซ่อม
                     </button>
                 </div>
@@ -243,129 +180,218 @@
         </div>
     </div>
 
-    
-<script>
-    const liffId = '2007374280-GEYwyNdl';
-    const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
-
-    async function initializeLiff() {
-      try {
-        await liff.init({ liffId });
-
-        if (!liff.isLoggedIn()) {
-          Swal.fire({
-            title: 'กรุณาเข้าสู่ระบบ LINE',
-            icon: 'info',
-            confirmButtonText: 'เข้าสู่ระบบ LINE'
-          }).then(result => {
-            if (result.isConfirmed) liff.login();
-          });
-          return;
-        }
-
-        const profile = await liff.getProfile();
-        document.getElementById('lineUserId').value = profile.userId;
-        document.getElementById('lineDisplayName').value = profile.displayName;
-        document.getElementById('linePictureUrl').value = profile.pictureUrl || '';
-        document.getElementById('profilePicture').src = profile.pictureUrl || '';
-
-      } catch (error) {
-        Swal.fire({
-          title: 'เกิดข้อผิดพลาด',
-          text: error.message,
-          icon: 'error'
+    <script>
+        // ตั้งค่า LIFF
+        const liffId = '2007374280-GEYwyNdl';
+        const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
+        
+        // ฟังก์ชันแปลงไฟล์เป็น Base64
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
         });
-      }
-    }
-
-     document.getElementById('repairForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  
-  if (!liff.isLoggedIn()) {
-    Swal.fire({ title: 'กรุณาเข้าสู่ระบบ', icon: 'warning' });
-    return;
-  }
-
-  Swal.fire({ 
-    title: 'กำลังส่งข้อมูล...', 
-    allowOutsideClick: false, 
-    didOpen: () => Swal.showLoading() 
-  });
-
-  try {
-    const formData = new FormData(this);
-    const files = document.getElementById('fileInput').files;
-    const attachments = [];
-    
-    // แปลงไฟล์เป็น Base64
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const base64 = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result.split(',')[1]);
-        reader.readAsDataURL(file);
-      });
-      attachments.push({
-        name: file.name,
-        type: file.type,
-        content: base64
-      });
-    }
-
-    // สร้าง object สำหรับส่งข้อมูล
-    const payload = {
-      lineUserId: formData.get('lineUserId'),
-      lineDisplayName: formData.get('lineDisplayName'),
-      linePictureUrl: formData.get('linePictureUrl'),
-      fullName: formData.get('fullName'),
-      department: formData.get('department'),
-      office: formData.get('office'),
-      phone: formData.get('phone'),
-      email: formData.get('email'),
-      problemType: formData.get('problemType'),
-      problemDetails: formData.get('problemDetails'),
-      urgency: formData.get('urgency'),
-      attachments: attachments
-    };
-
-    // ส่งข้อมูลไปยัง Google Apps Script
-    const response = await fetch(googleAppsScriptUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-    
-    if (result.status === 'success') {
-      Swal.fire({
-        title: 'ส่งแบบฟอร์มสำเร็จ!',
-        text: `บันทึกข้อมูลเรียบร้อย ${result.fileCount ? 'พร้อมไฟล์แนบ ' + result.fileCount + ' ไฟล์' : ''}`,
-        icon: 'success'
-      }).then(() => {
-        document.getElementById('repairForm').reset();
-        document.getElementById('fileList').innerHTML = '';
-      });
-    } else {
-      throw new Error(result.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-    }
-  } catch (error) {
-    console.error('Form Error:', error);
-    Swal.fire({
-      title: 'เกิดข้อผิดพลาด!',
-      text: error.message,
-      icon: 'error'
-    });
-  }
-});
-      
-
-    document.addEventListener('DOMContentLoaded', () => {
-      initializeLiff();
-    });
-  </script>
-
+        
+        // เริ่มต้น LIFF
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId });
+                
+                if (!liff.isLoggedIn()) {
+                    await liff.login();
+                    return;
+                }
+                
+                const profile = await liff.getProfile();
+                document.getElementById('lineUserId').value = profile.userId;
+                document.getElementById('lineDisplayName').value = profile.displayName;
+                document.getElementById('linePictureUrl').value = profile.pictureUrl || '';
+                document.getElementById('profilePicture').src = profile.pictureUrl || document.getElementById('profilePicture').src;
+                
+            } catch (error) {
+                console.error('LIFF Error:', error);
+                Swal.fire({
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่สามารถเชื่อมต่อกับ LINE ได้',
+                    icon: 'error'
+                });
+            }
+        }
+        
+        // จัดการไฟล์ที่เลือก
+        function handleFileSelect(files) {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            if (files.length === 0) return;
+            
+            Array.from(files).forEach((file, index) => {
+                if (file.size > 5 * 1024 * 1024) {
+                    Swal.fire({
+                        title: 'ไฟล์ขนาดใหญ่เกินไป',
+                        text: `ไฟล์ ${file.name} มีขนาดเกิน 5MB`,
+                        icon: 'warning'
+                    });
+                    return;
+                }
+                
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+                fileItem.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-file-alt text-blue-500 mr-3"></i>
+                        <div>
+                            <p class="text-sm font-medium truncate max-w-xs">${file.name}</p>
+                            <p class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                    </div>
+                    <button type="button" class="text-red-500 hover:text-red-700 remove-file" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                fileList.appendChild(fileItem);
+            });
+            
+            // เพิ่มเหตุการณ์ลบไฟล์
+            document.querySelectorAll('.remove-file').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    const dt = new DataTransfer();
+                    const input = document.getElementById('fileInput');
+                    
+                    Array.from(input.files).forEach((file, i) => {
+                        if (i !== index) dt.items.add(file);
+                    });
+                    
+                    input.files = dt.files;
+                    handleFileSelect(input.files);
+                });
+            });
+        }
+        
+        // ส่งแบบฟอร์ม
+        async function submitForm(formData) {
+            const submitBtn = document.getElementById('submitBtn');
+            const originalBtnContent = submitBtn.innerHTML;
+            
+            try {
+                // แสดงสถานะกำลังโหลด
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner spinner mr-2"></i>กำลังส่งข้อมูล...';
+                
+                // แปลงไฟล์เป็น Base64
+                const files = document.getElementById('fileInput').files;
+                const attachments = [];
+                
+                for (let i = 0; i < files.length; i++) {
+                    const base64 = await toBase64(files[i]);
+                    attachments.push({
+                        name: files[i].name,
+                        type: files[i].type,
+                        content: base64.split(',')[1]
+                    });
+                }
+                
+                // สร้าง payload
+                const payload = {
+                    lineUserId: formData.get('lineUserId'),
+                    lineDisplayName: formData.get('lineDisplayName'),
+                    linePictureUrl: formData.get('linePictureUrl'),
+                    fullName: formData.get('fullName'),
+                    department: formData.get('department'),
+                    office: formData.get('office'),
+                    phone: formData.get('phone'),
+                    email: formData.get('email'),
+                    problemType: formData.get('problemType'),
+                    problemDetails: formData.get('problemDetails'),
+                    urgency: formData.get('urgency') || 'low',
+                    attachments: attachments
+                };
+                
+                // ส่งข้อมูล
+                const response = await fetch(googleAppsScriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    Swal.fire({
+                        title: 'ส่งข้อมูลสำเร็จ!',
+                        text: 'ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว',
+                        icon: 'success'
+                    }).then(() => {
+                        document.getElementById('repairForm').reset();
+                        document.getElementById('fileList').innerHTML = '';
+                    });
+                } else {
+                    throw new Error(data.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                }
+                
+            } catch (error) {
+                console.error('Submission Error:', error);
+                Swal.fire({
+                    title: 'ส่งข้อมูลไม่สำเร็จ',
+                    text: error.message || 'เกิดข้อผิดพลาดในการส่งข้อมูล',
+                    icon: 'error'
+                });
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnContent;
+            }
+        }
+        
+        // เมื่อ DOM โหลดเสร็จ
+        document.addEventListener('DOMContentLoaded', () => {
+            // เริ่มต้น LIFF
+            initializeLiff();
+            
+            // เลือกไฟล์
+            document.getElementById('selectFilesBtn').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+            
+            // เมื่อเลือกไฟล์
+            document.getElementById('fileInput').addEventListener('change', (e) => {
+                handleFileSelect(e.target.files);
+            });
+            
+            // ลากและวางไฟล์
+            const fileDropArea = document.getElementById('fileDropArea');
+            
+            fileDropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileDropArea.classList.add('border-blue-500', 'bg-blue-50');
+            });
+            
+            fileDropArea.addEventListener('dragleave', () => {
+                fileDropArea.classList.remove('border-blue-500', 'bg-blue-50');
+            });
+            
+            fileDropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileDropArea.classList.remove('border-blue-500', 'bg-blue-50');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    document.getElementById('fileInput').files = e.dataTransfer.files;
+                    handleFileSelect(e.dataTransfer.files);
+                }
+            });
+            
+            // ส่งแบบฟอร์ม
+            document.getElementById('repairForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                await submitForm(formData);
+            });
+        });
+    </script>
 </body>
 </html>
