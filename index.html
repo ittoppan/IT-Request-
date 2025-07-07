@@ -278,57 +278,51 @@
       }
     }
 
-    document.getElementById('repairForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-      if (!liff.isLoggedIn()) {
-        Swal.fire({ title: 'กรุณาเข้าสู่ระบบ', icon: 'warning' });
-        return;
-      }
+     document.getElementById('repairForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    if (!liff.isLoggedIn()) {
+      Swal.fire({ title: 'กรุณาเข้าสู่ระบบ', icon: 'warning' });
+      return;
+    }
+    Swal.fire({ title: 'กำลังส่งข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-      Swal.fire({ title: 'กำลังส่งข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    const formData = new FormData(this);
+    const files = document.getElementById('fileInput').files;
+    const filePromises = Array.from(files).map(file => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve({ name: file.name, type: file.type, content: reader.result.split(',')[1] });
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    }));
 
-      const formData = new FormData(this);
-      const files = document.getElementById('fileInput').files;
+    try {
+      const base64Files = await Promise.all(filePromises);
+      const payload = {};
+      formData.forEach((value, key) => payload[key] = value);
+      payload.attachments = base64Files;
 
-      const filePromises = Array.from(files).map(file => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve({
-          name: file.name,
-          type: file.type,
-          content: reader.result.split(',')[1]
+      const response = await fetch(googleAppsScriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      Swal.close();
+      if (data.status === 'success') {
+        Swal.fire({ title: 'ส่งแบบฟอร์มสำเร็จ!', icon: 'success' }).then(() => {
+          document.getElementById('repairForm').reset();
+          document.getElementById('fileList').innerHTML = '';
+          initializeLiff();
         });
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      }));
-
-      try {
-        const base64Files = await Promise.all(filePromises);
-        const payload = {};
-        formData.forEach((value, key) => payload[key] = value);
-        payload.attachments = base64Files;
-
-        const response = await fetch(googleAppsScriptUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await response.json();
-        Swal.close();
-        if (data.status === 'success') {
-          Swal.fire({ title: 'ส่งแบบฟอร์มสำเร็จ!', icon: 'success' }).then(() => {
-            document.getElementById('repairForm').reset();
-            document.getElementById('fileList').innerHTML = '';
-            initializeLiff();
-          });
-        } else {
-          Swal.fire({ title: 'เกิดข้อผิดพลาด!', text: data.message || 'ข้อผิดพลาดจากเซิร์ฟเวอร์', icon: 'error' });
-        }
-      } catch (error) {
-        Swal.close();
-        Swal.fire({ title: 'เกิดข้อผิดพลาด!', text: error.message, icon: 'error' });
+      } else {
+        Swal.fire({ title: 'เกิดข้อผิดพลาด!', text: data.message || 'ข้อผิดพลาดจากเซิร์ฟเวอร์', icon: 'error' });
       }
-    });
+    } catch (error) {
+      Swal.close();
+      Swal.fire({ title: 'เกิดข้อผิดพลาด!', text: error.message, icon: 'error' });
+    }
+  });
 
     document.addEventListener('DOMContentLoaded', () => {
       initializeLiff();
