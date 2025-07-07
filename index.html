@@ -1,152 +1,426 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>แบบฟอร์มแจ้งซ่อม IT</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบฟอร์มแจ้งซ่อม IT</title>
+    <base target="_top">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #f59e0b;
+            --dark-color: #1e293b;
+            --light-color: #f8fafc;
+        }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        }
+        
+        .form-container {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        
+        .header-gradient {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+            border-color: var(--primary-color);
+        }
+        
+        .file-upload {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-upload-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .animate-bounce {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
 </head>
-<body class="p-4 bg-gray-100">
-  <form id="repairForm" class="space-y-4 bg-white p-6 rounded-lg shadow max-w-xl mx-auto">
-    <input type="hidden" id="lineUserId" name="lineUserId">
-    <input type="hidden" id="lineDisplayName" name="lineDisplayName">
-    <input type="hidden" id="linePictureUrl" name="linePictureUrl">
-
-    <div>
-      <label>ชื่อ-นามสกุล</label>
-      <input type="text" name="fullName" required class="w-full border p-2 rounded">
+<body class="min-h-screen flex items-center justify-center p-4 md:p-8">
+    <div class="form-container w-full max-w-2xl bg-white">
+        <div class="header-gradient text-white p-6 md:p-8 text-center">
+            <div class="flex justify-center mb-4">
+                <img id="profilePicture" src="https://via.placeholder.com/96/CCCCCC/FFFFFF?text=PROFILE" alt="รูปโปรไฟล์" class="w-24 h-24 rounded-full border-4 border-white/50 object-cover">
+            </div>
+            <h1 class="text-2xl md:text-3xl font-semibold mb-2">แบบฟอร์มแจ้งซ่อม IT</h1>
+            <p class="opacity-90">กรุณากรอกข้อมูลให้ครบถ้วนเพื่อให้เราสามารถช่วยเหลือคุณได้อย่างรวดเร็ว</p>
+        </div>
+        
+        <div class="p-6 md:p-8">
+            <form id="repairForm" class="space-y-6">
+                <input type="hidden" id="lineUserId" name="lineUserId">
+                <input type="hidden" id="lineDisplayName" name="lineDisplayName">
+                <input type="hidden" id="linePictureUrl" name="linePictureUrl">
+                
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-800 border-b pb-2">
+                        <i class="fas fa-user-circle mr-2 text-blue-500"></i>ข้อมูลผู้แจ้ง
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล</label>
+                            <div class="relative">
+                                <input type="text" id="fullName" name="fullName" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition duration-200"
+                                    placeholder="เช่น สมชาย ใจดี">
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="fas fa-user text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="department" class="block text-sm font-medium text-gray-700 mb-1">แผนก</label>
+                            <div class="relative">
+                                <input type="text" id="department" name="department" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition duration-200"
+                                    placeholder="เช่น แผนกบัญชี">
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="fas fa-building text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="office" class="block text-sm font-medium text-gray-700 mb-1">สำนักงาน</label>
+                            <div class="relative">
+                                <select id="office" name="office" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg appearance-none focus:outline-none input-focus transition duration-200 bg-white">
+                                    <option value="" disabled selected>เลือกสำนักงาน</option>
+                                    <option value="สำนักงานรังสิต">สำนักงานรังสิต</option>
+                                    <option value="สำนักงานระยอง">สำนักงานระยอง</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="fas fa-map-marker-alt text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">เบอร์ติดต่อ</label>
+                            <div class="relative">
+                                <input type="tel" id="phone" name="phone" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition duration-200"
+                                    placeholder="เช่น 02-1234567">
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="fas fa-phone text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">อีเมล (ถ้ามี)</label>
+                        <div class="relative">
+                            <input type="email" id="email" name="email"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition duration-200"
+                                placeholder="เช่น example@company.com">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-800 border-b pb-2">
+                        <i class="fas fa-exclamation-circle mr-2 text-orange-500"></i>รายละเอียดปัญหา
+                    </h2>
+                    
+                    <div>
+                        <label for="problemType" class="block text-sm font-medium text-gray-700 mb-1">ประเภทปัญหา</label>
+                        <div class="relative">
+                            <select id="problemType" name="problemType" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg appearance-none focus:outline-none input-focus transition duration-200 bg-white">
+                                <option value="" disabled selected>เลือกประเภทปัญหา</option>
+                                <option value="hardware">อุปกรณ์ฮาร์ดแวร์</option>
+                                <option value="software">ซอฟต์แวร์/โปรแกรม</option>
+                                <option value="network">ระบบเครือข่าย</option>
+                                <option value="email">อีเมล</option>
+                                <option value="printer">เครื่องพิมพ์/สแกนเนอร์</option>
+                                <option value="other">อื่นๆ</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="problemDetails" class="block text-sm font-medium text-gray-700 mb-1">รายละเอียดปัญหา</label>
+                        <textarea id="problemDetails" name="problemDetails" rows="4" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition duration-200"
+                            placeholder="อธิบายปัญหาที่พบให้ละเอียดที่สุด เช่น อาการที่พบ, ข้อความแจ้งเตือน, เวลาเกิดปัญหา"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ระดับความเร่งด่วน</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="urgency" value="low" class="form-radio text-blue-500" checked>
+                                <span class="ml-2">ปกติ</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="urgency" value="medium" class="form-radio text-yellow-500">
+                                <span class="ml-2">ปานกลาง</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="urgency" value="high" class="form-radio text-red-500">
+                                <span class="ml-2">ด่วน</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">แนบไฟล์ประกอบ (ถ้ามี)</label>
+                        <div class="file-upload flex items-center justify-center w-full">
+                            <label for="fileInput" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition duration-200">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                    <p class="mb-2 text-sm text-gray-500">
+                                        <span class="font-semibold">คลิกเพื่ออัพโหลด</span> หรือลากไฟล์มาวางที่นี่
+                                    </p>
+                                    <p class="text-xs text-gray-500">PNG, JPG, PDF (สูงสุด 5MB)</p>
+                                </div>
+                                <input id="fileInput" type="file" name="fileUpload" class="file-upload-input" accept="image/*,.pdf" multiple>
+                            </label>
+                        </div>
+                        <div id="fileList" class="mt-2 space-y-2"></div>
+                    </div>
+                </div>
+                
+                <div class="pt-4">
+                    <button type="submit" class="btn-primary text-white font-medium py-3 px-6 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-paper-plane mr-2"></i>ส่งแบบฟอร์มแจ้งซ่อม
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div>
-      <label>แผนก</label>
-      <input type="text" name="department" required class="w-full border p-2 rounded">
-    </div>
+    <script>
+        // LIFF ID ของคุณ
+        const liffId = '2007374280-GEYwyNdl'; // <<< **ตรวจสอบว่าเป็น LIFF ID ที่ถูกต้องของคุณ**
+        
+        // >>> **สำคัญมาก: แทนที่ด้วย URL จริงของ Google Apps Script Web App ของคุณที่ Deploy แล้ว**
+        const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec'; // <<< **อย่าลืมเปลี่ยนตรงนี้!**
 
-    <div>
-      <label>สำนักงาน</label>
-      <select name="office" required class="w-full border p-2 rounded">
-        <option value="">เลือกสำนักงาน</option>
-        <option value="สำนักงานรังสิต">สำนักงานรังสิต</option>
-        <option value="สำนักงานระยอง">สำนักงานระยอง</option>
-      </select>
-    </div>
+        // Initialize LIFF
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId: liffId });
+                
+                if (!liff.isLoggedIn()) {
+                    Swal.fire({
+                        title: 'กรุณาเข้าสู่ระบบ LINE',
+                        text: 'คุณต้องเข้าสู่ระบบ LINE เพื่อใช้งานฟอร์มแจ้งซ่อมนี้',
+                        icon: 'info',
+                        showCancelButton: false,
+                        confirmButtonColor: '#2563eb',
+                        confirmButtonText: 'เข้าสู่ระบบ LINE',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            liff.login();
+                        }
+                    });
+                    return;
+                }
+                
+                const profile = await liff.getProfile();
+                document.getElementById('lineUserId').value = profile.userId;
+                document.getElementById('lineDisplayName').value = profile.displayName;
+                document.getElementById('linePictureUrl').value = profile.pictureUrl || '';
+                
+                // *** ส่วนเพิ่มเติม: แสดงรูปโปรไฟล์ ***
+                const profilePictureElement = document.getElementById('profilePicture');
+                if (profile.pictureUrl) {
+                    profilePictureElement.src = profile.pictureUrl;
+                }
+                // **********************************
 
-    <div>
-      <label>เบอร์ติดต่อ</label>
-      <input type="tel" name="phone" required class="w-full border p-2 rounded">
-    </div>
+            } catch (error) {
+                console.error('LIFF initialization failed:', error);
+                Swal.fire({
+                    title: 'เกิดข้อผิดพลาด',
+                    text: `ไม่สามารถเริ่มต้น LIFF ได้: ${error.message || 'กรุณาตรวจสอบการตั้งค่า LIFF ID'}`,
+                    icon: 'error',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'ตกลง'
+                });
+            }
+        }
 
-    <div>
-      <label>อีเมล</label>
-      <input type="email" name="email" class="w-full border p-2 rounded">
-    </div>
+        // File upload preview
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = ''; // Clear previous files
+            
+            if (this.files.length > 0) {
+                Array.from(this.files).forEach(file => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'flex items-center p-2 bg-gray-100 rounded-lg';
+                    
+                    let iconClass = 'fas fa-file';
+                    if (file.type.startsWith('image/')) {
+                        iconClass = 'fas fa-image';
+                    } else if (file.type === 'application/pdf') {
+                        iconClass = 'fas fa-file-pdf';
+                    }
+                    
+                    fileItem.innerHTML = `
+                        <i class="${iconClass} text-blue-500 mr-3"></i>
+                        <div class="flex-1 truncate">
+                            <p class="text-sm font-medium text-gray-700 truncate">${file.name}</p>
+                            <p class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                        <button type="button" class="text-red-500 hover:text-red-700" onclick="this.parentNode.remove(); updateFileInput();">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    fileList.appendChild(fileItem);
+                });
+            }
+        });
 
-    <div>
-      <label>ประเภทปัญหา</label>
-      <select name="problemType" required class="w-full border p-2 rounded">
-        <option value="">เลือกประเภท</option>
-        <option value="hardware">ฮาร์ดแวร์</option>
-        <option value="software">ซอฟต์แวร์</option>
-        <option value="network">เครือข่าย</option>
-        <option value="email">อีเมล</option>
-        <option value="printer">เครื่องพิมพ์</option>
-        <option value="other">อื่น ๆ</option>
-      </select>
-    </div>
+        // Function to update file input if an item is removed
+        function updateFileInput() {
+            const fileInput = document.getElementById('fileInput');
+            const fileListDiv = document.getElementById('fileList');
+            if (fileListDiv.children.length === 0) {
+                fileInput.value = '';
+            }
+        }
+        
+        // Form submission
+        document.getElementById('repairForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (typeof liff === 'undefined' || !liff.isLoggedIn()) {
+                Swal.fire({
+                    title: 'กรุณาเข้าสู่ระบบ',
+                    text: 'คุณต้องเข้าสู่ระบบ LINE ก่อนส่งแบบฟอร์ม',
+                    icon: 'warning',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'ตกลง'
+                });
+                return;
+            }
+            
+            Swal.fire({
+                title: 'กำลังส่งข้อมูล...',
+                text: 'กรุณารอสักครู่',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
 
-    <div>
-      <label>รายละเอียดปัญหา</label>
-      <textarea name="problemDetails" rows="4" class="w-full border p-2 rounded" required></textarea>
-    </div>
+            const formData = new FormData(this);
+            
+            // --- ส่งข้อมูลไปยัง Google Apps Script Web App ---
+            fetch(googleAppsScriptUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                    }).catch(() => {
+                        throw new Error(`HTTP error! Status: ${response.status}. Response: ${response.statusText}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.close();
+                if (data.status === 'success') {
+                    Swal.fire({
+                        title: 'ส่งแบบฟอร์มสำเร็จ!',
+                        text: 'เราได้รับข้อมูลการแจ้งซ่อมของคุณแล้ว ทีมงานจะติดต่อกลับโดยเร็วที่สุด',
+                        icon: 'success',
+                        confirmButtonColor: '#2563eb',
+                        confirmButtonText: 'ตกลง',
+                        allowOutsideClick: false
+                    }).then(() => {
+                        document.getElementById('repairForm').reset();
+                        document.getElementById('fileList').innerHTML = '';
+                        initializeLiff(); // Re-initialize to clear profile pic if needed, or simply re-assign if still logged in
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'เกิดข้อผิดพลาด!',
+                        text: `ไม่สามารถส่งแบบฟอร์มได้: ${data.message || 'ข้อผิดพลาดจากเซิร์ฟเวอร์'}`,
+                        icon: 'error',
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'ตกลง'
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.close();
+                console.error('Error submitting form:', error);
+                Swal.fire({
+                    title: 'เกิดข้อผิดพลาด!',
+                    text: `ไม่สามารถส่งแบบฟอร์มได้: ${error.message}. โปรดลองอีกครั้ง.`,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'ตกลง'
+                });
+            });
+        });
 
-    <div>
-      <label>ระดับความเร่งด่วน</label><br>
-      <label><input type="radio" name="urgency" value="low" checked> ปกติ</label>
-      <label><input type="radio" name="urgency" value="medium"> ปานกลาง</label>
-      <label><input type="radio" name="urgency" value="high"> ด่วน</label>
-    </div>
-
-    <div>
-      <label>แนบไฟล์ (PNG, JPG, PDF):</label>
-      <input type="file" id="fileInput" multiple accept="image/*,.pdf">
-    </div>
-
-    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">ส่งแบบฟอร์ม</button>
-  </form>
-
-<script>
-const liffId = "2007374280-GEYwyNdl"; // ใส่ LIFF ID ของคุณ
-const googleAppsScriptUrl = "https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec";
-
-async function getBase64Files(files) {
-  const fileArray = Array.from(files);
-  return await Promise.all(fileArray.map(file => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve({
-        name: file.name,
-        type: file.type,
-        data: reader.result.split(',')[1]
-      });
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }));
-}
-
-document.getElementById('repairForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const form = e.target;
-  const formData = new FormData(form);
-  const files = await getBase64Files(document.getElementById('fileInput').files);
-
-  const payload = {
-    lineUserId: formData.get("lineUserId"),
-    lineDisplayName: formData.get("lineDisplayName"),
-    linePictureUrl: formData.get("linePictureUrl"),
-    fullName: formData.get("fullName"),
-    department: formData.get("department"),
-    office: formData.get("office"),
-    phone: formData.get("phone"),
-    email: formData.get("email"),
-    problemType: formData.get("problemType"),
-    problemDetails: formData.get("problemDetails"),
-    urgency: formData.get("urgency"),
-    files: files
-  };
-
-  Swal.fire({ title: "กำลังส่ง...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-  fetch(googleAppsScriptUrl, {
-    method: "POST",
-    body: JSON.stringify(payload),
-    headers: { "Content-Type": "application/json" }
-  })
-  .then(res => res.json())
-  .then(res => {
-    Swal.close();
-    if (res.status === "success") {
-      Swal.fire("ส่งสำเร็จ", "ข้อมูลถูกส่งเรียบร้อยแล้ว", "success");
-      form.reset();
-    } else {
-      throw new Error(res.message);
-    }
-  })
-  .catch(err => {
-    Swal.fire("เกิดข้อผิดพลาด", err.message, "error");
-  });
-});
-
-document.addEventListener("DOMContentLoaded", async () => {
-  await liff.init({ liffId });
-  if (!liff.isLoggedIn()) return liff.login();
-
-  const profile = await liff.getProfile();
-  document.getElementById("lineUserId").value = profile.userId;
-  document.getElementById("lineDisplayName").value = profile.displayName;
-  document.getElementById("linePictureUrl").value = profile.pictureUrl || "";
-});
-</script>
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeLiff();
+        });
+    </script>
 </body>
 </html>
