@@ -244,182 +244,131 @@
     </div>
 
     <script>
-        // LIFF ID ของคุณ
-        const liffId = '2007374280-GEYwyNdl'; // <<< **ตรวจสอบว่าเป็น LIFF ID ที่ถูกต้องของคุณ**
-        
-        // >>> **สำคัญมาก: แทนที่ด้วย URL จริงของ Google Apps Script Web App ของคุณที่ Deploy แล้ว**
-        const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec'; // <<< **อย่าลืมเปลี่ยนตรงนี้!**
+        const liffId = '2007374280-GEYwyNdl';
+        const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
 
-        // Initialize LIFF
         async function initializeLiff() {
             try {
-                await liff.init({ liffId: liffId });
-                
+                await liff.init({ liffId });
                 if (!liff.isLoggedIn()) {
                     Swal.fire({
                         title: 'กรุณาเข้าสู่ระบบ LINE',
                         text: 'คุณต้องเข้าสู่ระบบ LINE เพื่อใช้งานฟอร์มแจ้งซ่อมนี้',
-                        icon: 'info',
-                        showCancelButton: false,
-                        confirmButtonColor: '#2563eb',
-                        confirmButtonText: 'เข้าสู่ระบบ LINE',
-                        allowOutsideClick: false
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            liff.login();
-                        }
-                    });
+                        icon: 'info', confirmButtonText: 'เข้าสู่ระบบ LINE'
+                    }).then(result => { if (result.isConfirmed) liff.login(); });
                     return;
                 }
-                
                 const profile = await liff.getProfile();
                 document.getElementById('lineUserId').value = profile.userId;
                 document.getElementById('lineDisplayName').value = profile.displayName;
                 document.getElementById('linePictureUrl').value = profile.pictureUrl || '';
-                
-                // *** ส่วนเพิ่มเติม: แสดงรูปโปรไฟล์ ***
                 const profilePictureElement = document.getElementById('profilePicture');
-                if (profile.pictureUrl) {
-                    profilePictureElement.src = profile.pictureUrl;
-                }
-                // **********************************
-
+                if (profile.pictureUrl) profilePictureElement.src = profile.pictureUrl;
             } catch (error) {
-                console.error('LIFF initialization failed:', error);
                 Swal.fire({
                     title: 'เกิดข้อผิดพลาด',
-                    text: `ไม่สามารถเริ่มต้น LIFF ได้: ${error.message || 'กรุณาตรวจสอบการตั้งค่า LIFF ID'}`,
-                    icon: 'error',
-                    confirmButtonColor: '#2563eb',
-                    confirmButtonText: 'ตกลง'
+                    text: `ไม่สามารถเริ่มต้น LIFF ได้: ${error.message}`,
+                    icon: 'error'
                 });
             }
         }
 
-        // File upload preview
-        document.getElementById('fileInput').addEventListener('change', function(e) {
+        function setupEventListeners() {
+            const fileInput = document.getElementById('fileInput');
             const fileList = document.getElementById('fileList');
-            fileList.innerHTML = ''; // Clear previous files
-            
-            if (this.files.length > 0) {
-                Array.from(this.files).forEach(file => {
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'flex items-center p-2 bg-gray-100 rounded-lg';
-                    
-                    let iconClass = 'fas fa-file';
-                    if (file.type.startsWith('image/')) {
-                        iconClass = 'fas fa-image';
-                    } else if (file.type === 'application/pdf') {
-                        iconClass = 'fas fa-file-pdf';
-                    }
-                    
-                    fileItem.innerHTML = `
-                        <i class="${iconClass} text-blue-500 mr-3"></i>
-                        <div class="flex-1 truncate">
-                            <p class="text-sm font-medium text-gray-700 truncate">${file.name}</p>
-                            <p class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                        </div>
-                        <button type="button" class="text-red-500 hover:text-red-700" onclick="this.parentNode.remove(); updateFileInput();">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    `;
-                    
-                    fileList.appendChild(fileItem);
-                });
-            }
-        });
+            const repairForm = document.getElementById('repairForm');
 
-        // Function to update file input if an item is removed
+            if (!fileInput || !fileList || !repairForm) return;
+
+            fileInput.addEventListener('change', function(e) {
+                fileList.innerHTML = '';
+                if (this.files.length > 0) {
+                    Array.from(this.files).forEach(file => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'flex items-center p-2 bg-gray-100 rounded-lg';
+                        let iconClass = file.type.startsWith('image/') ? 'fas fa-image' : file.type === 'application/pdf' ? 'fas fa-file-pdf' : 'fas fa-file';
+                        fileItem.innerHTML = `
+                            <i class="${iconClass} text-blue-500 mr-3"></i>
+                            <div class="flex-1 truncate">
+                                <p class="text-sm font-medium text-gray-700 truncate">${file.name}</p>
+                                <p class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                            </div>
+                            <button type="button" class="text-red-500 hover:text-red-700" onclick="this.parentNode.remove(); updateFileInput();">
+                                <i class="fas fa-times"></i>
+                            </button>`;
+                        fileList.appendChild(fileItem);
+                    });
+                }
+            });
+
+            repairForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                if (typeof liff === 'undefined' || !liff.isLoggedIn()) {
+                    Swal.fire({ title: 'กรุณาเข้าสู่ระบบ', icon: 'warning' });
+                    return;
+                }
+                Swal.fire({ title: 'กำลังส่งข้อมูล...', didOpen: () => Swal.showLoading() });
+
+                const formData = new FormData(this);
+                const files = fileInput.files;
+                const fileBase64Array = [], filenames = [], mimetypes = [];
+
+                for (const file of files) {
+                    const base64 = await toBase64(file);
+                    fileBase64Array.push(base64);
+                    filenames.push(file.name);
+                    mimetypes.push(file.type);
+                }
+
+                formData.append('files', JSON.stringify(fileBase64Array));
+                formData.append('filenames', JSON.stringify(filenames));
+                formData.append('mimetypes', JSON.stringify(mimetypes));
+
+                fetch(googleAppsScriptUrl, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    Swal.close();
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            title: 'ส่งแบบฟอร์มสำเร็จ!',
+                            text: 'รหัสงานของคุณคือ ' + data.jobId,
+                            icon: 'success'
+                        });
+                        repairForm.reset();
+                        fileList.innerHTML = '';
+                        initializeLiff();
+                    } else {
+                        throw new Error(data.message);
+                    }
+                })
+                .catch(error => {
+                    Swal.close();
+                    Swal.fire({ title: 'เกิดข้อผิดพลาด!', text: error.message, icon: 'error' });
+                });
+            });
+        }
+
         function updateFileInput() {
             const fileInput = document.getElementById('fileInput');
             const fileListDiv = document.getElementById('fileList');
-            if (fileListDiv.children.length === 0) {
-                fileInput.value = '';
-            }
+            if (fileListDiv.children.length === 0) fileInput.value = '';
         }
-        
-        // Form submission
-        document.getElementById('repairForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (typeof liff === 'undefined' || !liff.isLoggedIn()) {
-                Swal.fire({
-                    title: 'กรุณาเข้าสู่ระบบ',
-                    text: 'คุณต้องเข้าสู่ระบบ LINE ก่อนส่งแบบฟอร์ม',
-                    icon: 'warning',
-                    confirmButtonColor: '#2563eb',
-                    confirmButtonText: 'ตกลง'
-                });
-                return;
-            }
-            
-            Swal.fire({
-                title: 'กำลังส่งข้อมูล...',
-                text: 'กรุณารอสักครู่',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
 
-            const formData = new FormData(this);
-            
-            // --- ส่งข้อมูลไปยัง Google Apps Script Web App ---
-            fetch(googleAppsScriptUrl, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(errorData => {
-                        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
-                    }).catch(() => {
-                        throw new Error(`HTTP error! Status: ${response.status}. Response: ${response.statusText}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                Swal.close();
-                if (data.status === 'success') {
-                    Swal.fire({
-                        title: 'ส่งแบบฟอร์มสำเร็จ!',
-                        text: 'เราได้รับข้อมูลการแจ้งซ่อมของคุณแล้ว ทีมงานจะติดต่อกลับโดยเร็วที่สุด',
-                        icon: 'success',
-                        confirmButtonColor: '#2563eb',
-                        confirmButtonText: 'ตกลง',
-                        allowOutsideClick: false
-                    }).then(() => {
-                        document.getElementById('repairForm').reset();
-                        document.getElementById('fileList').innerHTML = '';
-                        initializeLiff(); // Re-initialize to clear profile pic if needed, or simply re-assign if still logged in
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'เกิดข้อผิดพลาด!',
-                        text: `ไม่สามารถส่งแบบฟอร์มได้: ${data.message || 'ข้อผิดพลาดจากเซิร์ฟเวอร์'}`,
-                        icon: 'error',
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'ตกลง'
-                    });
-                }
-            })
-            .catch(error => {
-                Swal.close();
-                console.error('Error submitting form:', error);
-                Swal.fire({
-                    title: 'เกิดข้อผิดพลาด!',
-                    text: `ไม่สามารถส่งแบบฟอร์มได้: ${error.message}. โปรดลองอีกครั้ง.`,
-                    icon: 'error',
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'ตกลง'
-                });
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
             });
-        });
+        }
 
-        // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             initializeLiff();
+            setupEventListeners();
         });
     </script>
 </body>
