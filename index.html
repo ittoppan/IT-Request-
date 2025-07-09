@@ -115,9 +115,20 @@
                         <div>
                             <label for="department" class="block text-sm font-medium text-gray-700 mb-1">แผนก</label>
                             <div class="relative">
-                                <input type="text" id="department" name="department" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition duration-200"
-                                    placeholder="เช่น แผนกบัญชี">
+                                <select type="text" id="department" name="department" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg appearance-none focus:outline-none input-focus transition duration-200 bg-white">
+                                    <option value="" disabled selected>เลือกแผนก</option>
+                                    <option value="สำนักงานรังสิต">สำนักงานรังสิต</option>
+                                    <option value="สำนักงานระยอง">สำนักงานระยอง</option>
+                                    <option value="สำนักงานรังสิต">สำนักงานรังสิต</option>
+                                    <option value="สำนักงานระยอง">สำนักงานระยอง</option>
+                                    <option value="สำนักงานรังสิต">สำนักงานรังสิต</option>
+                                    <option value="สำนักงานระยอง">สำนักงานระยอง</option>
+                                    <option value="สำนักงานรังสิต">สำนักงานรังสิต</option>
+                                    <option value="สำนักงานระยอง">สำนักงานระยอง</option>
+                                    <option value="สำนักงานรังสิต">สำนักงานรังสิต</option>
+                                    <option value="สำนักงานระยอง">สำนักงานระยอง</option>
+                                </select>
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                     <i class="fas fa-building text-gray-400"></i>
                                 </div>
@@ -178,12 +189,12 @@
                             <select id="problemType" name="problemType" required
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg appearance-none focus:outline-none input-focus transition duration-200 bg-white">
                                 <option value="" disabled selected>เลือกประเภทปัญหา</option>
-                                <option value="hardware">อุปกรณ์ฮาร์ดแวร์</option>
-                                <option value="software">ซอฟต์แวร์/โปรแกรม</option>
-                                <option value="network">ระบบเครือข่าย</option>
-                                <option value="email">อีเมล</option>
-                                <option value="printer">เครื่องพิมพ์/สแกนเนอร์</option>
-                                <option value="other">อื่นๆ</option>
+                                <option value="อุปกรณ์ฮาร์ดแวร์">อุปกรณ์ฮาร์ดแวร์</option>
+                                <option value="ซอฟต์แวร์/โปรแกรม">ซอฟต์แวร์/โปรแกรม</option>
+                                <option value="ระบบเครือข่าย">ระบบเครือข่าย</option>
+                                <option value="อีเมล">อีเมล</option>
+                                <option value="เครื่องพิมพ์/สแกนเนอร์">เครื่องพิมพ์/สแกนเนอร์</option>
+                                <option value="อื่นๆ">อื่นๆ</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <i class="fas fa-chevron-down text-gray-400"></i>
@@ -202,19 +213,19 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">ระดับความเร่งด่วน</label>
                         <div class="flex space-x-4">
                             <label class="inline-flex items-center">
-                                <input type="radio" name="urgency" value=ปกติ" class="form-radio text-blue-500" checked>
+                                <input type="radio" name="urgency" value=ต่ำ class="form-radio text-blue-500" checked>
                                 <span class="ml-2">ต่ำ</span>
                             </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="urgency" value="medium" class="form-radio text-yellow-500">
+                                <input type="radio" name="urgency" value="ปานกลาง" class="form-radio text-yellow-500">
                                 <span class="ml-2">ปานกลาง</span>
                             </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="urgency" value="high" class="form-radio text-red-500">
+                                <input type="radio" name="urgency" value="สูง" class="form-radio text-red-500">
                                 <span class="ml-2">สูง</span>
                             </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="urgency" value="high" class="form-radio text-red-500">
+                                <input type="radio" name="urgency" value="ด่วนมาก" class="form-radio text-red-500">
                                 <span class="ml-2">ด่วนมาก</span>
                             </label>
                         </div>
