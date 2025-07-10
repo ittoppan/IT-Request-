@@ -107,6 +107,42 @@
             padding-bottom: 0.5rem;
             border-bottom: 1px solid #e2e8f0;
         }
+        
+        .thumbnail-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .thumbnail-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .thumbnail-remove {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .thumbnail-container:hover .thumbnail-remove {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 md:p-8 bg-gray-50">
@@ -386,7 +422,7 @@
                             />
                         </div>
 
-                        <div id="fileList" class="space-y-3"></div>
+                        <div id="fileList" class="flex flex-wrap gap-4 mt-4"></div>
                     </div>
                 </div>
 
@@ -406,6 +442,9 @@
     <script>
         const liffId = '2007374280-GEYwyNdl';
         const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
+        
+        // เก็บข้อมูลไฟล์ที่อัพโหลด
+        let uploadedFiles = [];
 
         function setProblemType(type) {
             document.getElementById('problemType').value = type;
@@ -426,9 +465,11 @@
             
             if (!files || files.length === 0) return;
             
+            // ล้างไฟล์เก่าทั้งหมด
             fileList.innerHTML = '';
+            uploadedFiles = [];
             
-            Array.from(files).forEach(file => {
+            Array.from(files).forEach((file, index) => {
                 if (file.size > 5 * 1024 * 1024) {
                     Swal.fire({
                         title: 'ไฟล์ใหญ่เกินไป',
@@ -438,39 +479,117 @@
                     return;
                 }
                 
-                const fileItem = document.createElement('div');
-                fileItem.className = 'flex items-center p-3 bg-gray-100 rounded-lg group hover:bg-gray-200 transition-colors';
+                // เพิ่มไฟล์ลงในอาร์เรย์
+                uploadedFiles.push(file);
                 
-                let iconClass;
+                // สร้าง container สำหรับแสดงผลไฟล์
+                const fileContainer = document.createElement('div');
+                fileContainer.className = 'thumbnail-container';
+                
                 if (file.type.startsWith('image/')) {
-                    iconClass = 'fas fa-image text-blue-500';
-                } else if (file.type === 'application/pdf') {
-                    iconClass = 'fas fa-file-pdf text-blue-500';
+                    // ถ้าเป็นไฟล์รูปภาพ ให้แสดงตัวอย่าง
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        fileContainer.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview">
+                            <div class="thumbnail-remove" onclick="removeFile(${index})">
+                                <i class="fas fa-times text-red-500"></i>
+                            </div>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
                 } else {
-                    iconClass = 'fas fa-file text-blue-500';
+                    // ถ้าเป็นไฟล์อื่น (เช่น PDF) แสดงไอคอน
+                    fileContainer.innerHTML = `
+                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-file-pdf text-red-500 text-3xl"></i>
+                            <div class="thumbnail-remove" onclick="removeFile(${index})">
+                                <i class="fas fa-times text-red-500"></i>
+                            </div>
+                        </div>
+                    `;
                 }
                 
-                fileItem.innerHTML = `
-                    <i class="${iconClass} w-10 h-10 mr-3"></i>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-800 truncate">${file.name}</p>
-                        <p class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                    </div>
-                    <button type="button" class="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700" onclick="this.parentNode.remove(); updateFileInput();">
-                        <i class="fas fa-times"></i>
-                    </button>
+                // เพิ่มชื่อไฟล์และขนาด
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'text-sm mt-2 text-center';
+                fileInfo.innerHTML = `
+                    <p class="font-medium truncate">${file.name}</p>
+                    <p class="text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
                 `;
                 
-                fileList.appendChild(fileItem);
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex flex-col items-center';
+                wrapper.appendChild(fileContainer);
+                wrapper.appendChild(fileInfo);
+                
+                fileList.appendChild(wrapper);
             });
         }
 
-        function updateFileInput() {
-            // In a real implementation, you would need to handle file removal
+        function removeFile(index) {
+            // ลบไฟล์ออกจากอาร์เรย์
+            uploadedFiles.splice(index, 1);
+            
+            // อัพเดทการแสดงผล
+            const fileInput = document.getElementById('fileInput');
             const fileList = document.getElementById('fileList');
-            if (fileList.children.length === 0) {
-                document.getElementById('fileInput').value = '';
-            }
+            
+            // ล้างและแสดงผลใหม่
+            fileList.innerHTML = '';
+            
+            // สร้าง DataTransfer object เพื่ออัพเดทไฟล์ที่เลือก
+            const dataTransfer = new DataTransfer();
+            
+            // เพิ่มไฟล์ที่เหลือกลับไป
+            uploadedFiles.forEach(file => {
+                dataTransfer.items.add(file);
+            });
+            
+            // อัพเดท file input
+            fileInput.files = dataTransfer.files;
+            
+            // แสดงผลไฟล์ที่เหลือ
+            uploadedFiles.forEach((file, newIndex) => {
+                const fileContainer = document.createElement('div');
+                fileContainer.className = 'thumbnail-container';
+                
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        fileContainer.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview">
+                            <div class="thumbnail-remove" onclick="removeFile(${newIndex})">
+                                <i class="fas fa-times text-red-500"></i>
+                            </div>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    fileContainer.innerHTML = `
+                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-file-pdf text-red-500 text-3xl"></i>
+                            <div class="thumbnail-remove" onclick="removeFile(${newIndex})">
+                                <i class="fas fa-times text-red-500"></i>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'text-sm mt-2 text-center';
+                fileInfo.innerHTML = `
+                    <p class="font-medium truncate">${file.name}</p>
+                    <p class="text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                `;
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex flex-col items-center';
+                wrapper.appendChild(fileContainer);
+                wrapper.appendChild(fileInfo);
+                
+                fileList.appendChild(wrapper);
+            });
         }
 
         async function initializeLiff() {
@@ -515,10 +634,9 @@
             });
 
             const formData = new FormData(this);
-            const files = document.getElementById('fileInput').files;
             
             // Convert files to base64
-            const filePromises = Array.from(files).map(file => {
+            const filePromises = Array.from(uploadedFiles).map(file => {
                 return new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.onload = (e) => resolve(e.target.result);
@@ -527,8 +645,8 @@
             });
             
             const fileBase64Array = await Promise.all(filePromises);
-            const filenames = Array.from(files).map(file => file.name);
-            const mimetypes = Array.from(files).map(file => file.type);
+            const filenames = Array.from(uploadedFiles).map(file => file.name);
+            const mimetypes = Array.from(uploadedFiles).map(file => file.type);
             
             formData.append('files', JSON.stringify(fileBase64Array));
             formData.append('filenames', JSON.stringify(filenames));
@@ -551,6 +669,7 @@
                     });
                     this.reset();
                     document.getElementById('fileList').innerHTML = '';
+                    uploadedFiles = [];
                     initializeLiff();
                 } else {
                     throw new Error(data.message || 'เกิดข้อผิดพลาดในการส่งแบบฟอร์ม');
