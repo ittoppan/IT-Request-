@@ -96,11 +96,18 @@
         <!-- Jobs Grid -->
         <div class="space-y-4">
           <h2 class="text-xl font-semibold text-gray-800 mb-4">
-            รายการงานซ่อม (<span id="jobCount">3</span> งาน)
+            รายการงานซ่อม (<span id="jobCount">0</span> งาน)
           </h2>
           
           <!-- Job Cards will be inserted here by JavaScript -->
           <div id="jobList"></div>
+          
+          <div id="loadingIndicator" class="glass-card rounded-lg shadow-md">
+            <div class="text-center py-8">
+              <i data-lucide="loader" class="w-12 h-12 mx-auto text-gray-400 mb-4 animate-spin"></i>
+              <p class="text-gray-500">กำลังโหลดข้อมูล...</p>
+            </div>
+          </div>
           
           <div id="noResults" class="glass-card rounded-lg shadow-md hidden">
             <div class="text-center py-8">
@@ -129,96 +136,93 @@
 
   <script>
     // ข้อมูลงานซ่อม
-    const mockJobs = [
-      {
-        id: '1',
-        jobId: 'IT2024001',
-        title: 'อุปกรณ์ฮาร์ดแวร์',
-        description: 'คอมพิวเตอร์เปิดไม่ติด หน้าจอดับ ไฟ LED ไม่ติด',
-        status: 'in-progress',
-        priority: 'สูง',
-        requester: 'สมชาย ใจดี',
-        department: 'แผนกบัญชี',
-        office: 'สำนักงานรังสิต',
-        phone: '02-1234567',
-        createdAt: '2024-01-15T09:30:00',
-        updatedAt: '2024-01-15T14:20:00',
-        assignedTo: 'ช่างเอ',
-        estimatedCompletion: '2024-01-16T16:00:00',
-        notes: [
-          'รับเรื่องแล้ว กำลังตรวจสอบ',
-          'พบว่า Power Supply เสีย กำลังสั่งอะไหล่',
-          'อะไหล่มาถึงแล้ว กำลังติดตั้ง'
-        ]
-      },
-      {
-        id: '2',
-        jobId: 'IT2024002',
-        title: 'ซอฟต์แวร์/โปรแกรม',
-        description: 'Microsoft Office ไม่สามารถเปิดไฟล์ได้',
-        status: 'completed',
-        priority: 'ปานกลาง',
-        requester: 'สมหญิง ดีใจ',
-        department: 'แผนกการตลาด',
-        office: 'สำนักงานระยอง',
-        phone: '038-123456',
-        createdAt: '2024-01-14T11:15:00',
-        updatedAt: '2024-01-14T16:45:00',
-        assignedTo: 'ช่างบี',
-        notes: [
-          'รับเรื่องแล้ว',
-          'ติดตั้ง Office ใหม่เรียบร้อย',
-          'ทดสอบแล้วใช้งานได้ปกติ'
-        ]
-      },
-      {
-        id: '3',
-        jobId: 'IT2024003',
-        title: 'ระบบเครือข่าย',
-        description: 'อินเทอร์เน็ตช้า ไม่สามารถเข้าเว็บไซต์ได้',
-        status: 'pending',
-        priority: 'ด่วนมาก',
-        requester: 'สมศักดิ์ มั่นใจ',
-        department: 'แผนกขาย',
-        office: 'สำนักงานรังสิต',
-        phone: '02-987654',
-        createdAt: '2024-01-15T15:20:00',
-        updatedAt: '2024-01-15T15:20:00'
-      }
-    ];
+    let jobs = [];
+    let filteredJobs = [];
+    let selectedJob = null;
 
     const statusConfig = {
-      pending: { label: 'รอดำเนินการ', icon: 'clock', color: 'bg-yellow-500' },
-      'in-progress': { label: 'กำลังดำเนินการ', icon: 'alert-circle', color: 'bg-blue-500' },
-      completed: { label: 'เสร็จสิ้น', icon: 'check-circle', color: 'bg-green-500' },
-      cancelled: { label: 'ยกเลิก', icon: 'x-circle', color: 'bg-red-500' }
+      'แจ้งซ่อมใหม่': { label: 'แจ้งซ่อมใหม่', icon: 'clock', color: 'bg-yellow-500' },
+      'กำลังดำเนินการ': { label: 'กำลังดำเนินการ', icon: 'alert-circle', color: 'bg-blue-500' },
+      'เสร็จสิ้น': { label: 'เสร็จสิ้น', icon: 'check-circle', color: 'bg-green-500' },
+      'ยกเลิก': { label: 'ยกเลิก', icon: 'x-circle', color: 'bg-red-500' }
     };
 
     const priorityConfig = {
-      'ต่ำ': 'bg-gray-500',
-      'ปานกลาง': 'bg-yellow-500',
-      'สูง': 'bg-orange-500',
-      'ด่วนมาก': 'bg-red-500'
+      'ปกติ': 'bg-gray-500',
+      'ด่วน': 'bg-yellow-500',
+      'ด่วนมาก': 'bg-orange-500',
+      'วิกฤต': 'bg-red-500'
     };
-
-    // ตัวแปรเก็บสถานะ
-    let selectedJob = null;
-    let filteredJobs = [...mockJobs];
 
     // เมื่อหน้าเว็บโหลดเสร็จ
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-      renderJobList();
-      
-      // ตั้งค่าเริ่มต้นให้แสดงงานแรก
-      if (mockJobs.length > 0) {
-        selectJob(mockJobs[0]);
-      }
+      fetchRepairJobs();
     });
+
+    // ดึงข้อมูลงานซ่อมจาก Google Sheets
+    function fetchRepairJobs() {
+      document.getElementById('loadingIndicator').classList.remove('hidden');
+      
+      // เรียกใช้ Google Apps Script API
+      google.script.run
+        .withSuccessHandler(handleJobsData)
+        .withFailureHandler(handleError)
+        .getRepairJobs({ action: 'getRepairJobs' });
+    }
+
+    function handleJobsData(response) {
+      document.getElementById('loadingIndicator').classList.add('hidden');
+      
+      if (response.status === 'success') {
+        jobs = response.data.map(job => {
+          // แปลงข้อมูลจาก Google Sheet ให้ตรงกับโครงสร้างที่ต้องการ
+          return {
+            id: job['Timestamp'],
+            jobId: job['เลขที่งานแจ้งซ่อม'],
+            title: job['ประเภทปัญหา'],
+            description: job['รายละเอียดปัญหา'],
+            status: job['สถานะ'] || 'แจ้งซ่อมใหม่',
+            priority: job['ความเร่งด่วน'] || 'ปกติ',
+            requester: job['ชื่อ-นามสกุล'],
+            department: job['แผนก/สำนัก'],
+            office: job['สถานที่'],
+            phone: job['เบอร์โทรศัพท์'],
+            email: job['อีเมล์'],
+            createdAt: job['Timestamp'],
+            updatedAt: job['Timestamp'], // ในกรณีจริงควรมีคอลัมน์วันที่อัพเดทแยกต่างหาก
+            images: job['Image Viewer URLs'] ? job['Image Viewer URLs'].split(', ') : []
+          };
+        });
+        
+        // เรียงลำดับตามวันที่ล่าสุด
+        jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        filteredJobs = [...jobs];
+        document.getElementById('jobCount').textContent = filteredJobs.length;
+        renderJobList();
+        
+        if (filteredJobs.length > 0) {
+          selectJob(filteredJobs[0]);
+        }
+      } else {
+        showToast('เกิดข้อผิดพลาด', response.message, 'error');
+      }
+    }
+
+    function handleError(error) {
+      document.getElementById('loadingIndicator').classList.add('hidden');
+      console.error('Error fetching jobs:', error);
+      showToast('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลได้', 'error');
+    }
 
     // จัดรูปแบบวันที่
     function formatDate(dateString) {
+      if (!dateString) return 'ไม่ระบุ';
+      
       const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'ไม่ระบุ';
+      
       const options = {
         year: 'numeric',
         month: 'long',
@@ -234,25 +238,29 @@
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
       
       if (!searchTerm.trim()) {
-        showToast('กรุณาใส่เลขที่งาน', 'กรุณาใส่เลขที่งานหรือชื่อผู้แจ้งเพื่อค้นหา', 'error');
-        return;
+        filteredJobs = [...jobs];
+      } else {
+        filteredJobs = jobs.filter(job =>
+          (job.jobId && job.jobId.toLowerCase().includes(searchTerm)) ||
+          (job.requester && job.requester.toLowerCase().includes(searchTerm)) ||
+          (job.title && job.title.toLowerCase().includes(searchTerm)) ||
+          (job.description && job.description.toLowerCase().includes(searchTerm))
+        );
       }
-
-      filteredJobs = mockJobs.filter(job =>
-        job.jobId.toLowerCase().includes(searchTerm) ||
-        job.requester.toLowerCase().includes(searchTerm) ||
-        job.title.toLowerCase().includes(searchTerm)
-      );
 
       document.getElementById('jobCount').textContent = filteredJobs.length;
       renderJobList();
 
       if (filteredJobs.length === 0) {
         document.getElementById('noResults').classList.remove('hidden');
-        showToast('ไม่พบงานที่ค้นหา', 'กรุณาตรวจสอบเลขที่งานอีกครั้ง', 'error');
       } else {
         document.getElementById('noResults').classList.add('hidden');
-        selectJob(filteredJobs[0]);
+        if (filteredJobs.length > 0) {
+          selectJob(filteredJobs[0]);
+        } else {
+          document.getElementById('jobDetails').classList.add('hidden');
+          document.getElementById('jobDetailsPlaceholder').classList.remove('hidden');
+        }
       }
     }
 
@@ -262,7 +270,8 @@
       jobListElement.innerHTML = '';
 
       filteredJobs.forEach((job, index) => {
-        const statusInfo = statusConfig[job.status];
+        const statusInfo = statusConfig[job.status] || statusConfig['แจ้งซ่อมใหม่'];
+        const priority = priorityConfig[job.priority] || priorityConfig['ปกติ'];
         
         const jobCard = document.createElement('div');
         jobCard.className = `glass-card cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] rounded-lg shadow-md overflow-hidden ${selectedJob?.id === job.id ? 'ring-2 ring-blue-500 shadow-glow' : ''}`;
@@ -273,16 +282,16 @@
           <div class="p-4">
             <div class="flex items-start justify-between mb-3">
               <div>
-                <h3 class="font-semibold text-gray-800 text-lg">${job.jobId}</h3>
-                <p class="text-gray-600">${job.title}</p>
+                <h3 class="font-semibold text-gray-800 text-lg">${job.jobId || 'ไม่มีเลขที่งาน'}</h3>
+                <p class="text-gray-600">${job.title || 'ไม่มีชื่อปัญหา'}</p>
               </div>
               <div class="flex flex-col items-end gap-2">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${statusInfo.color}">
                   <i data-lucide="${statusInfo.icon}" class="w-3 h-3 mr-1"></i>
                   ${statusInfo.label}
                 </span>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${priorityConfig[job.priority]}">
-                  ${job.priority}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${priority}">
+                  ${job.priority || 'ปกติ'}
                 </span>
               </div>
             </div>
@@ -290,7 +299,7 @@
             <div class="space-y-2 text-sm">
               <div class="flex items-center text-gray-600">
                 <i data-lucide="user" class="w-4 h-4 mr-2"></i>
-                ${job.requester} - ${job.department}
+                ${job.requester || 'ไม่ระบุ'} - ${job.department || 'ไม่ระบุ'}
               </div>
               <div class="flex items-center text-gray-600">
                 <i data-lucide="calendar" class="w-4 h-4 mr-2"></i>
@@ -320,13 +329,14 @@
       placeholderElement.classList.add('hidden');
       jobDetailsElement.classList.remove('hidden');
       
-      const statusInfo = statusConfig[selectedJob.status];
+      const statusInfo = statusConfig[selectedJob.status] || statusConfig['แจ้งซ่อมใหม่'];
+      const priority = priorityConfig[selectedJob.priority] || priorityConfig['ปกติ'];
       
       jobDetailsElement.innerHTML = `
         <div class="p-6">
           <div class="flex items-center mb-4">
             <i data-lucide="file-text" class="w-5 h-5 mr-2"></i>
-            <h2 class="text-lg font-semibold">รายละเอียดงาน ${selectedJob.jobId}</h2>
+            <h2 class="text-lg font-semibold">รายละเอียดงาน ${selectedJob.jobId || 'ไม่มีเลขที่งาน'}</h2>
           </div>
           
           <div class="space-y-6">
@@ -339,16 +349,12 @@
                   ${statusInfo.label}
                 </span>
               </div>
-              ${selectedJob.assignedTo ? `
-                <p class="text-sm text-gray-600">
-                  ผู้รับผิดชอบ: ${selectedJob.assignedTo}
-                </p>
-              ` : ''}
-              ${selectedJob.estimatedCompletion ? `
-                <p class="text-sm text-gray-600">
-                  คาดว่าจะเสร็จ: ${formatDate(selectedJob.estimatedCompletion)}
-                </p>
-              ` : ''}
+              <div class="flex items-center justify-between mt-2">
+                <span class="font-medium">ความเร่งด่วน</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${priority}">
+                  ${selectedJob.priority || 'ปกติ'}
+                </span>
+              </div>
             </div>
 
             <!-- Requester Info -->
@@ -357,13 +363,17 @@
               <div class="space-y-2 text-sm">
                 <div class="flex items-center">
                   <i data-lucide="user" class="w-4 h-4 mr-2 text-gray-600"></i>
-                  ${selectedJob.requester}
+                  ${selectedJob.requester || 'ไม่ระบุ'}
                 </div>
                 <div class="flex items-center">
                   <i data-lucide="phone" class="w-4 h-4 mr-2 text-gray-600"></i>
-                  ${selectedJob.phone}
+                  ${selectedJob.phone || 'ไม่ระบุ'}
                 </div>
-                <p class="text-gray-600">${selectedJob.department} - ${selectedJob.office}</p>
+                <div class="flex items-center">
+                  <i data-lucide="mail" class="w-4 h-4 mr-2 text-gray-600"></i>
+                  ${selectedJob.email || 'ไม่ระบุ'}
+                </div>
+                <p class="text-gray-600">${selectedJob.department || 'ไม่ระบุ'} - ${selectedJob.office || 'ไม่ระบุ'}</p>
               </div>
             </div>
 
@@ -371,21 +381,20 @@
             <div>
               <h4 class="font-medium mb-3">รายละเอียดปัญหา</h4>
               <div class="p-3 bg-gray-100/30 rounded-lg">
-                <p class="text-sm font-medium text-blue-600 mb-1">${selectedJob.title}</p>
-                <p class="text-sm text-gray-600">${selectedJob.description}</p>
+                <p class="text-sm font-medium text-blue-600 mb-1">${selectedJob.title || 'ไม่มีชื่อปัญหา'}</p>
+                <p class="text-sm text-gray-600">${selectedJob.description || 'ไม่มีรายละเอียด'}</p>
               </div>
             </div>
 
-            <!-- Progress Notes -->
-            ${selectedJob.notes && selectedJob.notes.length > 0 ? `
+            <!-- Images -->
+            ${selectedJob.images && selectedJob.images.length > 0 ? `
               <div>
-                <h4 class="font-medium mb-3">ความคืบหน้า</h4>
-                <div class="space-y-2">
-                  ${selectedJob.notes.map(note => `
-                    <div class="flex items-start gap-3 p-3 bg-gray-100/30 rounded-lg">
-                      <div class="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                      <p class="text-sm text-gray-600">${note}</p>
-                    </div>
+                <h4 class="font-medium mb-3">รูปภาพประกอบ</h4>
+                <div class="grid grid-cols-2 gap-2">
+                  ${selectedJob.images.map(imageUrl => `
+                    <a href="${imageUrl}" target="_blank" class="block">
+                      <img src="${imageUrl}" alt="รูปภาพประกอบ" class="w-full h-auto rounded-md border border-gray-200">
+                    </a>
                   `).join('')}
                 </div>
               </div>
@@ -398,10 +407,6 @@
                 <div class="flex justify-between">
                   <span class="text-gray-600">วันที่แจ้ง:</span>
                   <span>${formatDate(selectedJob.createdAt)}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">อัพเดทล่าสุด:</span>
-                  <span>${formatDate(selectedJob.updatedAt)}</span>
                 </div>
               </div>
             </div>
