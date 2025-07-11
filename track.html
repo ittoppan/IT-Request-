@@ -38,7 +38,7 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             border-radius: 0.75rem;
-            border: 1px solid rgba(255, 255, 255, 0.3); /* Softer border */
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         /* Header Gradient Background */
@@ -69,80 +69,17 @@
             box-shadow: none;
         }
         
-        /* Form Input Styles */
-        .form-input {
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            width: 100%;
-            transition: all 0.2s ease-in-out;
-            background-color: white;
-            color: var(--dark-color);
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--blue-500);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-        }
-        
-        /* Section Header Styles */
-        .section-header {
-            display: flex;
-            align-items: center;
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--dark-color);
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        /* Animations */
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        
-        .animate-slide-up {
-            animation: slideUp 0.5s ease-out forwards;
-        }
-        
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
         /* Status Badges */
         .status-badge {
             display: inline-flex;
             align-items: center;
             padding: 0.25rem 0.65rem;
             border-radius: 9999px;
-            font-size: 0.7rem; /* Slightly smaller for compactness */
-            font-weight: 600; /* Bolder for readability */
+            font-size: 0.7rem;
+            font-weight: 600;
             color: white;
-            text-transform: uppercase; /* Make status text uppercase */
-            letter-spacing: 0.025em; /* Add slight letter spacing */
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
         }
         
         .status-new { background-color: var(--blue-500); }
@@ -165,37 +102,32 @@
         
         .priority-low { background-color: var(--gray-500); }
         .priority-medium { background-color: var(--yellow-500); }
-        .priority-high { background-color: #f97316; /* Orange */ }
+        .priority-high { background-color: #f97316; }
         .priority-critical { background-color: var(--red-500); }
-        
-        /* Floating Shapes */
-        .floating-shapes {
-            pointer-events: none;
-        }
         
         /* Job Card Interactions */
         .job-card {
             transition: all 0.3s ease;
-            position: relative; /* For the selected state border */
-            overflow: hidden; /* Ensures border-radius applies well */
+            position: relative;
+            overflow: hidden;
         }
         
         .job-card:hover {
-            transform: translateY(-3px); /* More pronounced lift */
-            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.15), 0 5px 8px -3px rgba(0, 0, 0, 0.08); /* Stronger shadow */
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.15), 0 5px 8px -3px rgba(0, 0, 0, 0.08);
         }
         
         .job-card.selected {
-            box-shadow: 0 0 0 3px var(--blue-500), 0 0 25px rgba(59, 130, 246, 0.4); /* More prominent shadow and border */
-            transform: scale(1.01); /* Slight scale on selection */
+            box-shadow: 0 0 0 3px var(--blue-500), 0 0 25px rgba(59, 130, 246, 0.4);
+            transform: scale(1.01);
         }
         
         /* Loading Spinner */
         .loading-spinner {
-            border: 3px solid rgba(0, 0, 0, 0.1); /* Lighter border for contrast */
+            border: 3px solid rgba(0, 0, 0, 0.1);
             border-radius: 50%;
             border-top: 3px solid var(--blue-500);
-            width: 24px; /* Slightly larger spinner */
+            width: 24px;
             height: 24px;
             animation: spin 1s linear infinite;
         }
@@ -205,14 +137,58 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Responsive Adjustments */
-        @media (max-width: 1024px) {
-            .lg\:sticky {
-                position: static; /* Disable sticky on smaller screens */
+        /* Status Filter Tabs */
+        .status-tab {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .status-tab:hover {
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .status-tab.active {
+            border-bottom-color: var(--primary-color);
+            background-color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+        
+        /* Dashboard Stats Cards */
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Animations */
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
             }
         }
-
-        /* Scrollbar styling for better aesthetics */
+        
+        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -235,10 +211,10 @@
 <body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
     <div class="header-gradient text-white p-6 relative overflow-hidden shadow-lg">
         <div class="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-blue-600/90"></div>
-        <div class="floating-shapes absolute inset-0">
-            <div class="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-float"></div>
-            <div class="absolute top-32 right-20 w-16 h-16 bg-white/5 rounded-full animate-float" style="animation-delay: 1s;"></div>
-            <div class="absolute bottom-20 left-1/3 w-12 h-12 bg-white/5 rounded-full animate-float" style="animation-delay: 2s;"></div>
+        <div class="absolute inset-0">
+            <div class="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full"></div>
+            <div class="absolute top-32 right-20 w-16 h-16 bg-white/5 rounded-full"></div>
+            <div class="absolute bottom-20 left-1/3 w-12 h-12 bg-white/5 rounded-full"></div>
         </div>
         
         <div class="relative z-10 max-w-6xl mx-auto">
@@ -260,32 +236,50 @@
         </div>
 
         <div id="mainContent" class="hidden">
-            <div class="glass-card mb-8 animate-slide-up p-4 md:p-6">
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="glass-card mb-8 animate-slide-up p-4 md:p-6">
                 <div class="section-header">
-                    <i class="fas fa-search mr-3 text-blue-500"></i>
-                    <span>ค้นหางานซ่อมของคุณ</span>
+                    <i class="fas fa-chart-pie mr-3 text-blue-500"></i>
+                    <span>ภาพรวมงานซ่อมของคุณ</span>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="ใส่เลขที่งาน, ประเภทปัญหา, หรือรายละเอียด..."
-                        class="form-input flex-1"
-                        aria-label="Search repair jobs"
-                    >
-                    <button id="searchBtn" class="btn-primary px-6 py-2 rounded-lg text-base">
-                        <i class="fas fa-search mr-2"></i>
-                        ค้นหา
-                    </button>
-                 <Button 
-                onClick={handleRefresh} 
-                variant="outline"
-                disabled={isRefreshing}
-                className="min-w-[100px]"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                อัพเดท
-              </Button>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card glass-card p-4 text-center animate-fade-in" style="animation-delay: 100ms">
+                        <div class="text-3xl font-bold text-blue-600" id="totalJobsCount">0</div>
+                        <div class="text-sm text-gray-600">ทั้งหมด</div>
+                    </div>
+                    <div class="stat-card glass-card p-4 text-center animate-fade-in" style="animation-delay: 200ms">
+                        <div class="text-3xl font-bold text-blue-500" id="newJobsCount">0</div>
+                        <div class="text-sm text-gray-600">แจ้งซ่อมใหม่</div>
+                    </div>
+                    <div class="stat-card glass-card p-4 text-center animate-fade-in" style="animation-delay: 300ms">
+                        <div class="text-3xl font-bold text-yellow-500" id="inProgressJobsCount">0</div>
+                        <div class="text-sm text-gray-600">กำลังดำเนินการ</div>
+                    </div>
+                    <div class="stat-card glass-card p-4 text-center animate-fade-in" style="animation-delay: 400ms">
+                        <div class="text-3xl font-bold text-green-500" id="completedJobsCount">0</div>
+                        <div class="text-sm text-gray-600">เสร็จสิ้น</div>
+                    </div>
+                </div>
+                
+                <div class="flex overflow-x-auto pb-2 -mx-2">
+                    <div class="flex space-x-1 px-2">
+                        <div class="status-tab px-4 py-2 rounded-t-lg active" data-status="all">
+                            <i class="fas fa-list mr-2"></i>ทั้งหมด
+                        </div>
+                        <div class="status-tab px-4 py-2 rounded-t-lg" data-status="new">
+                            <i class="fas fa-file-circle-plus mr-2"></i>แจ้งซ่อมใหม่
+                        </div>
+                        <div class="status-tab px-4 py-2 rounded-t-lg" data-status="in-progress">
+                            <i class="fas fa-tools mr-2"></i>กำลังดำเนินการ
+                        </div>
+                        <div class="status-tab px-4 py-2 rounded-t-lg" data-status="completed">
+                            <i class="fas fa-check-circle mr-2"></i>เสร็จสิ้น
+                        </div>
+                        <div class="status-tab px-4 py-2 rounded-t-lg" data-status="cancelled">
+                            <i class="fas fa-times-circle mr-2"></i>ยกเลิก
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -296,27 +290,30 @@
                     </h2>
                     
                     <div id="jobsContainer" class="space-y-4">
-                        </div>
+                        <!-- Job cards will be inserted here -->
+                    </div>
                     
                     <div id="noJobsFound" class="glass-card hidden">
                         <div class="text-center py-8">
                             <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-500 font-medium">ไม่พบงานซ่อมที่คุณกำลังมองหา</p>
-                            <p class="text-sm text-gray-400 mt-1">ลองใช้คำค้นหาอื่น หรือตรวจสอบอีกครั้ง</p>
+                            <p class="text-gray-500 font-medium">ไม่พบงานซ่อมในสถานะนี้</p>
+                            <p class="text-sm text-gray-400 mt-1">คุณสามารถตรวจสอบสถานะอื่นได้จากเมนูด้านบน</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="lg:sticky lg:top-6 h-fit"> <div id="emptyDetails" class="glass-card">
+                <div class="lg:sticky lg:top-6 h-fit">
+                    <div id="emptyDetails" class="glass-card">
                         <div class="text-center py-12">
-                            <i class="fas fa-info-circle text-4xl text-blue-400 mb-4 animate-float"></i>
+                            <i class="fas fa-info-circle text-4xl text-blue-400 mb-4"></i>
                             <p class="text-gray-500 font-medium">เลือกงานจากรายการด้านซ้ายเพื่อดูรายละเอียด</p>
                             <p class="text-sm text-gray-400 mt-1">ข้อมูลความคืบหน้าและรายละเอียดจะปรากฏที่นี่</p>
                         </div>
                     </div>
                     
                     <div id="jobDetailsContainer" class="glass-card animate-fade-in hidden">
-                        </div>
+                        <!-- Job details will be inserted here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -335,18 +332,18 @@
         // Repair Job Data Variables
         let repairJobs = [];
         let filteredJobs = [];
-        let selectedJobId = null; // To keep track of the currently selected job
+        let selectedJobId = null;
+        let currentStatusFilter = 'all';
 
         /**
          * Initializes the LIFF app.
          * Fetches user profile and loads repair jobs.
          */
-       async function initializeLiff() {
+        async function initializeLiff() {
             try {
                 await liff.init({ liffId });
                 
                 if (!liff.isLoggedIn()) {
-                    // ถ้าไม่ได้ล็อกอิน ให้ล็อกอินก่อน
                     liff.login();
                     return;
                 }
@@ -356,47 +353,53 @@
                 userDisplayName = profile.displayName;
                 userPictureUrl = profile.pictureUrl || '';
                 
-                await loadRepairJobs(); // Load jobs after successful LIFF init and profile fetch
+                await loadRepairJobs();
                 
             } catch (error) {
                 console.error('LIFF initialization failed:', error);
-                document.getElementById('loadingIndicator').innerHTML = `
-                    <div class="text-center p-6 bg-white rounded-lg shadow-md">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
-                        <p class="text-lg font-semibold text-gray-700 mb-2">เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF</p>
-                        <p class="text-sm text-gray-500 mb-4">${error.message || 'กรุณาลองเข้าใช้งานใหม่อีกครั้ง'}</p>
-                        <button onclick="window.location.reload()" class="btn-primary px-5 py-2 rounded-lg text-base">
-                            <i class="fas fa-sync-alt mr-2"></i> ลองใหม่
-                        </button>
-                    </div>
-                `;
-                document.getElementById('loadingIndicator').classList.remove('hidden'); // Ensure it's visible to show error
-                document.getElementById('mainContent').classList.add('hidden');
+                showError('เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF', error.message);
             }
         }
         
         /**
+         * Shows an error message in the loading indicator area.
+         * @param {string} title - The main error title.
+         * @param {string} message - The detailed error message.
+         */
+        function showError(title, message) {
+            document.getElementById('loadingIndicator').innerHTML = `
+                <div class="text-center p-6 bg-white rounded-lg shadow-md">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                    <p class="text-lg font-semibold text-gray-700 mb-2">${title}</p>
+                    <p class="text-sm text-gray-500 mb-4">${message || 'กรุณาลองเข้าใช้งานใหม่อีกครั้ง'}</p>
+                    <button onclick="window.location.reload()" class="btn-primary px-5 py-2 rounded-lg text-base">
+                        <i class="fas fa-sync-alt mr-2"></i> ลองใหม่
+                    </button>
+                </div>
+            `;
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+            document.getElementById('mainContent').classList.add('hidden');
+        }
+        
+        /**
          * Fetches repair jobs from Google Apps Script.
-         */ async function loadRepairJobs() {
+         */
+        async function loadRepairJobs() {
             try {
-                // แสดง loading indicator
                 document.getElementById('loadingIndicator').classList.remove('hidden');
                 document.getElementById('mainContent').classList.add('hidden');
                 
-                // เรียก API เพื่อดึงข้อมูลงานซ่อม
                 const response = await fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}`);
                 const data = await response.json();
                 
                 if (data.status === 'success') {
                     repairJobs = data.data;
-                    filteredJobs = [...repairJobs];
-           
-                    renderJobList();
-         // ซ่อน loading indicator และแสดงเนื้อหาหลัก
+                    updateDashboardStats();
+                    filterJobsByStatus(currentStatusFilter);
+                    
                     document.getElementById('loadingIndicator').classList.add('hidden');
                     document.getElementById('mainContent').classList.remove('hidden');
                     
-                    // ถ้าไม่มีงานซ่อม
                     if (repairJobs.length === 0) {
                         document.getElementById('noJobsFound').classList.remove('hidden');
                     }
@@ -405,29 +408,78 @@
                 }
             } catch (error) {
                 console.error('Error loading repair jobs:', error);
-                document.getElementById('loadingIndicator').innerHTML = `
-                    <div class="text-center">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-2"></i>
-                        <p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>
-                        <p class="text-sm text-gray-500 mb-3">${error.message}</p>
-                        <button onclick="loadRepairJobs()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">
-                            ลองใหม่
-                        </button>
-                    </div>
-                `;
+                showError('เกิดข้อผิดพลาดในการโหลดข้อมูล', error.message);
             }
         }
         
-        // ฟังก์ชันแสดงรายการงานซ่อม
+        /**
+         * Updates the dashboard statistics cards.
+         */
+        function updateDashboardStats() {
+            const totalJobs = repairJobs.length;
+            const newJobs = repairJobs.filter(job => job.status === 'แจ้งซ่อมใหม่').length;
+            const inProgressJobs = repairJobs.filter(job => job.status === 'กำลังดำเนินการ').length;
+            const completedJobs = repairJobs.filter(job => job.status === 'เสร็จสิ้น').length;
+            
+            document.getElementById('totalJobsCount').textContent = totalJobs;
+            document.getElementById('newJobsCount').textContent = newJobs;
+            document.getElementById('inProgressJobsCount').textContent = inProgressJobs;
+            document.getElementById('completedJobsCount').textContent = completedJobs;
+        }
+        
+        /**
+         * Filters jobs by status and renders the job list.
+         * @param {string} status - The status to filter by ('all', 'new', 'in-progress', 'completed', 'cancelled')
+         */
+        function filterJobsByStatus(status) {
+            currentStatusFilter = status;
+            
+            // Update active tab
+            document.querySelectorAll('.status-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.status === status) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Filter jobs
+            switch(status) {
+                case 'new':
+                    filteredJobs = repairJobs.filter(job => job.status === 'แจ้งซ่อมใหม่');
+                    break;
+                case 'in-progress':
+                    filteredJobs = repairJobs.filter(job => job.status === 'กำลังดำเนินการ');
+                    break;
+                case 'completed':
+                    filteredJobs = repairJobs.filter(job => job.status === 'เสร็จสิ้น');
+                    break;
+                case 'cancelled':
+                    filteredJobs = repairJobs.filter(job => job.status === 'ยกเลิก');
+                    break;
+                default:
+                    filteredJobs = [...repairJobs];
+            }
+            
+            renderJobList();
+            
+            // Clear selected job if it's no longer in the filtered list
+            if (selectedJobId && !filteredJobs.some(job => job.jobId === selectedJobId)) {
+                selectedJobId = null;
+                document.getElementById('jobDetailsContainer').classList.add('hidden');
+                document.getElementById('emptyDetails').classList.remove('hidden');
+            }
+        }
+        
+        /**
+         * Renders the job list based on filteredJobs.
+         */
         function renderJobList() {
             const jobsContainer = document.getElementById('jobsContainer');
             const jobCountElement = document.getElementById('jobCount');
             
-            // ล้างรายการเก่า
             jobsContainer.innerHTML = '';
             jobCountElement.textContent = filteredJobs.length;
             
-            // ถ้าไม่มีงานซ่อม
             if (filteredJobs.length === 0) {
                 document.getElementById('noJobsFound').classList.remove('hidden');
                 return;
@@ -435,7 +487,6 @@
                 document.getElementById('noJobsFound').classList.add('hidden');
             }
             
-            // สร้างการ์ดงานซ่อมแต่ละรายการ
             filteredJobs.forEach((job, index) => {
                 const jobCard = document.createElement('div');
                 jobCard.className = `glass-card job-card cursor-pointer animate-slide-up`;
@@ -443,7 +494,6 @@
                 jobCard.id = `job-${job.jobId}`;
                 jobCard.onclick = () => selectJob(job.jobId);
                 
-        // กำหนดคลาสสถานะ
                 // Determine status class and icon
                 let statusClass, statusIcon, statusText;
                 switch(job.status) {
@@ -491,25 +541,8 @@
                     default:
                         priorityClass = 'priority-medium';
                 }
-                
 
-
- // ฟอร์แมตวันที่
-                const formatDate = (dateString) => {
-                    if (!dateString) return 'ไม่มีข้อมูล';
-                    const date = new Date(dateString);
-                    return date.toLocaleDateString('th-TH', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                };
-
-
-               
-          jobCard.innerHTML = `
+                jobCard.innerHTML = `
                     <div class="flex items-start justify-between mb-3">
                         <div>
                             <h3 class="font-bold text-gray-800 text-lg">${job.jobId || 'N/A'}</h3>
@@ -546,12 +579,6 @@
                 const prevSelectedCard = document.getElementById(`job-${selectedJobId}`);
                 if (prevSelectedCard) {
                     prevSelectedCard.classList.add('selected');
-                } else {
-                    // If the previously selected job is no longer in the filtered list,
-                    // clear details and show empty state.
-                    selectedJobId = null;
-                    document.getElementById('jobDetailsContainer').classList.add('hidden');
-                    document.getElementById('emptyDetails').classList.remove('hidden');
                 }
             }
         }
@@ -561,24 +588,19 @@
          * @param {string} jobId - The ID of the job to select.
          */
         function selectJob(jobId) {
-            // Find the selected job
             const selectedJob = filteredJobs.find(job => job.jobId === jobId);
             if (!selectedJob) return;
             
-            // Remove 'selected' class from all cards
             document.querySelectorAll('.job-card').forEach(card => {
                 card.classList.remove('selected');
             });
             
-            // Add 'selected' class to the clicked card
             const currentSelectedCard = document.getElementById(`job-${jobId}`);
             if (currentSelectedCard) {
                 currentSelectedCard.classList.add('selected');
             }
 
-            selectedJobId = jobId; // Update the selected job ID
-
-            // Render job details
+            selectedJobId = jobId;
             renderJobDetails(selectedJob);
         }
         
@@ -590,8 +612,8 @@
             const jobDetailsContainer = document.getElementById('jobDetailsContainer');
             const emptyDetails = document.getElementById('emptyDetails');
             
-            emptyDetails.classList.add('hidden'); // Hide empty state
-            jobDetailsContainer.classList.remove('hidden'); // Show details container
+            emptyDetails.classList.add('hidden');
+            jobDetailsContainer.classList.remove('hidden');
             
             // Determine status class and icon for details view
             let statusClass, statusIcon, statusText;
@@ -735,9 +757,6 @@
                     </div>
                 </div>
             `;
-            
-            // Make sure the details container is visible
-            jobDetailsContainer.classList.remove('hidden');
         }
         
         /**
@@ -749,7 +768,6 @@
             if (!dateString) return 'ไม่มีข้อมูล';
             try {
                 const date = new Date(dateString);
-                // Check for invalid date
                 if (isNaN(date.getTime())) {
                     return 'วันที่ไม่ถูกต้อง';
                 }
@@ -759,7 +777,7 @@
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
-                    hour12: false // Use 24-hour format
+                    hour12: false
                 });
             } catch (e) {
                 console.error("Error formatting date:", dateString, e);
@@ -768,36 +786,8 @@
         };
         
         /**
-         * Filters repair jobs based on the search input.
-         */
-        function searchJobs() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-            
-            if (!searchTerm) {
-                filteredJobs = [...repairJobs];
-            } else {
-                filteredJobs = repairJobs.filter(job =>
-                    (job.jobId && job.jobId.toLowerCase().includes(searchTerm)) ||
-                    (job.problemType && job.problemType.toLowerCase().includes(searchTerm)) ||
-                    (job.problemDetails && job.problemDetails.toLowerCase().includes(searchTerm)) ||
-                    (job.fullName && job.fullName.toLowerCase().includes(searchTerm)) ||
-                    (job.department && job.department.toLowerCase().includes(searchTerm)) ||
-                    (job.status && job.status.toLowerCase().includes(searchTerm))
-                );
-            }
-            
-            renderJobList();
-            
-            // Clear and hide job details when a new search is performed
-            selectedJobId = null;
-            document.getElementById('jobDetailsContainer').classList.add('hidden');
-            document.getElementById('emptyDetails').classList.remove('hidden');
-        }
-        
-        /**
          * Handles the back button click. Closes LIFF window if in LINE, otherwise redirects.
          */
-        // ฟังก์ชันกลับไปหน้าหลัก
         function goBack() {
             if (liff.isInClient()) {
                 liff.closeWindow();
@@ -807,10 +797,10 @@
         }
         
         // Event Listeners
-        document.getElementById('searchBtn').addEventListener('click', searchJobs);
-        document.getElementById('searchInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') searchJobs();
+        document.querySelectorAll('.status-tab').forEach(tab => {
+            tab.addEventListener('click', () => filterJobsByStatus(tab.dataset.status));
         });
+        
         document.getElementById('backBtn').addEventListener('click', goBack);
         
         // Initialize the LIFF app when the window loads
