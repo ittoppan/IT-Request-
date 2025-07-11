@@ -362,24 +362,7 @@ async function initializeLiff() {
                     text: `ไม่สามารถเริ่มต้น LIFF ได้: ${error.message}`,
                     icon: 'error'
                 });
-            }
-        }
-
-        document.getElementById('repairForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (typeof liff === 'undefined' || !liff.isLoggedIn()) {
-                Swal.fire({ title: 'กรุณาเข้าสู่ระบบ', icon: 'warning' });
-                return;
-            }
-            
-            Swal.fire({ 
-                title: 'กำลังส่งข้อมูล...', 
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading() 
-            });
-
-
+        
 
         
         /**
