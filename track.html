@@ -181,14 +181,15 @@
                         <div class="text-3xl font-bold text-blue-600" id="totalJobsCount">0</div>
                         <div class="text-sm text-gray-600">ทั้งหมด</div>
                     </div>
+                      <div class="stat-card glass-card p-4 text-center animate-fade-in" style="animation-delay: 300ms">
+                        <div class="text-3xl font-bold text-blue-500" id="newJobsCount">0</div>
+                        <div class="text-sm text-gray-600">แจ้งซ่อมใหม่</div>
+                    </div>
                     <div class="stat-card glass-card p-4 text-center animate-fade-in" style="animation-delay: 200ms">
                         <div class="text-3xl font-bold text-purple-500" id="pendingJobsCount">0</div>
                         <div class="text-sm text-gray-600">รอดำเนินการ</div>
                     </div>
-                    <div class="stat-card glass-card p-4 text-center animate-fade-in" style="animation-delay: 300ms">
-                        <div class="text-3xl font-bold text-blue-500" id="newJobsCount">0</div>
-                        <div class="text-sm text-gray-600">แจ้งซ่อมใหม่</div>
-                    </div>
+                  
                     <div class="stat-card glass-card p-4 text-center animate-fade-in" style="animation-delay: 400ms">
                         <div class="text-3xl font-bold text-yellow-500" id="inProgressJobsCount">0</div>
                         <div class="text-sm text-gray-600">กำลังดำเนินการ</div>
@@ -204,12 +205,14 @@
                         <div class="status-tab px-4 py-2 rounded-t-lg active" data-status="all">
                             <i class="fas fa-list mr-2"></i>ทั้งหมด
                         </div>
+                      <div class="status-tab px-4 py-2 rounded-t-lg" data-status="new">
+                            <i class="fas fa-file-circle-plus mr-2"></i>แจ้งซ่อมใหม่
+                        </div>
+                        
                         <div class="status-tab px-4 py-2 rounded-t-lg" data-status="pending">
                             <i class="fas fa-clock mr-2"></i>รอดำเนินการ
                         </div>
-                        <div class="status-tab px-4 py-2 rounded-t-lg" data-status="new">
-                            <i class="fas fa-file-circle-plus mr-2"></i>แจ้งซ่อมใหม่
-                        </div>
+                      
                         <div class="status-tab px-4 py-2 rounded-t-lg" data-status="in-progress">
                             <i class="fas fa-tools mr-2"></i>กำลังดำเนินการ
                         </div>
@@ -361,14 +364,14 @@
          */
         function updateDashboardStats() {
             const totalJobs = repairJobs.length;
+              const newJobs = repairJobs.filter(job => job.status === 'แจ้งซ่อมใหม่').length;
             const pendingJobs = repairJobs.filter(job => job.status === 'รอดำเนินการ').length;
-            const newJobs = repairJobs.filter(job => job.status === 'แจ้งซ่อมใหม่').length;
             const inProgressJobs = repairJobs.filter(job => job.status === 'กำลังดำเนินการ').length;
             const completedJobs = repairJobs.filter(job => job.status === 'เสร็จสิ้น').length;
             
             document.getElementById('totalJobsCount').textContent = totalJobs;
+             document.getElementById('newJobsCount').textContent = newJobs;
             document.getElementById('pendingJobsCount').textContent = pendingJobs;
-            document.getElementById('newJobsCount').textContent = newJobs;
             document.getElementById('inProgressJobsCount').textContent = inProgressJobs;
             document.getElementById('completedJobsCount').textContent = completedJobs;
         }
@@ -390,12 +393,14 @@
             
             // Filter jobs
             switch(status) {
+                  case 'new':
+                    filteredJobs = repairJobs.filter(job => job.status === 'แจ้งซ่อมใหม่');
+                    break;
+                    
                 case 'pending':
                     filteredJobs = repairJobs.filter(job => job.status === 'รอดำเนินการ');
                     break;
-                case 'new':
-                    filteredJobs = repairJobs.filter(job => job.status === 'แจ้งซ่อมใหม่');
-                    break;
+              
                 case 'in-progress':
                     filteredJobs = repairJobs.filter(job => job.status === 'กำลังดำเนินการ');
                     break;
@@ -446,16 +451,18 @@
                 // Determine status class and icon
                 let statusClass, statusIcon, statusText;
                 switch(job.status) {
+                   case 'แจ้งซ่อมใหม่':
+                        statusClass = 'status-new';
+                        statusIcon = 'fa-file-circle-plus';
+                        statusText = 'แจ้งซ่อมใหม่';
+                        break;
+                        
                     case 'รอดำเนินการ':
                         statusClass = 'status-pending';
                         statusIcon = 'fa-clock';
                         statusText = 'รอดำเนินการ';
                         break;
-                    case 'แจ้งซ่อมใหม่':
-                        statusClass = 'status-new';
-                        statusIcon = 'fa-file-circle-plus';
-                        statusText = 'แจ้งซ่อมใหม่';
-                        break;
+                 
                     case 'กำลังดำเนินการ':
                         statusClass = 'status-in-progress';
                         statusIcon = 'fa-tools';
@@ -572,16 +579,19 @@
             // Determine status class and icon for details view
             let statusClass, statusIcon, statusText;
             switch(job.status) {
-                case 'รอดำเนินการ':
-                    statusClass = 'status-pending';
-                    statusIcon = 'fa-clock';
-                    statusText = 'รอดำเนินการ';
-                    break;
                 case 'แจ้งซ่อมใหม่':
                     statusClass = 'status-new';
                     statusIcon = 'fa-file-circle-plus';
                     statusText = 'แจ้งซ่อมใหม่';
                     break;
+
+                    
+                case 'รอดำเนินการ':
+                    statusClass = 'status-pending';
+                    statusIcon = 'fa-clock';
+                    statusText = 'รอดำเนินการ';
+                    break;
+              
                 case 'กำลังดำเนินการ':
                     statusClass = 'status-in-progress';
                     statusIcon = 'fa-tools';
