@@ -337,7 +337,8 @@
          * Initializes the LIFF app.
          * Fetches user profile and loads repair jobs.
          */
-       async function initializeLiff() {
+       
+async function initializeLiff() {
             try {
                 await liff.init({ liffId });
                 if (!liff.isLoggedIn()) {
@@ -360,13 +361,26 @@
                     title: 'เกิดข้อผิดพลาด',
                     text: `ไม่สามารถเริ่มต้น LIFF ได้: ${error.message}`,
                     icon: 'error'
-                })
-            
-        
-                document.getElementById('loadingIndicator').classList.remove('hidden'); // Ensure it's visible to show error
-                document.getElementById('mainContent').classList.add('hidden');
+                });
             }
         }
+
+        document.getElementById('repairForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (typeof liff === 'undefined' || !liff.isLoggedIn()) {
+                Swal.fire({ title: 'กรุณาเข้าสู่ระบบ', icon: 'warning' });
+                return;
+            }
+            
+            Swal.fire({ 
+                title: 'กำลังส่งข้อมูล...', 
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading() 
+            });
+
+
+
         
         /**
          * Fetches repair jobs from Google Apps Script.
