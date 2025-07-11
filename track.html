@@ -1,717 +1,441 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ติดตามงานแจ้งซ่อม IT</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <style>
-        :root {
-            --primary-color: #183263;
-            --primary-dark: #1d4ed8;
-            --secondary-color: #f59e0b;
-            --dark-color: #1e293b;
-            --light-color: #f8fafc;
-        }
-        
-        body {
-            font-family: 'Kanit', sans-serif;
-            background-color: #f8fafc;
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border-radius: 0.75rem;
-        }
-        
-        .header-gradient {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            transition: all 0.3s ease;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        
-        .form-input {
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            width: 100%;
-            transition: all 0.2s;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-        }
-        
-        .section-header {
-            display: flex;
-            align-items: center;
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        .animate-slide-up {
-            animation: slideUp 0.5s ease-out;
-        }
-        
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: white;
-        }
-        
-        .status-new {
-            background-color: #3b82f6;
-        }
-        
-        .status-in-progress {
-            background-color: #f59e0b;
-        }
-        
-        .status-completed {
-            background-color: #10b981;
-        }
-        
-        .status-cancelled {
-            background-color: #ef4444;
-        }
-        
-        .priority-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: white;
-        }
-        
-        .priority-low {
-            background-color: #6b7280;
-        }
-        
-        .priority-medium {
-            background-color: #f59e0b;
-        }
-        
-        .priority-high {
-            background-color: #f97316;
-        }
-        
-        .priority-critical {
-            background-color: #ef4444;
-        }
-        
-        .floating-shapes {
-            pointer-events: none;
-        }
-        
-        .job-card {
-            transition: all 0.3s ease;
-        }
-        
-        .job-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        
-        .job-card.selected {
-            box-shadow: 0 0 0 2px #3b82f6, 0 0 20px rgba(59, 130, 246, 0.3);
-        }
-        
-        .loading-spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 3px solid #3b82f6;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบติดตามงานแจ้งซ่อม IT</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans Thai', sans-serif;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .header-gradient {
+      background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+    }
+    .animate-slide-up {
+      animation: slideUp 0.5s ease-out;
+    }
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+    .shadow-glow {
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+  </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+<body class="bg-gray-50">
+  <div id="app" class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200">
     <!-- Header -->
     <div class="header-gradient text-white p-6 relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-blue-600/90"></div>
-        <div class="floating-shapes absolute inset-0">
-            <div class="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-float"></div>
-            <div class="absolute top-32 right-20 w-16 h-16 bg-white/5 rounded-full animate-float" style="animation-delay: 1s;"></div>
-            <div class="absolute bottom-20 left-1/3 w-12 h-12 bg-white/5 rounded-full animate-float" style="animation-delay: 2s;"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-500/90 to-indigo-500/90"></div>
+      <div class="floating-shapes absolute inset-0 pointer-events-none">
+        <div class="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-float"></div>
+        <div class="absolute top-32 right-20 w-16 h-16 bg-white/5 rounded-full animate-float" style="animation-delay: 1s"></div>
+        <div class="absolute bottom-20 left-1/3 w-12 h-12 bg-white/5 rounded-full animate-float" style="animation-delay: 2s"></div>
+      </div>
+      
+      <div class="relative z-10 max-w-6xl mx-auto">
+        <div class="flex items-center gap-4 mb-4">
+          <a href="/">
+            <button class="flex items-center px-3 py-1.5 text-sm text-white border border-white/30 rounded-md hover:bg-white/20">
+              <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+              กลับ
+            </button>
+          </a>
         </div>
-        
-        <div class="relative z-10 max-w-6xl mx-auto">
-            <div class="flex items-center gap-4 mb-4">
-                <button id="backBtn" class="inline-flex items-center px-4 py-2 text-sm border border-white/30 rounded-lg hover:bg-white/20 text-white">
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    กลับ
-                </button>
-            </div>
-            <h1 class="text-3xl font-semibold mb-2">ติดตามงานแจ้งซ่อม IT</h1>
-            <p class="opacity-90">ตรวจสอบสถานะงานซ่อมของคุณได้ที่นี่</p>
-        </div>
+        <h1 class="text-3xl font-semibold mb-2">ติดตามงานแจ้งซ่อม IT</h1>
+        <p class="opacity-90">ตรวจสอบสถานะงานซ่อมของคุณได้ที่นี่</p>
+      </div>
     </div>
 
     <div class="max-w-6xl mx-auto p-6 -mt-8 relative z-10">
-        <!-- Loading Indicator -->
-        <div id="loadingIndicator" class="flex justify-center items-center py-12">
-            <div class="loading-spinner"></div>
-            <span class="ml-3">กำลังโหลดข้อมูล...</span>
+      <!-- Search Section -->
+      <div class="glass-card mb-8 rounded-lg shadow-md animate-slide-up">
+        <div class="p-6">
+          <div class="flex items-center mb-4">
+            <i data-lucide="search" class="w-5 h-5 mr-2"></i>
+            <h2 class="text-lg font-semibold">ค้นหางานซ่อม</h2>
+          </div>
+          <div class="flex gap-4">
+            <input
+              type="text"
+              placeholder="ใส่เลขที่งาน, ชื่อผู้แจ้ง หรือรายละเอียดงาน..."
+              id="searchInput"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onkeypress="if(event.key === 'Enter') handleSearch()"
+            />
+            <button onclick="handleSearch()" class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              <i data-lucide="search" class="w-4 h-4 mr-2"></i>
+              ค้นหา
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jobs List -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Jobs Grid -->
+        <div class="space-y-4">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">
+            รายการงานซ่อม (<span id="jobCount">3</span> งาน)
+          </h2>
+          
+          <!-- Job Cards will be inserted here by JavaScript -->
+          <div id="jobList"></div>
+          
+          <div id="noResults" class="glass-card rounded-lg shadow-md hidden">
+            <div class="text-center py-8">
+              <i data-lucide="search" class="w-12 h-12 mx-auto text-gray-400 mb-4"></i>
+              <p class="text-gray-500">ไม่พบงานที่ตรงกับการค้นหา</p>
+            </div>
+          </div>
         </div>
 
-        <!-- Main Content (hidden initially) -->
-        <div id="mainContent" class="hidden">
-            <!-- Search Section -->
-            <div class="glass-card mb-8 animate-slide-up">
-                <div class="p-6">
-                    <div class="section-header">
-                        <i class="fas fa-search mr-3 text-blue-500"></i>
-                        <span>ค้นหางานซ่อม</span>
-                    </div>
-                    <div class="flex gap-4">
-                        <input
-                            type="text"
-                            id="searchInput"
-                            placeholder="ใส่เลขที่งานหรือรายละเอียดงาน..."
-                            class="form-input flex-1"
-                        >
-                        <button id="searchBtn" class="btn-primary px-6 py-2 rounded-lg">
-                            <i class="fas fa-search mr-2"></i>
-                            ค้นหา
-                        </button>
-                    </div>
-                </div>
+        <!-- Job Details -->
+        <div class="lg:sticky lg:top-6">
+          <div id="jobDetailsPlaceholder" class="glass-card rounded-lg shadow-md">
+            <div class="text-center py-12">
+              <i data-lucide="file-text" class="w-16 h-16 mx-auto text-gray-400 mb-4"></i>
+              <p class="text-gray-500">เลือกงานจากรายการเพื่อดูรายละเอียด</p>
             </div>
-
-            <!-- Jobs List -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Jobs Grid -->
-                <div class="space-y-4">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">
-                        รายการงานซ่อม (<span id="jobCount">0</span> งาน)
-                    </h2>
-                    
-                    <div id="jobsContainer" class="space-y-4">
-                        <!-- Job cards will be inserted here dynamically -->
-                    </div>
-                    
-                    <div id="noJobsFound" class="glass-card hidden">
-                        <div class="text-center py-8">
-                            <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
-                            <p class="text-muted-foreground">ไม่พบงานซ่อมของคุณ</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Job Details -->
-                <div class="lg:sticky lg:top-6">
-                    <div id="emptyDetails" class="glass-card">
-                        <div class="text-center py-12">
-                            <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-500">เลือกงานจากรายการเพื่อดูรายละเอียด</p>
-                        </div>
-                    </div>
-                    
-                    <div id="jobDetailsContainer" class="glass-card animate-fade-in hidden">
-                        <!-- Job details will be inserted here dynamically -->
-                    </div>
-                </div>
-            </div>
+          </div>
+          
+          <div id="jobDetails" class="glass-card rounded-lg shadow-md hidden animate-fade-in">
+            <!-- Job details will be inserted here by JavaScript -->
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // ตั้งค่า LIFF
-        const liffId = '2007374280-GEYwyNdl';
-        
-        // ตั้งค่า Google Apps Script URL
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
-        
-        // ตัวแปรเก็บข้อมูลผู้ใช้
-        let userId = '';
-        let userDisplayName = '';
-        let userPictureUrl = '';
-        
-        // ตัวแปรเก็บข้อมูลงานซ่อม
-        let repairJobs = [];
-        let filteredJobs = [];
-        
-        // ฟังก์ชันเริ่มต้น LIFF
-        async function initializeLiff() {
-            try {
-                await liff.init({ liffId });
-                
-                if (!liff.isLoggedIn()) {
-                    // ถ้าไม่ได้ล็อกอิน ให้ล็อกอินก่อน
-                    liff.login();
-                    return;
-                }
-                
-                // ดึงข้อมูลโปรไฟล์ผู้ใช้
-                const profile = await liff.getProfile();
-                userId = profile.userId;
-                userDisplayName = profile.displayName;
-                userPictureUrl = profile.pictureUrl || '';
-                
-                // โหลดข้อมูลงานซ่อม
-                loadRepairJobs();
-                
-            } catch (error) {
-                console.error('LIFF initialization failed', error);
-                document.getElementById('loadingIndicator').innerHTML = `
-                    <div class="text-center">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-2"></i>
-                        <p>เกิดข้อผิดพลาดในการเชื่อมต่อ LINE</p>
-                        <button onclick="window.location.reload()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">
-                            ลองใหม่
-                        </button>
-                    </div>
-                `;
-            }
-        }
-        
-        // ฟังก์ชันโหลดข้อมูลงานซ่อมจาก Google Sheet
-        async function loadRepairJobs() {
-            try {
-                // แสดง loading indicator
-                document.getElementById('loadingIndicator').classList.remove('hidden');
-                document.getElementById('mainContent').classList.add('hidden');
-                
-                // เรียก API เพื่อดึงข้อมูลงานซ่อม
-                const response = await fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}`);
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    repairJobs = data.data;
-                    filteredJobs = [...repairJobs];
-                    
-                    // แสดงรายการงานซ่อม
-                    renderJobList();
-                    
-                    // ซ่อน loading indicator และแสดงเนื้อหาหลัก
-                    document.getElementById('loadingIndicator').classList.add('hidden');
-                    document.getElementById('mainContent').classList.remove('hidden');
-                    
-                    // ถ้าไม่มีงานซ่อม
-                    if (repairJobs.length === 0) {
-                        document.getElementById('noJobsFound').classList.remove('hidden');
-                    }
-                } else {
-                    throw new Error(data.message || 'Failed to load repair jobs');
-                }
-            } catch (error) {
-                console.error('Error loading repair jobs:', error);
-                document.getElementById('loadingIndicator').innerHTML = `
-                    <div class="text-center">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-2"></i>
-                        <p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>
-                        <p class="text-sm text-gray-500 mb-3">${error.message}</p>
-                        <button onclick="loadRepairJobs()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">
-                            ลองใหม่
-                        </button>
-                    </div>
-                `;
-            }
-        }
-        
-        // ฟังก์ชันแสดงรายการงานซ่อม
-        function renderJobList() {
-            const jobsContainer = document.getElementById('jobsContainer');
-            const jobCountElement = document.getElementById('jobCount');
-            
-            // ล้างรายการเก่า
-            jobsContainer.innerHTML = '';
-            jobCountElement.textContent = filteredJobs.length;
-            
-            // ถ้าไม่มีงานซ่อม
-            if (filteredJobs.length === 0) {
-                document.getElementById('noJobsFound').classList.remove('hidden');
-                return;
-            } else {
-                document.getElementById('noJobsFound').classList.add('hidden');
-            }
-            
-            // สร้างการ์ดงานซ่อมแต่ละรายการ
-            filteredJobs.forEach((job, index) => {
-                const jobCard = document.createElement('div');
-                jobCard.className = `glass-card job-card cursor-pointer animate-slide-up`;
-                jobCard.style.animationDelay = `${index * 100}ms`;
-                jobCard.id = `job-${job.jobId}`;
-                jobCard.onclick = () => selectJob(job.jobId);
-                
-                // กำหนดคลาสสถานะ
-                let statusClass, statusIcon, statusText;
-                switch(job.status) {
-                    case 'แจ้งซ่อมใหม่':
-                        statusClass = 'status-new';
-                        statusIcon = 'fa-file-circle-plus';
-                        statusText = 'แจ้งซ่อมใหม่';
-                        break;
-                    case 'กำลังดำเนินการ':
-                        statusClass = 'status-in-progress';
-                        statusIcon = 'fa-tools';
-                        statusText = 'กำลังดำเนินการ';
-                        break;
-                    case 'เสร็จสิ้น':
-                        statusClass = 'status-completed';
-                        statusIcon = 'fa-check-circle';
-                        statusText = 'เสร็จสิ้น';
-                        break;
-                    case 'ยกเลิก':
-                        statusClass = 'status-cancelled';
-                        statusIcon = 'fa-times-circle';
-                        statusText = 'ยกเลิก';
-                        break;
-                    default:
-                        statusClass = 'status-new';
-                        statusIcon = 'fa-file-circle-plus';
-                        statusText = job.status;
-                }
-                
-                // กำหนดคลาสความเร่งด่วน
-                let priorityClass;
-                switch(job.urgency) {
-                    case 'ต่ำ':
-                        priorityClass = 'priority-low';
-                        break;
-                    case 'ปานกลาง':
-                        priorityClass = 'priority-medium';
-                        break;
-                    case 'สูง':
-                        priorityClass = 'priority-high';
-                        break;
-                    case 'ด่วนมาก':
-                        priorityClass = 'priority-critical';
-                        break;
-                    default:
-                        priorityClass = 'priority-medium';
-                }
-                
-                // ฟอร์แมตวันที่
-                const formatDate = (dateString) => {
-                    if (!dateString) return 'ไม่มีข้อมูล';
-                    const date = new Date(dateString);
-                    return date.toLocaleDateString('th-TH', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                };
-                
-                jobCard.innerHTML = `
-                    <div class="p-4">
-                        <div class="flex items-start justify-between mb-3">
-                            <div>
-                                <h3 class="font-semibold text-gray-800 text-lg">${job.jobId}</h3>
-                                <p class="text-gray-500">${job.problemType || 'ไม่มีข้อมูล'}</p>
-                            </div>
-                            <div class="flex flex-col items-end gap-2">
-                                <span class="status-badge ${statusClass}">
-                                    <i class="fas ${statusIcon} mr-1"></i>
-                                    ${statusText}
-                                </span>
-                                <span class="priority-badge ${priorityClass}">
-                                    ${job.urgency || 'ปานกลาง'}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-2 text-sm">
-                            <div class="flex items-center text-gray-500">
-                                <i class="fas fa-user mr-2"></i>
-                                ${job.fullName || 'ไม่ระบุชื่อ'} - ${job.department || 'ไม่ระบุแผนก'}
-                            </div>
-                            <div class="flex items-center text-gray-500">
-                                <i class="fas fa-calendar-alt mr-2"></i>
-                                ${formatDate(job.timestamp)}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                jobsContainer.appendChild(jobCard);
-            });
-        }
-        
-        // ฟังก์ชันเลือกงานเพื่อดูรายละเอียด
-        function selectJob(jobId) {
-            // หางานที่เลือก
-            const selectedJob = filteredJobs.find(job => job.jobId === jobId);
-            if (!selectedJob) return;
-            
-            // ลบคลาส selected จากทุกการ์ด
-            document.querySelectorAll('.job-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // เพิ่มคลาส selected ให้กับการ์ดที่เลือก
-            document.getElementById(`job-${jobId}`).classList.add('selected');
-            
-            // แสดงรายละเอียดงาน
-            renderJobDetails(selectedJob);
-        }
-        
-        // ฟังก์ชันแสดงรายละเอียดงาน
-        function renderJobDetails(job) {
-            const jobDetailsContainer = document.getElementById('jobDetailsContainer');
-            const emptyDetails = document.getElementById('emptyDetails');
-            
-            // ซ่อน empty state
-            emptyDetails.classList.add('hidden');
-            
-            // กำหนดคลาสสถานะ
-            let statusClass, statusIcon, statusText;
-            switch(job.status) {
-                case 'แจ้งซ่อมใหม่':
-                    statusClass = 'status-new';
-                    statusIcon = 'fa-file-circle-plus';
-                    statusText = 'แจ้งซ่อมใหม่';
-                    break;
-                case 'กำลังดำเนินการ':
-                    statusClass = 'status-in-progress';
-                    statusIcon = 'fa-tools';
-                    statusText = 'กำลังดำเนินการ';
-                    break;
-                case 'เสร็จสิ้น':
-                    statusClass = 'status-completed';
-                    statusIcon = 'fa-check-circle';
-                    statusText = 'เสร็จสิ้น';
-                    break;
-                case 'ยกเลิก':
-                    statusClass = 'status-cancelled';
-                    statusIcon = 'fa-times-circle';
-                    statusText = 'ยกเลิก';
-                    break;
-                default:
-                    statusClass = 'status-new';
-                    statusIcon = 'fa-file-circle-plus';
-                    statusText = job.status;
-            }
-            
-            // ฟอร์แมตวันที่
-            const formatDate = (dateString) => {
-                if (!dateString) return 'ไม่มีข้อมูล';
-                const date = new Date(dateString);
-                return date.toLocaleDateString('th-TH', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            };
-            
-            // สร้างรายการไฟล์แนบ (ถ้ามี)
-            let fileAttachments = '';
-            if (job.imageViewUrls && job.imageViewUrls.length > 0) {
-                fileAttachments = `
-                    <div>
-                        <h4 class="font-medium mb-3">ไฟล์แนบประกอบ</h4>
-                        <div class="grid grid-cols-2 gap-2">
-                            ${job.imageViewUrls.map(url => `
-                                <a href="${url}" target="_blank" class="border rounded-lg overflow-hidden">
-                                    <img src="${url}" alt="ไฟล์แนบ" class="w-full h-24 object-cover">
-                                </a>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // สร้างรายการความคืบหน้า (ถ้ามี)
-            let progressNotes = '';
-            if (job.notes && job.notes.length > 0) {
-                progressNotes = `
-                    <div>
-                        <h4 class="font-medium mb-3">ความคืบหน้า</h4>
-                        <div class="space-y-2">
-                            ${job.notes.map(note => `
-                                <div class="flex items-start gap-3 p-3 bg-gray-100 rounded-lg">
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                                    <p class="text-sm text-gray-500">${note}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            jobDetailsContainer.innerHTML = `
-                <div class="p-6">
-                    <div class="section-header">
-                        <i class="fas fa-file-alt mr-3 text-blue-500"></i>
-                        <span>รายละเอียดงาน ${job.jobId}</span>
-                    </div>
-                    <div class="space-y-6">
-                        <!-- Status -->
-                        <div class="p-4 bg-gray-100 rounded-lg">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-medium">สถานะปัจจุบัน</span>
-                                <span class="status-badge ${statusClass}">
-                                    <i class="fas ${statusIcon} mr-1"></i>
-                                    ${statusText}
-                                </span>
-                            </div>
-                            ${job.assignedTo ? `
-                                <p class="text-sm text-gray-500">
-                                    ผู้รับผิดชอบ: ${job.assignedTo}
-                                </p>
-                            ` : ''}
-                            ${job.estimatedCompletion ? `
-                                <p class="text-sm text-gray-500">
-                                    คาดว่าจะเสร็จ: ${formatDate(job.estimatedCompletion)}
-                                </p>
-                            ` : ''}
-                        </div>
+  <script>
+    // ข้อมูลงานซ่อม
+    const mockJobs = [
+      {
+        id: '1',
+        jobId: 'IT2024001',
+        title: 'อุปกรณ์ฮาร์ดแวร์',
+        description: 'คอมพิวเตอร์เปิดไม่ติด หน้าจอดับ ไฟ LED ไม่ติด',
+        status: 'in-progress',
+        priority: 'สูง',
+        requester: 'สมชาย ใจดี',
+        department: 'แผนกบัญชี',
+        office: 'สำนักงานรังสิต',
+        phone: '02-1234567',
+        createdAt: '2024-01-15T09:30:00',
+        updatedAt: '2024-01-15T14:20:00',
+        assignedTo: 'ช่างเอ',
+        estimatedCompletion: '2024-01-16T16:00:00',
+        notes: [
+          'รับเรื่องแล้ว กำลังตรวจสอบ',
+          'พบว่า Power Supply เสีย กำลังสั่งอะไหล่',
+          'อะไหล่มาถึงแล้ว กำลังติดตั้ง'
+        ]
+      },
+      {
+        id: '2',
+        jobId: 'IT2024002',
+        title: 'ซอฟต์แวร์/โปรแกรม',
+        description: 'Microsoft Office ไม่สามารถเปิดไฟล์ได้',
+        status: 'completed',
+        priority: 'ปานกลาง',
+        requester: 'สมหญิง ดีใจ',
+        department: 'แผนกการตลาด',
+        office: 'สำนักงานระยอง',
+        phone: '038-123456',
+        createdAt: '2024-01-14T11:15:00',
+        updatedAt: '2024-01-14T16:45:00',
+        assignedTo: 'ช่างบี',
+        notes: [
+          'รับเรื่องแล้ว',
+          'ติดตั้ง Office ใหม่เรียบร้อย',
+          'ทดสอบแล้วใช้งานได้ปกติ'
+        ]
+      },
+      {
+        id: '3',
+        jobId: 'IT2024003',
+        title: 'ระบบเครือข่าย',
+        description: 'อินเทอร์เน็ตช้า ไม่สามารถเข้าเว็บไซต์ได้',
+        status: 'pending',
+        priority: 'ด่วนมาก',
+        requester: 'สมศักดิ์ มั่นใจ',
+        department: 'แผนกขาย',
+        office: 'สำนักงานรังสิต',
+        phone: '02-987654',
+        createdAt: '2024-01-15T15:20:00',
+        updatedAt: '2024-01-15T15:20:00'
+      }
+    ];
 
-                        <!-- Requester Info -->
-                        <div>
-                            <h4 class="font-medium mb-3">ข้อมูลผู้แจ้ง</h4>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex items-center">
-                                    <i class="fas fa-user mr-2 text-gray-500"></i>
-                                    ${job.fullName || 'ไม่ระบุชื่อ'}
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="fas fa-phone mr-2 text-gray-500"></i>
-                                    ${job.phone || 'ไม่ระบุเบอร์ติดต่อ'}
-                                </div>
-                                <p class="text-gray-500">${job.department || 'ไม่ระบุแผนก'} - ${job.office || 'ไม่ระบุสำนักงาน'}</p>
-                            </div>
-                        </div>
+    const statusConfig = {
+      pending: { label: 'รอดำเนินการ', icon: 'clock', color: 'bg-yellow-500' },
+      'in-progress': { label: 'กำลังดำเนินการ', icon: 'alert-circle', color: 'bg-blue-500' },
+      completed: { label: 'เสร็จสิ้น', icon: 'check-circle', color: 'bg-green-500' },
+      cancelled: { label: 'ยกเลิก', icon: 'x-circle', color: 'bg-red-500' }
+    };
 
-                        <!-- Problem Details -->
-                        <div>
-                            <h4 class="font-medium mb-3">รายละเอียดปัญหา</h4>
-                            <div class="p-3 bg-gray-100 rounded-lg">
-                                <p class="text-sm font-medium text-blue-600 mb-1">${job.problemType || 'ไม่มีข้อมูล'}</p>
-                                <p class="text-sm text-gray-500">${job.problemDetails || 'ไม่มีรายละเอียด'}</p>
-                            </div>
-                        </div>
-                        
-                        ${progressNotes}
-                        
-                        ${fileAttachments}
+    const priorityConfig = {
+      'ต่ำ': 'bg-gray-500',
+      'ปานกลาง': 'bg-yellow-500',
+      'สูง': 'bg-orange-500',
+      'ด่วนมาก': 'bg-red-500'
+    };
 
-                        <!-- Timeline -->
-                        <div>
-                            <h4 class="font-medium mb-3">เวลา</h4>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">วันที่แจ้ง:</span>
-                                    <span>${formatDate(job.timestamp)}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">อัพเดทล่าสุด:</span>
-                                    <span>${formatDate(job.updatedAt) || formatDate(job.timestamp)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    // ตัวแปรเก็บสถานะ
+    let selectedJob = null;
+    let filteredJobs = [...mockJobs];
+
+    // เมื่อหน้าเว็บโหลดเสร็จ
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderJobList();
+      
+      // ตั้งค่าเริ่มต้นให้แสดงงานแรก
+      if (mockJobs.length > 0) {
+        selectJob(mockJobs[0]);
+      }
+    });
+
+    // จัดรูปแบบวันที่
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      return date.toLocaleDateString('th-TH', options);
+    }
+
+    // การค้นหา
+    function handleSearch() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      
+      if (!searchTerm.trim()) {
+        showToast('กรุณาใส่เลขที่งาน', 'กรุณาใส่เลขที่งานหรือชื่อผู้แจ้งเพื่อค้นหา', 'error');
+        return;
+      }
+
+      filteredJobs = mockJobs.filter(job =>
+        job.jobId.toLowerCase().includes(searchTerm) ||
+        job.requester.toLowerCase().includes(searchTerm) ||
+        job.title.toLowerCase().includes(searchTerm)
+      );
+
+      document.getElementById('jobCount').textContent = filteredJobs.length;
+      renderJobList();
+
+      if (filteredJobs.length === 0) {
+        document.getElementById('noResults').classList.remove('hidden');
+        showToast('ไม่พบงานที่ค้นหา', 'กรุณาตรวจสอบเลขที่งานอีกครั้ง', 'error');
+      } else {
+        document.getElementById('noResults').classList.add('hidden');
+        selectJob(filteredJobs[0]);
+      }
+    }
+
+    // แสดงรายการงาน
+    function renderJobList() {
+      const jobListElement = document.getElementById('jobList');
+      jobListElement.innerHTML = '';
+
+      filteredJobs.forEach((job, index) => {
+        const statusInfo = statusConfig[job.status];
+        
+        const jobCard = document.createElement('div');
+        jobCard.className = `glass-card cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] rounded-lg shadow-md overflow-hidden ${selectedJob?.id === job.id ? 'ring-2 ring-blue-500 shadow-glow' : ''}`;
+        jobCard.style.animationDelay = `${index * 100}ms`;
+        jobCard.onclick = () => selectJob(job);
+        
+        jobCard.innerHTML = `
+          <div class="p-4">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <h3 class="font-semibold text-gray-800 text-lg">${job.jobId}</h3>
+                <p class="text-gray-600">${job.title}</p>
+              </div>
+              <div class="flex flex-col items-end gap-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${statusInfo.color}">
+                  <i data-lucide="${statusInfo.icon}" class="w-3 h-3 mr-1"></i>
+                  ${statusInfo.label}
+                </span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${priorityConfig[job.priority]}">
+                  ${job.priority}
+                </span>
+              </div>
+            </div>
+            
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center text-gray-600">
+                <i data-lucide="user" class="w-4 h-4 mr-2"></i>
+                ${job.requester} - ${job.department}
+              </div>
+              <div class="flex items-center text-gray-600">
+                <i data-lucide="calendar" class="w-4 h-4 mr-2"></i>
+                ${formatDate(job.createdAt)}
+              </div>
+            </div>
+          </div>
+        `;
+        
+        jobListElement.appendChild(jobCard);
+        lucide.createIcons();
+      });
+    }
+
+    // เลือกงานเพื่อแสดงรายละเอียด
+    function selectJob(job) {
+      selectedJob = job;
+      renderJobList();
+      renderJobDetails();
+    }
+
+    // แสดงรายละเอียดงาน
+    function renderJobDetails() {
+      const jobDetailsElement = document.getElementById('jobDetails');
+      const placeholderElement = document.getElementById('jobDetailsPlaceholder');
+      
+      placeholderElement.classList.add('hidden');
+      jobDetailsElement.classList.remove('hidden');
+      
+      const statusInfo = statusConfig[selectedJob.status];
+      
+      jobDetailsElement.innerHTML = `
+        <div class="p-6">
+          <div class="flex items-center mb-4">
+            <i data-lucide="file-text" class="w-5 h-5 mr-2"></i>
+            <h2 class="text-lg font-semibold">รายละเอียดงาน ${selectedJob.jobId}</h2>
+          </div>
+          
+          <div class="space-y-6">
+            <!-- Status -->
+            <div class="p-4 bg-gray-100/50 rounded-lg">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-medium">สถานะปัจจุบัน</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${statusInfo.color}">
+                  <i data-lucide="${statusInfo.icon}" class="w-3 h-3 mr-1"></i>
+                  ${statusInfo.label}
+                </span>
+              </div>
+              ${selectedJob.assignedTo ? `
+                <p class="text-sm text-gray-600">
+                  ผู้รับผิดชอบ: ${selectedJob.assignedTo}
+                </p>
+              ` : ''}
+              ${selectedJob.estimatedCompletion ? `
+                <p class="text-sm text-gray-600">
+                  คาดว่าจะเสร็จ: ${formatDate(selectedJob.estimatedCompletion)}
+                </p>
+              ` : ''}
+            </div>
+
+            <!-- Requester Info -->
+            <div>
+              <h4 class="font-medium mb-3">ข้อมูลผู้แจ้ง</h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex items-center">
+                  <i data-lucide="user" class="w-4 h-4 mr-2 text-gray-600"></i>
+                  ${selectedJob.requester}
                 </div>
-            `;
-            
-            // แสดงรายละเอียดงาน
-            jobDetailsContainer.classList.remove('hidden');
-        }
-        
-        // ฟังก์ชันค้นหางาน
-        function searchJobs() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
-            if (!searchTerm.trim()) {
-                filteredJobs = [...repairJobs];
-            } else {
-                filteredJobs = repairJobs.filter(job =>
-                    job.jobId.toLowerCase().includes(searchTerm) ||
-                    (job.problemType && job.problemType.toLowerCase().includes(searchTerm)) ||
-                    (job.problemDetails && job.problemDetails.toLowerCase().includes(searchTerm))
-                );
-            }
-            
-            renderJobList();
-            
-            // ซ่อนรายละเอียดงานที่เลือกไว้ (ถ้ามี)
-            document.getElementById('jobDetailsContainer').classList.add('hidden');
-            document.getElementById('emptyDetails').classList.remove('hidden');
-        }
-        
-        // ฟังก์ชันกลับไปหน้าหลัก
-        function goBack() {
-            if (liff.isInClient()) {
-                liff.closeWindow();
-            } else {
-                window.location.href = 'index.html';
-            }
-        }
-        
-        // Event Listeners
-        document.getElementById('searchBtn').addEventListener('click', searchJobs);
-        document.getElementById('searchInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') searchJobs();
-        });
-        document.getElementById('backBtn').addEventListener('click', goBack);
-        
-        // เริ่มต้นแอปพลิเคชัน
-        window.onload = initializeLiff;
-    </script>
+                <div class="flex items-center">
+                  <i data-lucide="phone" class="w-4 h-4 mr-2 text-gray-600"></i>
+                  ${selectedJob.phone}
+                </div>
+                <p class="text-gray-600">${selectedJob.department} - ${selectedJob.office}</p>
+              </div>
+            </div>
+
+            <!-- Problem Details -->
+            <div>
+              <h4 class="font-medium mb-3">รายละเอียดปัญหา</h4>
+              <div class="p-3 bg-gray-100/30 rounded-lg">
+                <p class="text-sm font-medium text-blue-600 mb-1">${selectedJob.title}</p>
+                <p class="text-sm text-gray-600">${selectedJob.description}</p>
+              </div>
+            </div>
+
+            <!-- Progress Notes -->
+            ${selectedJob.notes && selectedJob.notes.length > 0 ? `
+              <div>
+                <h4 class="font-medium mb-3">ความคืบหน้า</h4>
+                <div class="space-y-2">
+                  ${selectedJob.notes.map(note => `
+                    <div class="flex items-start gap-3 p-3 bg-gray-100/30 rounded-lg">
+                      <div class="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                      <p class="text-sm text-gray-600">${note}</p>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Timeline -->
+            <div>
+              <h4 class="font-medium mb-3">เวลา</h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">วันที่แจ้ง:</span>
+                  <span>${formatDate(selectedJob.createdAt)}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">อัพเดทล่าสุด:</span>
+                  <span>${formatDate(selectedJob.updatedAt)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      lucide.createIcons();
+    }
+
+    // แสดง Toast Notification
+    function showToast(title, description, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg text-white ${
+        type === 'error' ? 'bg-red-500' : 'bg-green-500'
+      }`;
+      toast.innerHTML = `
+        <div class="flex items-center">
+          <i data-lucide="${type === 'error' ? 'alert-triangle' : 'check-circle'}" class="w-5 h-5 mr-2"></i>
+          <div>
+            <p class="font-medium">${title}</p>
+            <p class="text-sm opacity-90">${description}</p>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(toast);
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  </script>
 </body>
 </html>
