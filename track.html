@@ -190,9 +190,9 @@
     <div class="header-gradient text-white p-6 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-blue-600/90"></div>
         <div class="floating-shapes absolute inset-0">
-            <div class="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-float" aria-hidden="true"></div>
-            <div class="absolute top-32 right-20 w-16 h-16 bg-white/5 rounded-full animate-float" style="animation-delay: 1s;" aria-hidden="true"></div>
-            <div class="absolute bottom-20 left-1/3 w-12 h-12 bg-white/5 rounded-full animate-float" style="animation-delay: 2s;" aria-hidden="true"></div>
+            <div class="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-float"></div>
+            <div class="absolute top-32 right-20 w-16 h-16 bg-white/5 rounded-full animate-float" style="animation-delay: 1s;"></div>
+            <div class="absolute bottom-20 left-1/3 w-12 h-12 bg-white/5 rounded-full animate-float" style="animation-delay: 2s;"></div>
         </div>
         
         <div class="relative z-10 max-w-6xl mx-auto">
@@ -208,37 +208,9 @@
     </div>
 
     <div class="max-w-6xl mx-auto p-6 -mt-8 relative z-10">
-        <div id="statusLiveRegion" role="status" aria-live="polite" class="sr-only"></div>
-
-        <div id="loadingIndicator" class="flex justify-center items-center py-12" aria-live="assertive">
+        <div id="loadingIndicator" class="flex justify-center items-center py-12">
             <div class="loading-spinner"></div>
             <span class="ml-3">กำลังโหลดข้อมูล...</span>
-        </div>
-
-        <div id="userIdInputContainer" class="glass-card mb-8 animate-slide-up hidden">
-            <div class="p-6">
-                <div class="section-header">
-                    <i class="fas fa-id-badge mr-3 text-blue-500"></i>
-                    <span>ระบุรหัสผู้ใช้งานของคุณ</span>
-                </div>
-                <p class="text-sm text-gray-600 mb-4">
-                    เนื่องจากไม่ได้เข้าผ่าน LINE LIFF กรุณาใส่ User ID ของคุณเพื่อติดตามงาน
-                    (สำหรับทดสอบ หรือเข้าจาก Web Browser โดยตรง)
-                </p>
-                <div class="flex gap-4">
-                    <label for="manualUserIdInput" class="sr-only">User ID</label>
-                    <input
-                        type="text"
-                        id="manualUserIdInput"
-                        placeholder="กรุณาใส่ User ID ของคุณ (เช่น Uxxxxxxxxxxxxxxx)"
-                        class="form-input flex-1"
-                        aria-label="ช่องใส่ User ID ด้วยตนเอง"
-                    >
-                    <button id="submitUserIdBtn" class="btn-primary px-6 py-2 rounded-lg" aria-label="ยืนยัน User ID">
-                        ยืนยัน
-                    </button>
-                </div>
-            </div>
         </div>
 
         <div id="mainContent" class="hidden">
@@ -249,15 +221,13 @@
                         <span>ค้นหางานซ่อม</span>
                     </div>
                     <div class="flex gap-4">
-                        <label for="searchInput" class="sr-only">ใส่เลขที่งานหรือรายละเอียดงาน</label>
                         <input
                             type="text"
                             id="searchInput"
                             placeholder="ใส่เลขที่งานหรือรายละเอียดงาน..."
                             class="form-input flex-1"
-                            aria-label="ค้นหางานแจ้งซ่อม"
                         >
-                        <button id="searchBtn" class="btn-primary px-6 py-2 rounded-lg" aria-label="ปุ่มค้นหา">
+                        <button id="searchBtn" class="btn-primary px-6 py-2 rounded-lg">
                             <i class="fas fa-search mr-2"></i>
                             ค้นหา
                         </button>
@@ -276,9 +246,8 @@
                     
                     <div id="noJobsFound" class="glass-card hidden">
                         <div class="text-center py-8">
-                            <i class="fas fa-file-alt text-4xl text-gray-400 mb-4" aria-hidden="true"></i>
+                            <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
                             <p class="text-muted-foreground">ไม่พบงานซ่อมของคุณ</p>
-                            <p class="text-sm text-gray-500 mt-2" id="noJobsFoundMessage"></p>
                         </div>
                     </div>
                 </div>
@@ -286,7 +255,7 @@
                 <div class="lg:sticky lg:top-6">
                     <div id="emptyDetails" class="glass-card">
                         <div class="text-center py-12">
-                            <i class="fas fa-file-alt text-4xl text-gray-400 mb-4" aria-hidden="true"></i>
+                            <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
                             <p class="text-gray-500">เลือกงานจากรายการเพื่อดูรายละเอียด</p>
                         </div>
                     </div>
@@ -299,219 +268,125 @@
     </div>
 
     <script>
-        // ตั้งค่า LIFF ID และ Google Apps Script URL
-        // **สำคัญ: คุณต้องเปลี่ยน 'YOUR_LIFF_ID' เป็น LIFF ID จริงของคุณ**
-        const liffId = '2007374280-GR1Q3YxJ'; // <<< **แก้ไข: ใส่ LIFF ID ของคุณที่นี่**
-        // **สำคัญ: คุณต้องเปลี่ยน 'YOUR_APPS_SCRIPT_WEB_APP_URL' เป็น URL ของ Google Apps Script Web App ของคุณ**
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMT0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec'; // <<< **แก้ไข: ใส่ URL Web App ของ Apps Script ที่ Deploy แล้ว**
+        // ตั้งค่า LIFF
+        const liffId = '2007374280-GEYwyNdl';
         
-        let userId = ''; // This will hold the LIFF User ID or manually entered ID
+        // ตั้งค่า Google Apps Script URL
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
+        
+        // ตัวแปรเก็บข้อมูลผู้ใช้
+        let userId = '';
+        let userDisplayName = '';
+        let userPictureUrl = '';
+        
+        // ตัวแปรเก็บข้อมูลงานซ่อม
         let repairJobs = [];
         let filteredJobs = [];
-        let selectedJobId = null; // Track selected job
-
-        const elements = {
-            loadingIndicator: document.getElementById('loadingIndicator'),
-            mainContent: document.getElementById('mainContent'),
-            searchInput: document.getElementById('searchInput'),
-            searchBtn: document.getElementById('searchBtn'),
-            jobsContainer: document.getElementById('jobsContainer'),
-            jobCount: document.getElementById('jobCount'),
-            noJobsFound: document.getElementById('noJobsFound'),
-            noJobsFoundMessage: document.getElementById('noJobsFoundMessage'),
-            emptyDetails: document.getElementById('emptyDetails'),
-            jobDetailsContainer: document.getElementById('jobDetailsContainer'),
-            backBtn: document.getElementById('backBtn'),
-            statusLiveRegion: document.getElementById('statusLiveRegion'),
-            // New elements for Web App mode
-            userIdInputContainer: document.getElementById('userIdInputContainer'),
-            manualUserIdInput: document.getElementById('manualUserIdInput'),
-            submitUserIdBtn: document.getElementById('submitUserIdBtn')
-        };
-
-        // Helper to update ARIA live region
-        const announceStatus = (message) => {
-            elements.statusLiveRegion.textContent = message;
-        };
-
-        // Function to show/hide loading indicator
-        const showLoading = (message = 'กำลังโหลดข้อมูล...') => {
-            elements.loadingIndicator.classList.remove('hidden');
-            elements.loadingIndicator.innerHTML = `
-                <div class="loading-spinner"></div>
-                <span class="ml-3">${message}</span>
-            `;
-            elements.mainContent.classList.add('hidden');
-            elements.userIdInputContainer.classList.add('hidden'); // Ensure this is hidden during loading
-            announceStatus(message);
-        };
-
-        const hideLoading = () => {
-            elements.loadingIndicator.classList.add('hidden');
-            elements.mainContent.classList.remove('hidden');
-            elements.userIdInputContainer.classList.add('hidden'); // Ensure this is hidden once main content shows
-            announceStatus('โหลดข้อมูลเสร็จสิ้น');
-        };
-
-        const showError = (message, retryFn) => {
-            elements.loadingIndicator.innerHTML = `
-                <div class="text-center">
-                    <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-2"></i>
-                    <p>${message}</p>
-                    ${retryFn ? `
-                        <button onclick="${retryFn.name}()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">
+        
+        // ฟังก์ชันเริ่มต้น LIFF
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId });
+                
+                if (!liff.isLoggedIn()) {
+                    // ถ้าไม่ได้ล็อกอิน ให้ล็อกอินก่อน
+                    liff.login();
+                    return;
+                }
+                
+                // ดึงข้อมูลโปรไฟล์ผู้ใช้
+                const profile = await liff.getProfile();
+                userId = profile.userId;
+                userDisplayName = profile.displayName;
+                userPictureUrl = profile.pictureUrl || '';
+                
+                // โหลดข้อมูลงานซ่อม
+                loadRepairJobs();
+                
+            } catch (error) {
+                console.error('LIFF initialization failed', error);
+                document.getElementById('loadingIndicator').innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-2"></i>
+                        <p>เกิดข้อผิดพลาดในการเชื่อมต่อ LINE</p>
+                        <button onclick="window.location.reload()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">
                             ลองใหม่
                         </button>
-                    ` : ''}
-                </div>
-            `;
-            elements.loadingIndicator.classList.remove('hidden');
-            elements.mainContent.classList.add('hidden');
-            elements.userIdInputContainer.classList.add('hidden'); // Always hide input container on error
-            announceStatus(`เกิดข้อผิดพลาด: ${message}`);
-        };
-
-        // Function to format date strings
-        const formatDate = (dateString) => {
-            if (!dateString) return 'ไม่มีข้อมูล';
-            try {
-                const date = new Date(dateString);
-                if (isNaN(date.getTime())) return 'วันที่ไม่ถูกต้อง';
-                return date.toLocaleDateString('th-TH', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } catch (e) {
-                console.error("Error formatting date:", e);
-                return 'วันที่ไม่ถูกต้อง';
+                    </div>
+                `;
             }
-        };
-
-        // Function to initialize LIFF or handle Web App mode
-        async function initializeApp() {
-            showLoading('กำลังเริ่มต้น...');
-
-            if (liff && liff.init) { // Check if LIFF SDK is loaded
-                try {
-                    await liff.init({ liffId });
-                    
-                    if (liff.isInClient()) {
-                        // Running in LINE LIFF
-                        console.log('Running in LINE LIFF client.');
-                        if (!liff.isLoggedIn()) {
-                            // If not logged in, redirect to LIFF login page
-                            liff.login();
-                            return; // Stop execution, LIFF will redirect
-                        }
-                        const profile = await liff.getProfile();
-                        userId = profile.userId;
-                        console.log('LIFF User ID:', userId);
-                        loadRepairJobs();
-                    } else {
-                        // Running as a standalone Web App
-                        console.log('Running as a standalone Web App.');
-                        promptForUserId(); // Ask for user ID
-                    }
-                } catch (error) {
-                    console.error('LIFF initialization failed:', error);
-                    // If LIFF fails even in LINE, or if it's a web app and LIFF errors
-                    showError('เกิดข้อผิดพลาดในการเริ่มต้น LIFF. กรุณาลองใหม่อีกครั้ง.', initializeApp);
-                }
-            } else {
-                // LIFF SDK not loaded, definitely a Web App
-                console.log('LIFF SDK not loaded. Assuming Web App mode.');
-                promptForUserId(); // Ask for user ID
-            }
-        }
-
-        // Function to prompt for User ID in Web App mode
-        function promptForUserId() {
-            elements.loadingIndicator.classList.add('hidden');
-            elements.mainContent.classList.add('hidden');
-            elements.userIdInputContainer.classList.remove('hidden');
-            announceStatus('โปรดใส่รหัสผู้ใช้งานของคุณ');
-
-            elements.submitUserIdBtn.onclick = () => {
-                const enteredId = elements.manualUserIdInput.value.trim();
-                if (enteredId) {
-                    userId = enteredId;
-                    console.log('Manually entered User ID:', userId);
-                    loadRepairJobs();
-                } else {
-                    alert('กรุณาใส่ User ID ก่อน');
-                    elements.manualUserIdInput.focus();
-                }
-            };
-
-            elements.manualUserIdInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    elements.submitUserIdBtn.click();
-                }
-            });
         }
         
-        // Function to load repair jobs from Google Sheet
+        // ฟังก์ชันโหลดข้อมูลงานซ่อมจาก Google Sheet
         async function loadRepairJobs() {
-            if (!userId) {
-                console.warn('No User ID available. Cannot load jobs.');
-                showError('ไม่พบ User ID. กรุณาลองใหม่หรือใส่ User ID.', promptForUserId);
-                return;
-            }
-
-            showLoading('กำลังโหลดข้อมูลงานซ่อม...');
             try {
+                // แสดง loading indicator
+                document.getElementById('loadingIndicator').classList.remove('hidden');
+                document.getElementById('mainContent').classList.add('hidden');
+                
+                // เรียก API เพื่อดึงข้อมูลงานซ่อม
                 const response = await fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}`);
                 const data = await response.json();
                 
                 if (data.status === 'success') {
-                    repairJobs = data.data || []; // Ensure it's an array
+                    repairJobs = data.data;
                     filteredJobs = [...repairJobs];
                     
+                    // แสดงรายการงานซ่อม
                     renderJobList();
-                    hideLoading();
                     
+                    // ซ่อน loading indicator และแสดงเนื้อหาหลัก
+                    document.getElementById('loadingIndicator').classList.add('hidden');
+                    document.getElementById('mainContent').classList.remove('hidden');
+                    
+                    // ถ้าไม่มีงานซ่อม
                     if (repairJobs.length === 0) {
-                        elements.noJobsFound.classList.remove('hidden');
-                        elements.noJobsFoundMessage.textContent = 'ยังไม่มีงานแจ้งซ่อมที่คุณแจ้งไว้';
-                    } else {
-                        elements.noJobsFound.classList.add('hidden');
+                        document.getElementById('noJobsFound').classList.remove('hidden');
                     }
                 } else {
-                    throw new Error(data.message || 'ไม่สามารถโหลดข้อมูลงานซ่อมได้');
+                    throw new Error(data.message || 'Failed to load repair jobs');
                 }
             } catch (error) {
                 console.error('Error loading repair jobs:', error);
-                showError(`เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}`, loadRepairJobs);
+                document.getElementById('loadingIndicator').innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-2"></i>
+                        <p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>
+                        <p class="text-sm text-gray-500 mb-3">${error.message}</p>
+                        <button onclick="loadRepairJobs()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">
+                            ลองใหม่
+                        </button>
+                    </div>
+                `;
             }
         }
         
-        // Function to render the list of repair jobs
+        // ฟังก์ชันแสดงรายการงานซ่อม
         function renderJobList() {
-            elements.jobsContainer.innerHTML = '';
-            elements.jobCount.textContent = filteredJobs.length;
+            const jobsContainer = document.getElementById('jobsContainer');
+            const jobCountElement = document.getElementById('jobCount');
             
+            // ล้างรายการเก่า
+            jobsContainer.innerHTML = '';
+            jobCountElement.textContent = filteredJobs.length;
+            
+            // ถ้าไม่มีงานซ่อม
             if (filteredJobs.length === 0) {
-                elements.noJobsFound.classList.remove('hidden');
-                elements.noJobsFoundMessage.textContent = elements.searchInput.value.trim() ? 'ไม่พบงานซ่อมที่ตรงกับคำค้นหาของคุณ' : 'ยังไม่มีงานแจ้งซ่อมที่คุณแจ้งไว้';
-                elements.jobDetailsContainer.classList.add('hidden');
-                elements.emptyDetails.classList.remove('hidden');
+                document.getElementById('noJobsFound').classList.remove('hidden');
                 return;
             } else {
-                elements.noJobsFound.classList.add('hidden');
+                document.getElementById('noJobsFound').classList.add('hidden');
             }
             
+            // สร้างการ์ดงานซ่อมแต่ละรายการ
             filteredJobs.forEach((job, index) => {
                 const jobCard = document.createElement('div');
                 jobCard.className = `glass-card job-card cursor-pointer animate-slide-up`;
-                jobCard.style.animationDelay = `${index * 75}ms`; // Slightly increased delay for smoother cascade
+                jobCard.style.animationDelay = `${index * 100}ms`;
                 jobCard.id = `job-${job.jobId}`;
-                jobCard.setAttribute('role', 'button');
-                jobCard.setAttribute('aria-label', `เลือกงานแจ้งซ่อมรหัส ${job.jobId}`);
                 jobCard.onclick = () => selectJob(job.jobId);
                 
+                // กำหนดคลาสสถานะ
                 let statusClass, statusIcon, statusText;
                 switch(job.status) {
                     case 'แจ้งซ่อมใหม่':
@@ -535,11 +410,12 @@
                         statusText = 'ยกเลิก';
                         break;
                     default:
-                        statusClass = 'status-new'; // Default to new
+                        statusClass = 'status-new';
                         statusIcon = 'fa-file-circle-plus';
-                        statusText = job.status || 'ไม่ระบุสถานะ';
+                        statusText = job.status;
                 }
                 
+                // กำหนดคลาสความเร่งด่วน
                 let priorityClass;
                 switch(job.urgency) {
                     case 'ต่ำ':
@@ -555,82 +431,88 @@
                         priorityClass = 'priority-critical';
                         break;
                     default:
-                        priorityClass = 'priority-medium'; // Default to medium
+                        priorityClass = 'priority-medium';
                 }
+                
+                // ฟอร์แมตวันที่และเวลา
+                const formatDate = (dateString) => {
+                    if (!dateString) return 'ไม่มีข้อมูล';
+                    const date = new Date(dateString);
+                    // ตรวจสอบว่าเป็นวันที่ที่ถูกต้องหรือไม่ก่อนฟอร์แมต
+                    if (isNaN(date.getTime())) {
+                        return 'วันที่ไม่ถูกต้อง'; 
+                    }
+                    return date.toLocaleDateString('th-TH', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                };
                 
                 jobCard.innerHTML = `
                     <div class="p-4">
                         <div class="flex items-start justify-between mb-3">
                             <div>
-                                <h3 class="font-semibold text-gray-800 text-lg">งานแจ้งซ่อม #${job.jobId}</h3>
-                                <p class="text-gray-500">${job.problemType || 'ไม่ระบุประเภทปัญหา'}</p>
+                                <h3 class="font-semibold text-gray-800 text-lg">${job.jobId}</h3>
+                                <p class="text-gray-500">${job.problemType || 'ไม่มีข้อมูล'}</p>
                             </div>
                             <div class="flex flex-col items-end gap-2">
                                 <span class="status-badge ${statusClass}">
-                                    <i class="fas ${statusIcon} mr-1" aria-hidden="true"></i>
-                                    <span class="sr-only">สถานะ:</span> ${statusText}
+                                    <i class="fas ${statusIcon} mr-1"></i>
+                                    ${statusText}
                                 </span>
                                 <span class="priority-badge ${priorityClass}">
-                                    <span class="sr-only">ความเร่งด่วน:</span> ${job.urgency || 'ปานกลาง'}
+                                    ${job.urgency || 'ปานกลาง'}
                                 </span>
                             </div>
                         </div>
                         
                         <div class="space-y-2 text-sm">
                             <div class="flex items-center text-gray-500">
-                                <i class="fas fa-user mr-2" aria-hidden="true"></i>
-                                <span class="sr-only">ผู้แจ้ง:</span> ${job.fullName || 'ไม่ระบุชื่อ'} - ${job.department || 'ไม่ระบุแผนก'}
+                                <i class="fas fa-user mr-2"></i>
+                                ${job.fullName || 'ไม่ระบุชื่อ'} - ${job.department || 'ไม่ระบุแผนก'}
                             </div>
                             <div class="flex items-center text-gray-500">
-                                <i class="fas fa-calendar-alt mr-2" aria-hidden="true"></i>
-                                <span class="sr-only">วันที่แจ้ง:</span> ${formatDate(job.timestamp)}
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                ${formatDate(job.timestamp)}
                             </div>
                         </div>
                     </div>
                 `;
                 
-                elements.jobsContainer.appendChild(jobCard);
+                jobsContainer.appendChild(jobCard);
             });
-
-            // Re-select job if one was previously selected
-            if (selectedJobId) {
-                const previouslySelectedCard = document.getElementById(`job-${selectedJobId}`);
-                if (previouslySelectedCard) {
-                    previouslySelectedCard.classList.add('selected');
-                } else {
-                    // If the previously selected job is no longer in filtered list, clear details
-                    selectedJobId = null;
-                    elements.jobDetailsContainer.classList.add('hidden');
-                    elements.emptyDetails.classList.remove('hidden');
-                }
-            }
         }
         
-        // Function to select a job and display its details
+        // ฟังก์ชันเลือกงานเพื่อดูรายละเอียด
         function selectJob(jobId) {
+            // หางานที่เลือก
             const selectedJob = filteredJobs.find(job => job.jobId === jobId);
             if (!selectedJob) return;
             
-            // Remove 'selected' class from all job cards
+            // ลบคลาส selected จากทุกการ์ด
             document.querySelectorAll('.job-card').forEach(card => {
                 card.classList.remove('selected');
             });
             
-            // Add 'selected' class to the clicked job card
-            const currentSelectedCard = document.getElementById(`job-${jobId}`);
-            if (currentSelectedCard) {
-                currentSelectedCard.classList.add('selected');
-            }
-            selectedJobId = jobId; // Store the ID of the selected job
+            // เพิ่มคลาส selected ให้กับการ์ดที่เลือก
+            document.getElementById(`job-${jobId}`).classList.add('selected');
             
+            // แสดงรายละเอียดงาน
             renderJobDetails(selectedJob);
-            announceStatus(`แสดงรายละเอียดงานแจ้งซ่อมรหัส ${jobId}`);
         }
         
-        // Function to render job details
+        // ฟังก์ชันแสดงรายละเอียดงาน
         function renderJobDetails(job) {
-            elements.emptyDetails.classList.add('hidden');
+            const jobDetailsContainer = document.getElementById('jobDetailsContainer');
+            const emptyDetails = document.getElementById('emptyDetails');
             
+            // ซ่อน empty state
+            emptyDetails.classList.add('hidden');
+            
+            // กำหนดคลาสสถานะ
             let statusClass, statusIcon, statusText;
             switch(job.status) {
                 case 'แจ้งซ่อมใหม่':
@@ -656,18 +538,35 @@
                 default:
                     statusClass = 'status-new';
                     statusIcon = 'fa-file-circle-plus';
-                    statusText = job.status || 'ไม่ระบุสถานะ';
+                    statusText = job.status;
             }
             
+            // ฟอร์แมตวันที่และเวลา
+            const formatDate = (dateString) => {
+                if (!dateString) return 'ไม่มีข้อมูล';
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) {
+                    return 'วันที่ไม่ถูกต้อง';
+                }
+                return date.toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            };
+            
+            // สร้างรายการไฟล์แนบ (ถ้ามี)
             let fileAttachments = '';
             if (job.imageViewUrls && job.imageViewUrls.length > 0) {
                 fileAttachments = `
                     <div>
                         <h4 class="font-medium mb-3">ไฟล์แนบประกอบ</h4>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            ${job.imageViewUrls.map((url, i) => `
-                                <a href="${url}" target="_blank" class="block border rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200" aria-label="ดูรูปภาพไฟล์แนบที่ ${i + 1}">
-                                    <img src="${url}" alt="ไฟล์แนบรูปภาพ ${i + 1}" class="w-full h-24 object-cover">
+                        <div class="grid grid-cols-2 gap-2">
+                            ${job.imageViewUrls.map(url => `
+                                <a href="${url}" target="_blank" class="border rounded-lg overflow-hidden">
+                                    <img src="${url}" alt="ไฟล์แนบ" class="w-full h-24 object-cover">
                                 </a>
                             `).join('')}
                         </div>
@@ -675,6 +574,7 @@
                 `;
             }
             
+            // สร้างรายการความคืบหน้า (ถ้ามี)
             let progressNotes = '';
             if (job.notes && job.notes.length > 0) {
                 progressNotes = `
@@ -683,8 +583,8 @@
                         <div class="space-y-2">
                             ${job.notes.map(note => `
                                 <div class="flex items-start gap-3 p-3 bg-gray-100 rounded-lg">
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" aria-hidden="true"></div>
-                                    <p class="text-sm text-gray-700">${note}</p>
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                                    <p class="text-sm text-gray-500">${note}</p>
                                 </div>
                             `).join('')}
                         </div>
@@ -692,53 +592,53 @@
                 `;
             }
             
-            elements.jobDetailsContainer.innerHTML = `
+            jobDetailsContainer.innerHTML = `
                 <div class="p-6">
                     <div class="section-header">
-                        <i class="fas fa-file-alt mr-3 text-blue-500" aria-hidden="true"></i>
-                        <span>รายละเอียดงาน #${job.jobId}</span>
+                        <i class="fas fa-file-alt mr-3 text-blue-500"></i>
+                        <span>รายละเอียดงาน ${job.jobId}</span>
                     </div>
                     <div class="space-y-6">
                         <div class="p-4 bg-gray-100 rounded-lg">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="font-medium">สถานะปัจจุบัน</span>
                                 <span class="status-badge ${statusClass}">
-                                    <i class="fas ${statusIcon} mr-1" aria-hidden="true"></i>
-                                    <span class="sr-only">สถานะ:</span> ${statusText}
+                                    <i class="fas ${statusIcon} mr-1"></i>
+                                    ${statusText}
                                 </span>
                             </div>
                             ${job.assignedTo ? `
-                                <p class="text-sm text-gray-700">
+                                <p class="text-sm text-gray-500">
                                     ผู้รับผิดชอบ: ${job.assignedTo}
                                 </p>
-                            ` : '<p class="text-sm text-gray-500">ผู้รับผิดชอบ: ยังไม่ระบุ</p>'}
+                            ` : ''}
                             ${job.estimatedCompletion ? `
-                                <p class="text-sm text-gray-700">
+                                <p class="text-sm text-gray-500">
                                     คาดว่าจะเสร็จ: ${formatDate(job.estimatedCompletion)}
                                 </p>
-                            ` : '<p class="text-sm text-gray-500">คาดว่าจะเสร็จ: ยังไม่ระบุ</p>'}
+                            ` : ''}
                         </div>
 
                         <div>
                             <h4 class="font-medium mb-3">ข้อมูลผู้แจ้ง</h4>
                             <div class="space-y-2 text-sm">
                                 <div class="flex items-center">
-                                    <i class="fas fa-user mr-2 text-gray-500" aria-hidden="true"></i>
+                                    <i class="fas fa-user mr-2 text-gray-500"></i>
                                     ${job.fullName || 'ไม่ระบุชื่อ'}
                                 </div>
                                 <div class="flex items-center">
-                                    <i class="fas fa-phone mr-2 text-gray-500" aria-hidden="true"></i>
+                                    <i class="fas fa-phone mr-2 text-gray-500"></i>
                                     ${job.phone || 'ไม่ระบุเบอร์ติดต่อ'}
                                 </div>
-                                <p class="text-gray-700">${job.department || 'ไม่ระบุแผนก'} - ${job.office || 'ไม่ระบุสำนักงาน'}</p>
+                                <p class="text-gray-500">${job.department || 'ไม่ระบุแผนก'} - ${job.office || 'ไม่ระบุสำนักงาน'}</p>
                             </div>
                         </div>
 
                         <div>
                             <h4 class="font-medium mb-3">รายละเอียดปัญหา</h4>
                             <div class="p-3 bg-gray-100 rounded-lg">
-                                <p class="text-sm font-medium text-blue-600 mb-1">${job.problemType || 'ไม่ระบุประเภทปัญหา'}</p>
-                                <p class="text-sm text-gray-700">${job.problemDetails || 'ไม่มีรายละเอียด'}</p>
+                                <p class="text-sm font-medium text-blue-600 mb-1">${job.problemType || 'ไม่มีข้อมูล'}</p>
+                                <p class="text-sm text-gray-500">${job.problemDetails || 'ไม่มีรายละเอียด'}</p>
                             </div>
                         </div>
                         
@@ -763,82 +663,53 @@
                 </div>
             `;
             
-            elements.jobDetailsContainer.classList.remove('hidden');
+            // แสดงรายละเอียดงาน
+            jobDetailsContainer.classList.remove('hidden');
         }
         
-        // Function to search jobs (unchanged)
-        let searchTimeout;
+        // ฟังก์ชันค้นหางาน
         function searchJobs() {
-            clearTimeout(searchTimeout); // Clear previous timeout
-            searchTimeout = setTimeout(() => {
-                const searchTerm = elements.searchInput.value.toLowerCase();
-                
-                if (!searchTerm.trim()) {
-                    filteredJobs = [...repairJobs];
-                } else {
-                    filteredJobs = repairJobs.filter(job =>
-                        job.jobId.toLowerCase().includes(searchTerm) ||
-                        (job.problemType && job.problemType.toLowerCase().includes(searchTerm)) ||
-                        (job.problemDetails && job.problemDetails.toLowerCase().includes(searchTerm)) ||
-                        (job.status && job.status.toLowerCase().includes(searchTerm)) ||
-                        (job.urgency && job.urgency.toLowerCase().includes(searchTerm)) ||
-                        (job.fullName && job.fullName.toLowerCase().includes(searchTerm)) ||
-                        (job.department && job.department.toLowerCase().includes(searchTerm)) ||
-                        (job.office && job.office.toLowerCase().includes(searchTerm)) ||
-                        (job.assignedTo && job.assignedTo.toLowerCase().includes(searchTerm)) ||
-                        (job.notes && job.notes.some(note => note.toLowerCase().includes(searchTerm)))
-                    );
-                }
-                
-                renderJobList();
-                
-                // If search results are empty, show no jobs found message
-                if (filteredJobs.length === 0) {
-                    elements.noJobsFound.classList.remove('hidden');
-                    elements.noJobsFoundMessage.textContent = 'ไม่พบงานซ่อมที่ตรงกับคำค้นหาของคุณ';
-                } else {
-                    elements.noJobsFound.classList.add('hidden');
-                }
-
-                // Hide details if no job is selected or the selected job is filtered out
-                if (selectedJobId && !filteredJobs.some(job => job.jobId === selectedJobId)) {
-                    selectedJobId = null; // Clear selection
-                    elements.jobDetailsContainer.classList.add('hidden');
-                    elements.emptyDetails.classList.remove('hidden');
-                } else if (!selectedJobId && filteredJobs.length > 0) {
-                    // If no job was selected but results exist, show empty details or auto-select first one
-                    elements.jobDetailsContainer.classList.add('hidden');
-                    elements.emptyDetails.classList.remove('hidden');
-                }
-
-                announceStatus(`ค้นหาเสร็จสิ้น พบ ${filteredJobs.length} งาน`);
-            }, 300); // Debounce time in milliseconds
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm.trim()) {
+                filteredJobs = [...repairJobs];
+            } else {
+                filteredJobs = repairJobs.filter(job =>
+                    job.jobId.toLowerCase().includes(searchTerm) ||
+                    (job.problemType && job.problemType.toLowerCase().includes(searchTerm)) ||
+                    (job.problemDetails && job.problemDetails.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            renderJobList();
+            
+            // ซ่อนรายละเอียดงานที่เลือกไว้ (ถ้ามี)
+            document.getElementById('jobDetailsContainer').classList.add('hidden');
+            document.getElementById('emptyDetails').classList.remove('hidden');
         }
         
-        // Function to go back (or close LIFF)
+        // ฟังก์ชันกลับไปหน้าหลัก
         function goBack() {
-            if (liff && liff.isInClient()) {
+            if (liff.isInClient()) {
                 liff.closeWindow();
             } else {
-                // If not in LIFF, go back to a default page or previous history
-                // Make sure 'index.html' is the correct path for your main app page
-                window.location.href = 'index.html'; 
+                // ตัวอย่าง: ถ้าอยู่นอก LIFF ให้กลับไปที่ Google.com
+                // คุณอาจต้องการเปลี่ยนเส้นทางนี้ให้เหมาะสมกับแอปพลิเคชันของคุณ
+                window.location.href = 'https://itrequests.netlify.app/track.html'; 
             }
         }
         
         // Event Listeners
-        elements.searchBtn.addEventListener('click', searchJobs);
-        elements.searchInput.addEventListener('input', searchJobs); // Use 'input' for live search
-        elements.searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent form submission if it were a form
-                searchJobs();
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('searchBtn').addEventListener('click', searchJobs);
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchJobs();
+            });
+            document.getElementById('backBtn').addEventListener('click', goBack);
+            
+            // เริ่มต้นแอปพลิเคชัน LIFF
+            initializeLiff();
         });
-        elements.backBtn.addEventListener('click', goBack);
-        
-        // Initialize application when DOM is ready
-        window.onload = initializeApp;
     </script>
 </body>
 </html>
