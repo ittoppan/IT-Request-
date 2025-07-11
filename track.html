@@ -234,7 +234,7 @@
                     </div>
                     
                     <div id="noJobsFound" class="glass-card hidden">
-                        <div class="text-center py-8">
+                        <div class="text-center pb-4  py-8">
                             <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
                             <p class="text-gray-500 font-medium">ไม่พบงานซ่อมในสถานะนี้</p>
                             <p class="text-sm text-gray-400 mt-1">คุณสามารถตรวจสอบสถานะอื่นได้จากเมนูด้านบน</p>
@@ -438,7 +438,7 @@
             
             filteredJobs.forEach((job, index) => {
                 const jobCard = document.createElement('div');
-                jobCard.className = `glass-card job-card cursor-pointer animate-slide-up`;
+                jobCard.className = `glass-card job-card cursor-pointer animate-slide-up p-4`; // เพิ่ม p-4
                 jobCard.style.animationDelay = `${index * 100}ms`;
                 jobCard.id = `job-${job.jobId}`;
                 jobCard.onclick = () => selectJob(job.jobId);
