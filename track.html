@@ -91,6 +91,9 @@
         </div>
       </div>
 
+      <!-- User ID from Line -->
+      <input type="hidden" id="lineUserId" value="<?= lineUserId ?>">
+
       <!-- Jobs List -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Jobs Grid -->
@@ -157,18 +160,35 @@
     // เมื่อหน้าเว็บโหลดเสร็จ
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-      fetchRepairJobs();
+      
+      // ดึง Line User ID จาก hidden input
+      const lineUserId = document.getElementById('lineUserId').value;
+      
+      if (lineUserId) {
+        fetchRepairJobsByLineUser(lineUserId);
+      } else {
+        fetchAllRepairJobs();
+      }
     });
 
-    // ดึงข้อมูลงานซ่อมจาก Google Sheets
-    function fetchRepairJobs() {
+    // ดึงข้อมูลงานซ่อมทั้งหมด
+    function fetchAllRepairJobs() {
       document.getElementById('loadingIndicator').classList.remove('hidden');
       
-      // เรียกใช้ Google Apps Script API
       google.script.run
         .withSuccessHandler(handleJobsData)
         .withFailureHandler(handleError)
-        .getRepairJobs({ action: 'getRepairJobs' });
+        .getAllRepairJobs();
+    }
+
+    // ดึงข้อมูลงานซ่อมตาม Line User ID
+    function fetchRepairJobsByLineUser(lineUserId) {
+      document.getElementById('loadingIndicator').classList.remove('hidden');
+      
+      google.script.run
+        .withSuccessHandler(handleJobsData)
+        .withFailureHandler(handleError)
+        .getRepairJobsByLineUser(lineUserId);
     }
 
     function handleJobsData(response) {
@@ -176,22 +196,22 @@
       
       if (response.status === 'success') {
         jobs = response.data.map(job => {
-          // แปลงข้อมูลจาก Google Sheet ให้ตรงกับโครงสร้างที่ต้องการ
           return {
-            id: job['Timestamp'],
-            jobId: job['เลขที่งานแจ้งซ่อม'],
-            title: job['ประเภทปัญหา'],
-            description: job['รายละเอียดปัญหา'],
-            status: job['สถานะ'] || 'แจ้งซ่อมใหม่',
-            priority: job['ความเร่งด่วน'] || 'ปกติ',
-            requester: job['ชื่อ-นามสกุล'],
-            department: job['แผนก/สำนัก'],
-            office: job['สถานที่'],
-            phone: job['เบอร์โทรศัพท์'],
-            email: job['อีเมล์'],
-            createdAt: job['Timestamp'],
-            updatedAt: job['Timestamp'], // ในกรณีจริงควรมีคอลัมน์วันที่อัพเดทแยกต่างหาก
-            images: job['Image Viewer URLs'] ? job['Image Viewer URLs'].split(', ') : []
+            id: job.id || job['Timestamp'],
+            jobId: job.jobId || job['เลขที่งานแจ้งซ่อม'],
+            title: job.title || job['ประเภทปัญหา'],
+            description: job.description || job['รายละเอียดปัญหา'],
+            status: job.status || job['สถานะ'] || 'แจ้งซ่อมใหม่',
+            priority: job.priority || job['ความเร่งด่วน'] || 'ปกติ',
+            requester: job.requester || job['ชื่อ-นามสกุล'],
+            department: job.department || job['แผนก/สำนัก'],
+            office: job.office || job['สถานที่'],
+            phone: job.phone || job['เบอร์โทรศัพท์'],
+            email: job.email || job['อีเมล์'],
+            lineUserId: job.lineUserId || job['Line User ID'],
+            createdAt: job.createdAt || job['Timestamp'],
+            updatedAt: job.updatedAt || job['วันที่อัพเดท'] || job['Timestamp'],
+            images: job.images || (job['Image Viewer URLs'] ? job['Image Viewer URLs'].split(', ') : [])
           };
         });
         
@@ -204,6 +224,9 @@
         
         if (filteredJobs.length > 0) {
           selectJob(filteredJobs[0]);
+        } else {
+          document.getElementById('jobDetails').classList.add('hidden');
+          document.getElementById('jobDetailsPlaceholder').classList.remove('hidden');
         }
       } else {
         showToast('เกิดข้อผิดพลาด', response.message, 'error');
@@ -407,6 +430,10 @@
                 <div class="flex justify-between">
                   <span class="text-gray-600">วันที่แจ้ง:</span>
                   <span>${formatDate(selectedJob.createdAt)}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">อัพเดทล่าสุด:</span>
+                  <span>${formatDate(selectedJob.updatedAt)}</span>
                 </div>
               </div>
             </div>
