@@ -754,16 +754,23 @@
                 });
             });
 
-            document.getElementById('backBtn').addEventListener('click', () => {
-                if (liff.isInClient()) {
-                    liff.closeWindow();
-                } else {
-                    alert('https://liff.line.me/2007374280-GEYwyNdl');
-                }
-            });
-
-            // Initialize LIFF when the DOM is fully loaded
-            initializeLiff();
+            function goBack() {
+            if (liff.isInClient()) {
+                liff.closeWindow();
+            } else {
+                window.location.href = 'https://liff.line.me/2007374280-GEYwyNdl';
+            }
+        }
+        
+        // Event Listeners
+        document.querySelectorAll('.status-tab').forEach(tab => {
+            tab.addEventListener('click', () => filterJobsByStatus(tab.dataset.status));
+        });
+        
+        document.getElementById('backBtn').addEventListener('click', goBack);
+        
+        // Initialize the LIFF app when the window loads
+        window.onload = initializeLiff;
         });
     </script>
 </body>
