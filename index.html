@@ -273,87 +273,7 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 md:p-8 bg-gray-50">
     <!-- Modal ติดตามงาน -->
-    <div id="trackingModal" class="tracking-modal">
-        <div class="tracking-content p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-800">ติดตามสถานะงานซ่อม</h3>
-                <button id="closeTrackingModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-2 mb-6">
-                <label for="trackingId" class="block text-sm font-medium text-gray-700 mb-1">รหัสงานซ่อม</label>
-                <div class="relative">
-                    <input
-                        type="text"
-                        id="trackingId"
-                        placeholder="เช่น IT-2023-00123"
-                        class="form-input pl-12"
-                    >
-                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                </div>
-            </div>
-            
-            <button id="trackButton" class="btn-primary w-full py-3 rounded-lg mb-6">
-                <i class="fas fa-search mr-2"></i>ตรวจสอบสถานะ
-            </button>
-            
-            <div id="trackingResult" class="hidden">
-                <h4 class="font-bold text-lg mb-4">สถานะงานซ่อม: <span id="jobStatus" class="text-blue-600">กำลังดำเนินการ</span></h4>
-                
-                <div class="space-y-4">
-                    <div class="status-item">
-                        <div class="status-dot completed">
-                            <i class="fas fa-check text-xs"></i>
-                        </div>
-                        <div class="bg-green-50 p-4 rounded-lg">
-                            <h5 class="font-medium text-green-800">รับเรื่องแล้ว</h5>
-                            <p class="text-sm text-gray-600">วันที่ 12 ก.ค. 2023 เวลา 09:30 น.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="status-item">
-                        <div class="status-dot completed">
-                            <i class="fas fa-check text-xs"></i>
-                        </div>
-                        <div class="bg-green-50 p-4 rounded-lg">
-                            <h5 class="font-medium text-green-800">กำลังตรวจสอบ</h5>
-                            <p class="text-sm text-gray-600">วันที่ 12 ก.ค. 2023 เวลา 10:45 น.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="status-item">
-                        <div class="status-dot current">
-                            <i class="fas fa-cog fa-spin text-xs"></i>
-                        </div>
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <h5 class="font-medium text-blue-800">กำลังดำเนินการซ่อม</h5>
-                            <p class="text-sm text-gray-600">วันที่ 12 ก.ค. 2023 เวลา 13:20 น.</p>
-                            <p class="text-sm mt-1">ช่าง: นายสมชาย ใจดี</p>
-                        </div>
-                    </div>
-                    
-                    <div class="status-item">
-                        <div class="status-dot pending">
-                            <i class="fas fa-clock text-xs"></i>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h5 class="font-medium text-gray-800">ซ่อมเสร็จสิ้น</h5>
-                            <p class="text-sm text-gray-600">-</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <h5 class="font-medium mb-2">หมายเหตุจากช่าง:</h5>
-                    <div class="bg-yellow-50 p-4 rounded-lg">
-                        <p class="text-sm">พบปัญหาที่เมนบอร์ด กำลังสั่งซื้ออะไหล่ทดแทน คาดว่าจะดำเนินการเสร็จสิ้นภายใน 2-3 วันทำการ</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <div class="glass-card w-full max-w-4xl rounded-2xl overflow-hidden shadow-xl animate-fade-in">
         <!-- Header -->
@@ -372,14 +292,16 @@
                     </div>
                 </div>
 
+                
+                <h1 class="text-3xl md:text-4xl font-bold mb-3 transform transition-transform duration-300 hover:scale-105 inline-block">
+                    แบบฟอร์มแจ้งซ่อม IT
+                </h1>
+                
                 <button id="openTrackingModal" class="btn-secondary px-6 py-2 rounded-full mb-6 inline-flex items-center animate-pulse">
                     <i class="fas fa-search mr-2"></i>
                     ติดตามงานซ่อม
                 </button>
 
-                <h1 class="text-3xl md:text-4xl font-bold mb-3 transform transition-transform duration-300 hover:scale-105 inline-block">
-                    แบบฟอร์มแจ้งซ่อม IT
-                </h1>
                 <p class="text-lg opacity-90">
                     ระบบแจ้งซ่อมออนไลน์ที่ทันสมัยและรวดเร็ว
                 </p>
