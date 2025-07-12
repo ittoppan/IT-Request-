@@ -210,48 +210,50 @@
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
-        <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in" style="animation-delay: 100ms">
-            <div class="text-4xl font-extrabold text-blue-700 mb-1"data-status="all" id="totalJobsCount">0</div>
-            <div class="text-sm text-gray-600 font-medium">ทั้งหมด</div>
-        </div>
-        <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in" style="animation-delay: 200ms">
-            <div class="text-4xl font-extrabold text-blue-500 mb-1" data-status="new" id="newJobsCount">0</div>
-            <div class="text-sm text-gray-600 font-medium">แจ้งซ่อมใหม่</div>
-        </div>
-        <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in" style="animation-delay: 300ms">
-            <div class="text-4xl font-extrabold text-orange-500 mb-1" data-status="pending" id="pendingJobsCount">0</div>
-            <div class="text-sm text-gray-600 font-medium">รอดำเนินการ</div>
-        </div>
-        <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in" style="animation-delay: 400ms">
-            <div class="text-4xl font-extrabold text-yellow-500 mb-1" data-status="in-progress" id="inProgressJobsCount">0</div>
-            <div class="text-sm text-gray-600 font-medium">กำลังดำเนินการ</div>
-        </div>
-        <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in" style="animation-delay: 500ms">
-            <div class="text-4xl font-extrabold text-green-600 mb-1"data-status="completed" id="completedJobsCount">0</div>
-            <div class="text-sm text-gray-600 font-medium">เสร็จสิ้น</div>
-        </div>
+    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="all" style="animation-delay: 100ms">
+        <div class="text-4xl font-extrabold text-blue-700 mb-1" id="totalJobsCount">0</div>
+        <div class="text-sm text-gray-600 font-medium">ทั้งหมด</div>
     </div>
+    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="new" style="animation-delay: 200ms">
+        <div class="text-4xl font-extrabold text-blue-500 mb-1" id="newJobsCount">0</div>
+        <div class="text-sm text-gray-600 font-medium">แจ้งซ่อมใหม่</div>
+    </div>
+    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="pending" style="animation-delay: 300ms">
+        <div class="text-4xl font-extrabold text-orange-500 mb-1" id="pendingJobsCount">0</div>
+        <div class="text-sm text-gray-600 font-medium">รอดำเนินการ</div>
+    </div>
+    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="in-progress" style="animation-delay: 400ms">
+        <div class="text-4xl font-extrabold text-yellow-500 mb-1" id="inProgressJobsCount">0</div>
+        <div class="text-sm text-gray-600 font-medium">กำลังดำเนินการ</div>
+    </div>
+    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="completed" style="animation-delay: 500ms">
+        <div class="text-4xl font-extrabold text-green-600 mb-1" id="completedJobsCount">0</div>
+        <div class="text-sm text-gray-600 font-medium">เสร็จสิ้น</div>
+    </div>
+</div>
 
-    <div class="flex overflow-x-auto pb-3 -mx-2 hide-scrollbar"> <div class="flex space-x-2 px-2 flex-grow sm:flex-grow-0"> <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200 active-tab-style" data-status="all">
-                <i class="fas fa-list mr-2"></i>ทั้งหมด
-            </div>
-            <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="new">
-                <i class="fas fa-file-circle-plus mr-2"></i>แจ้งซ่อมใหม่
-            </div>
-            <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="pending">
-                <i class="fas fa-clock mr-2"></i>รอดำเนินการ
-            </div>
-            <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="in-progress">
-                <i class="fas fa-tools mr-2"></i>กำลังดำเนินการ
-            </div>
-            <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="completed">
-                <i class="fas fa-check-circle mr-2"></i>เสร็จสิ้น
-            </div>
-            <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="cancelled">
-                <i class="fas fa-times-circle mr-2"></i>ยกเลิก
-            </div>
+<div class="flex overflow-x-auto pb-3 -mx-2 hide-scrollbar">
+    <div class="flex space-x-2 px-2 flex-grow sm:flex-grow-0">
+        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200 active-tab-style" data-status="all">
+            <i class="fas fa-list mr-2"></i>ทั้งหมด
+        </div>
+        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="new">
+            <i class="fas fa-file-circle-plus mr-2"></i>แจ้งซ่อมใหม่
+        </div>
+        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="pending">
+            <i class="fas fa-clock mr-2"></i>รอดำเนินการ
+        </div>
+        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="in-progress">
+            <i class="fas fa-tools mr-2"></i>กำลังดำเนินการ
+        </div>
+        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="completed">
+            <i class="fas fa-check-circle mr-2"></i>เสร็จสิ้น
+        </div>
+        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="cancelled">
+            <i class="fas fa-times-circle mr-2"></i>ยกเลิก
         </div>
     </div>
+</div>
 </div>
 
 
@@ -332,6 +334,10 @@
                 showError('เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF', error.message);
             }
         }
+
+
+
+        
         
         /**
          * Shows an error message in the loading indicator area.
@@ -399,7 +405,7 @@
             const completedJobs = repairJobs.filter(job => job.status === 'เสร็จสิ้น').length;
             
             document.getElementById('totalJobsCount').textContent = totalJobs;
-             document.getElementById('newJobsCount').textContent = newJobs;
+            document.getElementById('newJobsCount').textContent = newJobs;
             document.getElementById('pendingJobsCount').textContent = pendingJobs;
             document.getElementById('inProgressJobsCount').textContent = inProgressJobs;
             document.getElementById('completedJobsCount').textContent = completedJobs;
@@ -815,6 +821,51 @@
         
         // Initialize the LIFF app when the window loads
         window.onload = initializeLiff;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+    const statCards = document.querySelectorAll('.stat-card');
+    const statusTabs = document.querySelectorAll('.status-tab');
+
+    // ฟังก์ชันสำหรับจัดการการเปลี่ยนสถานะแท็บ
+    function setActiveTab(selectedStatus) {
+        // ลบคลาส active-tab-style ออกจากทุกแท็บ
+        statusTabs.forEach(tab => {
+            tab.classList.remove('active-tab-style');
+        });
+
+        // เพิ่มคลาส active-tab-style ให้กับแท็บที่ตรงกับ selectedStatus
+        const targetTab = document.querySelector(`.status-tab[data-status="${selectedStatus}"]`);
+        if (targetTab) {
+            targetTab.classList.add('active-tab-style');
+            // คุณอาจต้องการเรียกฟังก์ชันเพื่อโหลดข้อมูลตารางที่นี่
+            // เช่น loadJobsByStatus(selectedStatus);
+            console.log(`Filtering jobs by status: ${selectedStatus}`);
+        }
+    }
+
+    // เพิ่ม Event Listener ให้กับ Stat Cards
+    statCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const status = this.dataset.status; // ดึงค่าจาก data-status ของ card ที่คลิก
+            setActiveTab(status); // เรียกฟังก์ชันให้จัดการ active tab และ filter
+        });
+    });
+
+    // เพิ่ม Event Listener ให้กับ Status Tabs (หากยังไม่มี)
+    // ถ้าคุณมีโค้ดสำหรับจัดการการคลิก tab อยู่แล้ว ก็ไม่จำเป็นต้องเพิ่มส่วนนี้
+    statusTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const status = this.dataset.status;
+            setActiveTab(status);
+        });
+    });
+
+    // ตั้งค่าเริ่มต้นเมื่อโหลดหน้า
+    // setActiveTab('all'); // ถ้าต้องการให้ 'ทั้งหมด' เป็น Active ตั้งแต่แรก
+});
+    
+    
+    
     </script>
 </body>
 </html>
