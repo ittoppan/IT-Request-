@@ -36,19 +36,6 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
         
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        
         .form-input {
             border: 1px solid #e2e8f0;
             border-radius: 0.5rem;
@@ -89,14 +76,6 @@
             animation: float 6s ease-in-out infinite;
         }
         
-        .animate-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        
-        .animate-bounce {
-            animation: bounce 1s infinite;
-        }
-        
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -116,22 +95,6 @@
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        @keyframes bounce {
-            0%, 100% { 
-                transform: translateY(-25%); 
-                animation-timing-function: cubic-bezier(0.8,0,1,1);
-            }
-            50% {
-                transform: translateY(0);
-                animation-timing-function: cubic-bezier(0,0,0.2,1);
-            }
         }
         
         .section-header {
@@ -180,132 +143,41 @@
         .thumbnail-container:hover .thumbnail-remove {
             opacity: 1;
         }
-        
-        .tracking-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .tracking-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .tracking-content {
-            background-color: white;
-            border-radius: 1rem;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-        }
-        
-        .tracking-modal.active .tracking-content {
-            transform: translateY(0);
-        }
-        
-        .status-item {
-            position: relative;
-            padding-left: 2rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .status-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .status-item::before {
-            content: '';
-            position: absolute;
-            left: 0.5rem;
-            top: 0;
-            height: 100%;
-            width: 2px;
-            background-color: #e2e8f0;
-        }
-        
-        .status-item:last-child::before {
-            height: 1.5rem;
-        }
-        
-        .status-dot {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 1.5rem;
-            height: 1.5rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
-        }
-        
-        .status-dot.completed {
-            background-color: #10b981;
-            color: white;
-        }
-        
-        .status-dot.current {
-            background-color: #3b82f6;
-            color: white;
-            animation: pulse 2s infinite;
-        }
-        
-        .status-dot.pending {
-            background-color: #e2e8f0;
-            color: #64748b;
-        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 md:p-8 bg-gray-50">
-    <!-- Modal ติดตามงาน -->
-    
-
     <div class="glass-card w-full max-w-4xl rounded-2xl overflow-hidden shadow-xl animate-fade-in">
         <!-- Header -->
         <div class="bg-gradient-primary text-white p-8 relative overflow-hidden">
             <div class="absolute inset-0 opacity-10">
                 <div class="absolute top-4 right-4 w-32 h-32 bg-white rounded-full blur-3xl animate-float"></div>
                 <div class="absolute bottom-4 left-4 w-24 h-24 bg-white rounded-full blur-2xl animate-float" style="animation-delay: 1s;"></div>
-                <div class="absolute top-1/4 left-1/4 w-16 h-16 bg-white rounded-full blur-xl animate-float" style="animation-delay: 1.5s;"></div>
             </div>
             
             <div class="relative z-10 text-center">
                 <div class="flex justify-center mb-6">
-                    <div class="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center shadow-lg relative group">
-                        <img id="profilePicture" src="https://via.placeholder.com/96/CCCCCC/FFFFFF?text=PROFILE" alt="รูปโปรไฟล์" class="w-20 h-20 rounded-full object-cover transition-transform duration-300 group-hover:scale-110">
-                        <div class="absolute inset-0 rounded-full border-2 border-transparent group-hover:border-white/50 transition-all duration-300"></div>
+                    <div class="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center shadow-lg">
+                        <img id="profilePicture" src="https://via.placeholder.com/96/CCCCCC/FFFFFF?text=PROFILE" alt="รูปโปรไฟล์" class="w-20 h-20 rounded-full object-cover">
                     </div>
-                </div>
 
-                
-                <h1 class="text-3xl md:text-4xl font-bold mb-3 transform transition-transform duration-300 hover:scale-105 inline-block">
+                </div>
+                <Button variant="outline" className="text-white border-white/30 hover:bg-white/20 font-kanit">
+                <Search className="w-4 h-4 mr-2" />
+                ติดตามงานซ่อม
+              </Button>
+
+                <h1 class="text-3xl md:text-4xl font-bold mb-3">
                     แบบฟอร์มแจ้งซ่อม IT
                 </h1>
-                
-                
-
                 <p class="text-lg opacity-90">
                     ระบบแจ้งซ่อมออนไลน์ที่ทันสมัยและรวดเร็ว
                 </p>
-          <a href="https://liff.line.me/2007374280-GR1Q3YxJ" target="_blank" class="btn-secondary px-6 py-2 rounded-full mb-6 inline-flex items-center animate-pulse no-underline hover:no-underline">
-          <i class="fas fa-search mr-2"></i>
-             ติดตามงานซ่อม
+                <div class="flex justify-center mt-4 space-x-2">
+                    <a href="https://liff.line.me/2007374280-GR1Q3YxJ" target="_blank" class="btn-secondary px-6 py-2 rounded-full mb-6 inline-flex items-center animate-pulse no-underline hover:no-underline">
+    <i class="fas fa-search mr-2"></i>
+    ติดตามงานซ่อม
            </a>
+                </div>
             </div>
         </div>
 
@@ -335,7 +207,7 @@
                                     name="fullName"
                                     required
                                     placeholder="เช่น สมชาย ใจดี"
-                                    class="form-input pl-12 transition-all duration-300 hover:border-blue-300 focus:hover:border-blue-500"
+                                    class="form-input pl-12"
                                 >
                                 <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                             </div>
@@ -350,7 +222,7 @@
                                     id="department"
                                     name="department"
                                     required
-                                    class="form-input pl-12 appearance-none bg-white transition-all duration-300 hover:border-blue-300 focus:hover:border-blue-500"
+                                    class="form-input pl-12 appearance-none bg-white"
                                 >
                                     <option value="" disabled selected>เลือกแผนก</option>
                                     <option value="สำนักงานรังสิต">สำนักงานรังสิต</option>
@@ -375,7 +247,7 @@
                                     id="office"
                                     name="office"
                                     required
-                                    class="form-input pl-12 appearance-none bg-white transition-all duration-300 hover:border-blue-300 focus:hover:border-blue-500"
+                                    class="form-input pl-12 appearance-none bg-white"
                                 >
                                     <option value="" disabled selected>เลือกสำนักงาน</option>
                                     <option value="สำนักงานรังสิต">สำนักงานรังสิต</option>
@@ -396,7 +268,7 @@
                                     name="phone"
                                     required
                                     placeholder="เช่น 02-1234567"
-                                    class="form-input pl-12 transition-all duration-300 hover:border-blue-300 focus:hover:border-blue-500"
+                                    class="form-input pl-12"
                                 >
                                 <i class="fas fa-phone absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                             </div>
@@ -413,7 +285,7 @@
                                 id="email"
                                 name="email"
                                 placeholder="เช่น example@company.com"
-                                class="form-input pl-12 transition-all duration-300 hover:border-blue-300 focus:hover:border-blue-500"
+                                class="form-input pl-12"
                             >
                             <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                         </div>
@@ -480,7 +352,7 @@
                             rows="4"
                             required
                             placeholder="อธิบายปัญหาที่พบให้ละเอียดที่สุด เช่น อาการที่พบ ข้อความแจ้งเตือน เวลาเกิดปัญหา"
-                            class="form-input min-h-[120px] resize-none transition-all duration-300 hover:border-blue-300 focus:hover:border-blue-500"
+                            class="form-input min-h-[120px] resize-none"
                         ></textarea>
                     </div>
 
@@ -537,7 +409,7 @@
                             class="file-upload-zone"
                             onclick="document.getElementById('fileInput').click()"
                         >
-                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-4 transition-transform duration-300 group-hover:scale-110"></i>
+                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-4"></i>
                             <div class="text-center">
                                 <p class="text-lg font-medium text-gray-800 mb-2">
                                     คลิกเพื่ออัพโหลดไฟล์
@@ -565,7 +437,7 @@
                 <div class="pt-6 animate-slide-up" style="animation-delay: 0.4s;">
                     <button
                         type="submit"
-                        class="btn-primary w-full py-4 text-lg font-medium rounded-lg hover:shadow-xl transition-all duration-300"
+                        class="btn-primary w-full py-4 text-lg font-medium rounded-lg"
                     >
                         <i class="fas fa-paper-plane mr-2"></i>ส่งแบบฟอร์มแจ้งซ่อม
                     </button>
@@ -580,47 +452,6 @@
         
         // เก็บข้อมูลไฟล์ที่อัพโหลด
         let uploadedFiles = [];
-
-        // Modal ติดตามงาน
-        const trackingModal = document.getElementById('trackingModal');
-        const openTrackingModal = document.getElementById('openTrackingModal');
-        const closeTrackingModal = document.getElementById('closeTrackingModal');
-        const trackButton = document.getElementById('trackButton');
-        const trackingResult = document.getElementById('trackingResult');
-
-        openTrackingModal.addEventListener('click', () => {
-            trackingModal.classList.add('active');
-        });
-
-        closeTrackingModal.addEventListener('click', () => {
-            trackingModal.classList.remove('active');
-        });
-
-        trackButton.addEventListener('click', () => {
-            const trackingId = document.getElementById('trackingId').value.trim();
-            
-            if (!trackingId) {
-                Swal.fire({
-                    title: 'กรุณากรอกรหัสงานซ่อม',
-                    text: 'โปรดระบุรหัสงานซ่อมที่ต้องการติดตาม',
-                    icon: 'warning'
-                });
-                return;
-            }
-            
-            // จำลองการโหลดข้อมูล
-            trackButton.disabled = true;
-            trackButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>กำลังตรวจสอบ...';
-            
-            setTimeout(() => {
-                trackingResult.classList.remove('hidden');
-                trackButton.disabled = false;
-                trackButton.innerHTML = '<i class="fas fa-search mr-2"></i>ตรวจสอบสถานะ';
-                
-                // Scroll to result
-                trackingResult.scrollIntoView({ behavior: 'smooth' });
-            }, 1500);
-        });
 
         function setProblemType(type) {
             document.getElementById('problemType').value = type;
@@ -667,7 +498,7 @@
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         fileContainer.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview" class="transition-transform duration-300 hover:scale-105">
+                            <img src="${e.target.result}" alt="Preview">
                             <div class="thumbnail-remove" onclick="removeFile(${index})">
                                 <i class="fas fa-times text-red-500"></i>
                             </div>
@@ -695,7 +526,7 @@
                 `;
                 
                 const wrapper = document.createElement('div');
-                wrapper.className = 'flex flex-col items-center transform transition-transform duration-300 hover:-translate-y-1';
+                wrapper.className = 'flex flex-col items-center';
                 wrapper.appendChild(fileContainer);
                 wrapper.appendChild(fileInfo);
                 
@@ -734,7 +565,7 @@
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         fileContainer.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview" class="transition-transform duration-300 hover:scale-105">
+                            <img src="${e.target.result}" alt="Preview">
                             <div class="thumbnail-remove" onclick="removeFile(${newIndex})">
                                 <i class="fas fa-times text-red-500"></i>
                             </div>
@@ -760,7 +591,7 @@
                 `;
                 
                 const wrapper = document.createElement('div');
-                wrapper.className = 'flex flex-col items-center transform transition-transform duration-300 hover:-translate-y-1';
+                wrapper.className = 'flex flex-col items-center';
                 wrapper.appendChild(fileContainer);
                 wrapper.appendChild(fileInfo);
                 
