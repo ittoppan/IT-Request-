@@ -701,6 +701,23 @@
         document.addEventListener('DOMContentLoaded', () => {
             initializeLiff();
         });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const trackingButton = document.getElementById('openTrackingModal');
+
+    if (trackingButton) {
+        trackingButton.addEventListener('click', function() {
+            // กำหนด URL ที่คุณต้องการให้ปุ่มนี้ลิงก์ไป
+            const targetUrl = 'https://liff.line.me/2007374280-GR1Q3YxJ'; // **เปลี่ยน URL นี้**
+
+            // เปิดหน้าใหม่ในแท็บใหม่ (แนะนำสำหรับลิงก์ออกนอก)
+            window.open(targetUrl, '_blank');
+
+            // หรือถ้าต้องการเปิดในแท็บเดิม:
+            // window.location.href = targetUrl;
+        });
+    }
+});
     </script>
 </body>
 </html>
