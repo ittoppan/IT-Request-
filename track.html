@@ -108,16 +108,26 @@
             animation: spin 1s linear infinite;
         }
         
+        /* Base style for status tabs */
         .status-tab {
             transition: all 0.2s ease;
             cursor: pointer;
             border-bottom: 3px solid transparent;
+            background-color: rgba(255, 255, 255, 0.08); /* Light translucent background for inactive tabs */
+            color: #E2E8F0; /* text-gray-200 or similar for contrast */
+            white-space: nowrap; /* Prevent wrapping */
         }
         
-        .status-tab.active {
-            border-bottom-color: var(--primary-color);
-            background-color: rgba(255, 255, 255, 0.9);
-            font-weight: 600;
+        /* Active tab style - More prominent, reflecting glassmorphism */
+        .status-tab.active-tab-style { /* ใช้ active-tab-style แทน active */
+            background-color: rgba(255, 255, 255, 0.2); /* More opaque for active */
+            color: #F8FAFC; /* text-gray-50 */
+            font-weight: 600; /* semibold */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1), inset 0 2px 5px rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            border-left: 1px solid rgba(255, 255, 255, 0.4);
+            border-right: 1px solid rgba(255, 255, 255, 0.4);
+            border-bottom: none; /* Remove bottom border for active tab */
         }
         
         .stat-card {
@@ -145,34 +155,14 @@
             }
         }
         /* For Webkit browsers (Chrome, Safari) */
-.hide-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-
-/* For Firefox */
-.hide-scrollbar {
-    scrollbar-width: none; /* Firefox */
-}
-
-/* Base style for status tabs */
-.status-tab {
-    background-color: rgba(255, 255, 255, 0.08); /* Light translucent background for inactive tabs */
-    color: #E2E8F0; /* text-gray-200 or similar for contrast */
-    white-space: nowrap; /* Prevent wrapping */
-    transition: all 0.2s ease-in-out;
-}
-
-/* Active tab style - More prominent, reflecting glassmorphism */
-.active-tab-style {
-    background-color: rgba(255, 255, 255, 0.2); /* More opaque for active */
-    color: #F8FAFC; /* text-gray-50 */
-    font-weight: 600; /* semibold */
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1), inset 0 2px 5px rgba(255, 255, 255, 0.1);
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
-    border-left: 1px solid rgba(255, 255, 255, 0.4);
-    border-right: 1px solid rgba(255, 255, 255, 0.4);
-    border-bottom: none; /* Remove bottom border for active tab */
-}
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* For Firefox */
+        .hide-scrollbar {
+            scrollbar-width: none; /* Firefox */
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -197,65 +187,63 @@
         </div>
 
         <div id="mainContent" class="hidden">
-            <!-- Dashboard Section -->
             <div id="dashboardSection" class="glass-card mb-8 animate-slide-up p-6 md:p-8 rounded-xl shadow-2xl backdrop-blur-md border border-white border-opacity-30">
-    <div class="flex items-center justify-between mb-8">
-        <div class="flex items-center">
-            <i class="fas fa-chart-pie mr-4 text-blue-600 text-2xl"></i>
-            <h2 class="text-2xl font-bold text-gray-900 tracking-tight">ภาพรวมงานซ่อมของคุณ</h2>
-        </div>
-        <div class="text-sm text-gray-500 font-medium">
-            อัปเดตล่าสุด: <span id="lastUpdatedTime" class="font-semibold text-gray-700">กำลังโหลด...</span>
-        </div>
-    </div>
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center">
+                        <i class="fas fa-chart-pie mr-4 text-blue-600 text-2xl"></i>
+                        <h2 class="text-2xl font-bold text-gray-900 tracking-tight">ภาพรวมงานซ่อมของคุณ</h2>
+                    </div>
+                    <div class="text-sm text-gray-500 font-medium">
+                        อัปเดตล่าสุด: <span id="lastUpdatedTime" class="font-semibold text-gray-700">กำลังโหลด...</span>
+                    </div>
+                </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
-    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="all" style="animation-delay: 100ms">
-        <div class="text-4xl font-extrabold text-blue-700 mb-1" id="totalJobsCount">0</div>
-        <div class="text-sm text-gray-600 font-medium">ทั้งหมด</div>
-    </div>
-    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="new" style="animation-delay: 200ms">
-        <div class="text-4xl font-extrabold text-blue-500 mb-1" id="newJobsCount">0</div>
-        <div class="text-sm text-gray-600 font-medium">แจ้งซ่อมใหม่</div>
-    </div>
-    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="pending" style="animation-delay: 300ms">
-        <div class="text-4xl font-extrabold text-orange-500 mb-1" id="pendingJobsCount">0</div>
-        <div class="text-sm text-gray-600 font-medium">รอดำเนินการ</div>
-    </div>
-    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="in-progress" style="animation-delay: 400ms">
-        <div class="text-4xl font-extrabold text-yellow-500 mb-1" id="inProgressJobsCount">0</div>
-        <div class="text-sm text-gray-600 font-medium">กำลังดำเนินการ</div>
-    </div>
-    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="completed" style="animation-delay: 500ms">
-        <div class="text-4xl font-extrabold text-green-600 mb-1" id="completedJobsCount">0</div>
-        <div class="text-sm text-gray-600 font-medium">เสร็จสิ้น</div>
-    </div>
-</div>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="all" style="animation-delay: 100ms">
+                        <div class="text-4xl font-extrabold text-blue-700 mb-1" id="totalJobsCount">0</div>
+                        <div class="text-sm text-gray-600 font-medium">ทั้งหมด</div>
+                    </div>
+                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="new" style="animation-delay: 200ms">
+                        <div class="text-4xl font-extrabold text-blue-500 mb-1" id="newJobsCount">0</div>
+                        <div class="text-sm text-gray-600 font-medium">แจ้งซ่อมใหม่</div>
+                    </div>
+                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="pending" style="animation-delay: 300ms">
+                        <div class="text-4xl font-extrabold text-orange-500 mb-1" id="pendingJobsCount">0</div>
+                        <div class="text-sm text-gray-600 font-medium">รอดำเนินการ</div>
+                    </div>
+                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="in-progress" style="animation-delay: 400ms">
+                        <div class="text-4xl font-extrabold text-yellow-500 mb-1" id="inProgressJobsCount">0</div>
+                        <div class="text-sm text-gray-600 font-medium">กำลังดำเนินการ</div>
+                    </div>
+                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="completed" style="animation-delay: 500ms">
+                        <div class="text-4xl font-extrabold text-green-600 mb-1" id="completedJobsCount">0</div>
+                        <div class="text-sm text-gray-600 font-medium">เสร็จสิ้น</div>
+                    </div>
+                </div>
 
-<div class="flex overflow-x-auto pb-3 -mx-2 hide-scrollbar">
-    <div class="flex space-x-2 px-2 flex-grow sm:flex-grow-0">
-        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200 active-tab-style" data-status="all">
-            <i class="fas fa-list mr-2"></i>ทั้งหมด
-        </div>
-        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="new">
-            <i class="fas fa-file-circle-plus mr-2"></i>แจ้งซ่อมใหม่
-        </div>
-        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="pending">
-            <i class="fas fa-clock mr-2"></i>รอดำเนินการ
-        </div>
-        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="in-progress">
-            <i class="fas fa-tools mr-2"></i>กำลังดำเนินการ
-        </div>
-        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="completed">
-            <i class="fas fa-check-circle mr-2"></i>เสร็จสิ้น
-        </div>
-        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="cancelled">
-            <i class="fas fa-times-circle mr-2"></i>ยกเลิก
-        </div>
-    </div>
-</div>
-</div>
-
+                <div class="flex overflow-x-auto pb-3 -mx-2 hide-scrollbar">
+                    <div class="flex space-x-2 px-2 flex-grow sm:flex-grow-0">
+                        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200 active-tab-style" data-status="all">
+                            <i class="fas fa-list mr-2"></i>ทั้งหมด
+                        </div>
+                        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="new">
+                            <i class="fas fa-file-circle-plus mr-2"></i>แจ้งซ่อมใหม่
+                        </div>
+                        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="pending">
+                            <i class="fas fa-clock mr-2"></i>รอดำเนินการ
+                        </div>
+                        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="in-progress">
+                            <i class="fas fa-tools mr-2"></i>กำลังดำเนินการ
+                        </div>
+                        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="completed">
+                            <i class="fas fa-check-circle mr-2"></i>เสร็จสิ้น
+                        </div>
+                        <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="cancelled">
+                            <i class="fas fa-times-circle mr-2"></i>ยกเลิก
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-4 mb-4">
                 <div class="space-y-4">
@@ -264,11 +252,10 @@
                     </h2>
                     
                     <div id="jobsContainer" class="space-y-4">
-                        <!-- Job cards will be inserted here -->
-                    </div>
+                        </div>
                     
                     <div id="noJobsFound" class="glass-card hidden">
-                        <div class="text-center pb-4  py-8">
+                        <div class="text-center pb-4 py-8">
                             <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
                             <p class="text-gray-500 font-medium">ไม่พบงานซ่อมในสถานะนี้</p>
                             <p class="text-sm text-gray-400 mt-1">คุณสามารถตรวจสอบสถานะอื่นได้จากเมนูด้านบน</p>
@@ -286,218 +273,342 @@
                     </div>
                     
                     <div id="jobDetailsContainer" class="glass-card animate-fade-in hidden">
-                        <!-- Job details will be inserted here -->
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // LIFF and Google Apps Script Configuration
-        const liffId = '2007374280-GR1Q3YxJ';
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
-        
-        // User Data Variables
-        let userId = '';
-        let userDisplayName = '';
-        let userPictureUrl = '';
-        
-        // Repair Job Data Variables
-        let repairJobs = [];
-        let filteredJobs = [];
-        let selectedJobId = null;
-        let currentStatusFilter = 'all';
+        document.addEventListener('DOMContentLoaded', function() {
+            const statCards = document.querySelectorAll('.stat-card');
+            const statusTabs = document.querySelectorAll('.status-tab');
 
-        /**
-         * Initializes the LIFF app.
-         * Fetches user profile and loads repair jobs.
-         */
-        async function initializeLiff() {
-            try {
-                await liff.init({ liffId });
-                
-                if (!liff.isLoggedIn()) {
-                    liff.login();
-                    return;
+            // LIFF and Google Apps Script Configuration
+            const liffId = '2007374280-GR1Q3YxJ';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
+            
+            // User Data Variables
+            let userId = '';
+            let userDisplayName = '';
+            let userPictureUrl = '';
+            
+            // Repair Job Data Variables
+            let repairJobs = [];
+            let filteredJobs = [];
+            let selectedJobId = null;
+            let currentStatusFilter = 'all';
+
+            /**
+             * Initializes the LIFF app.
+             * Fetches user profile and loads repair jobs.
+             */
+            async function initializeLiff() {
+                try {
+                    await liff.init({ liffId });
+                    
+                    if (!liff.isLoggedIn()) {
+                        liff.login();
+                        return;
+                    }
+                    
+                    const profile = await liff.getProfile();
+                    userId = profile.userId;
+                    userDisplayName = profile.displayName;
+                    userPictureUrl = profile.pictureUrl || '';
+                    
+                    await loadRepairJobs();
+                    
+                } catch (error) {
+                    console.error('LIFF initialization failed:', error);
+                    showError('เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF', error.message);
                 }
-                
-                const profile = await liff.getProfile();
-                userId = profile.userId;
-                userDisplayName = profile.displayName;
-                userPictureUrl = profile.pictureUrl || '';
-                
-                await loadRepairJobs();
-                
-            } catch (error) {
-                console.error('LIFF initialization failed:', error);
-                showError('เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF', error.message);
             }
-        }
-
-
-
-        
-        
-        /**
-         * Shows an error message in the loading indicator area.
-         * @param {string} title - The main error title.
-         * @param {string} message - The detailed error message.
-         */
-        function showError(title, message) {
-            document.getElementById('loadingIndicator').innerHTML = `
-                <div class="text-center p-6 bg-white rounded-lg shadow-md">
-                    <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
-                    <p class="text-lg font-semibold text-gray-700 mb-2">${title}</p>
-                    <p class="text-sm text-gray-500 mb-4">${message || 'กรุณาลองเข้าใช้งานใหม่อีกครั้ง'}</p>
-                    <button onclick="window.location.reload()" class="btn-primary px-5 py-2 rounded-lg text-base">
-                        <i class="fas fa-sync-alt mr-2"></i> ลองใหม่
-                    </button>
-                </div>
-            `;
-            document.getElementById('loadingIndicator').classList.remove('hidden');
-            document.getElementById('mainContent').classList.add('hidden');
-        }
-        
-        /**
-         * Fetches repair jobs from Google Apps Script.
-         */
-        async function loadRepairJobs() {
-            try {
+            
+            /**
+             * Shows an error message in the loading indicator area.
+             * @param {string} title - The main error title.
+             * @param {string} message - The detailed error message.
+             */
+            function showError(title, message) {
+                document.getElementById('loadingIndicator').innerHTML = `
+                    <div class="text-center p-6 bg-white rounded-lg shadow-md">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                        <p class="text-lg font-semibold text-gray-700 mb-2">${title}</p>
+                        <p class="text-sm text-gray-500 mb-4">${message || 'กรุณาลองเข้าใช้งานใหม่อีกครั้ง'}</p>
+                        <button onclick="window.location.reload()" class="btn-primary px-5 py-2 rounded-lg text-base">
+                            <i class="fas fa-sync-alt mr-2"></i> ลองใหม่
+                        </button>
+                    </div>
+                `;
                 document.getElementById('loadingIndicator').classList.remove('hidden');
                 document.getElementById('mainContent').classList.add('hidden');
-                
-                const response = await fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}`);
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    repairJobs = data.data;
-                    updateDashboardStats();
-                    filterJobsByStatus(currentStatusFilter);
+            }
+            
+            /**
+             * Fetches repair jobs from Google Apps Script.
+             */
+            async function loadRepairJobs() {
+                try {
+                    document.getElementById('loadingIndicator').classList.remove('hidden');
+                    document.getElementById('mainContent').classList.add('hidden');
                     
-                    // Update last updated time
-                    const now = new Date();
-                    document.getElementById('lastUpdatedTime').textContent = formatTime(now);
+                    const response = await fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}`);
+                    const data = await response.json();
                     
-                    document.getElementById('loadingIndicator').classList.add('hidden');
-                    document.getElementById('mainContent').classList.remove('hidden');
-                    
-                    if (repairJobs.length === 0) {
-                        document.getElementById('noJobsFound').classList.remove('hidden');
+                    if (data.status === 'success') {
+                        repairJobs = data.data;
+                        updateDashboardStats();
+                        filterJobsByStatus(currentStatusFilter); // Apply initial filter
+                        
+                        // Update last updated time
+                        const now = new Date();
+                        document.getElementById('lastUpdatedTime').textContent = formatTime(now);
+                        
+                        document.getElementById('loadingIndicator').classList.add('hidden');
+                        document.getElementById('mainContent').classList.remove('hidden');
+                        
+                        if (repairJobs.length === 0) {
+                            document.getElementById('noJobsFound').classList.remove('hidden');
+                        }
+                    } else {
+                        throw new Error(data.message || 'Failed to load repair jobs');
                     }
-                } else {
-                    throw new Error(data.message || 'Failed to load repair jobs');
+                } catch (error) {
+                    console.error('Error loading repair jobs:', error);
+                    showError('เกิดข้อผิดพลาดในการโหลดข้อมูล', error.message);
                 }
-            } catch (error) {
-                console.error('Error loading repair jobs:', error);
-                showError('เกิดข้อผิดพลาดในการโหลดข้อมูล', error.message);
-            }
-        }
-        
-        /**
-         * Updates the dashboard statistics cards.
-         */
-        function updateDashboardStats() {
-            const totalJobs = repairJobs.length;
-            const newJobs = repairJobs.filter(job => job.status === 'แจ้งซ่อมใหม่').length;
-            const pendingJobs = repairJobs.filter(job => job.status === 'รอดำเนินการ').length;
-            const inProgressJobs = repairJobs.filter(job => job.status === 'กำลังดำเนินการ').length;
-            const completedJobs = repairJobs.filter(job => job.status === 'เสร็จสิ้น').length;
-            
-            document.getElementById('totalJobsCount').textContent = totalJobs;
-            document.getElementById('newJobsCount').textContent = newJobs;
-            document.getElementById('pendingJobsCount').textContent = pendingJobs;
-            document.getElementById('inProgressJobsCount').textContent = inProgressJobs;
-            document.getElementById('completedJobsCount').textContent = completedJobs;
-        }
-        
-        /**
-         * Filters jobs by status and renders the job list.
-         * @param {string} status - The status to filter by ('all', 'pending', 'new', 'in-progress', 'completed', 'cancelled')
-         */
-        function filterJobsByStatus(status) {
-            currentStatusFilter = status;
-            
-            // Update active tab
-            document.querySelectorAll('.status-tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.dataset.status === status) {
-                    tab.classList.add('active');
-                }
-            });
-            
-            // Filter jobs
-            switch(status) {
-                  case 'new':
-                    filteredJobs = repairJobs.filter(job => job.status === 'แจ้งซ่อมใหม่');
-                    break;
-                    
-                case 'pending':
-                    filteredJobs = repairJobs.filter(job => job.status === 'รอดำเนินการ');
-                    break;
-              
-                case 'in-progress':
-                    filteredJobs = repairJobs.filter(job => job.status === 'กำลังดำเนินการ');
-                    break;
-                case 'completed':
-                    filteredJobs = repairJobs.filter(job => job.status === 'เสร็จสิ้น');
-                    break;
-                case 'cancelled':
-                    filteredJobs = repairJobs.filter(job => job.status === 'ยกเลิก');
-                    break;
-                default:
-                    filteredJobs = [...repairJobs];
             }
             
-            renderJobList();
-            
-            // Clear selected job if it's no longer in the filtered list
-            if (selectedJobId && !filteredJobs.some(job => job.jobId === selectedJobId)) {
-                selectedJobId = null;
-                document.getElementById('jobDetailsContainer').classList.add('hidden');
-                document.getElementById('emptyDetails').classList.remove('hidden');
-            }
-        }
-        
-        /**
-         * Renders the job list based on filteredJobs.
-         */
-        function renderJobList() {
-            const jobsContainer = document.getElementById('jobsContainer');
-            const jobCountElement = document.getElementById('jobCount');
-            
-            jobsContainer.innerHTML = '';
-            jobCountElement.textContent = filteredJobs.length;
-            
-            if (filteredJobs.length === 0) {
-                document.getElementById('noJobsFound').classList.remove('hidden');
-                return;
-            } else {
-                document.getElementById('noJobsFound').classList.add('hidden');
-            }
-            
-            filteredJobs.forEach((job, index) => {
-                const jobCard = document.createElement('div');
-                jobCard.className = `glass-card job-card cursor-pointer animate-slide-up p-4`; // เพิ่ม p-4
-                jobCard.style.animationDelay = `${index * 100}ms`;
-                jobCard.id = `job-${job.jobId}`;
-                jobCard.onclick = () => selectJob(job.jobId);
+            /**
+             * Updates the dashboard statistics cards.
+             */
+            function updateDashboardStats() {
+                const totalJobs = repairJobs.length;
+                const newJobs = repairJobs.filter(job => job.status === 'แจ้งซ่อมใหม่').length;
+                const pendingJobs = repairJobs.filter(job => job.status === 'รอดำเนินการ').length;
+                const inProgressJobs = repairJobs.filter(job => job.status === 'กำลังดำเนินการ').length;
+                const completedJobs = repairJobs.filter(job => job.status === 'เสร็จสิ้น').length;
+                const cancelledJobs = repairJobs.filter(job => job.status === 'ยกเลิก').length; // Added cancelled for completeness
                 
-                // Determine status class and icon
+                document.getElementById('totalJobsCount').textContent = totalJobs;
+                document.getElementById('newJobsCount').textContent = newJobs;
+                document.getElementById('pendingJobsCount').textContent = pendingJobs;
+                document.getElementById('inProgressJobsCount').textContent = inProgressJobs;
+                document.getElementById('completedJobsCount').textContent = completedJobs;
+                // If you add a cancelled stat card, uncomment this:
+                // document.getElementById('cancelledJobsCount').textContent = cancelledJobs;
+            }
+            
+            /**
+             * Filters jobs by status and renders the job list.
+             * @param {string} status - The status to filter by ('all', 'pending', 'new', 'in-progress', 'completed', 'cancelled')
+             */
+            function filterJobsByStatus(status) {
+                currentStatusFilter = status;
+                
+                // Update active tab style
+                statusTabs.forEach(tab => {
+                    tab.classList.remove('active-tab-style'); // Remove old active class
+                    if (tab.dataset.status === status) {
+                        tab.classList.add('active-tab-style'); // Add new active class
+                    }
+                });
+                
+                // Filter jobs
+                switch(status) {
+                    case 'new':
+                        filteredJobs = repairJobs.filter(job => job.status === 'แจ้งซ่อมใหม่');
+                        break;
+                    case 'pending':
+                        filteredJobs = repairJobs.filter(job => job.status === 'รอดำเนินการ');
+                        break;
+                    case 'in-progress':
+                        filteredJobs = repairJobs.filter(job => job.status === 'กำลังดำเนินการ');
+                        break;
+                    case 'completed':
+                        filteredJobs = repairJobs.filter(job => job.status === 'เสร็จสิ้น');
+                        break;
+                    case 'cancelled':
+                        filteredJobs = repairJobs.filter(job => job.status === 'ยกเลิก');
+                        break;
+                    default: // 'all'
+                        filteredJobs = [...repairJobs];
+                }
+                
+                renderJobList();
+                
+                // Clear selected job if it's no longer in the filtered list
+                if (selectedJobId && !filteredJobs.some(job => job.jobId === selectedJobId)) {
+                    selectedJobId = null;
+                    document.getElementById('jobDetailsContainer').classList.add('hidden');
+                    document.getElementById('emptyDetails').classList.remove('hidden');
+                }
+            }
+            
+            /**
+             * Renders the job list based on filteredJobs.
+             */
+            function renderJobList() {
+                const jobsContainer = document.getElementById('jobsContainer');
+                const jobCountElement = document.getElementById('jobCount');
+                
+                jobsContainer.innerHTML = '';
+                jobCountElement.textContent = filteredJobs.length;
+                
+                if (filteredJobs.length === 0) {
+                    document.getElementById('noJobsFound').classList.remove('hidden');
+                    return;
+                } else {
+                    document.getElementById('noJobsFound').classList.add('hidden');
+                }
+                
+                filteredJobs.forEach((job, index) => {
+                    const jobCard = document.createElement('div');
+                    jobCard.className = `glass-card job-card cursor-pointer animate-slide-up p-4`;
+                    jobCard.style.animationDelay = `${index * 100}ms`;
+                    jobCard.id = `job-${job.jobId}`;
+                    jobCard.onclick = () => selectJob(job.jobId);
+                    
+                    // Determine status class and icon
+                    let statusClass, statusIcon, statusText;
+                    switch(job.status) {
+                        case 'แจ้งซ่อมใหม่':
+                            statusClass = 'status-new';
+                            statusIcon = 'fa-file-circle-plus';
+                            statusText = 'แจ้งซ่อมใหม่';
+                            break;
+                        case 'รอดำเนินการ':
+                            statusClass = 'status-pending';
+                            statusIcon = 'fa-clock';
+                            statusText = 'รอดำเนินการ';
+                            break;
+                        case 'กำลังดำเนินการ':
+                            statusClass = 'status-in-progress';
+                            statusIcon = 'fa-tools';
+                            statusText = 'กำลังดำเนินการ';
+                            break;
+                        case 'เสร็จสิ้น':
+                            statusClass = 'status-completed';
+                            statusIcon = 'fa-check-circle';
+                            statusText = 'เสร็จสิ้น';
+                            break;
+                        case 'ยกเลิก':
+                            statusClass = 'status-cancelled';
+                            statusIcon = 'fa-times-circle';
+                            statusText = 'ยกเลิก';
+                            break;
+                        default:
+                            statusClass = 'status-pending';
+                            statusIcon = 'fa-clock';
+                            statusText = job.status || 'ไม่ทราบสถานะ';
+                    }
+                    
+                    // Determine priority class
+                    let priorityClass;
+                    switch(job.urgency) {
+                        case 'ต่ำ':
+                            priorityClass = 'priority-low';
+                            break;
+                        case 'ปานกลาง':
+                            priorityClass = 'priority-medium';
+                            break;
+                        case 'สูง':
+                            priorityClass = 'priority-high';
+                            break;
+                        case 'ด่วนมาก':
+                            priorityClass = 'priority-critical';
+                            break;
+                        default:
+                            priorityClass = 'priority-medium';
+                    }
+
+                    jobCard.innerHTML = `
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-lg">${job.jobId || 'N/A'}</h3>
+                                <p class="text-gray-600 text-sm">${job.problemType || 'ไม่ระบุประเภทปัญหา'}</p>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <span class="status-badge ${statusClass}">
+                                    <i class="fas ${statusIcon} mr-1"></i>
+                                    ${statusText}
+                                </span>
+                                <span class="priority-badge ${priorityClass}">
+                                    ${job.urgency || 'ปานกลาง'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2 text-sm text-gray-700">
+                            <div class="flex items-center">
+                                <i class="fas fa-user-circle mr-2 text-gray-500"></i>
+                                <span>${job.fullName || 'ไม่ระบุชื่อ'} (${job.department || 'ไม่ระบุแผนก'})</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-alt mr-2 text-gray-500"></i>
+                                <span>${formatDate(job.timestamp)}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    jobsContainer.appendChild(jobCard);
+                });
+
+                // Re-select the previously selected job if it's still in the filtered list
+                if (selectedJobId) {
+                    const prevSelectedCard = document.getElementById(`job-${selectedJobId}`);
+                    if (prevSelectedCard) {
+                        prevSelectedCard.classList.add('selected');
+                    }
+                }
+            }
+            
+            /**
+             * Selects a job and displays its details.
+             * @param {string} jobId - The ID of the job to select.
+             */
+            function selectJob(jobId) {
+                const selectedJob = filteredJobs.find(job => job.jobId === jobId);
+                if (!selectedJob) return;
+                
+                document.querySelectorAll('.job-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                const currentSelectedCard = document.getElementById(`job-${jobId}`);
+                if (currentSelectedCard) {
+                    currentSelectedCard.classList.add('selected');
+                }
+
+                selectedJobId = jobId;
+                renderJobDetails(selectedJob);
+            }
+            
+            /**
+             * Renders the detailed view of a selected job.
+             * @param {object} job - The job object containing details.
+             */
+            function renderJobDetails(job) {
+                const jobDetailsContainer = document.getElementById('jobDetailsContainer');
+                const emptyDetails = document.getElementById('emptyDetails');
+                
+                emptyDetails.classList.add('hidden');
+                jobDetailsContainer.classList.remove('hidden');
+                
+                // Determine status class and icon for details view
                 let statusClass, statusIcon, statusText;
                 switch(job.status) {
-                   case 'แจ้งซ่อมใหม่':
+                    case 'แจ้งซ่อมใหม่':
                         statusClass = 'status-new';
                         statusIcon = 'fa-file-circle-plus';
                         statusText = 'แจ้งซ่อมใหม่';
                         break;
-                        
                     case 'รอดำเนินการ':
                         statusClass = 'status-pending';
                         statusIcon = 'fa-clock';
                         statusText = 'รอดำเนินการ';
                         break;
-                 
                     case 'กำลังดำเนินการ':
                         statusClass = 'status-in-progress';
                         statusIcon = 'fa-tools';
@@ -519,353 +630,162 @@
                         statusText = job.status || 'ไม่ทราบสถานะ';
                 }
                 
-                // Determine priority class
-                let priorityClass;
-                switch(job.urgency) {
-                    case 'ต่ำ':
-                        priorityClass = 'priority-low';
-                        break;
-                    case 'ปานกลาง':
-                        priorityClass = 'priority-medium';
-                        break;
-                    case 'สูง':
-                        priorityClass = 'priority-high';
-                        break;
-                    case 'ด่วนมาก':
-                        priorityClass = 'priority-critical';
-                        break;
-                    default:
-                        priorityClass = 'priority-medium';
-                }
-
-                jobCard.innerHTML = `
-                    <div class="flex items-start justify-between mb-3">
+                // Generate file attachments section
+                let fileAttachmentsHtml = '';
+                if (job.imageViewUrls && job.imageViewUrls.length > 0) {
+                    fileAttachmentsHtml = `
                         <div>
-                            <h3 class="font-bold text-gray-800 text-lg">${job.jobId || 'N/A'}</h3>
-                            <p class="text-gray-600 text-sm">${job.problemType || 'ไม่ระบุประเภทปัญหา'}</p>
+                            <h4 class="font-semibold mb-3 text-gray-700">ไฟล์แนบประกอบปัญหา (${job.imageViewUrls.length} รูป)</h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                ${job.imageViewUrls.map(url => `
+                                    <a href="${url}" target="_blank" class="block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
+                                        <img src="${url}" alt="ไฟล์แนบ" class="w-full h-24 object-cover">
+                                    </a>
+                                `).join('')}
+                            </div>
                         </div>
-                        <div class="flex flex-col items-end gap-2">
+                    `;
+                }
+                
+                // Generate progress notes section
+                let progressNotesHtml = '';
+                if (job.notes && job.notes.length > 0) {
+                    progressNotesHtml = `
+                        <div>
+                            <h4 class="font-semibold mb-3 text-gray-700">ความคืบหน้าการดำเนินงาน</h4>
+                            <div class="space-y-3">
+                                ${job.notes.map(note => `
+                                    <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                        <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                                        <p class="text-sm text-gray-700">${note}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                jobDetailsContainer.innerHTML = `
+                    <div class="p-6 space-y-6">
+                        <div class="flex items-center justify-between border-b pb-4 mb-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle mr-3 text-blue-500 text-xl"></i>
+                                <span class="text-lg font-semibold text-gray-800">รายละเอียดงานแจ้งซ่อม ${job.jobId || 'N/A'}</span>
+                            </div>
                             <span class="status-badge ${statusClass}">
                                 <i class="fas ${statusIcon} mr-1"></i>
                                 ${statusText}
                             </span>
-                            <span class="priority-badge ${priorityClass}">
-                                ${job.urgency || 'ปานกลาง'}
-                            </span>
                         </div>
-                    </div>
-                    
-                    <div class="space-y-2 text-sm text-gray-700">
-                        <div class="flex items-center">
-                            <i class="fas fa-user-circle mr-2 text-gray-500"></i>
-                            <span>${job.fullName || 'ไม่ระบุชื่อ'} (${job.department || 'ไม่ระบุแผนก'})</span>
-                        </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-calendar-alt mr-2 text-gray-500"></i>
-                            <span>${formatDate(job.timestamp)}</span>
-                        </div>
-                    </div>
-                `;
-                
-                jobsContainer.appendChild(jobCard);
-            });
 
-            // Re-select the previously selected job if it's still in the filtered list
-            if (selectedJobId) {
-                const prevSelectedCard = document.getElementById(`job-${selectedJobId}`);
-                if (prevSelectedCard) {
-                    prevSelectedCard.classList.add('selected');
-                }
-            }
-        }
-        
-        /**
-         * Selects a job and displays its details.
-         * @param {string} jobId - The ID of the job to select.
-         */
-        function selectJob(jobId) {
-            const selectedJob = filteredJobs.find(job => job.jobId === jobId);
-            if (!selectedJob) return;
-            
-            document.querySelectorAll('.job-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            const currentSelectedCard = document.getElementById(`job-${jobId}`);
-            if (currentSelectedCard) {
-                currentSelectedCard.classList.add('selected');
-            }
-
-            selectedJobId = jobId;
-            renderJobDetails(selectedJob);
-        }
-        
-        /**
-         * Renders the detailed view of a selected job.
-         * @param {object} job - The job object containing details.
-         */
-        function renderJobDetails(job) {
-            const jobDetailsContainer = document.getElementById('jobDetailsContainer');
-            const emptyDetails = document.getElementById('emptyDetails');
-            
-            emptyDetails.classList.add('hidden');
-            jobDetailsContainer.classList.remove('hidden');
-            
-            // Determine status class and icon for details view
-            let statusClass, statusIcon, statusText;
-            switch(job.status) {
-                case 'แจ้งซ่อมใหม่':
-                    statusClass = 'status-new';
-                    statusIcon = 'fa-file-circle-plus';
-                    statusText = 'แจ้งซ่อมใหม่';
-                    break;
-
-                    
-                case 'รอดำเนินการ':
-                    statusClass = 'status-pending';
-                    statusIcon = 'fa-clock';
-                    statusText = 'รอดำเนินการ';
-                    break;
-              
-                case 'กำลังดำเนินการ':
-                    statusClass = 'status-in-progress';
-                    statusIcon = 'fa-tools';
-                    statusText = 'กำลังดำเนินการ';
-                    break;
-                case 'เสร็จสิ้น':
-                    statusClass = 'status-completed';
-                    statusIcon = 'fa-check-circle';
-                    statusText = 'เสร็จสิ้น';
-                    break;
-                case 'ยกเลิก':
-                    statusClass = 'status-cancelled';
-                    statusIcon = 'fa-times-circle';
-                    statusText = 'ยกเลิก';
-                    break;
-                default:
-                    statusClass = 'status-pending';
-                    statusIcon = 'fa-clock';
-                    statusText = job.status || 'ไม่ทราบสถานะ';
-            }
-            
-            // Generate file attachments section
-            let fileAttachmentsHtml = '';
-            if (job.imageViewUrls && job.imageViewUrls.length > 0) {
-                fileAttachmentsHtml = `
-                    <div>
-                        <h4 class="font-semibold mb-3 text-gray-700">ไฟล์แนบประกอบปัญหา (${job.imageViewUrls.length} รูป)</h4>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                            ${job.imageViewUrls.map(url => `
-                                <a href="${url}" target="_blank" class="block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-                                    <img src="${url}" alt="ไฟล์แนบ" class="w-full h-24 object-cover">
-                                </a>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Generate progress notes section
-            let progressNotesHtml = '';
-            if (job.notes && job.notes.length > 0) {
-                progressNotesHtml = `
-                    <div>
-                        <h4 class="font-semibold mb-3 text-gray-700">ความคืบหน้าการดำเนินงาน</h4>
-                        <div class="space-y-3">
-                            ${job.notes.map(note => `
-                                <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                                    <p class="text-sm text-gray-700">${note}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            jobDetailsContainer.innerHTML = `
-                <div class="p-6 space-y-6">
-                    <div class="flex items-center justify-between border-b pb-4 mb-4">
-                        <div class="flex items-center">
-                            <i class="fas fa-info-circle mr-3 text-blue-500 text-xl"></i>
-                            <span class="text-lg font-semibold text-gray-800">รายละเอียดงานแจ้งซ่อม ${job.jobId || 'N/A'}</span>
-                        </div>
-                        <span class="status-badge ${statusClass}">
-                            <i class="fas ${statusIcon} mr-1"></i>
-                            ${statusText}
-                        </span>
-                    </div>
-
-                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 shadow-sm">
-                        ${job.assignedTo ? `
-                            <p class="text-sm text-gray-600 mb-1">
-                                <i class="fas fa-user-tie mr-2"></i> ผู้รับผิดชอบ: <span class="font-medium">${job.assignedTo}</span>
-                            </p>
-                        ` : '<p class="text-sm text-gray-500"><i class="fas fa-user-tie mr-2"></i> ยังไม่มีผู้รับผิดชอบ</p>'}
-                        ${job.estimatedCompletion ? `
-                            <p class="text-sm text-gray-600">
-                                <i class="fas fa-hourglass-half mr-2"></i> คาดว่าจะเสร็จ: <span class="font-medium">${formatDate(job.estimatedCompletion)}</span>
-                            </p>
-                        ` : ''}
-                    </div>
-
-                    <div>
-                        <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลผู้แจ้ง</h4>
-                        <div class="space-y-2 text-sm text-gray-700">
-                            <div class="flex items-center">
-                                <i class="fas fa-user mr-2 text-gray-500"></i>
-                                <span>${job.fullName || 'ไม่ระบุชื่อ'}</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-building mr-2 text-gray-500"></i>
-                                <span>${job.department || 'ไม่ระบุแผนก'} (${job.office || 'ไม่ระบุสำนักงาน'})</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-phone mr-2 text-gray-500"></i>
-                                <span>${job.phone || 'ไม่ระบุเบอร์ติดต่อ'}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h4 class="font-semibold mb-3 text-gray-700">รายละเอียดปัญหาที่แจ้ง</h4>
-                        <div class="p-3 bg-gray-100 rounded-lg border border-gray-200">
-                            <p class="text-base font-medium text-blue-700 mb-2">${job.problemType || 'ไม่มีข้อมูลประเภทปัญหา'}</p>
-                            <p class="text-sm text-gray-700">${job.problemDetails || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
-                        </div>
-                    </div>
-                    
-                    ${progressNotesHtml}
-                    
-                    ${fileAttachmentsHtml}
-
-                    <div>
-                        <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลเวลา</h4>
-                        <div class="space-y-2 text-sm text-gray-700">
-                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded-md">
-                                <span class="text-gray-600"><i class="fas fa-calendar-plus mr-2"></i>วันที่แจ้ง:</span>
-                                <span class="font-medium">${formatDate(job.timestamp)}</span>
-                            </div>
-                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded-md">
-                                <span class="text-gray-600"><i class="fas fa-history mr-2"></i>อัพเดทล่าสุด:</span>
-                                <span class="font-medium">${formatDate(job.updatedAt) || formatDate(job.timestamp)}</span>
-                            </div>
-                            ${job.completionDate ? `
-                                <div class="flex justify-between items-center p-2 bg-gray-50 rounded-md">
-                                    <span class="text-gray-600"><i class="fas fa-calendar-check mr-2"></i>วันที่เสร็จสิ้น:</span>
-                                    <span class="font-medium">${formatDate(job.completionDate)}</span>
-                                </div>
+                        <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 shadow-sm">
+                            ${job.assignedTo ? `
+                                <p class="text-sm text-gray-600 mb-1">
+                                    <i class="fas fa-user-tie mr-2"></i> ผู้รับผิดชอบ: <span class="font-medium">${job.assignedTo}</span>
+                                </p>
+                            ` : '<p class="text-sm text-gray-500"><i class="fas fa-user-tie mr-2"></i> ยังไม่มีผู้รับผิดชอบ</p>'}
+                            ${job.estimatedCompletion ? `
+                                <p class="text-sm text-gray-600">
+                                    <i class="fas fa-hourglass-half mr-2"></i> คาดว่าจะเสร็จ: <span class="font-medium">${formatDate(job.estimatedCompletion)}</span>
+                                </p>
                             ` : ''}
                         </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลปัญหา</h4>
+                            <ul class="space-y-2 text-sm text-gray-700">
+                                <li><strong>ประเภทปัญหา:</strong> ${job.problemType || 'ไม่ระบุ'}</li>
+                                <li><strong>รายละเอียด:</strong> ${job.description || 'ไม่มีรายละเอียดเพิ่มเติม'}</li>
+                                <li><strong>อุปกรณ์:</strong> ${job.device || 'ไม่ระบุ'}</li>
+                                <li><strong>รหัสสินทรัพย์:</strong> ${job.assetId || 'ไม่ระบุ'}</li>
+                                <li><strong>สถานที่:</strong> ${job.location || 'ไม่ระบุ'}</li>
+                            </ul>
+                        </div>
+
+                        ${fileAttachmentsHtml}
+                        ${progressNotesHtml}
+
+                        <div class="text-right text-xs text-gray-500 pt-4 border-t mt-4">
+                            แจ้งซ่อมเมื่อ: ${formatDateTime(job.timestamp)}
+                        </div>
                     </div>
-                </div>
-            `;
-        }
-        
-        /**
-         * Formats a date string into a Thai locale string.
-         * @param {string} dateString - The date string to format.
-         * @returns {string} The formatted date string.
-         */
-        const formatDate = (dateString) => {
-            if (!dateString) return 'ไม่มีข้อมูล';
-            try {
+                `;
+            }
+
+            /**
+             * Helper function to format date.
+             * @param {string} dateString - The date string from data.
+             * @returns {string} Formatted date.
+             */
+            function formatDate(dateString) {
+                if (!dateString) return 'ไม่ระบุ';
                 const date = new Date(dateString);
-                if (isNaN(date.getTime())) {
-                    return 'วันที่ไม่ถูกต้อง';
-                }
                 return date.toLocaleDateString('th-TH', {
                     year: 'numeric',
                     month: 'long',
+                    day: 'numeric'
+                });
+            }
+
+            /**
+             * Helper function to format date and time.
+             * @param {string} dateTimeString - The date/time string from data.
+             * @returns {string} Formatted date and time.
+             */
+            function formatDateTime(dateTimeString) {
+                if (!dateTimeString) return 'ไม่ระบุ';
+                const date = new Date(dateTimeString);
+                return date.toLocaleString('th-TH', {
+                    year: 'numeric',
+                    month: 'short',
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: false
                 });
-            } catch (e) {
-                console.error("Error formatting date:", dateString, e);
-                return 'วันที่ผิดพลาด';
             }
-        };
-        
-        /**
-         * Formats a time string into a Thai locale string.
-         * @param {Date} date - The date object to format.
-         * @returns {string} The formatted time string.
-         */
-        const formatTime = (date) => {
-            return date.toLocaleTimeString('th-TH', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
+
+            /**
+             * Helper function to format time only (e.g., for last updated).
+             * @param {Date} dateObj - The Date object.
+             * @returns {string} Formatted time.
+             */
+            function formatTime(dateObj) {
+                return dateObj.toLocaleTimeString('th-TH', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            }
+
+            // Event Listeners
+            // Add event listeners to stat cards for filtering
+            statCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const status = this.dataset.status; // Get the status from data-status attribute
+                    filterJobsByStatus(status); // Call the filter function
+                });
             });
-        };
-        
-        /**
-         * Handles the back button click. Closes LIFF window if in LINE, otherwise redirects.
-         */
-        function goBack() {
-            if (liff.isInClient()) {
-                liff.closeWindow();
-            } else {
-                window.location.href = 'https://liff.line.me/2007374280-GEYwyNdl';
-            }
-        }
-        
-        // Event Listeners
-        document.querySelectorAll('.status-tab').forEach(tab => {
-            tab.addEventListener('click', () => filterJobsByStatus(tab.dataset.status));
+
+            // Add event listeners to status tabs for filtering (if not already handled elsewhere)
+            statusTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const status = this.dataset.status;
+                    filterJobsByStatus(status);
+                });
+            });
+
+            document.getElementById('backBtn').addEventListener('click', () => {
+                if (liff.isInClient()) {
+                    liff.closeWindow();
+                } else {
+                    alert('This action is only available in LINE client.');
+                }
+            });
+
+            // Initialize LIFF when the DOM is fully loaded
+            initializeLiff();
         });
-        
-        document.getElementById('backBtn').addEventListener('click', goBack);
-        
-        // Initialize the LIFF app when the window loads
-        window.onload = initializeLiff;
-    
-    document.addEventListener('DOMContentLoaded', function() {
-    const statCards = document.querySelectorAll('.stat-card');
-    const statusTabs = document.querySelectorAll('.status-tab');
-
-    // ฟังก์ชันสำหรับจัดการการเปลี่ยนสถานะแท็บ
-    function setActiveTab(selectedStatus) {
-        // ลบคลาส active-tab-style ออกจากทุกแท็บ
-        statusTabs.forEach(tab => {
-            tab.classList.remove('active-tab-style');
-        });
-
-        // เพิ่มคลาส active-tab-style ให้กับแท็บที่ตรงกับ selectedStatus
-        const targetTab = document.querySelector(`.status-tab[data-status="${selectedStatus}"]`);
-        if (targetTab) {
-            targetTab.classList.add('active-tab-style');
-            // คุณอาจต้องการเรียกฟังก์ชันเพื่อโหลดข้อมูลตารางที่นี่
-            // เช่น loadJobsByStatus(selectedStatus);
-            console.log(`Filtering jobs by status: ${selectedStatus}`);
-        }
-    }
-
-    // เพิ่ม Event Listener ให้กับ Stat Cards
-    statCards.forEach(card => {
-        card.addEventListener('click', function() {
-            const status = this.dataset.status; // ดึงค่าจาก data-status ของ card ที่คลิก
-            setActiveTab(status); // เรียกฟังก์ชันให้จัดการ active tab และ filter
-        });
-    });
-
-    // เพิ่ม Event Listener ให้กับ Status Tabs (หากยังไม่มี)
-    // ถ้าคุณมีโค้ดสำหรับจัดการการคลิก tab อยู่แล้ว ก็ไม่จำเป็นต้องเพิ่มส่วนนี้
-    statusTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const status = this.dataset.status;
-            setActiveTab(status);
-        });
-    });
-
-    // ตั้งค่าเริ่มต้นเมื่อโหลดหน้า
-    // setActiveTab('all'); // ถ้าต้องการให้ 'ทั้งหมด' เป็น Active ตั้งแต่แรก
-});
-    
-    
-    
     </script>
 </body>
 </html>
