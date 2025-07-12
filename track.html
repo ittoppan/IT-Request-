@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <style>
         :root {
             --primary-color: #183263;
@@ -38,7 +37,6 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             border-radius: 0.75rem;
             border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
         }
         
         .header-gradient {
@@ -66,14 +64,13 @@
             color: white;
             text-transform: uppercase;
             letter-spacing: 0.025em;
-            transition: all 0.2s ease;
         }
         
         .status-new { background-color: var(--blue-500); }
-        .status-pending { background-color: var(--purple-500); }
+        .status-pending { background-color: #f97316; }
         .status-in-progress { background-color: var(--yellow-500); }
         .status-completed { background-color: var(--green-500); }
-        .status-cancelled { background-color: var(--red-500); }
+        .status-cancelled { background-color: #e3e3e3; }
         
         .priority-badge {
             display: inline-flex;
@@ -85,28 +82,21 @@
             color: white;
             text-transform: uppercase;
             letter-spacing: 0.025em;
-            transition: all 0.2s ease;
         }
         
-        .priority-low { background-color: var(--gray-500); }
-        .priority-medium { background-color: var(--yellow-500); }
+        .priority-low { background-color: #e3e3e3; }
+        .priority-medium { background-color: #1d95ff; }
         .priority-high { background-color: #f97316; }
-        .priority-critical { background-color: var(--red-500); }
+        .priority-critical { background-color: #ff0000; }
         
         .job-card {
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
-        
-        .job-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        
         .job-card.selected {
-            box-shadow: 0 0 0 3px var(--blue-500), 0 0 25px rgba(59, 130, 246, 0.4);
-            transform: scale(1.02);
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 0 2px var(--primary-color);
         }
         
         .loading-spinner {
@@ -119,56 +109,19 @@
         }
         
         .status-tab {
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             cursor: pointer;
             border-bottom: 3px solid transparent;
-        }
-        
-        .status-tab:hover {
-            transform: translateY(-2px);
         }
         
         .status-tab.active {
             border-bottom-color: var(--primary-color);
             background-color: rgba(255, 255, 255, 0.9);
             font-weight: 600;
-            transform: translateY(-2px);
         }
         
         .stat-card {
-            transition: all 0.4s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px) scale(1.03);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        
-        .slide-up {
-            animation: slideUp 0.5s ease-out forwards;
-        }
-        
-        .bounce {
-            animation: bounce 2s infinite;
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        .float {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .lottie-animation {
-            width: 100%;
-            height: auto;
-            max-width: 200px;
-            margin: 0 auto;
+            transition: all 0.3s ease;
         }
         
         @keyframes spin {
@@ -191,31 +144,35 @@
                 transform: translateY(0);
             }
         }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        
-        .shake {
-            animation: shake 0.5s;
-        }
+        /* For Webkit browsers (Chrome, Safari) */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* For Firefox */
+.hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+}
+
+/* Base style for status tabs */
+.status-tab {
+    background-color: rgba(255, 255, 255, 0.08); /* Light translucent background for inactive tabs */
+    color: #E2E8F0; /* text-gray-200 or similar for contrast */
+    white-space: nowrap; /* Prevent wrapping */
+    transition: all 0.2s ease-in-out;
+}
+
+/* Active tab style - More prominent, reflecting glassmorphism */
+.active-tab-style {
+    background-color: rgba(255, 255, 255, 0.2); /* More opaque for active */
+    color: #F8FAFC; /* text-gray-50 */
+    font-weight: 600; /* semibold */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1), inset 0 2px 5px rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    border-left: 1px solid rgba(255, 255, 255, 0.4);
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+    border-bottom: none; /* Remove bottom border for active tab */
+}
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -223,86 +180,84 @@
         <div class="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-blue-600/90"></div>
         <div class="relative z-10 max-w-6xl mx-auto">
             <div class="flex items-center gap-4 mb-4">
-                <button id="backBtn" class="inline-flex items-center px-4 py-2 text-sm border border-white/30 rounded-lg hover:bg-white/20 text-white transition-all duration-200 ease-in-out hover:scale-105 active:scale-95">
-                    <i class="fas fa-arrow-left mr-2 fa-beat-fade"></i>
+                <button id="backBtn" class="inline-flex items-center px-4 py-2 text-sm border border-white/30 rounded-lg hover:bg-white/20 text-white transition-all duration-200 ease-in-out">
+                    <i class="fas fa-arrow-left mr-2"></i>
                     กลับ
                 </button>
             </div>
-            <h1 class="text-3xl md:text-4xl font-bold mb-2 slide-up">ติดตามงานแจ้งซ่อม IT <i class="fas fa-rocket ml-2 fa-bounce" style="--fa-animation-duration: 3s;"></i></h1>
-            <p class="opacity-90 text-sm md:text-base fade-in">ตรวจสอบสถานะงานซ่อมของคุณได้อย่างรวดเร็วและง่ายดายที่นี่</p>
+            <h1 class="text-3xl md:text-4xl font-bold mb-2">ติดตามงานแจ้งซ่อม IT 🚀</h1>
+            <p class="opacity-90 text-sm md:text-base">ตรวจสอบสถานะงานซ่อมของคุณได้อย่างรวดเร็วและง่ายดายที่นี่</p>
         </div>
     </div>
 
     <div class="max-w-6xl mx-auto p-4 md:p-6 -mt-8 relative z-10">
         <div id="loadingIndicator" class="flex flex-col justify-center items-center py-12 glass-card hidden">
-            <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_usmfx6bp.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
-            <span class="ml-3 text-gray-700 font-medium mt-4 fade-in">กำลังโหลดข้อมูล... กรุณารอสักครู่</span>
+            <div class="loading-spinner"></div>
+            <span class="ml-3 text-gray-700 font-medium mt-4">กำลังโหลดข้อมูล... กรุณารอสักครู่</span>
         </div>
 
         <div id="mainContent" class="hidden">
             <!-- Dashboard Section -->
-            <div id="dashboardSection" class="glass-card mb-8 slide-up p-4 md:p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center">
-                        <i class="fas fa-chart-pie mr-3 text-blue-500 text-xl fa-beat-fade" style="--fa-animation-duration: 4s;"></i>
-                        <span class="text-lg font-semibold text-gray-800">ภาพรวมงานซ่อมของคุณ</span>
-                    </div>
-                    <div class="text-sm text-gray-500">
-                        <i class="fas fa-clock mr-1 fa-shake" style="--fa-animation-duration: 5s;"></i> อัปเดตล่าสุด: <span id="lastUpdatedTime">กำลังโหลด...</span>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-                    <div class="stat-card glass-card p-4 text-center fade-in" style="animation-delay: 100ms">
-                        <div class="text-3xl font-bold text-blue-600" id="totalJobsCount">0</div>
-                        <div class="text-sm text-gray-600"><i class="fas fa-layer-group mr-1"></i> ทั้งหมด</div>
-                    </div>
-                    <div class="stat-card glass-card p-4 text-center fade-in" style="animation-delay: 200ms">
-                        <div class="text-3xl font-bold text-blue-500" id="newJobsCount">0</div>
-                        <div class="text-sm text-gray-600"><i class="fas fa-file-circle-plus mr-1 fa-fade" style="--fa-animation-duration: 2s;"></i> แจ้งซ่อมใหม่</div>
-                    </div>
-                    <div class="stat-card glass-card p-4 text-center fade-in" style="animation-delay: 300ms">
-                        <div class="text-3xl font-bold text-purple-500" id="pendingJobsCount">0</div>
-                        <div class="text-sm text-gray-600"><i class="fas fa-clock mr-1 fa-spin" style="--fa-animation-duration: 3s;"></i> รอดำเนินการ</div>
-                    </div>
-                    <div class="stat-card glass-card p-4 text-center fade-in" style="animation-delay: 400ms">
-                        <div class="text-3xl font-bold text-yellow-500" id="inProgressJobsCount">0</div>
-                        <div class="text-sm text-gray-600"><i class="fas fa-tools mr-1 fa-spin-pulse"></i> กำลังดำเนินการ</div>
-                    </div>
-                    <div class="stat-card glass-card p-4 text-center fade-in" style="animation-delay: 500ms">
-                        <div class="text-3xl font-bold text-green-500" id="completedJobsCount">0</div>
-                        <div class="text-sm text-gray-600"><i class="fas fa-check-circle mr-1 fa-bounce" style="--fa-animation-duration: 2s;"></i> เสร็จสิ้น</div>
-                    </div>
-                </div>
-                
-                <div class="flex overflow-x-auto pb-2 -mx-2">
-                    <div class="flex space-x-1 px-2">
-                        <div class="status-tab px-4 py-2 rounded-t-lg active" data-status="all">
-                            <i class="fas fa-list mr-2 fa-beat-fade" style="--fa-animation-duration: 3s;"></i>ทั้งหมด
-                        </div>
-                        <div class="status-tab px-4 py-2 rounded-t-lg" data-status="new">
-                            <i class="fas fa-file-circle-plus mr-2 fa-fade" style="--fa-animation-duration: 2s;"></i>แจ้งซ่อมใหม่
-                        </div>
-                        <div class="status-tab px-4 py-2 rounded-t-lg" data-status="pending">
-                            <i class="fas fa-clock mr-2 fa-spin" style="--fa-animation-duration: 3s;"></i>รอดำเนินการ
-                        </div>
-                        <div class="status-tab px-4 py-2 rounded-t-lg" data-status="in-progress">
-                            <i class="fas fa-tools mr-2 fa-spin-pulse"></i>กำลังดำเนินการ
-                        </div>
-                        <div class="status-tab px-4 py-2 rounded-t-lg" data-status="completed">
-                            <i class="fas fa-check-circle mr-2 fa-bounce" style="--fa-animation-duration: 2s;"></i>เสร็จสิ้น
-                        </div>
-                        <div class="status-tab px-4 py-2 rounded-t-lg" data-status="cancelled">
-                            <i class="fas fa-times-circle mr-2 fa-shake" style="--fa-animation-duration: 3s;"></i>ยกเลิก
-                        </div>
-                    </div>
-                </div>
+            <div id="dashboardSection" class="glass-card mb-8 animate-slide-up p-6 md:p-8 rounded-xl shadow-2xl backdrop-blur-md border border-white border-opacity-30">
+    <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center">
+            <i class="fas fa-chart-pie mr-4 text-blue-600 text-2xl"></i>
+            <h2 class="text-2xl font-bold text-gray-900 tracking-tight">ภาพรวมงานซ่อมของคุณ</h2>
+        </div>
+        <div class="text-sm text-gray-500 font-medium">
+            อัปเดตล่าสุด: <span id="lastUpdatedTime" class="font-semibold text-gray-700">กำลังโหลด...</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+        <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in" style="animation-delay: 100ms">
+            <div class="text-4xl font-extrabold text-blue-700 mb-1" id="totalJobsCount">0</div>
+            <div class="text-sm text-gray-600 font-medium">ทั้งหมด</div>
+        </div>
+        <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in" style="animation-delay: 200ms">
+            <div class="text-4xl font-extrabold text-blue-500 mb-1" id="newJobsCount">0</div>
+            <div class="text-sm text-gray-600 font-medium">แจ้งซ่อมใหม่</div>
+        </div>
+        <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in" style="animation-delay: 300ms">
+            <div class="text-4xl font-extrabold text-orange-500 mb-1" id="pendingJobsCount">0</div>
+            <div class="text-sm text-gray-600 font-medium">รอดำเนินการ</div>
+        </div>
+        <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in" style="animation-delay: 400ms">
+            <div class="text-4xl font-extrabold text-yellow-500 mb-1" id="inProgressJobsCount">0</div>
+            <div class="text-sm text-gray-600 font-medium">กำลังดำเนินการ</div>
+        </div>
+        <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in" style="animation-delay: 500ms">
+            <div class="text-4xl font-extrabold text-green-600 mb-1" id="completedJobsCount">0</div>
+            <div class="text-sm text-gray-600 font-medium">เสร็จสิ้น</div>
+        </div>
+    </div>
+
+    <div class="flex overflow-x-auto pb-3 -mx-2 hide-scrollbar"> <div class="flex space-x-2 px-2 flex-grow sm:flex-grow-0"> <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200 active-tab-style" data-status="all">
+                <i class="fas fa-list mr-2"></i>ทั้งหมด
             </div>
+            <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="new">
+                <i class="fas fa-file-circle-plus mr-2"></i>แจ้งซ่อมใหม่
+            </div>
+            <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="pending">
+                <i class="fas fa-clock mr-2"></i>รอดำเนินการ
+            </div>
+            <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="in-progress">
+                <i class="fas fa-tools mr-2"></i>กำลังดำเนินการ
+            </div>
+            <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="completed">
+                <i class="fas fa-check-circle mr-2"></i>เสร็จสิ้น
+            </div>
+            <div class="status-tab px-5 py-3 rounded-t-xl cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors duration-200" data-status="cancelled">
+                <i class="fas fa-times-circle mr-2"></i>ยกเลิก
+            </div>
+        </div>
+    </div>
+</div>
+
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-4 mb-4">
                 <div class="space-y-4">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4 slide-up">
-                        <i class="fas fa-tasks mr-2 fa-beat-fade" style="--fa-animation-duration: 4s;"></i>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">
                         รายการงานซ่อมของคุณ (<span id="jobCount">0</span> งาน)
                     </h2>
                     
@@ -311,8 +266,8 @@
                     </div>
                     
                     <div id="noJobsFound" class="glass-card hidden">
-                        <div class="text-center pb-4 py-8">
-                            <lottie-player src="https://assets5.lottiefiles.com/packages/lf20_khtt8ejx.json" background="transparent" speed="1" style="width: 200px; height: 200px; margin: 0 auto;" loop autoplay></lottie-player>
+                        <div class="text-center pb-4  py-8">
+                            <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
                             <p class="text-gray-500 font-medium">ไม่พบงานซ่อมในสถานะนี้</p>
                             <p class="text-sm text-gray-400 mt-1">คุณสามารถตรวจสอบสถานะอื่นได้จากเมนูด้านบน</p>
                         </div>
@@ -322,13 +277,13 @@
                 <div class="lg:sticky lg:top-6 h-fit">
                     <div id="emptyDetails" class="glass-card">
                         <div class="text-center py-12">
-                            <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_gn0tojcq.json" background="transparent" speed="1" style="width: 200px; height: 200px; margin: 0 auto;" loop autoplay></lottie-player>
+                            <i class="fas fa-info-circle text-4xl text-blue-400 mb-4"></i>
                             <p class="text-gray-500 font-medium">เลือกงานจากรายการด้านซ้ายเพื่อดูรายละเอียด</p>
                             <p class="text-sm text-gray-400 mt-1">ข้อมูลความคืบหน้าและรายละเอียดจะปรากฏที่นี่</p>
                         </div>
                     </div>
                     
-                    <div id="jobDetailsContainer" class="glass-card fade-in hidden">
+                    <div id="jobDetailsContainer" class="glass-card animate-fade-in hidden">
                         <!-- Job details will be inserted here -->
                     </div>
                 </div>
@@ -386,11 +341,11 @@
         function showError(title, message) {
             document.getElementById('loadingIndicator').innerHTML = `
                 <div class="text-center p-6 bg-white rounded-lg shadow-md">
-                    <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_qpwbiyxf.json" background="transparent" speed="1" style="width: 150px; height: 150px; margin: 0 auto;" loop autoplay></lottie-player>
+                    <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
                     <p class="text-lg font-semibold text-gray-700 mb-2">${title}</p>
                     <p class="text-sm text-gray-500 mb-4">${message || 'กรุณาลองเข้าใช้งานใหม่อีกครั้ง'}</p>
-                    <button onclick="window.location.reload()" class="btn-primary px-5 py-2 rounded-lg text-base hover:scale-105 active:scale-95 transition-transform">
-                        <i class="fas fa-sync-alt mr-2 fa-spin"></i> ลองใหม่
+                    <button onclick="window.location.reload()" class="btn-primary px-5 py-2 rounded-lg text-base">
+                        <i class="fas fa-sync-alt mr-2"></i> ลองใหม่
                     </button>
                 </div>
             `;
@@ -418,10 +373,8 @@
                     const now = new Date();
                     document.getElementById('lastUpdatedTime').textContent = formatTime(now);
                     
-                    // Add animation when content loads
                     document.getElementById('loadingIndicator').classList.add('hidden');
                     document.getElementById('mainContent').classList.remove('hidden');
-                    document.getElementById('mainContent').classList.add('fade-in');
                     
                     if (repairJobs.length === 0) {
                         document.getElementById('noJobsFound').classList.remove('hidden');
@@ -446,19 +399,10 @@
             const completedJobs = repairJobs.filter(job => job.status === 'เสร็จสิ้น').length;
             
             document.getElementById('totalJobsCount').textContent = totalJobs;
-            document.getElementById('newJobsCount').textContent = newJobs;
+             document.getElementById('newJobsCount').textContent = newJobs;
             document.getElementById('pendingJobsCount').textContent = pendingJobs;
             document.getElementById('inProgressJobsCount').textContent = inProgressJobs;
             document.getElementById('completedJobsCount').textContent = completedJobs;
-            
-            // Add animation to stats update
-            const statCards = document.querySelectorAll('.stat-card');
-            statCards.forEach(card => {
-                card.classList.add('pulse');
-                setTimeout(() => {
-                    card.classList.remove('pulse');
-                }, 1000);
-            });
         }
         
         /**
@@ -467,13 +411,6 @@
          */
         function filterJobsByStatus(status) {
             currentStatusFilter = status;
-            
-            // Add animation to tab change
-            const activeTab = document.querySelector(`.status-tab[data-status="${status}"]`);
-            activeTab.classList.add('shake');
-            setTimeout(() => {
-                activeTab.classList.remove('shake');
-            }, 500);
             
             // Update active tab
             document.querySelectorAll('.status-tab').forEach(tab => {
@@ -485,12 +422,14 @@
             
             // Filter jobs
             switch(status) {
-                case 'new':
+                  case 'new':
                     filteredJobs = repairJobs.filter(job => job.status === 'แจ้งซ่อมใหม่');
                     break;
+                    
                 case 'pending':
                     filteredJobs = repairJobs.filter(job => job.status === 'รอดำเนินการ');
                     break;
+              
                 case 'in-progress':
                     filteredJobs = repairJobs.filter(job => job.status === 'กำลังดำเนินการ');
                     break;
@@ -533,49 +472,45 @@
             
             filteredJobs.forEach((job, index) => {
                 const jobCard = document.createElement('div');
-                jobCard.className = `glass-card job-card cursor-pointer slide-up p-4`;
+                jobCard.className = `glass-card job-card cursor-pointer animate-slide-up p-4`; // เพิ่ม p-4
                 jobCard.style.animationDelay = `${index * 100}ms`;
                 jobCard.id = `job-${job.jobId}`;
                 jobCard.onclick = () => selectJob(job.jobId);
                 
                 // Determine status class and icon
-                let statusClass, statusIcon, statusText, iconAnimation;
+                let statusClass, statusIcon, statusText;
                 switch(job.status) {
-                    case 'แจ้งซ่อมใหม่':
+                   case 'แจ้งซ่อมใหม่':
                         statusClass = 'status-new';
                         statusIcon = 'fa-file-circle-plus';
                         statusText = 'แจ้งซ่อมใหม่';
-                        iconAnimation = 'fa-fade';
                         break;
+                        
                     case 'รอดำเนินการ':
                         statusClass = 'status-pending';
                         statusIcon = 'fa-clock';
                         statusText = 'รอดำเนินการ';
-                        iconAnimation = 'fa-spin';
                         break;
+                 
                     case 'กำลังดำเนินการ':
                         statusClass = 'status-in-progress';
                         statusIcon = 'fa-tools';
                         statusText = 'กำลังดำเนินการ';
-                        iconAnimation = 'fa-spin-pulse';
                         break;
                     case 'เสร็จสิ้น':
                         statusClass = 'status-completed';
                         statusIcon = 'fa-check-circle';
                         statusText = 'เสร็จสิ้น';
-                        iconAnimation = 'fa-bounce';
                         break;
                     case 'ยกเลิก':
                         statusClass = 'status-cancelled';
                         statusIcon = 'fa-times-circle';
                         statusText = 'ยกเลิก';
-                        iconAnimation = 'fa-shake';
                         break;
                     default:
                         statusClass = 'status-pending';
                         statusIcon = 'fa-clock';
                         statusText = job.status || 'ไม่ทราบสถานะ';
-                        iconAnimation = '';
                 }
                 
                 // Determine priority class
@@ -605,11 +540,10 @@
                         </div>
                         <div class="flex flex-col items-end gap-2">
                             <span class="status-badge ${statusClass}">
-                                <i class="fas ${statusIcon} mr-1 ${iconAnimation}" style="--fa-animation-duration: 2s;"></i>
+                                <i class="fas ${statusIcon} mr-1"></i>
                                 ${statusText}
                             </span>
                             <span class="priority-badge ${priorityClass}">
-                                <i class="fas fa-bolt mr-1"></i>
                                 ${job.urgency || 'ปานกลาง'}
                             </span>
                         </div>
@@ -647,21 +581,13 @@
             const selectedJob = filteredJobs.find(job => job.jobId === jobId);
             if (!selectedJob) return;
             
-            // Add animation to selection
-            const jobCard = document.getElementById(`job-${jobId}`);
-            if (jobCard) {
-                jobCard.classList.add('bounce');
-                setTimeout(() => {
-                    jobCard.classList.remove('bounce');
-                }, 1000);
-            }
-            
             document.querySelectorAll('.job-card').forEach(card => {
                 card.classList.remove('selected');
             });
             
-            if (jobCard) {
-                jobCard.classList.add('selected');
+            const currentSelectedCard = document.getElementById(`job-${jobId}`);
+            if (currentSelectedCard) {
+                currentSelectedCard.classList.add('selected');
             }
 
             selectedJobId = jobId;
@@ -678,62 +604,54 @@
             
             emptyDetails.classList.add('hidden');
             jobDetailsContainer.classList.remove('hidden');
-            jobDetailsContainer.classList.add('slide-up');
             
             // Determine status class and icon for details view
-            let statusClass, statusIcon, statusText, iconAnimation;
+            let statusClass, statusIcon, statusText;
             switch(job.status) {
                 case 'แจ้งซ่อมใหม่':
                     statusClass = 'status-new';
                     statusIcon = 'fa-file-circle-plus';
                     statusText = 'แจ้งซ่อมใหม่';
-                    iconAnimation = 'fa-fade';
                     break;
+
+                    
                 case 'รอดำเนินการ':
                     statusClass = 'status-pending';
                     statusIcon = 'fa-clock';
                     statusText = 'รอดำเนินการ';
-                    iconAnimation = 'fa-spin';
                     break;
+              
                 case 'กำลังดำเนินการ':
                     statusClass = 'status-in-progress';
                     statusIcon = 'fa-tools';
                     statusText = 'กำลังดำเนินการ';
-                    iconAnimation = 'fa-spin-pulse';
                     break;
                 case 'เสร็จสิ้น':
                     statusClass = 'status-completed';
                     statusIcon = 'fa-check-circle';
                     statusText = 'เสร็จสิ้น';
-                    iconAnimation = 'fa-bounce';
                     break;
                 case 'ยกเลิก':
                     statusClass = 'status-cancelled';
                     statusIcon = 'fa-times-circle';
                     statusText = 'ยกเลิก';
-                    iconAnimation = 'fa-shake';
                     break;
                 default:
                     statusClass = 'status-pending';
                     statusIcon = 'fa-clock';
                     statusText = job.status || 'ไม่ทราบสถานะ';
-                    iconAnimation = '';
             }
             
             // Generate file attachments section
             let fileAttachmentsHtml = '';
             if (job.imageViewUrls && job.imageViewUrls.length > 0) {
                 fileAttachmentsHtml = `
-                    <div class="slide-up" style="animation-delay: 200ms">
-                        <h4 class="font-semibold mb-3 text-gray-700">
-                            <i class="fas fa-images mr-2 fa-beat-fade" style="--fa-animation-duration: 3s;"></i>
-                            ไฟล์แนบประกอบปัญหา (${job.imageViewUrls.length} รูป)
-                        </h4>
+                    <div>
+                        <h4 class="font-semibold mb-3 text-gray-700">ไฟล์แนบประกอบปัญหา (${job.imageViewUrls.length} รูป)</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                            ${job.imageViewUrls.map((url, i) => `
-                                <a href="${url}" target="_blank" class="block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1" style="animation-delay: ${300 + (i * 100)}ms">
+                            ${job.imageViewUrls.map(url => `
+                                <a href="${url}" target="_blank" class="block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
                                     <img src="${url}" alt="ไฟล์แนบ" class="w-full h-24 object-cover">
-                                    <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all duration-300"></div>
                                 </a>
                             `).join('')}
                         </div>
@@ -745,14 +663,11 @@
             let progressNotesHtml = '';
             if (job.notes && job.notes.length > 0) {
                 progressNotesHtml = `
-                    <div class="slide-up" style="animation-delay: 300ms">
-                        <h4 class="font-semibold mb-3 text-gray-700">
-                            <i class="fas fa-list-check mr-2 fa-beat" style="--fa-animation-duration: 2s;"></i>
-                            ความคืบหน้าการดำเนินงาน
-                        </h4>
+                    <div>
+                        <h4 class="font-semibold mb-3 text-gray-700">ความคืบหน้าการดำเนินงาน</h4>
                         <div class="space-y-3">
-                            ${job.notes.map((note, i) => `
-                                <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100 slide-up" style="animation-delay: ${400 + (i * 50)}ms">
+                            ${job.notes.map(note => `
+                                <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
                                     <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                                     <p class="text-sm text-gray-700">${note}</p>
                                 </div>
@@ -764,35 +679,32 @@
             
             jobDetailsContainer.innerHTML = `
                 <div class="p-6 space-y-6">
-                    <div class="flex items-center justify-between border-b pb-4 mb-4 slide-up">
+                    <div class="flex items-center justify-between border-b pb-4 mb-4">
                         <div class="flex items-center">
-                            <i class="fas fa-info-circle mr-3 text-blue-500 text-xl fa-beat-fade" style="--fa-animation-duration: 4s;"></i>
+                            <i class="fas fa-info-circle mr-3 text-blue-500 text-xl"></i>
                             <span class="text-lg font-semibold text-gray-800">รายละเอียดงานแจ้งซ่อม ${job.jobId || 'N/A'}</span>
                         </div>
                         <span class="status-badge ${statusClass}">
-                            <i class="fas ${statusIcon} mr-1 ${iconAnimation}" style="--fa-animation-duration: 2s;"></i>
+                            <i class="fas ${statusIcon} mr-1"></i>
                             ${statusText}
                         </span>
                     </div>
 
-                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 shadow-sm slide-up" style="animation-delay: 100ms">
+                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 shadow-sm">
                         ${job.assignedTo ? `
                             <p class="text-sm text-gray-600 mb-1">
-                                <i class="fas fa-user-tie mr-2 fa-beat-fade" style="--fa-animation-duration: 3s;"></i> ผู้รับผิดชอบ: <span class="font-medium">${job.assignedTo}</span>
+                                <i class="fas fa-user-tie mr-2"></i> ผู้รับผิดชอบ: <span class="font-medium">${job.assignedTo}</span>
                             </p>
                         ` : '<p class="text-sm text-gray-500"><i class="fas fa-user-tie mr-2"></i> ยังไม่มีผู้รับผิดชอบ</p>'}
                         ${job.estimatedCompletion ? `
                             <p class="text-sm text-gray-600">
-                                <i class="fas fa-hourglass-half mr-2 fa-spin-pulse"></i> คาดว่าจะเสร็จ: <span class="font-medium">${formatDate(job.estimatedCompletion)}</span>
+                                <i class="fas fa-hourglass-half mr-2"></i> คาดว่าจะเสร็จ: <span class="font-medium">${formatDate(job.estimatedCompletion)}</span>
                             </p>
                         ` : ''}
                     </div>
 
-                    <div class="slide-up" style="animation-delay: 150ms">
-                        <h4 class="font-semibold mb-3 text-gray-700">
-                            <i class="fas fa-user mr-2 fa-beat" style="--fa-animation-duration: 3s;"></i>
-                            ข้อมูลผู้แจ้ง
-                        </h4>
+                    <div>
+                        <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลผู้แจ้ง</h4>
                         <div class="space-y-2 text-sm text-gray-700">
                             <div class="flex items-center">
                                 <i class="fas fa-user mr-2 text-gray-500"></i>
@@ -809,11 +721,8 @@
                         </div>
                     </div>
 
-                    <div class="slide-up" style="animation-delay: 200ms">
-                        <h4 class="font-semibold mb-3 text-gray-700">
-                            <i class="fas fa-bug mr-2 fa-beat-fade" style="--fa-animation-duration: 2.5s;"></i>
-                            รายละเอียดปัญหาที่แจ้ง
-                        </h4>
+                    <div>
+                        <h4 class="font-semibold mb-3 text-gray-700">รายละเอียดปัญหาที่แจ้ง</h4>
                         <div class="p-3 bg-gray-100 rounded-lg border border-gray-200">
                             <p class="text-base font-medium text-blue-700 mb-2">${job.problemType || 'ไม่มีข้อมูลประเภทปัญหา'}</p>
                             <p class="text-sm text-gray-700">${job.problemDetails || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
@@ -824,11 +733,8 @@
                     
                     ${fileAttachmentsHtml}
 
-                    <div class="slide-up" style="animation-delay: 400ms">
-                        <h4 class="font-semibold mb-3 text-gray-700">
-                            <i class="fas fa-clock mr-2 fa-spin" style="--fa-animation-duration: 3s;"></i>
-                            ข้อมูลเวลา
-                        </h4>
+                    <div>
+                        <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลเวลา</h4>
                         <div class="space-y-2 text-sm text-gray-700">
                             <div class="flex justify-between items-center p-2 bg-gray-50 rounded-md">
                                 <span class="text-gray-600"><i class="fas fa-calendar-plus mr-2"></i>วันที่แจ้ง:</span>
