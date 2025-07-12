@@ -182,6 +182,8 @@
                 <input type="hidden" id="lineUserId" name="lineUserId">
                 <input type="hidden" id="lineDisplayName" name="lineDisplayName">
                 <input type="hidden" id="linePictureUrl" name="linePictureUrl">
+                <input type="hidden" id="device_id" name="device_id">
+
                 
                 <!-- ข้อมูลผู้แจ้ง -->
                 <div class="space-y-6 animate-slide-up">
@@ -701,6 +703,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             initializeLiff();
         });
+
+
+        const urlParams = new URLSearchParams(window.location.search);
+     const deviceId = urlParams.get("device_id");
+
+  // ใส่ค่า device_id ลงใน input hidden
+          if (deviceId) {
+        document.getElementById("device_id").value = deviceId;
+          }
+
 
 document.addEventListener('DOMContentLoaded', function() {
     const trackingButton = document.getElementById('openTrackingModal');
