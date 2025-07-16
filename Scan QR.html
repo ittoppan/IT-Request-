@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Scan QR</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <script>
+    async function startApp() {
+      await liff.init({ liffId: "2007374280-k1zBoL3A" });
+
+      // เปิดกล้องทันทีเมื่อเข้า LIFF
+      try {
+        const result = await liff.scanCode();
+        alert("ผลลัพธ์ที่สแกนได้: " + result.value);
+
+        // ตัวอย่าง: ปิด LIFF และส่งค่ากลับไป LINE
+        liff.sendMessages([{
+          type: "text",
+          text: "QR ที่สแกนได้: " + result.value
+        }]).then(() => {
+          liff.closeWindow();
+        });
+
+      } catch (err) {
+        alert("เกิดข้อผิดพลาด: " + err.message);
+        liff.closeWindow();
+      }
+    }
+
+    startApp();
+  </script>
+</body>
+</html>
