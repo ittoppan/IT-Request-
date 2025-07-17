@@ -20,14 +20,24 @@
   <script>
     async function startApp() {
       try {
-        await liff.init({ liffId: "2007374280-k1zBoL3A","2007374280-MpkD0bN8" }); // 🔁 เปลี่ยนเป็น LIFF ID ของคุณ
+        let liffIdToUse;
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestedLiffId = urlParams.get('liffid'); // ดึง LIFF ID จากพารามิเตอร์ใน URL
+
+        if (requestedLiffId === '2007374280-MpkD0bN8') {
+          liffIdToUse = '2007374280-MpkD0bN8';
+        } else {
+          // LIFF ID เริ่มต้น หรือ LIFF ID หลัก
+          liffIdToUse = '2007374280-k1zBoL3A';
+        }
+
+        await liff.init({ liffId: liffIdToUse });
 
         const result = await liff.scanCode();
         const scannedValue = result.value;
 
         document.getElementById("status").textContent = "QR ที่สแกนได้: " + scannedValue;
 
-        // ตรวจสอบว่าเป็น URL หรือไม่
         if (scannedValue.startsWith("http://") || scannedValue.startsWith("https://")) {
           window.location.href = scannedValue;
         } else {
