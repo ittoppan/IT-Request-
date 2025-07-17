@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แบบฟอร์มแจ้งซ่อม MAINTENANCE JOB REQUEST  </title>
+    <title>แบบฟอร์มแจ้งซ่อม MAINTENANCE JOB REQUEST</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -116,6 +116,7 @@
             overflow: hidden;
             margin-right: 1rem;
             margin-bottom: 1rem;
+            border: 1px solid #e2e8f0; /* Added border for better visibility */
         }
         
         .thumbnail-container img {
@@ -138,16 +139,23 @@
             cursor: pointer;
             opacity: 0;
             transition: opacity 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         
         .thumbnail-container:hover .thumbnail-remove {
             opacity: 1;
         }
+
+        /* Style for selected problem type */
+        .selected-problem-type {
+            border-color: #3b82f6 !important; /* Tailwind blue-500 */
+            background-color: #eff6ff !important; /* Tailwind blue-50 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 md:p-8 bg-gray-50">
     <div class="glass-card w-full max-w-4xl rounded-2xl overflow-hidden shadow-xl animate-fade-in">
-        <!-- Header -->
         <div class="bg-gradient-primary text-white p-8 relative overflow-hidden">
             <div class="absolute inset-0 opacity-10">
                 <div class="absolute top-4 right-4 w-32 h-32 bg-white rounded-full blur-3xl animate-float"></div>
@@ -160,7 +168,7 @@
                     <img id="profilePicture" src="https://via.placeholder.com/96/CCCCCC/FFFFFF?text=PROFILE" alt="รูปโปรไฟล์" class="w-20 h-20 rounded-full object-cover"> 
                </div>
             </div>
-         
+           
                 <h1 class="text-3xl md:text-4xl font-bold mb-3">
                     แบบฟอร์มแจ้งซ่อม MAINTENANCE JOB REQUEST 👨🏻‍🔧
                 </h1>
@@ -176,14 +184,12 @@
             </div>
         </div>
 
-        <!-- Form -->
         <div class="p-8">
             <form id="repairForm" class="space-y-8">
                 <input type="hidden" id="lineUserId" name="lineUserId">
                 <input type="hidden" id="lineDisplayName" name="lineDisplayName">
                 <input type="hidden" id="linePictureUrl" name="linePictureUrl">
                 
-                <!-- ข้อมูลผู้แจ้ง -->
                 <div class="space-y-6 animate-slide-up">
                     <div class="section-header">
                         <i class="fas fa-user-circle mr-3 text-blue-500"></i>
@@ -220,7 +226,7 @@
                                     class="form-input pl-12 appearance-none bg-white"
                                 >
                                     <option value="" disabled selected>เลือกแผนก</option>
-                                    <option value="HR&GA">HR&GA</option>                           
+                                    <option value="HR&GA">HR&GA</option>                                 
                                     <option value="Safety">Safety</option>
                                     <option value="IT">IT</option>
                                     <option value="Printing & Color match">Printing & Color match</option>
@@ -248,7 +254,7 @@
                                     required
                                     class="form-input pl-12 appearance-none bg-white"
                                 >
-                                         
+                                            
                                     <option value="โรงงานอมตะซิตี้ (ระยอง)">โรงงานอมตะซิตี้ (ระยอง)</option>
                                 </select>
                                 <i class="fas fa-map-marker-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
@@ -290,7 +296,6 @@
                     </div>
                 </div>
 
-                <!-- รายละเอียดปัญหา -->
                 <div class="space-y-6 animate-slide-up" style="animation-delay: 0.2s;">
                     <div class="section-header">
                         <i class="fas fa-exclamation-circle mr-3 text-yellow-500"></i>
@@ -300,28 +305,24 @@
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทปัญหา *</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div class="p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-border hover:border-blue-500/50" onclick="setProblemType('อุปกรณ์ฮาร์ดแวร์')">
+                            <div class="p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-gray-200 hover:border-blue-500/50" onclick="setProblemType(this, 'เครื่องจักร (Machinery)')">
                                 <div class="flex items-center space-x-3">
-                                    <i class="fas fa-desktop text-blue-500"></i>
-                                    <span class="text-sm">เครื่องจักร (Machinery)</span>
+                                    <i class="fas fa-cogs text-blue-500"></i> <span class="text-sm">เครื่องจักร (Machinery)</span>
                                 </div>
                             </div>
-                            <div class="p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-border hover:border-blue-500/50" onclick="setProblemType('ซอฟต์แวร์/โปรแกรม')">
+                            <div class="p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-gray-200 hover:border-blue-500/50" onclick="setProblemType(this, 'อุปกรณ์สนับสนุน (Equipment Support)')">
                                 <div class="flex items-center space-x-3">
-                                    <i class="fas fa-cog text-blue-500"></i>
-                                    <span class="text-sm">อุปกรณ์สนับสนุน (Equipment Support)</span>
+                                    <i class="fas fa-wrench text-blue-500"></i> <span class="text-sm">อุปกรณ์สนับสนุน (Equipment Support)</span>
                                 </div>
                             </div>
-                            <div class="p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-border hover:border-blue-500/50" onclick="setProblemType('ระบบเครือข่าย')">
+                            <div class="p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-gray-200 hover:border-blue-500/50" onclick="setProblemType(this, 'โครงสร้างพื้นฐาน (Facilities)')">
                                 <div class="flex items-center space-x-3">
-                                    <i class="fas fa-wifi text-blue-500"></i>
-                                    <span class="text-sm">โครงสร้างพื้นฐาน (Facilities)</span>
+                                    <i class="fas fa-building text-blue-500"></i> <span class="text-sm">โครงสร้างพื้นฐาน (Facilities)</span>
                                 </div>
                             </div>
-                            <div class="p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-border hover:border-blue-500/50" onclick="setProblemType('อีเมล')">
+                            <div class="p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-gray-200 hover:border-blue-500/50" onclick="setProblemType(this, 'อื่นๆ (Other)')">
                                 <div class="flex items-center space-x-3">
-                                    <i class="fas fa-envelope text-blue-500"></i>
-                                    <span class="text-sm">อื่นๆ (Other)</span>
+                                    <i class="fas fa-ellipsis-h text-blue-500"></i> <span class="text-sm">อื่นๆ (Other)</span>
                                 </div>
                             </div>
                             
@@ -389,7 +390,6 @@
                         </div>
                     </div>
 
-                    <!-- File Upload -->
                     <div class="space-y-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">แนบไฟล์ประกอบ (ถ้ามี)</label>
                         <div
@@ -420,7 +420,6 @@
                     </div>
                 </div>
 
-                <!-- Submit Button -->
                 <div class="pt-6 animate-slide-up" style="animation-delay: 0.4s;">
                     <button
                         type="submit"
@@ -435,42 +434,46 @@
 
     <script>
         const liffId = '2007374280-MpkD0bN8';
+        // URL ของ Google Apps Script ของคุณ
         const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
         
         // เก็บข้อมูลไฟล์ที่อัพโหลด
         let uploadedFiles = [];
 
-        function setProblemType(type) {
+        // ฟังก์ชันสำหรับเลือกประเภทปัญหาและไฮไลท์
+        function setProblemType(element, type) {
             document.getElementById('problemType').value = type;
-            // Highlight selected type
-            const allTypes = document.querySelectorAll('[onclick^="setProblemType"]');
+            
+            // ลบ class 'selected-problem-type' ออกจากทุกอัน
+            const allTypes = document.querySelectorAll('.grid-cols-1 > div, .md\\:grid-cols-2 > div, .lg\\:grid-cols-3 > div');
             allTypes.forEach(el => {
-                if (el.getAttribute('onclick').includes(`'${type}'`)) {
-                    el.classList.add('border-blue-500', 'bg-blue-50', 'shadow-lg');
-                } else {
-                    el.classList.remove('border-blue-500', 'bg-blue-50', 'shadow-lg');
-                }
+                el.classList.remove('selected-problem-type');
             });
+
+            // เพิ่ม class 'selected-problem-type' ให้กับ element ที่ถูกคลิก
+            element.classList.add('selected-problem-type');
         }
 
+        // ฟังก์ชันจัดการการอัพโหลดไฟล์
         function handleFileUpload(event) {
             const files = event.target.files;
             const fileList = document.getElementById('fileList');
             
             if (!files || files.length === 0) return;
             
-            // ล้างไฟล์เก่าทั้งหมด
+            // ล้างไฟล์เก่าทั้งหมดและเคลียร์อาร์เรย์
             fileList.innerHTML = '';
             uploadedFiles = [];
             
             Array.from(files).forEach((file, index) => {
-                if (file.size > 5 * 1024 * 1024) {
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
                     Swal.fire({
                         title: 'ไฟล์ใหญ่เกินไป',
-                        text: `ไฟล์ ${file.name} มีขนาดเกิน 5MB`,
+                        text: `ไฟล์ ${file.name} มีขนาดเกิน 5MB กรุณาเลือกไฟล์ที่เล็กกว่า`,
                         icon: 'warning'
                     });
-                    return;
+                    // ไม่เพิ่มไฟล์ที่ใหญ่เกินกำหนด
+                    return; 
                 }
                 
                 // เพิ่มไฟล์ลงในอาร์เรย์
@@ -492,14 +495,24 @@
                         `;
                     };
                     reader.readAsDataURL(file);
-                } else {
-                    // ถ้าเป็นไฟล์อื่น (เช่น PDF) แสดงไอคอน
+                } else if (file.type === 'application/pdf') {
+                    // ถ้าเป็นไฟล์ PDF แสดงไอคอน PDF
                     fileContainer.innerHTML = `
                         <div class="w-full h-full bg-gray-100 flex items-center justify-center">
                             <i class="fas fa-file-pdf text-red-500 text-3xl"></i>
-                            <div class="thumbnail-remove" onclick="removeFile(${index})">
-                                <i class="fas fa-times text-red-500"></i>
-                            </div>
+                        </div>
+                        <div class="thumbnail-remove" onclick="removeFile(${index})">
+                            <i class="fas fa-times text-red-500"></i>
+                        </div>
+                    `;
+                } else {
+                    // สำหรับไฟล์ประเภทอื่น ๆ (อาจจะไม่เกิดขึ้นถ้า accept กำหนดไว้ดีแล้ว)
+                     fileContainer.innerHTML = `
+                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-file text-gray-500 text-3xl"></i>
+                        </div>
+                        <div class="thumbnail-remove" onclick="removeFile(${index})">
+                            <i class="fas fa-times text-red-500"></i>
                         </div>
                     `;
                 }
@@ -521,30 +534,16 @@
             });
         }
 
+        // ฟังก์ชันสำหรับลบไฟล์ที่แนบ
         function removeFile(index) {
             // ลบไฟล์ออกจากอาร์เรย์
             uploadedFiles.splice(index, 1);
             
-            // อัพเดทการแสดงผล
-            const fileInput = document.getElementById('fileInput');
+            // อัพเดทการแสดงผลใหม่ทั้งหมด
             const fileList = document.getElementById('fileList');
+            fileList.innerHTML = ''; // ล้างทั้งหมด
             
-            // ล้างและแสดงผลใหม่
-            fileList.innerHTML = '';
-            
-            // สร้าง DataTransfer object เพื่ออัพเดทไฟล์ที่เลือก
-            const dataTransfer = new DataTransfer();
-            
-            // เพิ่มไฟล์ที่เหลือกลับไป
-            uploadedFiles.forEach(file => {
-                dataTransfer.items.add(file);
-            });
-            
-            // อัพเดท file input
-            fileInput.files = dataTransfer.files;
-            
-            // แสดงผลไฟล์ที่เหลือ
-            uploadedFiles.forEach((file, newIndex) => {
+            uploadedFiles.forEach((file, newIndex) => { // แสดงผลไฟล์ที่เหลืออยู่
                 const fileContainer = document.createElement('div');
                 fileContainer.className = 'thumbnail-container';
                 
@@ -559,13 +558,22 @@
                         `;
                     };
                     reader.readAsDataURL(file);
-                } else {
+                } else if (file.type === 'application/pdf') {
                     fileContainer.innerHTML = `
                         <div class="w-full h-full bg-gray-100 flex items-center justify-center">
                             <i class="fas fa-file-pdf text-red-500 text-3xl"></i>
-                            <div class="thumbnail-remove" onclick="removeFile(${newIndex})">
-                                <i class="fas fa-times text-red-500"></i>
-                            </div>
+                        </div>
+                        <div class="thumbnail-remove" onclick="removeFile(${newIndex})">
+                            <i class="fas fa-times text-red-500"></i>
+                        </div>
+                    `;
+                } else {
+                     fileContainer.innerHTML = `
+                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-file text-gray-500 text-3xl"></i>
+                        </div>
+                        <div class="thumbnail-remove" onclick="removeFile(${newIndex})">
+                            <i class="fas fa-times text-red-500"></i>
                         </div>
                     `;
                 }
@@ -586,6 +594,7 @@
             });
         }
 
+        // ฟังก์ชันเริ่มต้น LIFF
         async function initializeLiff() {
             try {
                 await liff.init({ liffId });
@@ -613,6 +622,7 @@
             }
         }
 
+        // Event Listener สำหรับการส่งฟอร์ม
         document.getElementById('repairForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -629,7 +639,10 @@
 
             const formData = new FormData(this);
             
-            // Convert files to base64
+            // *** สำคัญ: เพิ่ม formType เพื่อให้ Google Apps Script รู้ว่านี่คือฟอร์มอะไร ***
+            formData.append('formType', 'MaintenanceJobRequest'); 
+
+            // แปลงไฟล์เป็น Base64
             const filePromises = Array.from(uploadedFiles).map(file => {
                 return new Promise((resolve) => {
                     const reader = new FileReader();
@@ -658,46 +671,91 @@
                 if (data.status === 'success') {
                     Swal.fire({
                         title: 'ส่งแบบฟอร์มสำเร็จ!',
-                        text: 'รหัสงานของคุณคือ ' + data.jobId,
+                        html: `รหัสงานของคุณคือ <strong>${data.jobId}</strong><br>คุณสามารถใช้รหัสนี้เพื่อติดตามสถานะงานได้`,
                         icon: 'success'
+                    }).then(() => {
+                        this.reset(); // ล้างฟอร์ม
+                        uploadedFiles = []; // เคลียร์อาร์เรย์ไฟล์
+                        document.getElementById('fileList').innerHTML = ''; // ล้างการแสดงผลไฟล์
+                        // ลบไฮไลท์ประเภทปัญหา
+                        const allTypes = document.querySelectorAll('.grid-cols-1 > div, .md\\:grid-cols-2 > div, .lg\\:grid-cols-3 > div');
+                        allTypes.forEach(el => {
+                            el.classList.remove('selected-problem-type');
+                        });
+                        document.getElementById('urgency-low').checked = true; // ตั้งค่าความเร่งด่วนกลับเป็น 'ต่ำ'
                     });
-                    this.reset();
-                    document.getElementById('fileList').innerHTML = '';
-                    uploadedFiles = [];
-                    initializeLiff();
                 } else {
-                    throw new Error(data.message || 'เกิดข้อผิดพลาดในการส่งแบบฟอร์ม');
+                    Swal.fire({
+                        title: 'เกิดข้อผิดพลาดในการส่งข้อมูล!',
+                        text: data.message || 'ไม่สามารถส่งแบบฟอร์มได้ กรุณาลองอีกครั้ง',
+                        icon: 'error'
+                    });
                 }
             } catch (error) {
                 Swal.close();
-                Swal.fire({ 
-                    title: 'เกิดข้อผิดพลาด!', 
-                    text: error.message, 
-                    icon: 'error' 
+                Swal.fire({
+                    title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ!',
+                    text: `ไม่สามารถติดต่อเซิร์ฟเวอร์ได้: ${error.message}`,
+                    icon: 'error'
                 });
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeLiff();
+        // Event Listener สำหรับปุ่มติดตามงานซ่อม (คุณอาจจะต้องเพิ่ม Modal หรือ URL สำหรับการติดตามงานซ่อมในส่วนนี้)
+        document.getElementById('openTrackingModal').addEventListener('click', () => {
+            Swal.fire({
+                title: 'ติดตามงานซ่อม',
+                input: 'text',
+                inputPlaceholder: 'กรอกรหัสงานซ่อมของคุณ',
+                showCancelButton: true,
+                confirmButtonText: 'ค้นหา',
+                showLoaderOnConfirm: true,
+                preConfirm: (jobId) => {
+                    // ใส่ URL หรือ Logic สำหรับการติดตามงานซ่อมของคุณที่นี่
+                    // เช่น การ redirect ไปยังหน้าติดตามงาน หรือเรียก API
+                    if (jobId) {
+                        // ตัวอย่าง: ถ้ามีหน้าติดตามงานแยก
+                        // window.open(`https://your-tracking-page.com/?jobId=${jobId}`, '_blank');
+                        // หรือแสดงผลใน Swal เลย (ขึ้นอยู่กับการออกแบบระบบของคุณ)
+                        return fetch(`${googleAppsScriptUrl}?action=getJobStatus&jobId=${jobId}`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(response.statusText);
+                                }
+                                return response.json();
+                            })
+                            .catch(error => {
+                                Swal.showValidationMessage(`Request failed: ${error}`);
+                            });
+                    } else {
+                        Swal.showValidationMessage('กรุณากรอกรหัสงานซ่อม');
+                    }
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (result.value.status === 'success') {
+                        Swal.fire({
+                            title: `สถานะงาน ${result.value.jobId}`,
+                            html: `สถานะ: <strong>${result.value.jobStatus}</strong><br>
+                                   รายละเอียด: ${result.value.jobDescription || 'ไม่มีข้อมูลเพิ่มเติม'}`,
+                            icon: 'info'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'ไม่พบข้อมูล',
+                            text: result.value.message || 'ไม่พบรหัสงานซ่อมนี้ หรือเกิดข้อผิดพลาด',
+                            icon: 'error'
+                        });
+                    }
+                }
+            });
         });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const trackingButton = document.getElementById('openTrackingModal');
 
-    if (trackingButton) {
-        trackingButton.addEventListener('click', function() {
-            // กำหนด URL ที่คุณต้องการให้ปุ่มนี้ลิงก์ไป
-            const targetUrl = 'https://liff.line.me/2007374280-GR1Q3YxJ'; // **เปลี่ยน URL นี้**
+        // เริ่มต้น LIFF เมื่อ DOM โหลดเสร็จ
+        window.addEventListener('DOMContentLoaded', initializeLiff);
 
-            // เปิดหน้าใหม่ในแท็บใหม่ (แนะนำสำหรับลิงก์ออกนอก)
-            window.open(targetUrl, '_blank');
-
-            // หรือถ้าต้องการเปิดในแท็บเดิม:
-            // window.location.href = targetUrl;
-        });
-    }
-});
     </script>
 </body>
 </html>
