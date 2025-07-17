@@ -20,8 +20,8 @@
   <script>
     async function startApp() {
       try {
-        await liff.init({ liffId: "2007374280-k1zBoL3A" }); // 🔁 เปลี่ยนเป็น LIFF ID ของคุณ
-        await liff.init({ liffId: "2007374280-MpkD0bN8" }); // 🔁 เปลี่ยนเป็น LIFF ID ของคุณ
+        await liff.init({ liffId: "2007374280-k1zBoL3A","2007374280-MpkD0bN8" }); // 🔁 เปลี่ยนเป็น LIFF ID ของคุณ
+
         const result = await liff.scanCode();
         const scannedValue = result.value;
 
