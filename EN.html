@@ -683,7 +683,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             initializeLiff();
         });
-
+//device_id
+     const params = new URLSearchParams(window.location.search);
+  const deviceId = params.get("MachineCode");
+  if (deviceId) {
+    document.getElementById("MachineCode").value = MachineCode;
+  }
 document.addEventListener('DOMContentLoaded', function() {
     const trackingButton = document.getElementById('openTrackingModal');
 
