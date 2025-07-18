@@ -300,7 +300,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทปัญหา *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทงาน *</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div class="p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border-border hover:border-blue-500/50" onclick="setProblemType('อุปกรณ์ฮาร์ดแวร์')">
                                 <div class="flex items-center space-x-3">
@@ -328,16 +328,16 @@
                             </div>
                             
                         </div>
-                        <input type="hidden" id="problemType" name="problemType" required>
+                        <input type="hidden" id="jobType" name="jobType" required>
                     </div>
 
                     <div class="space-y-2">
-                        <label for="problemDetails" class="block text-sm font-medium text-gray-700 mb-1">
+                        <label for="problemDescription" class="block text-sm font-medium text-gray-700 mb-1">
                             ※ รายละเอียดของปัญหา (Problem Description)*
                         </label>
                         <textarea
-                            id="problemDetails"
-                            name="problemDetails"
+                            id="problemDescription"
+                            name="problemDescription"
                             rows="4"
                             required
                             placeholder="อธิบายปัญหาที่พบให้ละเอียดที่สุด เช่น อาการที่พบ ข้อความแจ้งเตือน เวลาเกิดปัญหา"
@@ -404,7 +404,7 @@
                                     คลิกเพื่ออัพโหลดไฟล์
                                 </p>
                                 <p class="text-sm text-gray-500">
-                                    รองรับ PNG, JPG, PDF (สูงสุด 5MB ต่อไฟล์)
+                                    รองรับ PNG, JPG, (สูงสุด 5MB ต่อไฟล์)
                                 </p>
                             </div>
                             <input
@@ -412,7 +412,7 @@
                                 type="file"
                                 name="fileUpload"
                                 class="hidden"
-                                accept="image/*,.pdf"
+                                accept="image/*"
                                 multiple
                                 onchange="handleFileUpload(event)"
                             />
@@ -443,9 +443,9 @@
         let uploadedFiles = [];
 
         function setProblemType(type) {
-            document.getElementById('problemType').value = type;
+            document.getElementById('jobType').value = type;
             // Highlight selected type
-            const allTypes = document.querySelectorAll('[onclick^="setProblemType"]');
+            const allTypes = document.querySelectorAll('[onclick^="setjobType"]');
             allTypes.forEach(el => {
                 if (el.getAttribute('onclick').includes(`'${type}'`)) {
                     el.classList.add('border-blue-500', 'bg-blue-50', 'shadow-lg');
@@ -659,7 +659,7 @@
                 Swal.close();
                 if (data.status === 'success') {
                     Swal.fire({
-                        title: 'ส่งแบบฟอร์มสำเร็จ!',
+                        title: 'แจ้งซ่อมสำเร็จ!',
                         text: 'รหัสงานของคุณคือ ' + data.jobId,
                         icon: 'success'
                     });
