@@ -685,9 +685,9 @@
         });
 //device_id
      const params = new URLSearchParams(window.location.search);
-  const MachineCode = params.get("MachineCode");
-  if (MachineCode) {
-    document.getElementById("MachineCode").value = MachineCode;
+  const machineName = params.get("machineName");
+  if (machineName) {
+    document.getElementById("machineName").value = machineName;
   }
 document.addEventListener('DOMContentLoaded', function() {
     const trackingButton = document.getElementById('openTrackingModal');
