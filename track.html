@@ -1009,115 +1009,117 @@
             /**
              * สร้าง HTML สำหรับไฟล์แนบ
              */
-            function createFileAttachmentsHtml(job) {
-                // ดึง URL ของไฟล์แนบทั้งหมด
-                let fileUrls = [];
-                
-                if (currentJobType === 'IT') {
-                    // สำหรับงาน IT: รวมทั้ง imageUrls และ driveUrls
-                    fileUrls = [...(job.imageUrls || []), ...(job.driveUrls || [])];
-                } else {
-                    // สำหรับงาน EN: รวมรูปภาพจากทุกคอลัมน์
-                    fileUrls = job.imageUrls || [];
-                }
-                
-                // กรองเฉพาะ URL รูปภาพ
-                const imageUrls = fileUrls
-                    .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
-                    .filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i))
-                    .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
-                
-                // กรองไฟล์อื่นๆ ที่ไม่ใช่รูปภาพ
-                const otherFiles = fileUrls
-                    .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
-                    .filter(url => !url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i))
-                    .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
-                
-                // ส่วนแสดงรูปภาพ
-                let imagesSection = '';
-                if (imageUrls.length > 0) {
-                    imagesSection = `
-                        <div class="mb-6">
-                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">รูปภาพแจ้งซ่อม (${imageUrls.length})</h4>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                ${imageUrls.map((url, index) => `
-                                    <div class="relative group cursor-pointer" onclick="openLightbox(imageUrls, ${index})">
-                                        <img src="${url}" alt="รูปภาพแจ้งซ่อม" 
-                                            class="w-full h-32 object-cover rounded-lg shadow hover:shadow-md transition-shadow"
-                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                            <i class="fas fa-expand text-white text-xl"></i>
-                                        </div>
+            /**
+ * สร้าง HTML สำหรับไฟล์แนบ
+ */
+function createFileAttachmentsHtml(job) {
+    // ดึง URL ของไฟล์แนบทั้งหมด
+    let fileUrls = [];
+    
+    if (currentJobType === 'IT') {
+        // สำหรับงาน IT: รวมทั้ง imageUrls และ driveUrls
+        fileUrls = [...(job.imageUrls || []), ...(job.driveUrls || [])];
+    } else {
+        // สำหรับงาน EN: รวมรูปภาพจากทุกคอลัมน์
+        fileUrls = job.imageUrls || [];
+    }
+    
+    // กรองเฉพาะ URL รูปภาพ
+    const imageUrls = fileUrls
+        .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
+        .filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i))
+        .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
+    
+    // กรองไฟล์อื่นๆ ที่ไม่ใช่รูปภาพ
+    const otherFiles = fileUrls
+        .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
+        .filter(url => !url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i))
+        .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
+    
+    // ส่วนแสดงรูปภาพ
+    let imagesSection = '';
+    if (imageUrls.length > 0) {
+        imagesSection = `
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">รูปภาพแจ้งซ่อม (${imageUrls.length})</h4>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    ${imageUrls.map((url, index) => `
+                        <div class="relative group cursor-pointer" onclick="openLightbox(${JSON.stringify(imageUrls)}, ${index})">
+                            <img src="${url}" alt="รูปภาพแจ้งซ่อม" 
+                                class="w-full h-32 object-cover rounded-lg shadow hover:shadow-md transition-shadow"
+                                onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                <i class="fas fa-expand text-white text-xl"></i>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    // ส่วนแสดงไฟล์อื่นๆ
+    let filesSection = '';
+    if (otherFiles.length > 0) {
+        filesSection = `
+            <div>
+                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบอื่นๆ (${otherFiles.length})</h4>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    ${otherFiles.map((url, index) => {
+                        const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
+                        const fileExtension = fileName.split('.').pop().toLowerCase();
+                        
+                        let iconClass = 'fas fa-file file-icon-default';
+                        if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
+                        else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
+                        else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
+                        else if (['ppt', 'pptx'].includes(fileExtension)) iconClass = 'fas fa-file-powerpoint ppt-icon';
+                        else if (['zip', 'rar', '7z'].includes(fileExtension)) iconClass = 'fas fa-file-archive zip-icon';
+                        else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) iconClass = 'fas fa-file-video video-icon';
+                        else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) iconClass = 'fas fa-file-audio audio-icon';
+                        
+                        return `
+                            <a href="${url}" target="_blank" 
+                               class="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
+                               title="${fileName}">
+                                <div class="relative pt-[100%] bg-gray-100 dark:bg-gray-700">
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <i class="${iconClass} file-icon"></i>
                                     </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // ส่วนแสดงไฟล์อื่นๆ
-                let filesSection = '';
-                if (otherFiles.length > 0) {
-                    filesSection = `
-                        <div>
-                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบอื่นๆ (${otherFiles.length})</h4>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                                ${otherFiles.map((url, index) => {
-                                    const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
-                                    const fileExtension = fileName.split('.').pop().toLowerCase();
-                                    
-                                    let iconClass = 'fas fa-file file-icon-default';
-                                    if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
-                                    else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
-                                    else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
-                                    else if (['ppt', 'pptx'].includes(fileExtension)) iconClass = 'fas fa-file-powerpoint ppt-icon';
-                                    else if (['zip', 'rar', '7z'].includes(fileExtension)) iconClass = 'fas fa-file-archive zip-icon';
-                                    else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) iconClass = 'fas fa-file-video video-icon';
-                                    else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) iconClass = 'fas fa-file-audio audio-icon';
-                                    
-                                    return `
-                                        <a href="${url}" target="_blank" 
-                                           class="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
-                                           title="${fileName}">
-                                            <div class="relative pt-[100%] bg-gray-100 dark:bg-gray-700">
-                                                <div class="absolute inset-0 flex items-center justify-center">
-                                                    <i class="${iconClass} file-icon"></i>
-                                                </div>
-                                            </div>
-                                            <div class="p-2 bg-white dark:bg-gray-800">
-                                                <p class="text-xs text-gray-600 dark:text-gray-300 truncate">${fileName}</p>
-                                            </div>
-                                        </a>
-                                    `;
-                                }).join('')}
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // ถ้าไม่มีไฟล์แนบใดๆ
-                if (imageUrls.length === 0 && otherFiles.length === 0) {
-                    return `
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ</h4>
-                            <div class="text-center py-4 text-gray-500 dark:text-gray-400">
-                                <i class="fas fa-paperclip text-3xl mb-2"></i>
-                                <p>ไม่มีไฟล์แนบ</p>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // รวมส่วนแสดงผล
-                return `
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ</h4>
-                        ${imagesSection}
-                        ${filesSection}
-                    </div>
-                `;
-            }
-            
+                                </div>
+                                <div class="p-2 bg-white dark:bg-gray-800">
+                                    <p class="text-xs text-gray-600 dark:text-gray-300 truncate">${fileName}</p>
+                                </div>
+                            </a>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    // ถ้าไม่มีไฟล์แนบใดๆ
+    if (imageUrls.length === 0 && otherFiles.length === 0) {
+        return `
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ</h4>
+                <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-paperclip text-3xl mb-2"></i>
+                    <p>ไม่มีไฟล์แนบ</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // รวมส่วนแสดงผล
+    return `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ</h4>
+            ${imagesSection}
+            ${filesSection}
+        </div>
+    `;
+}
             /**
              * สร้าง HTML สำหรับบันทึกความคืบหน้า
              */
