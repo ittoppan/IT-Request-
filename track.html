@@ -1,34 +1,31 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ติดตามงานแจ้งซ่อม</title>
+    <title>ระบบติดตามงานแจ้งซ่อม</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         :root {
-            --primary-color: #183263;
-            --primary-dark: #1d4ed8;
+            --primary-color: #2563eb;
+            --primary-dark: #1e40af;
             --secondary-color: #f59e0b;
             --dark-color: #1e293b;
             --light-color: #f8fafc;
-            --blue-500: #3b82f6;
-            --red-500: #ef4444;
-            --green-500: #10b981;
-            --yellow-500: #f59e0b;
-            --purple-500: #230075;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
         }
         
         body {
             font-family: 'Kanit', sans-serif;
-            background-color: var(--light-color);
             line-height: 1.6;
-            color: var(--dark-color);
+            transition: all 0.3s ease;
+        }
+        
+        .dark {
+            background-color: #1a202c;
+            color: #f7fafc;
         }
         
         .glass-card {
@@ -37,288 +34,231 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             border-radius: 0.75rem;
             border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .header-gradient {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             transition: all 0.3s ease;
-            color: white;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            cursor: pointer;
+        }
+        
+        .dark .glass-card {
+            background: rgba(26, 32, 44, 0.9);
+            border: 1px solid rgba(74, 85, 104, 0.3);
         }
         
         .status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.65rem;
-            border-radius: 9999px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
+            @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
         }
         
-        .status-new { background-color: var(--blue-500); }
-        .status-pending { background-color: #f97316; }
-        .status-in-progress { background-color: var(--yellow-500); }
-        .status-completed { background-color: var(--green-500); }
-        .status-cancelled { background-color: #e3e3e3; }
+        .status-new { @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100; }
+        .status-pending { @apply bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100; }
+        .status-in-progress { @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100; }
+        .status-completed { @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100; }
+        .status-cancelled { @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100; }
         
         .priority-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.65rem;
-            border-radius: 9999px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
+            @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
         }
         
-        .priority-low { background-color: #e3e3e3; }
-        .priority-medium { background-color: #1d95ff; }
-        .priority-high { background-color: #f97316; }
-        .priority-critical { background-color: #ff0000; }
+        .priority-low { @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100; }
+        .priority-medium { @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100; }
+        .priority-high { @apply bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100; }
+        .priority-critical { @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100; }
         
-        .job-card {
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .job-card.selected {
-            border: 2px solid var(--primary-color);
-            box-shadow: 0 0 0 2px var(--primary-color);
-        }
-        
-        .loading-spinner {
-            border: 3px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top: 3px solid var(--blue-500);
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        
-        .status-tab {
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            background-color: rgba(255, 255, 255, 0.08);
-            color: #E2E8F0;
-            white-space: nowrap;
-        }
-        
-        .status-tab.active-tab-style {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #F8FAFC;
-            font-weight: 600;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1), inset 0 2px 5px rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.4);
-            border-left: 1px solid rgba(255, 255, 255, 0.4);
-            border-right: 1px solid rgba(255, 255, 255, 0.4);
-            border-bottom: none;
-        }
-        
-        .stat-card {
-            transition: all 0.3s ease;
-        }
-        
-        /* แท็บประเภทงาน */
-        .job-type-tabs {
-            display: flex;
-            border-bottom: 1px solid #e2e8f0;
-            margin-bottom: 1.5rem;
-        }
-        
-        .job-type-tab {
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            font-weight: 500;
-            color: #64748b;
-            transition: all 0.2s ease;
-        }
-        
-        .job-type-tab.active {
-            color: #1e40af;
-            border-bottom-color: #1e40af;
-            background-color: #eff6ff;
-        }
-        
-        /* การแสดงผลเฉพาะ EN */
-        .en-specific {
-            display: none;
-        }
-        
-        .show-en .en-specific {
-            display: block;
-        }
-        
-        .show-en .it-specific {
-            display: none;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .file-icon {
+            @apply text-4xl;
         }
         
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .hide-scrollbar {
-            scrollbar-width: none;
-        }
+        .pdf-icon { @apply text-red-500; }
+        .doc-icon { @apply text-blue-500; }
+        .xls-icon { @apply text-green-500; }
+        .img-icon { @apply text-purple-500; }
+        .file-icon-default { @apply text-gray-400; }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-    <div class="header-gradient text-white p-6 relative overflow-hidden shadow-lg">
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-blue-600/90"></div>
-        <div class="relative z-10 max-w-6xl mx-auto">
-            <div class="flex items-center gap-4 mb-4">
-                <button id="backBtn" class="inline-flex items-center px-4 py-2 text-sm border border-white/30 rounded-lg hover:bg-white/20 text-white transition-all duration-200 ease-in-out">
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    กลับ
-                </button>
-            </div>
-            <h1 class="text-3xl md:text-4xl font-bold mb-2">ติดตามงานแจ้งซ่อม</h1>
-            <p class="opacity-90 text-sm md:text-base">ตรวจสอบสถานะงานซ่อมของคุณได้อย่างรวดเร็วและง่ายดายที่นี่</p>
-        </div>
-    </div>
-
-    <div class="max-w-6xl mx-auto p-4 md:p-6 -mt-8 relative z-10">
-        <!-- แท็บเลือกประเภทงาน -->
-        <div class="job-type-tabs glass-card mb-4">
-            <div class="job-type-tab active" data-type="IT">งานซ่อม IT</div>
-            <div class="job-type-tab" data-type="EN">งานซ่อมเครื่องจักร (EN)</div>
-        </div>
-
-        <div id="loadingIndicator" class="flex flex-col justify-center items-center py-12 glass-card hidden">
-            <div class="loading-spinner"></div>
-            <span class="ml-3 text-gray-700 font-medium mt-4">กำลังโหลดข้อมูล... กรุณารอสักครู่</span>
-        </div>
-
-        <div id="mainContent" class="hidden">
-            <div id="dashboardSection" class="glass-card mb-8 animate-slide-up p-6 md:p-8 rounded-xl shadow-2xl backdrop-blur-md border border-white border-opacity-30">
-                <div class="flex items-center justify-between mb-8">
-                    <div class="flex items-center">
-                        <i class="fas fa-chart-pie mr-4 text-blue-600 text-2xl"></i>
-                        <h2 class="text-2xl font-bold text-gray-900 tracking-tight">ภาพรวมงานซ่อมของคุณ</h2>
-                    </div>
-                    <div class="text-sm text-gray-500 font-medium">
-                        อัปเดตล่าสุด: <span id="lastUpdatedTime" class="font-semibold text-gray-700">กำลังโหลด...</span>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="all" style="animation-delay: 100ms">
-                        <div class="text-4xl font-extrabold text-blue-700 mb-1" id="totalJobsCount">0</div>
-                        <div class="text-sm text-gray-600 font-medium">ทั้งหมด</div>
-                    </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="new" style="animation-delay: 200ms">
-                        <div class="text-4xl font-extrabold text-blue-500 mb-1" id="newJobsCount">0</div>
-                        <div class="text-sm text-gray-600 font-medium">แจ้งซ่อมใหม่</div>
-                    </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="pending" style="animation-delay: 300ms">
-                        <div class="text-4xl font-extrabold text-orange-500 mb-1" id="pendingJobsCount">0</div>
-                        <div class="text-sm text-gray-600 font-medium">รอดำเนินการ</div>
-                    </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="in-progress" style="animation-delay: 400ms">
-                        <div class="text-4xl font-extrabold text-yellow-500 mb-1" id="inProgressJobsCount">0</div>
-                        <div class="text-sm text-gray-600 font-medium">กำลังดำเนินการ</div>
-                    </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="completed" style="animation-delay: 500ms">
-                        <div class="text-4xl font-extrabold text-green-600 mb-1" id="completedJobsCount">0</div>
-                        <div class="text-sm text-gray-600 font-medium">เสร็จสิ้น</div>
-                    </div>
-                </div>
-
-                <!-- แท็บสถานะ -->
-                <div class="flex overflow-x-auto hide-scrollbar pb-2">
-                    <div class="status-tab active-tab-style mr-4 px-4 py-2 rounded-t-lg" data-status="all">ทั้งหมด</div>
-                    <div class="status-tab mr-4 px-4 py-2 rounded-t-lg" data-status="new">แจ้งซ่อมใหม่</div>
-                    <div class="status-tab mr-4 px-4 py-2 rounded-t-lg" data-status="pending">รอดำเนินการ</div>
-                    <div class="status-tab mr-4 px-4 py-2 rounded-t-lg" data-status="in-progress">กำลังดำเนินการ</div>
-                    <div class="status-tab px-4 py-2 rounded-t-lg" data-status="completed">เสร็จสิ้น</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-4 mb-4">
-                <div class="space-y-4">
+<body class="min-h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="flex-1">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-gray-800">
-                            รายการงานซ่อมของคุณ (<span id="jobCount">0</span> งาน)
-                            <span class="text-sm font-normal ml-2" id="currentJobType">(IT)</span>
-                        </h2>
-                        <button id="refreshBtn" class="text-blue-600 hover:text-blue-800 transition-colors">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
+                        <div class="flex items-center space-x-4">
+                            <button id="backBtn" class="flex items-center px-3 py-2 border border-white/30 rounded-lg hover:bg-white/20 transition-all">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                กลับ
+                            </button>
+                            <button id="themeToggle" class="p-2 rounded-full hover:bg-white/20 transition-colors">
+                                <i class="fas fa-moon dark:hidden"></i>
+                                <i class="fas fa-sun hidden dark:inline"></i>
+                            </button>
+                        </div>
+                        <div class="md:hidden">
+                            <button id="mobileMenuButton" class="p-2 rounded-md hover:bg-white/20">
+                                <i class="fas fa-bars"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <h1 class="text-3xl font-bold">ระบบติดตามงานแจ้งซ่อม</h1>
+                        <p class="mt-2 opacity-90">ตรวจสอบสถานะงานซ่อมได้อย่างรวดเร็วและมีประสิทธิภาพ</p>
+                    </div>
+                </div>
+                <div class="mt-4 md:mt-0 flex items-center space-x-4">
+                    <div id="userProfile" class="hidden items-center space-x-2 bg-white/10 rounded-full pl-2 pr-4 py-1">
+                        <img id="userAvatar" class="w-8 h-8 rounded-full" src="" alt="User Avatar">
+                        <span id="userName" class="font-medium"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Job Type Tabs -->
+        <div class="flex overflow-x-auto scrollbar-hide mb-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <button class="job-type-tab active px-6 py-3 font-medium text-sm whitespace-nowrap" data-type="IT">
+                <i class="fas fa-desktop mr-2"></i> งานซ่อม IT
+            </button>
+            <button class="job-type-tab px-6 py-3 font-medium text-sm whitespace-nowrap" data-type="EN">
+                <i class="fas fa-cogs mr-2"></i> งานซ่อมเครื่องจักร
+            </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="glass-card flex flex-col items-center justify-center py-12 hidden">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+            <p class="text-gray-700 dark:text-gray-300 font-medium">กำลังโหลดข้อมูล...</p>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="mainContent" class="hidden">
+            <!-- Dashboard Section -->
+            <section id="dashboardSection" class="glass-card p-6 mb-8 animate-fade-in">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+                        <i class="fas fa-chart-pie mr-3 text-blue-500"></i>
+                        ภาพรวมงานซ่อม
+                    </h2>
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-2 md:mt-0">
+                        อัปเดตล่าสุด: <span id="lastUpdatedTime" class="font-semibold">กำลังโหลด...</span>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                    <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="all">
+                        <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1" id="totalJobsCount">0</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">ทั้งหมด</div>
+                    </div>
+                    <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="new">
+                        <div class="text-3xl font-bold text-blue-500 dark:text-blue-300 mb-1" id="newJobsCount">0</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">แจ้งซ่อมใหม่</div>
+                    </div>
+                    <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="pending">
+                        <div class="text-3xl font-bold text-orange-500 dark:text-orange-300 mb-1" id="pendingJobsCount">0</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">รอดำเนินการ</div>
+                    </div>
+                    <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="in-progress">
+                        <div class="text-3xl font-bold text-yellow-500 dark:text-yellow-300 mb-1" id="inProgressJobsCount">0</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">กำลังดำเนินการ</div>
+                    </div>
+                    <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="completed">
+                        <div class="text-3xl font-bold text-green-500 dark:text-green-300 mb-1" id="completedJobsCount">0</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">เสร็จสิ้น</div>
+                    </div>
+                </div>
+
+                <!-- Status Tabs -->
+                <div class="flex overflow-x-auto scrollbar-hide border-b border-gray-200 dark:border-gray-700">
+                    <button class="status-tab active px-4 py-2 font-medium text-sm whitespace-nowrap border-b-2 border-blue-500 text-blue-600 dark:text-blue-400" data-status="all">
+                        ทั้งหมด
+                    </button>
+                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" data-status="new">
+                        แจ้งซ่อมใหม่
+                    </button>
+                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" data-status="pending">
+                        รอดำเนินการ
+                    </button>
+                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" data-status="in-progress">
+                        กำลังดำเนินการ
+                    </button>
+                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" data-status="completed">
+                        เสร็จสิ้น
+                    </button>
+                </div>
+            </section>
+
+            <!-- Job List and Details Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Job List Column -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                รายการงานซ่อม (<span id="jobCount">0</span>)
+                                <span class="text-sm font-normal ml-2" id="currentJobType">(IT)</span>
+                            </h2>
+                            <button id="refreshBtn" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
                     </div>
                     
-                    <!-- ช่องค้นหา -->
-                    <div class="relative">
-                        <input type="text" id="jobSearch" placeholder="ค้นหาจากเลขที่งานหรือรายละเอียด..." 
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                    <!-- Search Box -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                        <div class="relative">
+                            <input type="text" id="jobSearch" placeholder="ค้นหาจากเลขที่งาน, รายละเอียด..." 
+                                   class="w-full px-4 py-3 border-0 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                            <div class="absolute right-3 top-3 text-gray-400">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="jobsContainer" class="space-y-4"></div>
+                    <!-- Jobs Container -->
+                    <div id="jobsContainer" class="space-y-3"></div>
                     
+                    <!-- No Jobs Found -->
                     <div id="noJobsFound" class="glass-card hidden">
-                        <div class="text-center pb-4 py-8">
+                        <div class="text-center p-8">
                             <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-500 font-medium">ไม่พบงานซ่อมในสถานะนี้</p>
-                            <p class="text-sm text-gray-400 mt-1">คุณสามารถตรวจสอบสถานะอื่นได้จากเมนูด้านบน</p>
+                            <p class="text-gray-600 dark:text-gray-300 font-medium">ไม่พบงานซ่อมในสถานะนี้</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">ลองเปลี่ยนสถานะหรือประเภทงานดูนะคะ</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="lg:sticky lg:top-6 h-fit">
-                    <div id="detailHeader" class="hidden mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">
-                            <span id="detailJobType">IT</span> - <span id="detailJobId"></span>
+                <!-- Job Details Column -->
+                <div class="lg:sticky lg:top-8 h-fit space-y-4">
+                    <div id="detailHeader" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                            <span id="detailJobType" class="text-blue-600 dark:text-blue-400">IT</span> - 
+                            <span id="detailJobId" class="font-mono"></span>
                         </h3>
                     </div>
                     
+                    <!-- Empty State -->
                     <div id="emptyDetails" class="glass-card">
-                        <div class="text-center py-12">
+                        <div class="text-center p-8">
                             <i class="fas fa-info-circle text-4xl text-blue-400 mb-4"></i>
-                            <p class="text-gray-500 font-medium">เลือกงานจากรายการด้านซ้ายเพื่อดูรายละเอียด</p>
-                            <p class="text-sm text-gray-400 mt-1">ข้อมูลความคืบหน้าและรายละเอียดจะปรากฏที่นี่</p>
+                            <p class="text-gray-600 dark:text-gray-300 font-medium">เลือกงานจากรายการด้านซ้าย</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">รายละเอียดงานจะแสดงที่นี่</p>
                         </div>
                     </div>
                     
-                    <div id="jobDetailsContainer" class="glass-card animate-fade-in hidden"></div>
+                    <!-- Job Details Container -->
+                    <div id="jobDetailsContainer" class="glass-card hidden animate-fade-in"></div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -349,9 +289,20 @@
             const jobSearch = document.getElementById('jobSearch');
             const refreshBtn = document.getElementById('refreshBtn');
             const backBtn = document.getElementById('backBtn');
+            const themeToggle = document.getElementById('themeToggle');
+            const userProfile = document.getElementById('userProfile');
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
             const statCards = document.querySelectorAll('.stat-card');
             const statusTabs = document.querySelectorAll('.status-tab');
             const jobTypeTabs = document.querySelectorAll('.job-type-tab');
+
+            // ตรวจสอบโหมดสี
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
 
             /**
              * เริ่มต้น LIFF แอปพลิเคชัน
@@ -370,6 +321,14 @@
                     userDisplayName = profile.displayName;
                     userPictureUrl = profile.pictureUrl || '';
                     
+                    // แสดงข้อมูลผู้ใช้
+                    if (userPictureUrl) {
+                        userAvatar.src = userPictureUrl;
+                        userAvatar.alt = userDisplayName;
+                    }
+                    userName.textContent = userDisplayName;
+                    userProfile.classList.remove('hidden');
+                    
                     await loadRepairJobs();
                     
                 } catch (error) {
@@ -380,18 +339,23 @@
             
             /**
              * แสดงข้อความผิดพลาด
-             * @param {string} title - หัวข้อข้อผิดพลาด
-             * @param {string} message - ข้อความรายละเอียด
              */
             function showError(title, message) {
                 loadingIndicator.innerHTML = `
-                    <div class="text-center p-6 bg-white rounded-lg shadow-md">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
-                        <p class="text-lg font-semibold text-gray-700 mb-2">${title}</p>
-                        <p class="text-sm text-gray-500 mb-4">${message || 'กรุณาลองเข้าใช้งานใหม่อีกครั้ง'}</p>
-                        <button onclick="window.location.reload()" class="btn-primary px-5 py-2 rounded-lg text-base">
-                            <i class="fas fa-sync-alt mr-2"></i> ลองใหม่
-                        </button>
+                    <div class="text-center p-6">
+                        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                            <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                        </div>
+                        <h3 class="mt-3 text-lg font-medium text-gray-900 dark:text-white">${title}</h3>
+                        <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                            ${message || 'กรุณาลองใหม่อีกครั้ง'}
+                        </div>
+                        <div class="mt-5">
+                            <button onclick="window.location.reload()" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-sync-alt mr-2"></i> ลองใหม่
+                            </button>
+                        </div>
                     </div>
                 `;
                 loadingIndicator.classList.remove('hidden');
@@ -399,30 +363,24 @@
             }
             
             /**
-             * โหลดข้อมูลงานซ่อมจาก Google Apps Script
+             * โหลดข้อมูลงานซ่อม
              */
             async function loadRepairJobs() {
                 try {
                     if (!userId) {
-                        throw new Error('ไม่พบข้อมูลผู้ใช้ (userId)');
+                        throw new Error('ไม่พบข้อมูลผู้ใช้');
                     }
                     
                     loadingIndicator.classList.remove('hidden');
                     mainContent.classList.add('hidden');
                     
-                    // เพิ่ม timestamp เพื่อป้องกันการ cache
                     const timestamp = new Date().getTime();
-                    
-                    // ดึงข้อมูลทั้ง IT และ EN พร้อมกัน
                     const [itResponse, enResponse] = await Promise.all([
                         fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT&t=${timestamp}`),
                         fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN&t=${timestamp}`)
                     ]);
                     
-                    // ตรวจสอบสถานะการตอบกลับ
                     if (!itResponse.ok || !enResponse.ok) {
-                        const errorText = await itResponse.text();
-                        console.error('Error response:', errorText);
                         throw new Error(`การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา: ${itResponse.status}`);
                     }
                     
@@ -431,29 +389,19 @@
                         enResponse.json()
                     ]);
                     
-                    // ตรวจสอบสถานะการตอบกลับจาก API
                     if (itData.status === 'error' || enData.status === 'error') {
-                        console.error('API Error:', itData.message || enData.message);
                         throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
                     }
                     
-                    // บันทึกข้อมูลงานซ่อม
                     repairJobs.IT = itData.data || [];
                     repairJobs.EN = enData.data || [];
                     
-                    // Debug: แสดงข้อมูลที่ได้รับมา
-                    console.log('IT Jobs:', repairJobs.IT);
-                    console.log('EN Jobs:', repairJobs.EN);
-                    
-                    // อัปเดต UI
                     updateDashboardStats();
                     filterJobsByType(currentJobType);
                     
-                    // ซ่อนตัวโหลดและแสดงเนื้อหาหลัก
                     loadingIndicator.classList.add('hidden');
                     mainContent.classList.remove('hidden');
                     
-                    // อัปเดตเวลาล่าสุด
                     document.getElementById('lastUpdatedTime').textContent = new Date().toLocaleString('th-TH', {
                         hour: '2-digit',
                         minute: '2-digit',
@@ -463,33 +411,11 @@
                 } catch (error) {
                     console.error('Error loading repair jobs:', error);
                     showError('โหลดข้อมูลงานซ่อมไม่สำเร็จ', error.message || 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
-                    
-                    // แสดงปุ่มสำหรับดูข้อมูล debug
-                    loadingIndicator.innerHTML += `
-                        <button onclick="showDebugInfo()" class="mt-4 text-blue-600 underline">
-                            แสดงข้อมูล Debug
-                        </button>
-                        <div id="debugInfo" class="hidden mt-4 p-4 bg-gray-100 rounded text-left text-sm"></div>
-                    `;
                 }
-            }
-
-            // เพิ่มฟังก์ชันแสดงข้อมูล Debug
-            function showDebugInfo() {
-                const debugInfo = document.getElementById('debugInfo');
-                debugInfo.innerHTML = `
-                    <p><strong>User ID:</strong> ${userId}</p>
-                    <p><strong>Current Job Type:</strong> ${currentJobType}</p>
-                    <p><strong>IT Jobs Data:</strong></p>
-                    <pre>${JSON.stringify(repairJobs.IT, null, 2)}</pre>
-                    <p><strong>EN Jobs Data:</strong></p>
-                    <pre>${JSON.stringify(repairJobs.EN, null, 2)}</pre>
-                `;
-                debugInfo.classList.toggle('hidden');
             }
             
             /**
-             * อัปเดตสถิติบนแดชบอร์ด
+             * อัปเดตสถิติแดชบอร์ด
              */
             function updateDashboardStats() {
                 const jobs = repairJobs[currentJobType];
@@ -508,41 +434,34 @@
             
             /**
              * กรองงานตามประเภท
-             * @param {string} type - ประเภทงาน ('IT' หรือ 'EN')
              */
             function filterJobsByType(type) {
                 currentJobType = type;
                 document.getElementById('currentJobType').textContent = `(${type})`;
                 document.body.classList.toggle('show-en', type === 'EN');
                 
-                // อัปเดตแท็บที่ active
                 jobTypeTabs.forEach(tab => {
                     tab.classList.toggle('active', tab.dataset.type === type);
                 });
                 
-                // กรองงานตามสถานะที่เลือก
                 filterJobsByStatus(currentStatusFilter);
-                
-                // อัปเดตสถิติแดชบอร์ด
                 updateDashboardStats();
             }
             
             /**
              * กรองงานตามสถานะ
-             * @param {string} status - สถานะงาน ('all', 'new', 'pending', 'in-progress', 'completed')
              */
             function filterJobsByStatus(status) {
                 currentStatusFilter = status;
                 
-                // อัปเดตแท็บสถานะ
                 statusTabs.forEach(tab => {
-                    tab.classList.remove('active-tab-style');
-                    if (tab.dataset.status === status) {
-                        tab.classList.add('active-tab-style');
-                    }
+                    tab.classList.toggle('border-blue-500', tab.dataset.status === status);
+                    tab.classList.toggle('text-blue-600', tab.dataset.status === status);
+                    tab.classList.toggle('dark:text-blue-400', tab.dataset.status === status);
+                    tab.classList.toggle('text-gray-500', tab.dataset.status !== status);
+                    tab.classList.toggle('dark:text-gray-400', tab.dataset.status !== status);
                 });
                 
-                // กรองงานตามสถานะและประเภท
                 let jobs = [...repairJobs[currentJobType]];
                 
                 switch(status) {
@@ -563,7 +482,6 @@
                 filteredJobs = jobs;
                 renderJobList();
                 
-                // ล้างการเลือกงานถ้าไม่อยู่ในรายการที่กรองแล้ว
                 if (selectedJobId && !filteredJobs.some(job => job.jobId === selectedJobId)) {
                     selectedJobId = null;
                     jobDetailsContainer.classList.add('hidden');
@@ -580,6 +498,7 @@
             function checkNoJobsFound() {
                 const hasJobs = filteredJobs.length > 0;
                 noJobsFound.classList.toggle('hidden', hasJobs);
+                jobsContainer.classList.toggle('hidden', !hasJobs);
             }
             
             /**
@@ -596,78 +515,67 @@
                 
                 filteredJobs.forEach((job, index) => {
                     const jobCard = document.createElement('div');
-                    jobCard.className = `glass-card job-card cursor-pointer animate-slide-up p-4`;
-                    jobCard.style.animationDelay = `${index * 50}ms`;
+                    jobCard.className = `bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md ${selectedJobId === job.jobId ? 'ring-2 ring-blue-500' : ''}`;
                     jobCard.id = `job-${job.jobId}`;
                     jobCard.onclick = () => selectJob(job.jobId);
                     
-                    // ข้อมูลสถานะและความเร่งด่วน
                     const statusInfo = getStatusInfo(job.status);
                     const priorityInfo = getPriorityInfo(job.urgency);
-                    
-                    // ข้อมูลปัญหา
                     const problemInfo = currentJobType === 'IT' 
                         ? job.problemType || 'ไม่ระบุประเภทปัญหา'
                         : job.machineName ? `${job.machineName} (${job.jobType || 'ไม่ระบุ'})` : job.jobType || 'ไม่ระบุประเภทงาน';
                     
                     jobCard.innerHTML = `
-                        <div class="flex items-start justify-between mb-3">
-                            <div>
-                                <h3 class="font-bold text-gray-800 text-lg">${job.jobId || 'N/A'}</h3>
-                                <p class="text-gray-600 text-sm">${problemInfo}</p>
-                            </div>
-                            <div class="flex flex-col items-end gap-2">
-                                <span class="status-badge ${statusInfo.class}">
-                                    <i class="fas ${statusInfo.icon} mr-1"></i>
-                                    ${statusInfo.text}
-                                </span>
-                                ${priorityInfo ? `
-                                    <span class="priority-badge ${priorityInfo.class}">
-                                        ${priorityInfo.text}
+                        <div class="p-4">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">${job.jobId || 'N/A'}</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 truncate">${problemInfo}</p>
+                                </div>
+                                <div class="ml-4 flex flex-col items-end">
+                                    <span class="${statusInfo.class} mb-1">
+                                        <i class="${statusInfo.icon} mr-1"></i>
+                                        ${statusInfo.text}
                                     </span>
-                                ` : ''}
+                                    ${priorityInfo ? `
+                                        <span class="${priorityInfo.class}">
+                                            ${priorityInfo.text}
+                                        </span>
+                                    ` : ''}
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="space-y-2 text-sm text-gray-700">
-                            <div class="flex items-center">
-                                <i class="fas fa-user-circle mr-2 text-gray-500"></i>
-                                <span>${job.fullName || 'ไม่ระบุชื่อ'} (${job.department || 'ไม่ระบุแผนก'})</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-calendar-alt mr-2 text-gray-500"></i>
-                                <span>${formatDate(job.timestamp)}</span>
+                            
+                            <div class="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                                <div class="flex items-center">
+                                    <i class="fas fa-user-circle mr-2"></i>
+                                    <span>${job.fullName || 'ไม่ระบุชื่อ'}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar-alt mr-2"></i>
+                                    <span>${formatDate(job.timestamp)}</span>
+                                </div>
                             </div>
                         </div>
                     `;
                     
                     jobsContainer.appendChild(jobCard);
                 });
-
-                // เลือกงานเดิมถ้ายังอยู่ในรายการ
-                if (selectedJobId) {
-                    const prevSelectedCard = document.getElementById(`job-${selectedJobId}`);
-                    if (prevSelectedCard) {
-                        prevSelectedCard.classList.add('selected');
-                    }
-                }
             }
             
             /**
              * เลือกงานเพื่อดูรายละเอียด
-             * @param {string} jobId - ID งานที่เลือก
              */
             function selectJob(jobId) {
                 const selectedJob = filteredJobs.find(job => job.jobId === jobId);
                 if (!selectedJob) return;
                 
-                document.querySelectorAll('.job-card').forEach(card => {
-                    card.classList.remove('selected');
+                document.querySelectorAll('#jobsContainer > div').forEach(card => {
+                    card.classList.remove('ring-2', 'ring-blue-500');
                 });
                 
                 const currentSelectedCard = document.getElementById(`job-${jobId}`);
                 if (currentSelectedCard) {
-                    currentSelectedCard.classList.add('selected');
+                    currentSelectedCard.classList.add('ring-2', 'ring-blue-500');
                 }
 
                 selectedJobId = jobId;
@@ -676,52 +584,41 @@
             
             /**
              * แสดงรายละเอียดงาน
-             * @param {object} job - ข้อมูลงาน
              */
             function renderJobDetails(job) {
                 emptyDetails.classList.add('hidden');
                 detailHeader.classList.remove('hidden');
                 jobDetailsContainer.classList.remove('hidden');
                 
-                // อัปเดตหัวข้อรายละเอียด
                 document.getElementById('detailJobType').textContent = currentJobType;
                 document.getElementById('detailJobId').textContent = job.jobId || 'N/A';
                 
-                // สร้าง HTML ทั้งหมด
                 jobDetailsContainer.innerHTML = `
                     <div class="p-6 space-y-6">
-                        <!-- สรุปสถานะงาน -->
                         ${createStatusSummaryHtml(job)}
                         
-                        <!-- ข้อมูลพื้นฐาน -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                <p class="text-sm text-gray-500 mb-2">ผู้แจ้งซ่อม</p>
-                                <p class="font-medium">${job.fullName || 'ไม่ระบุ'}</p>
-                                <p class="text-sm text-gray-600">${job.department || 'ไม่ระบุแผนก'}</p>
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">ผู้แจ้งซ่อม</p>
+                                <p class="font-medium text-gray-900 dark:text-white">${job.fullName || 'ไม่ระบุ'}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">${job.department || 'ไม่ระบุแผนก'}</p>
                             </div>
-                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                <p class="text-sm text-gray-500 mb-2">วันที่แจ้งซ่อม</p>
-                                <p class="font-medium">${formatThaiDate(job.timestamp)}</p>
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">วันที่แจ้งซ่อม</p>
+                                <p class="font-medium text-gray-900 dark:text-white">${formatThaiDate(job.timestamp)}</p>
                             </div>
                         </div>
                         
-                        <!-- ข้อมูลเฉพาะประเภทงาน -->
                         ${createTypeSpecificHtml(job)}
                         
-                        <!-- ไฟล์แนบ -->
                         ${createFileAttachmentsHtml(job)}
                         
-                        <!-- บันทึกความคืบหน้า -->
                         ${createProgressNotesHtml(job)}
                         
-                        <!-- หมายเหตุเพิ่มเติม -->
                         ${job.additionalNotes ? `
-                            <div>
-                                <h4 class="font-semibold mb-3 text-gray-700">หมายเหตุเพิ่มเติม</h4>
-                                <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                                    <p class="text-sm text-gray-700">${job.additionalNotes}</p>
-                                </div>
+                            <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                                <h4 class="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">หมายเหตุเพิ่มเติม</h4>
+                                <p class="text-sm text-yellow-700 dark:text-yellow-300">${job.additionalNotes}</p>
                             </div>
                         ` : ''}
                     </div>
@@ -730,56 +627,28 @@
             
             /**
              * สร้าง HTML สำหรับสรุปสถานะงาน
-             * @param {object} job - ข้อมูลงาน
-             * @returns {string} HTML string
              */
             function createStatusSummaryHtml(job) {
                 const statusInfo = getStatusInfo(job.status);
                 const priorityInfo = getPriorityInfo(job.urgency || job.priority);
                 
                 return `
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="p-3 bg-${statusInfo.color}-50 rounded-lg border border-${statusInfo.color}-200">
-                            <p class="text-xs text-gray-500 mb-1">สถานะงาน</p>
-                            <p class="font-semibold text-${statusInfo.color}-600">
-                                <i class="fas ${statusInfo.icon} mr-2"></i>
-                                ${statusInfo.text}
-                            </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">สถานะงาน</p>
+                            <div class="flex items-center">
+                                <i class="${statusInfo.icon} mr-2 text-${statusInfo.color}-500 dark:text-${statusInfo.color}-400"></i>
+                                <span class="font-medium text-gray-900 dark:text-white">${statusInfo.text}</span>
+                            </div>
                         </div>
                         ${priorityInfo ? `
-                            <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                <p class="text-xs text-gray-500 mb-1">ระดับความเร่งด่วน</p>
-                                <p class="font-semibold text-gray-700">
-                                    <i class="fas fa-exclamation-circle mr-2"></i>
-                                    ${priorityInfo.text}
-                                </p>
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">ความเร่งด่วน</p>
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-2 text-${priorityInfo.color}-500 dark:text-${priorityInfo.color}-400"></i>
+                                    <span class="font-medium text-gray-900 dark:text-white">${priorityInfo.text}</span>
+                                </div>
                             </div>
-                        ` : ''}
-                    </div>
-                `;
-            }
-            
-            /**
-             * สร้าง HTML สำหรับข้อมูลผู้รับผิดชอบและวันที่
-             * @param {object} job - ข้อมูลงาน
-             * @returns {string} HTML string
-             */
-            function createAssignedInfoHtml(job) {
-                const assignedTo = job.assignedTo || job.responsible || 'ยังไม่มีผู้รับผิดชอบ';
-                const completionDate = job.estimatedCompletion || job.finishDate;
-                
-                return `
-                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 shadow-sm">
-                        <p class="text-sm text-gray-600 mb-1">
-                            <i class="fas fa-user-tie mr-2"></i> ผู้รับผิดชอบ: 
-                            <span class="font-medium">${assignedTo}</span>
-                        </p>
-                        ${completionDate ? `
-                            <p class="text-sm text-gray-600">
-                                <i class="fas fa-hourglass-half mr-2"></i> 
-                                ${currentJobType === 'IT' ? 'คาดว่าจะเสร็จ:' : 'วันที่เสร็จ:'} 
-                                <span class="font-medium">${formatDate(completionDate)}</span>
-                            </p>
                         ` : ''}
                     </div>
                 `;
@@ -787,59 +656,112 @@
             
             /**
              * สร้าง HTML สำหรับข้อมูลเฉพาะประเภทงาน
-             * @param {object} job - ข้อมูลงาน
-             * @returns {string} HTML string
              */
             function createTypeSpecificHtml(job) {
                 if (currentJobType === 'IT') {
                     return `
-                        <div>
-                            <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลปัญหา</h4>
-                            <ul class="space-y-2 text-sm text-gray-700">
-                                <li><strong>ประเภทปัญหา:</strong> ${job.problemType || 'ไม่ระบุ'}</li>
-                                <li><strong>รายละเอียด:</strong> ${job.problemDetails || 'ไม่มีรายละเอียดเพิ่มเติม'}</li>
-                                <li><strong>อุปกรณ์:</strong> ${job.device || 'ไม่ระบุ'}</li>
-                                <li><strong>ความเร่งด่วน:</strong> ${job.urgency || 'ไม่ระบุ'}</li>
-                                <li><strong>สำนักงาน:</strong> ${job.office || 'ไม่ระบุ'}</li>
-                                <li><strong>หมายเลขโทรศัพท์:</strong> ${job.phoneNumber || 'ไม่ระบุ'}</li>
-                            </ul>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ข้อมูลปัญหา</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">ประเภทปัญหา</p>
+                                    <p class="text-gray-900 dark:text-white">${job.problemType || 'ไม่ระบุ'}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">อุปกรณ์</p>
+                                    <p class="text-gray-900 dark:text-white">${job.device || 'ไม่ระบุ'}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">ความเร่งด่วน</p>
+                                    <p class="text-gray-900 dark:text-white">${job.urgency || 'ไม่ระบุ'}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">สำนักงาน</p>
+                                    <p class="text-gray-900 dark:text-white">${job.office || 'ไม่ระบุ'}</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">รายละเอียดปัญหา</p>
+                                <p class="text-gray-900 dark:text-white mt-1">${job.problemDetails || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
+                            </div>
                         </div>
                     `;
                 } else {
                     return `
-                        <div>
-                            <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลเครื่องจักร</h4>
-                            <ul class="space-y-2 text-sm text-gray-700">
-                                <li><strong>ชื่อเครื่องจักร:</strong> ${job.machineName || 'ไม่ระบุ'}</li>
-                                <li><strong>รหัสเครื่องจักร:</strong> ${job.machineCode || 'ไม่ระบุ'}</li>
-                                <li><strong>สถานที่ตั้ง:</strong> ${job.machineLocation || 'ไม่ระบุ'}</li>
-                                <li><strong>สถานะเครื่อง:</strong> ${job.machineStatus || 'ไม่ระบุ'}</li>
-                                <li><strong>ประเภทงาน:</strong> ${job.jobType || 'ไม่ระบุ'}</li>
-                                <li><strong>รายละเอียดปัญหา:</strong> ${job.problemDescription || 'ไม่มีรายละเอียด'}</li>
-                                <li><strong>อาการที่พบ:</strong> ${job.symptoms || 'ไม่ระบุ'}</li>
-                            </ul>
-                        </div>
-                        <div class="en-specific">
-                            <h4 class="font-semibold mb-3 text-gray-700">การซ่อมบำรุง</h4>
-                            <ul class="space-y-2 text-sm text-gray-700">
-                                <li><strong>ผู้ตรวจพบปัญหา:</strong> ${job.reportedBy || 'ไม่ระบุ'}</li>
-                                <li><strong>วันที่พบปัญหา:</strong> ${formatDate(job.problemDate) || 'ไม่ระบุ'}</li>
-                                <li><strong>สาเหตุ:</strong> ${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</li>
-                                <li><strong>การดำเนินการ:</strong> ${job.maintenanceAction || 'ไม่ระบุ'}</li>
-                                <li><strong>รายละเอียดการซ่อม:</strong> ${job.maintenanceDescription || 'ไม่มีข้อมูล'}</li>
-                                <li><strong>ผู้รับผิดชอบ:</strong> ${job.technician || 'ไม่ระบุ'}</li>
-                                <li><strong>วันที่เริ่มซ่อม:</strong> ${formatDate(job.startDate) || 'ไม่ระบุ'}</li>
-                                <li><strong>วันที่เสร็จสิ้น:</strong> ${formatDate(job.finishDate) || 'ยังไม่เสร็จสิ้น'}</li>
-                            </ul>
-                        </div>
-                        <div class="en-specific">
-                            <h4 class="font-semibold mb-3 text-gray-700">อะไหล่และวัสดุ</h4>
-                            <ul class="space-y-2 text-sm text-gray-700">
-                                <li><strong>อะไหล่ที่ใช้:</strong> ${job.sparePartsUsed || 'ไม่มี'}</li>
-                                <li><strong>จำนวน:</strong> ${job.quantity || '0'} ${job.unit || 'ชิ้น'}</li>
-                                <li><strong>หมายเลขอะไหล่:</strong> ${job.partNumber || 'ไม่ระบุ'}</li>
-                                <li><strong>ค่าใช้จ่าย:</strong> ${job.cost ? '฿' + job.cost : 'ไม่ระบุ'}</li>
-                            </ul>
+                        <div class="space-y-6">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ข้อมูลเครื่องจักร</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">ชื่อเครื่องจักร</p>
+                                        <p class="text-gray-900 dark:text-white">${job.machineName || 'ไม่ระบุ'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">รหัสเครื่องจักร</p>
+                                        <p class="text-gray-900 dark:text-white">${job.machineCode || 'ไม่ระบุ'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">สถานที่ตั้ง</p>
+                                        <p class="text-gray-900 dark:text-white">${job.machineLocation || 'ไม่ระบุ'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">ประเภทงาน</p>
+                                        <p class="text-gray-900 dark:text-white">${job.jobType || 'ไม่ระบุ'}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">รายละเอียดปัญหา</p>
+                                    <p class="text-gray-900 dark:text-white mt-1">${job.problemDescription || 'ไม่มีรายละเอียด'}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow en-specific">
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">การซ่อมบำรุง</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">ผู้ตรวจพบปัญหา</p>
+                                        <p class="text-gray-900 dark:text-white">${job.reportedBy || 'ไม่ระบุ'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">วันที่พบปัญหา</p>
+                                        <p class="text-gray-900 dark:text-white">${formatDate(job.problemDate) || 'ไม่ระบุ'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">สาเหตุ</p>
+                                        <p class="text-gray-900 dark:text-white">${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">การดำเนินการ</p>
+                                        <p class="text-gray-900 dark:text-white">${job.maintenanceAction || 'ไม่ระบุ'}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">รายละเอียดการซ่อม</p>
+                                    <p class="text-gray-900 dark:text-white mt-1">${job.maintenanceDescription || 'ไม่มีข้อมูล'}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow en-specific">
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">อะไหล่และวัสดุ</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">อะไหล่ที่ใช้</p>
+                                        <p class="text-gray-900 dark:text-white">${job.sparePartsUsed || 'ไม่มี'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">จำนวน</p>
+                                        <p class="text-gray-900 dark:text-white">${job.quantity || '0'} ${job.unit || 'ชิ้น'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">หมายเลขอะไหล่</p>
+                                        <p class="text-gray-900 dark:text-white">${job.partNumber || 'ไม่ระบุ'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">ค่าใช้จ่าย</p>
+                                        <p class="text-gray-900 dark:text-white">${job.cost ? '฿' + job.cost : 'ไม่ระบุ'}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     `;
                 }
@@ -847,63 +769,62 @@
             
             /**
              * สร้าง HTML สำหรับไฟล์แนบ
-             * @param {object} job - ข้อมูลงาน
-             * @returns {string} HTML string
              */
             function createFileAttachmentsHtml(job) {
                 let urls = job.imageViewUrls || job.driveUrls || job.attachments || [];
                 
-                // ถ้าเป็น EN และมีข้อมูล attachments
                 if (currentJobType === 'EN' && job.attachmentUrls) {
                     urls = job.attachmentUrls;
                 }
                 
-                // แปลง string URLs เป็น array ถ้าเป็น string
                 const urlArray = typeof urls === 'string' ? urls.split(',').map(url => url.trim()) : urls;
-                const validUrls = urlArray.filter(url => url.length > 0);
+                const validUrls = urlArray.filter(url => url && (url.startsWith('http://') || url.startsWith('https://')));
                 
                 if (validUrls.length === 0) {
                     return `
-                        <div>
-                            <h4 class="font-semibold mb-3 text-gray-700">ไฟล์แนบประกอบ</h4>
-                            <div class="text-center py-4 text-gray-500">
-                                <i class="fas fa-paperclip mr-2"></i>
-                                ไม่มีไฟล์แนบ
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ</h4>
+                            <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-paperclip text-3xl mb-2"></i>
+                                <p>ไม่มีไฟล์แนบ</p>
                             </div>
                         </div>
                     `;
                 }
                 
                 return `
-                    <div>
-                        <h4 class="font-semibold mb-3 text-gray-700">ไฟล์แนบประกอบ (${validUrls.length} ไฟล์)</h4>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ (${validUrls.length})</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                             ${validUrls.map((url, index) => {
-                                const isImage = url.match(/\.(jpeg|jpg|gif|png)$/) !== null;
+                                const isImage = url.match(/\.(jpeg|jpg|gif|png|webp)$/i) !== null;
                                 const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
+                                const fileExtension = fileName.split('.').pop().toLowerCase();
                                 
-                                if (isImage) {
-                                    return `
-                                        <a href="${url}" target="_blank" class="block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 group">
-                                            <div class="relative pt-[100%]">
+                                let iconClass = 'fas fa-file file-icon-default';
+                                if (isImage) iconClass = 'fas fa-image img-icon';
+                                else if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
+                                else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
+                                else if (['xls', 'xlsx'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
+                                
+                                return `
+                                    <a href="${url}" target="_blank" class="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
+                                        <div class="relative pt-[100%] bg-gray-100 dark:bg-gray-700">
+                                            ${isImage ? `
                                                 <img src="${url}" alt="ไฟล์แนบ" 
                                                     class="absolute top-0 left-0 w-full h-full object-cover"
                                                     onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200"></div>
-                                            </div>
-                                            <p class="text-xs text-gray-600 truncate px-2 py-1">${fileName}</p>
-                                        </a>
-                                    `;
-                                } else {
-                                    return `
-                                        <a href="${url}" target="_blank" class="block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 group">
-                                            <div class="p-4 bg-gray-50 flex justify-center">
-                                                <i class="fas fa-file-alt text-3xl text-gray-400"></i>
-                                            </div>
-                                            <p class="text-xs text-gray-600 truncate px-2 py-1">${fileName}</p>
-                                        </a>
-                                    `;
-                                }
+                                            ` : `
+                                                <div class="absolute inset-0 flex items-center justify-center">
+                                                    <i class="${iconClass} file-icon"></i>
+                                                </div>
+                                            `}
+                                        </div>
+                                        <div class="p-2 bg-white dark:bg-gray-800">
+                                            <p class="text-xs text-gray-600 dark:text-gray-300 truncate">${fileName}</p>
+                                        </div>
+                                    </a>
+                                `;
                             }).join('')}
                         </div>
                     </div>
@@ -912,45 +833,41 @@
             
             /**
              * สร้าง HTML สำหรับบันทึกความคืบหน้า
-             * @param {object} job - ข้อมูลงาน
-             * @returns {string} HTML string
              */
             function createProgressNotesHtml(job) {
                 let notes = job.notes || job.maintenanceNote || job.progressNotes || '';
                 
-                // ถ้าเป็น EN และมีข้อมูล historyNotes
                 if (currentJobType === 'EN' && job.historyNotes) {
                     notes = job.historyNotes;
                 }
                 
                 if (!notes || notes.length === 0) {
                     return `
-                        <div>
-                            <h4 class="font-semibold mb-3 text-gray-700">บันทึกความคืบหน้า</h4>
-                            <div class="text-center py-4 text-gray-500">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                ยังไม่มีบันทึกความคืบหน้า
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">บันทึกความคืบหน้า</h4>
+                            <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-info-circle text-3xl mb-2"></i>
+                                <p>ยังไม่มีบันทึกความคืบหน้า</p>
                             </div>
                         </div>
                     `;
                 }
                 
-                // แปลงเป็น array ถ้าเป็น string
                 const notesArray = typeof notes === 'string' ? notes.split('\n').filter(n => n.trim().length > 0) : notes;
                 
                 return `
-                    <div>
-                        <h4 class="font-semibold mb-3 text-gray-700">บันทึกความคืบหน้า (${notesArray.length} รายการ)</h4>
-                        <div class="space-y-4">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">บันทึกความคืบหน้า (${notesArray.length})</h4>
+                        <div class="space-y-3">
                             ${notesArray.map((note, index) => `
-                                <div class="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200 shadow-xs">
-                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <span class="text-blue-600 font-medium text-sm">${index + 1}</span>
+                                <div class="flex items-start space-x-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                        <span class="text-blue-600 dark:text-blue-300 font-medium text-sm">${index + 1}</span>
                                     </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm text-gray-700">${note}</p>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-sm text-gray-800 dark:text-gray-200">${note}</p>
                                         ${job.noteDates && job.noteDates[index] ? `
-                                            <p class="text-xs text-gray-500 mt-1">
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                                 <i class="far fa-clock mr-1"></i>
                                                 ${formatDateTime(job.noteDates[index])}
                                             </p>
@@ -965,59 +882,56 @@
             
             /**
              * ข้อมูลสถานะงาน
-             * @param {string} status - สถานะงาน
-             * @returns {object} ข้อมูลสถานะ
              */
             function getStatusInfo(status) {
                 switch(status) {
                     case 'แจ้งซ่อมใหม่':
-                        return { class: 'status-new', icon: 'fa-file-circle-plus', text: 'แจ้งซ่อมใหม่', color: 'blue' };
+                        return { class: 'status-new', icon: 'fas fa-file-circle-plus text-blue-500', text: 'แจ้งซ่อมใหม่', color: 'blue' };
                     case 'รอดำเนินการ':
-                        return { class: 'status-pending', icon: 'fa-clock', text: 'รอดำเนินการ', color: 'orange' };
+                        return { class: 'status-pending', icon: 'fas fa-clock text-orange-500', text: 'รอดำเนินการ', color: 'orange' };
                     case 'กำลังดำเนินการ':
-                        return { class: 'status-in-progress', icon: 'fa-tools', text: 'กำลังดำเนินการ', color: 'yellow' };
+                        return { class: 'status-in-progress', icon: 'fas fa-tools text-yellow-500', text: 'กำลังดำเนินการ', color: 'yellow' };
                     case 'เสร็จสิ้น':
-                        return { class: 'status-completed', icon: 'fa-check-circle', text: 'เสร็จสิ้น', color: 'green' };
+                        return { class: 'status-completed', icon: 'fas fa-check-circle text-green-500', text: 'เสร็จสิ้น', color: 'green' };
                     case 'ยกเลิก':
-                        return { class: 'status-cancelled', icon: 'fa-times-circle', text: 'ยกเลิก', color: 'gray' };
+                        return { class: 'status-cancelled', icon: 'fas fa-times-circle text-gray-500', text: 'ยกเลิก', color: 'gray' };
                     default:
-                        return { class: 'status-pending', icon: 'fa-clock', text: status || 'ไม่ทราบสถานะ', color: 'gray' };
+                        return { class: 'status-pending', icon: 'fas fa-clock text-gray-500', text: status || 'ไม่ทราบสถานะ', color: 'gray' };
                 }
             }
             
             /**
              * ข้อมูลความเร่งด่วน
-             * @param {string} priority - ระดับความเร่งด่วน
-             * @returns {object|null} ข้อมูลความเร่งด่วน
              */
             function getPriorityInfo(priority) {
                 if (!priority) return null;
                 
                 switch(priority.toLowerCase()) {
                     case 'ต่ำ':
-                        return { class: 'priority-low', text: 'ต่ำ' };
+                        return { class: 'priority-low', text: 'ต่ำ', color: 'gray' };
                     case 'ปานกลาง':
                     case 'normal':
-                        return { class: 'priority-medium', text: 'ปานกลาง' };
+                        return { class: 'priority-medium', text: 'ปานกลาง', color: 'blue' };
                     case 'สูง':
                     case 'high':
-                        return { class: 'priority-high', text: 'สูง' };
+                        return { class: 'priority-high', text: 'สูง', color: 'orange' };
                     case 'ด่วนมาก':
                     case 'critical':
-                        return { class: 'priority-critical', text: 'ด่วนมาก' };
+                        return { class: 'priority-critical', text: 'ด่วนมาก', color: 'red' };
                     default:
-                        return { class: 'priority-medium', text: priority };
+                        return { class: 'priority-medium', text: priority, color: 'blue' };
                 }
             }
             
             /**
              * จัดรูปแบบวันที่
-             * @param {string} dateString - วันที่ในรูปแบบ string
-             * @returns {string} วันที่ที่จัดรูปแบบแล้ว
              */
             function formatDate(dateString) {
                 if (!dateString) return 'ไม่ระบุ';
-                const date = new Date(dateString);
+                
+                const date = convertGoogleDate(dateString);
+                if (isNaN(date.getTime())) return 'ไม่ระบุ';
+                
                 return date.toLocaleDateString('th-TH', {
                     year: 'numeric',
                     month: 'short',
@@ -1026,14 +940,14 @@
             }
             
             /**
-             * จัดรูปแบบวันที่ให้เป็นข้อความภาษาไทย
-             * @param {string} dateString - วันที่ในรูปแบบ string
-             * @returns {string} วันที่ที่จัดรูปแบบแล้ว
+             * จัดรูปแบบวันที่ภาษาไทย
              */
             function formatThaiDate(dateString) {
                 if (!dateString) return 'ไม่ระบุ';
                 
-                const date = new Date(dateString);
+                const date = convertGoogleDate(dateString);
+                if (isNaN(date.getTime())) return 'ไม่ระบุ';
+                
                 const thaiMonths = [
                     'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน',
                     'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
@@ -1051,12 +965,13 @@
             
             /**
              * จัดรูปแบบวันที่และเวลา
-             * @param {string} dateTimeString - วันที่และเวลาในรูปแบบ string
-             * @returns {string} วันที่และเวลาที่จัดรูปแบบแล้ว
              */
             function formatDateTime(dateTimeString) {
                 if (!dateTimeString) return 'ไม่ระบุ';
-                const date = new Date(dateTimeString);
+                
+                const date = convertGoogleDate(dateTimeString);
+                if (isNaN(date.getTime())) return 'ไม่ระบุ';
+                
                 return date.toLocaleString('th-TH', {
                     year: 'numeric',
                     month: 'short',
@@ -1065,6 +980,49 @@
                     minute: '2-digit',
                     hour12: false
                 });
+            }
+            
+            /**
+             * แปลงรูปแบบวันที่จาก Google Sheets
+             */
+            function convertGoogleDate(dateString) {
+                if (!dateString) return new Date(NaN);
+                
+                // ถ้าเป็น timestamp
+                if (typeof dateString === 'number') {
+                    return new Date(dateString);
+                }
+                
+                // ถ้าเป็น string ที่มีรูปแบบวันที่
+                if (typeof dateString === 'string') {
+                    // รูปแบบ yyyy-mm-dd
+                    const isoFormat = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+                    if (isoFormat) {
+                        return new Date(Date.UTC(
+                            parseInt(isoFormat[1]),
+                            parseInt(isoFormat[2]) - 1,
+                            parseInt(isoFormat[3])
+                        ));
+                    }
+                    
+                    // รูปแบบ dd/mm/yyyy
+                    const slashFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+                    if (slashFormat) {
+                        return new Date(
+                            parseInt(slashFormat[3]),
+                            parseInt(slashFormat[2]) - 1,
+                            parseInt(slashFormat[1])
+                        );
+                    }
+                    
+                    // ลองแปลงเป็น Date object ตรงๆ
+                    const parsedDate = new Date(dateString);
+                    if (!isNaN(parsedDate.getTime())) {
+                        return parsedDate;
+                    }
+                }
+                
+                return new Date(NaN);
             }
             
             /**
@@ -1106,6 +1064,19 @@
                 }
             }
             
+            /**
+             * สลับโหมดสี
+             */
+            function toggleDarkMode() {
+                if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
+            
             // ตั้งค่า Event Listeners
             statCards.forEach(card => {
                 card.addEventListener('click', function() {
@@ -1127,6 +1098,7 @@
             
             refreshBtn.addEventListener('click', loadRepairJobs);
             backBtn.addEventListener('click', goBack);
+            themeToggle.addEventListener('click', toggleDarkMode);
             
             // เริ่มต้นแอปพลิเคชัน
             window.onload = function() {
