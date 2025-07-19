@@ -305,7 +305,7 @@
                     </div>
                 </div>
 
-                <!-- Status Tabs 
+                <!-- Status Tabs -->
                 <div class="flex overflow-x-auto scrollbar-hide border-b border-gray-200 dark:border-gray-700">
                     <button class="status-tab active px-4 py-2 font-medium text-sm whitespace-nowrap border-b-2 border-blue-500 text-blue-600 dark:text-blue-400" data-status="all">
                         ทั้งหมด
@@ -323,7 +323,7 @@
                         เสร็จสิ้น
                     </button>
                 </div>
-            </section> -->
+            </section>
 
             <!-- Job List and Details Section -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -352,8 +352,8 @@
                         </div>
                     </div>
                     
-                    <!-- Jobs Container 
-                    <div id="jobsContainer" class="space-y-3"></div>-->
+                    <!-- Jobs Container -->
+                    <div id="jobsContainer" class="space-y-3"></div>
                     
                     <!-- No Jobs Found -->
                     <div id="noJobsFound" class="glass-card hidden">
@@ -365,14 +365,14 @@
                     </div>
                 </div>
 
-                <!-- Job Details Column 
+                <!-- Job Details Column -->
                 <div class="lg:sticky lg:top-8 h-fit space-y-4">
                     <div id="detailHeader" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                             <span id="detailJobType" class="text-blue-600 dark:text-blue-400">IT</span> - 
                             <span id="detailJobId" class="font-mono"></span>
                         </h3>
-                    </div>-->
+                    </div>
                     
                     <!-- Empty State -->
                     <div id="emptyDetails" class="glass-card">
@@ -888,6 +888,14 @@
                                         <p class="text-gray-900 dark:text-white">${job.machineName || 'ไม่ระบุ'}</p>
                                     </div>
                                     <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">รหัสเครื่องจักร</p>
+                                        <p class="text-gray-900 dark:text-white">${job.machineCode || 'ไม่ระบุ'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">สถานที่ตั้ง</p>
+                                        <p class="text-gray-900 dark:text-white">${job.machineLocation || 'ไม่ระบุ'}</p>
+                                    </div>
+                                    <div>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">ประเภทงาน</p>
                                         <p class="text-gray-900 dark:text-white">${job.jobType || 'ไม่ระบุ'}</p>
                                     </div>
@@ -903,17 +911,20 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">ผู้ตรวจพบปัญหา</p>
-                                        <p class="text-gray-900 dark:text-white">${job.fullName || 'ไม่ระบุ'}</p>
+                                        <p class="text-gray-900 dark:text-white">${job.reportedBy || 'ไม่ระบุ'}</p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">วันที่พบปัญหา</p>
-                                        <p class="text-gray-900 dark:text-white">${formatDate(job.timestamp) || 'ไม่ระบุ'}</p>
+                                        <p class="text-gray-900 dark:text-white">${formatDate(job.problemDate) || 'ไม่ระบุ'}</p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">สาเหตุ</p>
                                         <p class="text-gray-900 dark:text-white">${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</p>
                                     </div>
-                                
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">การดำเนินการ</p>
+                                        <p class="text-gray-900 dark:text-white">${job.maintenanceAction || 'ไม่ระบุ'}</p>
+                                    </div>
                                 </div>
                                 <div class="mt-4">
                                     <p class="text-sm text-gray-500 dark:text-gray-400">รายละเอียดการซ่อม</p>
@@ -925,14 +936,17 @@
                                 <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">อะไหล่และวัสดุ</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">อะไหล่ที่เปลี่ยน</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">อะไหล่ที่ใช้</p>
                                         <p class="text-gray-900 dark:text-white">${job.sparePartsUsed || 'ไม่มี'}</p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">จำนวน</p>
                                         <p class="text-gray-900 dark:text-white">${job.quantity || '0'} ${job.unit || 'ชิ้น'}</p>
                                     </div>
-                                    
+                                    <div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">หมายเลขอะไหล่</p>
+                                        <p class="text-gray-900 dark:text-white">${job.partNumber || 'ไม่ระบุ'}</p>
+                                    </div>
                                     <div>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">ค่าใช้จ่าย</p>
                                         <p class="text-gray-900 dark:text-white">${job.cost ? '฿' + job.cost : 'ไม่ระบุ'}</p>
@@ -967,10 +981,10 @@
                 if (validUrls.length === 0) {
                     return `
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">รูปภาพประกอบ</h4>
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ</h4>
                             <div class="text-center py-4 text-gray-500 dark:text-gray-400">
                                 <i class="fas fa-paperclip text-3xl mb-2"></i>
-                                <p>ไม่มีรูปภาพ</p>
+                                <p>ไม่มีไฟล์แนบ</p>
                             </div>
                         </div>
                     `;
