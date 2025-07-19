@@ -948,108 +948,115 @@
             /**
              * สร้าง HTML สำหรับไฟล์แนบ
              */
-            function createFileAttachmentsHtml(job) {
-                // ดึง URL ของไฟล์แนบทั้งหมด
-                let fileUrls = [];
-                
-                if (currentJobType === 'IT') {
-                    // สำหรับงาน IT: รวมทั้ง imageUrls และ driveUrls
-                    fileUrls = [...(job.imageUrls || []), ...(job.driveUrls || [])];
-                } else {
-                    // สำหรับงาน EN: รวมรูปภาพจากทุกคอลัมน์
-                    fileUrls = job.imageUrls || [];
-                }
-                
-                // กรอง URL ที่ไม่ถูกต้องออก
-                const validUrls = fileUrls
-                    .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
-                    .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
-                
-                if (validUrls.length === 0) {
-                    return `
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ</h4>
-                            <div class="text-center py-4 text-gray-500 dark:text-gray-400">
-                                <i class="fas fa-paperclip text-3xl mb-2"></i>
-                                <p>ไม่มีไฟล์แนบ</p>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // แยก URL รูปภาพออกมา
-                const imageUrls = validUrls.filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i));
-                
-                return `
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ (${validUrls.length})</h4>
+           function createFileAttachmentsHtml(job) {
+    // ดึง URL ของไฟล์แนบทั้งหมด
+    let fileUrls = [];
+
+    // currentJobType ต้องถูกกำหนดค่าไว้ก่อนเรียกใช้ฟังก์ชันนี้
+    // เช่น currentJobType = 'IT'; หรือ currentJobType = 'EN';
+    // สมมติว่า currentJobType ถูกส่งมาจากที่อื่น หรือถูกกำหนดเป็น Global Variable
+    // ถ้า currentJobType ไม่ได้ถูกกำหนด จะต้องพิจารณาว่าควรมีค่าเริ่มต้นเป็นอะไร
+    // ตัวอย่าง: ถ้าต้องการให้เป็น 'EN' โดย default ให้เพิ่มบรรทัดนี้:
+    // const currentJobType = window.currentJobType || 'EN';
+
+    if (currentJobType === 'IT') {
+        // สำหรับงาน IT: รวมทั้ง imageUrls และ driveUrls
+        fileUrls = [...(job.imageUrls || []), ...(job.driveUrls || [])];
+    } else {
+        // สำหรับงาน EN: รวมรูปภาพจากทุกคอลัมน์
+        fileUrls = job.imageUrls || [];
+    }
+
+    // กรอง URL ที่ไม่ถูกต้องออกและเอาค่าซ้ำออก
+    const validUrls = fileUrls
+        .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
+        .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
+
+    if (validUrls.length === 0) {
+        return `
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ</h4>
+                <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-paperclip text-3xl mb-2"></i>
+                    <p>ไม่มีไฟล์แนบ</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // แยก URL รูปภาพออกมา
+    const imageUrls = validUrls.filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i));
+
+    return `
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ (${validUrls.length})</h4>
+            
+            <div class="mb-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    ${validUrls.map((url, index) => {
+                        const isImage = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) !== null;
+                        const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
+                        const fileExtension = fileName.split('.').pop().toLowerCase();
                         
-                        <div class="mb-4">
-                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                                ${validUrls.map((url, index) => {
-                                    const isImage = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) !== null;
-                                    const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
-                                    const fileExtension = fileName.split('.').pop().toLowerCase();
-                                    
-                                    let iconClass = 'fas fa-file file-icon-default';
-                                    if (isImage) iconClass = 'fas fa-image img-icon';
-                                    else if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
-                                    else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
-                                    else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
-                                    else if (['ppt', 'pptx'].includes(fileExtension)) iconClass = 'fas fa-file-powerpoint ppt-icon';
-                                    else if (['zip', 'rar', '7z'].includes(fileExtension)) iconClass = 'fas fa-file-archive zip-icon';
-                                    else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) iconClass = 'fas fa-file-video video-icon';
-                                    else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) iconClass = 'fas fa-file-audio audio-icon';
-                                    
-                                    return `
-                                        <a href="${url}" target="_blank" 
-                                           class="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 relative"
-                                           title="${fileName}">
-                                            <div class="relative pt-[100%] bg-gray-100 dark:bg-gray-700">
-                                                ${isImage ? `
-                                                    <img src="${url}" alt="ไฟล์แนบ" 
-                                                        class="absolute top-0 left-0 w-full h-full object-cover"
-                                                        onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                                                ` : `
-                                                    <div class="absolute inset-0 flex items-center justify-center">
-                                                        <i class="${iconClass} file-icon"></i>
-                                                    </div>
-                                                `}
-                                            </div>
-                                            <div class="p-2 bg-white dark:bg-gray-800">
-                                                <p class="text-xs text-gray-600 dark:text-gray-300 truncate">${fileName}</p>
-                                            </div>
-                                            ${isImage ? `
-                                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                    <i class="fas fa-expand text-white text-xl"></i>
-                                                </div>
-                                            ` : ''}
-                                        </a>
-                                    `;
-                                }).join('')}
-                            </div>
-                        </div>
+                        let iconClass = 'fas fa-file file-icon-default';
+                        if (isImage) iconClass = 'fas fa-image img-icon'; // จะไม่ถูกใช้ถ้า isImage เป็นจริงใน template
+                        else if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
+                        else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
+                        else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
+                        else if (['ppt', 'pptx'].includes(fileExtension)) iconClass = 'fas fa-file-powerpoint ppt-icon';
+                        else if (['zip', 'rar', '7z'].includes(fileExtension)) iconClass = 'fas fa-file-archive zip-icon';
+                        else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) iconClass = 'fas fa-file-video video-icon';
+                        else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) iconClass = 'fas fa-file-audio audio-icon';
                         
-                        ${imageUrls.length > 0 ? `
-                            <div class="mt-6">
-                                <h5 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3">รูปภาพทั้งหมด</h5>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    ${imageUrls.map((url, index) => `
-                                        <div class="relative group cursor-pointer" onclick="openLightbox(imageUrls, ${index})">
-                                            <img src="${url}" alt="รูปภาพประกอบงานซ่อม" 
-                                                class="w-full h-48 object-cover rounded-lg shadow"
-                                                onerror="this.onerror=null;this.src='https://via.placeholder.com/400?text=Image+Not+Found'">
-                                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                <i class="fas fa-expand text-white text-xl"></i>
-                                            </div>
+                        return `
+                            <a href="${url}" target="_blank" 
+                               class="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 relative"
+                               title="${fileName}">
+                                <div class="relative pt-[100%] bg-gray-100 dark:bg-gray-700">
+                                    ${isImage ? `
+                                        <img src="${url}" alt="ไฟล์แนบ" 
+                                            class="absolute top-0 left-0 w-full h-full object-cover"
+                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                                    ` : `
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <i class="${iconClass} file-icon text-4xl text-gray-500 dark:text-gray-400"></i>
                                         </div>
-                                    `).join('')}
+                                    `}
+                                </div>
+                                <div class="p-2 bg-white dark:bg-gray-800">
+                                    <p class="text-xs text-gray-600 dark:text-gray-300 truncate">${fileName}</p>
+                                </div>
+                                ${isImage ? `
+                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                        <i class="fas fa-expand text-white text-xl"></i>
+                                    </div>
+                                ` : ''}
+                            </a>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+            
+            ${imageUrls.length > 0 ? `
+                <div class="mt-6">
+                    <h5 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3">รูปภาพทั้งหมด (ภาพขยาย)</h5>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        ${imageUrls.map((url, index) => `
+                            <div class="relative group cursor-pointer" onclick="openLightbox(imageUrls, ${index})">
+                                <img src="${url}" alt="รูปภาพประกอบงานซ่อม" 
+                                    class="w-full h-48 object-cover rounded-lg shadow"
+                                    onerror="this.onerror=null;this.src='https://via.placeholder.com/400?text=Image+Not+Found'">
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                    <i class="fas fa-expand text-white text-xl"></i>
                                 </div>
                             </div>
-                        ` : ''}
+                        `).join('')}
                     </div>
-                `;
-            }
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
             
             /**
              * สร้าง HTML สำหรับบันทึกความคืบหน้า
