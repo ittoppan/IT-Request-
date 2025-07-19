@@ -79,6 +79,87 @@
         .xls-icon { @apply text-green-500; }
         .img-icon { @apply text-purple-500; }
         .file-icon-default { @apply text-gray-400; }
+        
+        /* Lightbox styles */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+        
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            transform: translateY(-50%);
+            z-index: 1001;
+        }
+        
+        .lightbox-nav button {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .lightbox-nav button:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .lightbox-close:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .lightbox-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: white;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body class="min-h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
@@ -260,6 +341,30 @@
         </div>
     </main>
 
+    <!-- Lightbox สำหรับดูรูปภาพแบบเต็มหน้าจอ -->
+    <div id="lightbox" class="lightbox">
+        <button class="lightbox-close" onclick="closeLightbox()">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="lightbox-nav">
+            <button onclick="changeLightboxImage(-1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button onclick="changeLightboxImage(1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <div class="lightbox-content">
+            <img id="lightbox-image" src="" alt="">
+        </div>
+        
+        <div class="lightbox-caption">
+            <span id="lightbox-caption"></span>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // ค่าคงที่และตัวแปร
@@ -277,6 +382,10 @@
             let selectedJobId = null;
             let currentStatusFilter = 'all';
             let currentJobType = 'IT';
+
+            // Lightbox ตัวแปร
+            let currentLightboxImages = [];
+            let currentLightboxIndex = 0;
 
             // องค์ประกอบ DOM
             const loadingIndicator = document.getElementById('loadingIndicator');
@@ -393,8 +502,28 @@
                         throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
                     }
                     
-                    repairJobs.IT = itData.data || [];
-                    repairJobs.EN = enData.data || [];
+                    // Process IT jobs
+                    repairJobs.IT = (itData.data || []).map(job => {
+                        return {
+                            ...job,
+                            // แปลงข้อมูลรูปภาพให้เป็น array
+                            imageUrls: job.imageViewerUrls ? job.imageViewerUrls.split(',').map(url => url.trim()) : [],
+                            driveUrls: job.googleDriveUrls ? job.googleDriveUrls.split(',').map(url => url.trim()) : []
+                        };
+                    });
+                    
+                    // Process EN jobs
+                    repairJobs.EN = (enData.data || []).map(job => {
+                        return {
+                            ...job,
+                            // รวมรูปภาพจากทุกคอลัมน์ที่อาจมีรูปภาพ
+                            imageUrls: [
+                                job.photo1,
+                                job.photo2,
+                                job.photo3
+                            ].filter(url => url && url.trim() !== '')
+                        };
+                    });
                     
                     updateDashboardStats();
                     filterJobsByType(currentJobType);
@@ -771,14 +900,21 @@
              * สร้าง HTML สำหรับไฟล์แนบ
              */
             function createFileAttachmentsHtml(job) {
-                let urls = job.imageViewUrls || job.driveUrls || job.attachments || [];
+                // ดึง URL ของไฟล์แนบทั้งหมด
+                let fileUrls = [];
                 
-                if (currentJobType === 'EN' && job.attachmentUrls) {
-                    urls = job.attachmentUrls;
+                if (currentJobType === 'IT') {
+                    // สำหรับงาน IT: รวมทั้ง imageUrls และ driveUrls
+                    fileUrls = [...(job.imageUrls || []), ...(job.driveUrls || [])];
+                } else {
+                    // สำหรับงาน EN: รวมรูปภาพจากทุกคอลัมน์
+                    fileUrls = job.imageUrls || [];
                 }
                 
-                const urlArray = typeof urls === 'string' ? urls.split(',').map(url => url.trim()) : urls;
-                const validUrls = urlArray.filter(url => url && (url.startsWith('http://') || url.startsWith('https://')));
+                // กรอง URL ที่ไม่ถูกต้องออก
+                const validUrls = fileUrls
+                    .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
+                    .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
                 
                 if (validUrls.length === 0) {
                     return `
@@ -792,41 +928,76 @@
                     `;
                 }
                 
+                // แยก URL รูปภาพออกมา
+                const imageUrls = validUrls.filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i));
+                
                 return `
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
                         <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ (${validUrls.length})</h4>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                            ${validUrls.map((url, index) => {
-                                const isImage = url.match(/\.(jpeg|jpg|gif|png|webp)$/i) !== null;
-                                const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
-                                const fileExtension = fileName.split('.').pop().toLowerCase();
-                                
-                                let iconClass = 'fas fa-file file-icon-default';
-                                if (isImage) iconClass = 'fas fa-image img-icon';
-                                else if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
-                                else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
-                                else if (['xls', 'xlsx'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
-                                
-                                return `
-                                    <a href="${url}" target="_blank" class="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-                                        <div class="relative pt-[100%] bg-gray-100 dark:bg-gray-700">
+                        
+                        <div class="mb-4">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                ${validUrls.map((url, index) => {
+                                    const isImage = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) !== null;
+                                    const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
+                                    const fileExtension = fileName.split('.').pop().toLowerCase();
+                                    
+                                    let iconClass = 'fas fa-file file-icon-default';
+                                    if (isImage) iconClass = 'fas fa-image img-icon';
+                                    else if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
+                                    else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
+                                    else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
+                                    else if (['ppt', 'pptx'].includes(fileExtension)) iconClass = 'fas fa-file-powerpoint ppt-icon';
+                                    else if (['zip', 'rar', '7z'].includes(fileExtension)) iconClass = 'fas fa-file-archive zip-icon';
+                                    else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) iconClass = 'fas fa-file-video video-icon';
+                                    else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) iconClass = 'fas fa-file-audio audio-icon';
+                                    
+                                    return `
+                                        <a href="${url}" target="_blank" 
+                                           class="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 relative"
+                                           title="${fileName}">
+                                            <div class="relative pt-[100%] bg-gray-100 dark:bg-gray-700">
+                                                ${isImage ? `
+                                                    <img src="${url}" alt="ไฟล์แนบ" 
+                                                        class="absolute top-0 left-0 w-full h-full object-cover"
+                                                        onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                                                ` : `
+                                                    <div class="absolute inset-0 flex items-center justify-center">
+                                                        <i class="${iconClass} file-icon"></i>
+                                                    </div>
+                                                `}
+                                            </div>
+                                            <div class="p-2 bg-white dark:bg-gray-800">
+                                                <p class="text-xs text-gray-600 dark:text-gray-300 truncate">${fileName}</p>
+                                            </div>
                                             ${isImage ? `
-                                                <img src="${url}" alt="ไฟล์แนบ" 
-                                                    class="absolute top-0 left-0 w-full h-full object-cover"
-                                                    onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                                            ` : `
-                                                <div class="absolute inset-0 flex items-center justify-center">
-                                                    <i class="${iconClass} file-icon"></i>
+                                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                                    <i class="fas fa-expand text-white text-xl"></i>
                                                 </div>
-                                            `}
-                                        </div>
-                                        <div class="p-2 bg-white dark:bg-gray-800">
-                                            <p class="text-xs text-gray-600 dark:text-gray-300 truncate">${fileName}</p>
-                                        </div>
-                                    </a>
-                                `;
-                            }).join('')}
+                                            ` : ''}
+                                        </a>
+                                    `;
+                                }).join('')}
+                            </div>
                         </div>
+                        
+                        ${imageUrls.length > 0 ? `
+                            <div class="mt-6">
+                                <h5 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3">รูปภาพทั้งหมด</h5>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    ${imageUrls.map((url, index) => `
+                                        <div class="relative group cursor-pointer" onclick="openLightbox(imageUrls, ${index})">
+                                            <img src="${url}" alt="รูปภาพประกอบงานซ่อม" 
+                                                class="w-full h-48 object-cover rounded-lg shadow"
+                                                onerror="this.onerror=null;this.src='https://via.placeholder.com/400?text=Image+Not+Found'">
+                                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                                <i class="fas fa-expand text-white text-xl"></i>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             }
@@ -1023,6 +1194,54 @@
                 }
                 
                 return new Date(NaN);
+            }
+            
+            /**
+             * เปิด Lightbox สำหรับดูรูปภาพ
+             */
+            function openLightbox(images, startIndex = 0) {
+                if (!images || images.length === 0) return;
+                
+                currentLightboxImages = images;
+                currentLightboxIndex = startIndex;
+                
+                const lightbox = document.getElementById('lightbox');
+                const lightboxImage = document.getElementById('lightbox-image');
+                const lightboxCaption = document.getElementById('lightbox-caption');
+                
+                lightboxImage.src = images[startIndex];
+                lightboxCaption.textContent = `รูปภาพ ${startIndex + 1} จาก ${images.length}`;
+                
+                lightbox.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+            
+            /**
+             * ปิด Lightbox
+             */
+            function closeLightbox() {
+                document.getElementById('lightbox').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+            
+            /**
+             * เปลี่ยนรูปภาพใน Lightbox
+             */
+            function changeLightboxImage(step) {
+                currentLightboxIndex += step;
+                
+                // Handle wrap-around
+                if (currentLightboxIndex >= currentLightboxImages.length) {
+                    currentLightboxIndex = 0;
+                } else if (currentLightboxIndex < 0) {
+                    currentLightboxIndex = currentLightboxImages.length - 1;
+                }
+                
+                const lightboxImage = document.getElementById('lightbox-image');
+                const lightboxCaption = document.getElementById('lightbox-caption');
+                
+                lightboxImage.src = currentLightboxImages[currentLightboxIndex];
+                lightboxCaption.textContent = `รูปภาพ ${currentLightboxIndex + 1} จาก ${currentLightboxImages.length}`;
             }
             
             /**
