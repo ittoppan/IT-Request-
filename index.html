@@ -183,7 +183,7 @@
                 <input type="hidden" id="lineUserId" name="lineUserId">
                 <input type="hidden" id="lineDisplayName" name="lineDisplayName">
                 <input type="hidden" id="linePictureUrl" name="linePictureUrl">
-                <input type="hidden" id="device_id" name="device">
+                <input type="hidden" id="device" name="device">
 
                 
                 <!-- ข้อมูลผู้แจ้ง -->
@@ -707,9 +707,9 @@
 
 //device_id
      const params = new URLSearchParams(window.location.search);
-  const deviceId = params.get("device_id");
-  if (deviceId) {
-    document.getElementById("device_id").value = deviceId;
+  const device = params.get("device");
+  if (device) {
+    document.getElementById("device").value = device;
   }
 
 
