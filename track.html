@@ -401,60 +401,92 @@
             /**
              * โหลดข้อมูลงานซ่อมจาก Google Apps Script
              */
-            async function loadRepairJobs() {
-                try {
-                    if (!userId) {
-                        throw new Error('ไม่พบข้อมูลผู้ใช้ (userId)');
-                    }
-                    
-                    loadingIndicator.classList.remove('hidden');
-                    mainContent.classList.add('hidden');
-                    
-                    // ดึงข้อมูลทั้ง IT และ EN พร้อมกัน
-                    const [itResponse, enResponse] = await Promise.all([
-                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT`),
-                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN`)
-                    ]);
-                    
-                    // ตรวจสอบสถานะการตอบกลับ
-                    if (!itResponse.ok || !enResponse.ok) {
-                        throw new Error('การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา');
-                    }
-                    
-                    const [itData, enData] = await Promise.all([
-                        itResponse.json(),
-                        enResponse.json()
-                    ]);
-                    
-                    // ตรวจสอบสถานะการตอบกลับจาก API
-                    if (itData.status === 'error' || enData.status === 'error') {
-                        throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
-                    }
-                    
-                    // บันทึกข้อมูลงานซ่อม
-                    repairJobs.IT = itData.data || [];
-                    repairJobs.EN = enData.data || [];
-                    
-                    // อัปเดต UI
-                    updateDashboardStats();
-                    filterJobsByType(currentJobType);
-                    
-                    // ซ่อนตัวโหลดและแสดงเนื้อหาหลัก
-                    loadingIndicator.classList.add('hidden');
-                    mainContent.classList.remove('hidden');
-                    
-                    // อัปเดตเวลาล่าสุด
-                    document.getElementById('lastUpdatedTime').textContent = new Date().toLocaleString('th-TH', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
-                    
-                } catch (error) {
-                    console.error('Error loading repair jobs:', error);
-                    showError('โหลดข้อมูลงานซ่อมไม่สำเร็จ', error.message || 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
-                }
-            }
+         async function loadRepairJobs() {
+    try {
+        if (!userId) {
+            throw new Error('ไม่พบข้อมูลผู้ใช้ (userId)');
+        }
+        
+        loadingIndicator.classList.remove('hidden');
+        mainContent.classList.add('hidden');
+        
+        // เพิ่ม timestamp เพื่อป้องกันการ cache
+        const timestamp = new Date().getTime();
+        
+        // ดึงข้อมูลทั้ง IT และ EN พร้อมกัน
+        const [itResponse, enResponse] = await Promise.all([
+            fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT&t=${timestamp}`),
+            fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN&t=${timestamp}`)
+        ]);
+        
+        // ตรวจสอบสถานะการตอบกลับ
+        if (!itResponse.ok || !enResponse.ok) {
+            const errorText = await itResponse.text();
+            console.error('Error response:', errorText);
+            throw new Error(`การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา: ${itResponse.status}`);
+        }
+        
+        const [itData, enData] = await Promise.all([
+            itResponse.json(),
+            enResponse.json()
+        ]);
+        
+        // ตรวจสอบสถานะการตอบกลับจาก API
+        if (itData.status === 'error' || enData.status === 'error') {
+            console.error('API Error:', itData.message || enData.message);
+            throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
+        }
+        
+        // บันทึกข้อมูลงานซ่อม
+        repairJobs.IT = itData.data || [];
+        repairJobs.EN = enData.data || [];
+        
+        // Debug: แสดงข้อมูลที่ได้รับมา
+        console.log('IT Jobs:', repairJobs.IT);
+        console.log('EN Jobs:', repairJobs.EN);
+        
+        // อัปเดต UI
+        updateDashboardStats();
+        filterJobsByType(currentJobType);
+        
+        // ซ่อนตัวโหลดและแสดงเนื้อหาหลัก
+        loadingIndicator.classList.add('hidden');
+        mainContent.classList.remove('hidden');
+        
+        // อัปเดตเวลาล่าสุด
+        document.getElementById('lastUpdatedTime').textContent = new Date().toLocaleString('th-TH', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        
+    } catch (error) {
+        console.error('Error loading repair jobs:', error);
+        showError('โหลดข้อมูลงานซ่อมไม่สำเร็จ', error.message || 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
+        
+        // แสดงปุ่มสำหรับดูข้อมูล debug
+        loadingIndicator.innerHTML += `
+            <button onclick="showDebugInfo()" class="mt-4 text-blue-600 underline">
+                แสดงข้อมูล Debug
+            </button>
+            <div id="debugInfo" class="hidden mt-4 p-4 bg-gray-100 rounded text-left text-sm"></div>
+        `;
+    }
+}
+
+// เพิ่มฟังก์ชันแสดงข้อมูล Debug
+function showDebugInfo() {
+    const debugInfo = document.getElementById('debugInfo');
+    debugInfo.innerHTML = `
+        <p><strong>User ID:</strong> ${userId}</p>
+        <p><strong>Current Job Type:</strong> ${currentJobType}</p>
+        <p><strong>IT Jobs Data:</strong></p>
+        <pre>${JSON.stringify(repairJobs.IT, null, 2)}</pre>
+        <p><strong>EN Jobs Data:</strong></p>
+        <pre>${JSON.stringify(repairJobs.EN, null, 2)}</pre>
+    `;
+    debugInfo.classList.toggle('hidden');
+}
             
             /**
              * อัปเดตสถิติบนแดชบอร์ด
