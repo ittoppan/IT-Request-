@@ -401,92 +401,92 @@
             /**
              * โหลดข้อมูลงานซ่อมจาก Google Apps Script
              */
-         async function loadRepairJobs() {
-    try {
-        if (!userId) {
-            throw new Error('ไม่พบข้อมูลผู้ใช้ (userId)');
-        }
-        
-        loadingIndicator.classList.remove('hidden');
-        mainContent.classList.add('hidden');
-        
-        // เพิ่ม timestamp เพื่อป้องกันการ cache
-        const timestamp = new Date().getTime();
-        
-        // ดึงข้อมูลทั้ง IT และ EN พร้อมกัน
-        const [itResponse, enResponse] = await Promise.all([
-            fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT&t=${timestamp}`),
-            fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN&t=${timestamp}`)
-        ]);
-        
-        // ตรวจสอบสถานะการตอบกลับ
-        if (!itResponse.ok || !enResponse.ok) {
-            const errorText = await itResponse.text();
-            console.error('Error response:', errorText);
-            throw new Error(`การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา: ${itResponse.status}`);
-        }
-        
-        const [itData, enData] = await Promise.all([
-            itResponse.json(),
-            enResponse.json()
-        ]);
-        
-        // ตรวจสอบสถานะการตอบกลับจาก API
-        if (itData.status === 'error' || enData.status === 'error') {
-            console.error('API Error:', itData.message || enData.message);
-            throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
-        }
-        
-        // บันทึกข้อมูลงานซ่อม
-        repairJobs.IT = itData.data || [];
-        repairJobs.EN = enData.data || [];
-        
-        // Debug: แสดงข้อมูลที่ได้รับมา
-        console.log('IT Jobs:', repairJobs.IT);
-        console.log('EN Jobs:', repairJobs.EN);
-        
-        // อัปเดต UI
-        updateDashboardStats();
-        filterJobsByType(currentJobType);
-        
-        // ซ่อนตัวโหลดและแสดงเนื้อหาหลัก
-        loadingIndicator.classList.add('hidden');
-        mainContent.classList.remove('hidden');
-        
-        // อัปเดตเวลาล่าสุด
-        document.getElementById('lastUpdatedTime').textContent = new Date().toLocaleString('th-TH', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
-        
-    } catch (error) {
-        console.error('Error loading repair jobs:', error);
-        showError('โหลดข้อมูลงานซ่อมไม่สำเร็จ', error.message || 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
-        
-        // แสดงปุ่มสำหรับดูข้อมูล debug
-        loadingIndicator.innerHTML += `
-            <button onclick="showDebugInfo()" class="mt-4 text-blue-600 underline">
-                แสดงข้อมูล Debug
-            </button>
-            <div id="debugInfo" class="hidden mt-4 p-4 bg-gray-100 rounded text-left text-sm"></div>
-        `;
-    }
-}
+            async function loadRepairJobs() {
+                try {
+                    if (!userId) {
+                        throw new Error('ไม่พบข้อมูลผู้ใช้ (userId)');
+                    }
+                    
+                    loadingIndicator.classList.remove('hidden');
+                    mainContent.classList.add('hidden');
+                    
+                    // เพิ่ม timestamp เพื่อป้องกันการ cache
+                    const timestamp = new Date().getTime();
+                    
+                    // ดึงข้อมูลทั้ง IT และ EN พร้อมกัน
+                    const [itResponse, enResponse] = await Promise.all([
+                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT&t=${timestamp}`),
+                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN&t=${timestamp}`)
+                    ]);
+                    
+                    // ตรวจสอบสถานะการตอบกลับ
+                    if (!itResponse.ok || !enResponse.ok) {
+                        const errorText = await itResponse.text();
+                        console.error('Error response:', errorText);
+                        throw new Error(`การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา: ${itResponse.status}`);
+                    }
+                    
+                    const [itData, enData] = await Promise.all([
+                        itResponse.json(),
+                        enResponse.json()
+                    ]);
+                    
+                    // ตรวจสอบสถานะการตอบกลับจาก API
+                    if (itData.status === 'error' || enData.status === 'error') {
+                        console.error('API Error:', itData.message || enData.message);
+                        throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
+                    }
+                    
+                    // บันทึกข้อมูลงานซ่อม
+                    repairJobs.IT = itData.data || [];
+                    repairJobs.EN = enData.data || [];
+                    
+                    // Debug: แสดงข้อมูลที่ได้รับมา
+                    console.log('IT Jobs:', repairJobs.IT);
+                    console.log('EN Jobs:', repairJobs.EN);
+                    
+                    // อัปเดต UI
+                    updateDashboardStats();
+                    filterJobsByType(currentJobType);
+                    
+                    // ซ่อนตัวโหลดและแสดงเนื้อหาหลัก
+                    loadingIndicator.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                    
+                    // อัปเดตเวลาล่าสุด
+                    document.getElementById('lastUpdatedTime').textContent = new Date().toLocaleString('th-TH', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                    
+                } catch (error) {
+                    console.error('Error loading repair jobs:', error);
+                    showError('โหลดข้อมูลงานซ่อมไม่สำเร็จ', error.message || 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
+                    
+                    // แสดงปุ่มสำหรับดูข้อมูล debug
+                    loadingIndicator.innerHTML += `
+                        <button onclick="showDebugInfo()" class="mt-4 text-blue-600 underline">
+                            แสดงข้อมูล Debug
+                        </button>
+                        <div id="debugInfo" class="hidden mt-4 p-4 bg-gray-100 rounded text-left text-sm"></div>
+                    `;
+                }
+            }
 
-// เพิ่มฟังก์ชันแสดงข้อมูล Debug
-function showDebugInfo() {
-    const debugInfo = document.getElementById('debugInfo');
-    debugInfo.innerHTML = `
-        <p><strong>User ID:</strong> ${userId}</p>
-        <p><strong>Current Job Type:</strong> ${currentJobType}</p>
-        <p><strong>IT Jobs Data:</strong></p>
-        <pre>${JSON.stringify(repairJobs.IT, null, 2)}</pre>
-        <p><strong>EN Jobs Data:</strong></p>
-        <pre>${JSON.stringify(repairJobs.EN, null, 2)}</pre>
-    `;
-    debugInfo.classList.toggle('hidden');
-}
+            // เพิ่มฟังก์ชันแสดงข้อมูล Debug
+            function showDebugInfo() {
+                const debugInfo = document.getElementById('debugInfo');
+                debugInfo.innerHTML = `
+                    <p><strong>User ID:</strong> ${userId}</p>
+                    <p><strong>Current Job Type:</strong> ${currentJobType}</p>
+                    <p><strong>IT Jobs Data:</strong></p>
+                    <pre>${JSON.stringify(repairJobs.IT, null, 2)}</pre>
+                    <p><strong>EN Jobs Data:</strong></p>
+                    <pre>${JSON.stringify(repairJobs.EN, null, 2)}</pre>
+                `;
+                debugInfo.classList.toggle('hidden');
+            }
             
             /**
              * อัปเดตสถิติบนแดชบอร์ด
@@ -683,43 +683,78 @@ function showDebugInfo() {
                 detailHeader.classList.remove('hidden');
                 jobDetailsContainer.classList.remove('hidden');
                 
-                // ข้อมูลสถานะ
-                const statusInfo = getStatusInfo(job.status);
-                
-                // ส่วนไฟล์แนบ
-                const fileAttachmentsHtml = createFileAttachmentsHtml(job);
-                
-                // ส่วนความคืบหน้า
-                const progressNotesHtml = createProgressNotesHtml(job);
-                
-                // ส่วนข้อมูลเฉพาะประเภทงาน
-                const typeSpecificHtml = createTypeSpecificHtml(job);
-                
-                // ส่วนข้อมูลผู้รับผิดชอบและวันที่
-                const assignedInfoHtml = createAssignedInfoHtml(job);
+                // อัปเดตหัวข้อรายละเอียด
+                document.getElementById('detailJobType').textContent = currentJobType;
+                document.getElementById('detailJobId').textContent = job.jobId || 'N/A';
                 
                 // สร้าง HTML ทั้งหมด
                 jobDetailsContainer.innerHTML = `
                     <div class="p-6 space-y-6">
-                        <div class="flex items-center justify-between border-b pb-4 mb-4">
-                            <div class="flex items-center">
-                                <i class="fas ${statusInfo.icon} mr-3 text-${statusInfo.color}-500 text-xl"></i>
-                                <span class="text-lg font-semibold text-gray-800">สถานะ: ${statusInfo.text}</span>
+                        <!-- สรุปสถานะงาน -->
+                        ${createStatusSummaryHtml(job)}
+                        
+                        <!-- ข้อมูลพื้นฐาน -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <p class="text-sm text-gray-500 mb-2">ผู้แจ้งซ่อม</p>
+                                <p class="font-medium">${job.fullName || 'ไม่ระบุ'}</p>
+                                <p class="text-sm text-gray-600">${job.department || 'ไม่ระบุแผนก'}</p>
                             </div>
-                            <span class="status-badge ${statusInfo.class}">
-                                <i class="fas ${statusInfo.icon} mr-1"></i>
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <p class="text-sm text-gray-500 mb-2">วันที่แจ้งซ่อม</p>
+                                <p class="font-medium">${formatThaiDate(job.timestamp)}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- ข้อมูลเฉพาะประเภทงาน -->
+                        ${createTypeSpecificHtml(job)}
+                        
+                        <!-- ไฟล์แนบ -->
+                        ${createFileAttachmentsHtml(job)}
+                        
+                        <!-- บันทึกความคืบหน้า -->
+                        ${createProgressNotesHtml(job)}
+                        
+                        <!-- หมายเหตุเพิ่มเติม -->
+                        ${job.additionalNotes ? `
+                            <div>
+                                <h4 class="font-semibold mb-3 text-gray-700">หมายเหตุเพิ่มเติม</h4>
+                                <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                                    <p class="text-sm text-gray-700">${job.additionalNotes}</p>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            /**
+             * สร้าง HTML สำหรับสรุปสถานะงาน
+             * @param {object} job - ข้อมูลงาน
+             * @returns {string} HTML string
+             */
+            function createStatusSummaryHtml(job) {
+                const statusInfo = getStatusInfo(job.status);
+                const priorityInfo = getPriorityInfo(job.urgency || job.priority);
+                
+                return `
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="p-3 bg-${statusInfo.color}-50 rounded-lg border border-${statusInfo.color}-200">
+                            <p class="text-xs text-gray-500 mb-1">สถานะงาน</p>
+                            <p class="font-semibold text-${statusInfo.color}-600">
+                                <i class="fas ${statusInfo.icon} mr-2"></i>
                                 ${statusInfo.text}
-                            </span>
+                            </p>
                         </div>
-
-                        ${assignedInfoHtml}
-                        ${typeSpecificHtml}
-                        ${fileAttachmentsHtml}
-                        ${progressNotesHtml}
-
-                        <div class="text-right text-xs text-gray-500 pt-4 border-t mt-4">
-                            แจ้งซ่อมเมื่อ: ${formatDateTime(job.timestamp)}
-                        </div>
+                        ${priorityInfo ? `
+                            <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <p class="text-xs text-gray-500 mb-1">ระดับความเร่งด่วน</p>
+                                <p class="font-semibold text-gray-700">
+                                    <i class="fas fa-exclamation-circle mr-2"></i>
+                                    ${priorityInfo.text}
+                                </p>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             }
@@ -766,6 +801,7 @@ function showDebugInfo() {
                                 <li><strong>อุปกรณ์:</strong> ${job.device || 'ไม่ระบุ'}</li>
                                 <li><strong>ความเร่งด่วน:</strong> ${job.urgency || 'ไม่ระบุ'}</li>
                                 <li><strong>สำนักงาน:</strong> ${job.office || 'ไม่ระบุ'}</li>
+                                <li><strong>หมายเลขโทรศัพท์:</strong> ${job.phoneNumber || 'ไม่ระบุ'}</li>
                             </ul>
                         </div>
                     `;
@@ -775,19 +811,34 @@ function showDebugInfo() {
                             <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลเครื่องจักร</h4>
                             <ul class="space-y-2 text-sm text-gray-700">
                                 <li><strong>ชื่อเครื่องจักร:</strong> ${job.machineName || 'ไม่ระบุ'}</li>
+                                <li><strong>รหัสเครื่องจักร:</strong> ${job.machineCode || 'ไม่ระบุ'}</li>
+                                <li><strong>สถานที่ตั้ง:</strong> ${job.machineLocation || 'ไม่ระบุ'}</li>
                                 <li><strong>สถานะเครื่อง:</strong> ${job.machineStatus || 'ไม่ระบุ'}</li>
                                 <li><strong>ประเภทงาน:</strong> ${job.jobType || 'ไม่ระบุ'}</li>
                                 <li><strong>รายละเอียดปัญหา:</strong> ${job.problemDescription || 'ไม่มีรายละเอียด'}</li>
-                                <li><strong>สาเหตุ:</strong> ${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</li>
+                                <li><strong>อาการที่พบ:</strong> ${job.symptoms || 'ไม่ระบุ'}</li>
                             </ul>
                         </div>
                         <div class="en-specific">
                             <h4 class="font-semibold mb-3 text-gray-700">การซ่อมบำรุง</h4>
                             <ul class="space-y-2 text-sm text-gray-700">
-                                <li><strong>รายละเอียดการซ่อม:</strong> ${job.maintenanceDescription || 'ไม่มีข้อมูล'}</li>
+                                <li><strong>ผู้ตรวจพบปัญหา:</strong> ${job.reportedBy || 'ไม่ระบุ'}</li>
+                                <li><strong>วันที่พบปัญหา:</strong> ${formatDate(job.problemDate) || 'ไม่ระบุ'}</li>
+                                <li><strong>สาเหตุ:</strong> ${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</li>
                                 <li><strong>การดำเนินการ:</strong> ${job.maintenanceAction || 'ไม่ระบุ'}</li>
+                                <li><strong>รายละเอียดการซ่อม:</strong> ${job.maintenanceDescription || 'ไม่มีข้อมูล'}</li>
+                                <li><strong>ผู้รับผิดชอบ:</strong> ${job.technician || 'ไม่ระบุ'}</li>
+                                <li><strong>วันที่เริ่มซ่อม:</strong> ${formatDate(job.startDate) || 'ไม่ระบุ'}</li>
+                                <li><strong>วันที่เสร็จสิ้น:</strong> ${formatDate(job.finishDate) || 'ยังไม่เสร็จสิ้น'}</li>
+                            </ul>
+                        </div>
+                        <div class="en-specific">
+                            <h4 class="font-semibold mb-3 text-gray-700">อะไหล่และวัสดุ</h4>
+                            <ul class="space-y-2 text-sm text-gray-700">
                                 <li><strong>อะไหล่ที่ใช้:</strong> ${job.sparePartsUsed || 'ไม่มี'}</li>
-                                <li><strong>จำนวน:</strong> ${job.quantity || '0'}</li>
+                                <li><strong>จำนวน:</strong> ${job.quantity || '0'} ${job.unit || 'ชิ้น'}</li>
+                                <li><strong>หมายเลขอะไหล่:</strong> ${job.partNumber || 'ไม่ระบุ'}</li>
+                                <li><strong>ค่าใช้จ่าย:</strong> ${job.cost ? '฿' + job.cost : 'ไม่ระบุ'}</li>
                             </ul>
                         </div>
                     `;
@@ -800,24 +851,60 @@ function showDebugInfo() {
              * @returns {string} HTML string
              */
             function createFileAttachmentsHtml(job) {
-                const urls = job.imageViewUrls || job.driveUrls || [];
-                if (urls.length === 0) return '';
+                let urls = job.imageViewUrls || job.driveUrls || job.attachments || [];
+                
+                // ถ้าเป็น EN และมีข้อมูล attachments
+                if (currentJobType === 'EN' && job.attachmentUrls) {
+                    urls = job.attachmentUrls;
+                }
                 
                 // แปลง string URLs เป็น array ถ้าเป็น string
                 const urlArray = typeof urls === 'string' ? urls.split(',').map(url => url.trim()) : urls;
                 const validUrls = urlArray.filter(url => url.length > 0);
                 
-                if (validUrls.length === 0) return '';
+                if (validUrls.length === 0) {
+                    return `
+                        <div>
+                            <h4 class="font-semibold mb-3 text-gray-700">ไฟล์แนบประกอบ</h4>
+                            <div class="text-center py-4 text-gray-500">
+                                <i class="fas fa-paperclip mr-2"></i>
+                                ไม่มีไฟล์แนบ
+                            </div>
+                        </div>
+                    `;
+                }
                 
                 return `
                     <div>
-                        <h4 class="font-semibold mb-3 text-gray-700">ไฟล์แนบประกอบปัญหา (${validUrls.length} รูป)</h4>
+                        <h4 class="font-semibold mb-3 text-gray-700">ไฟล์แนบประกอบ (${validUrls.length} ไฟล์)</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                            ${validUrls.map(url => `
-                                <a href="${url}" target="_blank" class="block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-                                    <img src="${url}" alt="ไฟล์แนบ" class="w-full h-24 object-cover" onerror="this.style.display='none'">
-                                </a>
-                            `).join('')}
+                            ${validUrls.map((url, index) => {
+                                const isImage = url.match(/\.(jpeg|jpg|gif|png)$/) !== null;
+                                const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
+                                
+                                if (isImage) {
+                                    return `
+                                        <a href="${url}" target="_blank" class="block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 group">
+                                            <div class="relative pt-[100%]">
+                                                <img src="${url}" alt="ไฟล์แนบ" 
+                                                    class="absolute top-0 left-0 w-full h-full object-cover"
+                                                    onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200"></div>
+                                            </div>
+                                            <p class="text-xs text-gray-600 truncate px-2 py-1">${fileName}</p>
+                                        </a>
+                                    `;
+                                } else {
+                                    return `
+                                        <a href="${url}" target="_blank" class="block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 group">
+                                            <div class="p-4 bg-gray-50 flex justify-center">
+                                                <i class="fas fa-file-alt text-3xl text-gray-400"></i>
+                                            </div>
+                                            <p class="text-xs text-gray-600 truncate px-2 py-1">${fileName}</p>
+                                        </a>
+                                    `;
+                                }
+                            }).join('')}
                         </div>
                     </div>
                 `;
@@ -829,22 +916,46 @@ function showDebugInfo() {
              * @returns {string} HTML string
              */
             function createProgressNotesHtml(job) {
-                const notes = job.notes || job.maintenanceNote || '';
-                if (!notes || notes.length === 0) return '';
+                let notes = job.notes || job.maintenanceNote || job.progressNotes || '';
+                
+                // ถ้าเป็น EN และมีข้อมูล historyNotes
+                if (currentJobType === 'EN' && job.historyNotes) {
+                    notes = job.historyNotes;
+                }
+                
+                if (!notes || notes.length === 0) {
+                    return `
+                        <div>
+                            <h4 class="font-semibold mb-3 text-gray-700">บันทึกความคืบหน้า</h4>
+                            <div class="text-center py-4 text-gray-500">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                ยังไม่มีบันทึกความคืบหน้า
+                            </div>
+                        </div>
+                    `;
+                }
                 
                 // แปลงเป็น array ถ้าเป็น string
                 const notesArray = typeof notes === 'string' ? notes.split('\n').filter(n => n.trim().length > 0) : notes;
                 
-                if (notesArray.length === 0) return '';
-                
                 return `
                     <div>
-                        <h4 class="font-semibold mb-3 text-gray-700">ความคืบหน้าการดำเนินงาน</h4>
-                        <div class="space-y-3">
-                            ${notesArray.map(note => `
-                                <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                                    <p class="text-sm text-gray-700">${note}</p>
+                        <h4 class="font-semibold mb-3 text-gray-700">บันทึกความคืบหน้า (${notesArray.length} รายการ)</h4>
+                        <div class="space-y-4">
+                            ${notesArray.map((note, index) => `
+                                <div class="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200 shadow-xs">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <span class="text-blue-600 font-medium text-sm">${index + 1}</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm text-gray-700">${note}</p>
+                                        ${job.noteDates && job.noteDates[index] ? `
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                <i class="far fa-clock mr-1"></i>
+                                                ${formatDateTime(job.noteDates[index])}
+                                            </p>
+                                        ` : ''}
+                                    </div>
                                 </div>
                             `).join('')}
                         </div>
@@ -912,6 +1023,30 @@ function showDebugInfo() {
                     month: 'short',
                     day: 'numeric'
                 });
+            }
+            
+            /**
+             * จัดรูปแบบวันที่ให้เป็นข้อความภาษาไทย
+             * @param {string} dateString - วันที่ในรูปแบบ string
+             * @returns {string} วันที่ที่จัดรูปแบบแล้ว
+             */
+            function formatThaiDate(dateString) {
+                if (!dateString) return 'ไม่ระบุ';
+                
+                const date = new Date(dateString);
+                const thaiMonths = [
+                    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน',
+                    'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
+                    'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+                ];
+                
+                const day = date.getDate();
+                const month = thaiMonths[date.getMonth()];
+                const year = date.getFullYear() + 543;
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                
+                return `${day} ${month} ${year} ${hours}:${minutes} น.`;
             }
             
             /**
