@@ -92,17 +92,20 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            animation: fadeIn 0.3s ease-out;
         }
         
         .lightbox-content {
             max-width: 90%;
             max-height: 90%;
+            position: relative;
         }
         
         .lightbox-content img {
             max-width: 100%;
             max-height: 90vh;
             object-fit: contain;
+            transition: opacity 0.3s ease;
         }
         
         .lightbox-nav {
@@ -126,6 +129,9 @@
             font-size: 24px;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .lightbox-nav button:hover {
@@ -144,6 +150,9 @@
             height: 40px;
             font-size: 20px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .lightbox-close:hover {
@@ -159,6 +168,47 @@
             color: white;
             padding: 10px;
             background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Time grid styles */
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .time-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-align: center;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .time-value {
+            font-size: 0.875rem;
+            color: #111827;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .dark .time-label {
+            color: #9ca3af;
+        }
+        
+        .dark .time-value {
+            color: #f3f4f6;
+        }
+        
+        /* Scrollbar styling */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
@@ -366,6 +416,10 @@
     </div>
 
     <script>
+        // ตัวแปร global สำหรับ Lightbox
+        let currentLightboxImages = [];
+        let currentLightboxIndex = 0;
+
         document.addEventListener('DOMContentLoaded', function() {
             // ค่าคงที่และตัวแปร
             const liffId = '2007374280-GR1Q3YxJ';
@@ -382,10 +436,6 @@
             let selectedJobId = null;
             let currentStatusFilter = 'all';
             let currentJobType = 'IT';
-
-            // Lightbox ตัวแปร
-            let currentLightboxImages = [];
-            let currentLightboxIndex = 0;
 
             // องค์ประกอบ DOM
             const loadingIndicator = document.getElementById('loadingIndicator');
@@ -654,6 +704,11 @@
                         ? job.problemType || 'ไม่ระบุประเภทปัญหา'
                         : job.machineName ? `${job.machineName} (${job.jobType || 'ไม่ระบุ'})` : job.jobType || 'ไม่ระบุประเภทงาน';
                     
+                    // คำนวณระยะเวลาดำเนินการ
+                    const startDate = job.startDate ? formatDate(job.startDate) : '-';
+                    const endDate = job.endDate ? formatDate(job.endDate) : '-';
+                    const duration = calculateDuration(job.startDate, job.endDate);
+                    
                     jobCard.innerHTML = `
                         <div class="p-4">
                             <div class="flex items-start justify-between">
@@ -674,7 +729,23 @@
                                 </div>
                             </div>
                             
-                            <div class="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                            <!-- เพิ่มแถวข้อมูลเวลา -->
+                            <div class="mt-4 grid grid-cols-3 gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                <div class="text-center">
+                                    <div class="font-medium text-xs text-gray-400 dark:text-gray-500">START</div>
+                                    <div>${startDate}</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="font-medium text-xs text-gray-400 dark:text-gray-500">END</div>
+                                    <div>${endDate}</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="font-medium text-xs text-gray-400 dark:text-gray-500">TIME</div>
+                                    <div>${duration}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-2 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                                 <div class="flex items-center">
                                     <i class="fas fa-user-circle mr-2"></i>
                                     <span>${job.fullName || 'ไม่ระบุชื่อ'}</span>
@@ -689,6 +760,35 @@
                     
                     jobsContainer.appendChild(jobCard);
                 });
+            }
+            
+            /**
+             * คำนวณระยะเวลาดำเนินการ
+             */
+            function calculateDuration(startDateStr, endDateStr) {
+                if (!startDateStr || !endDateStr) return '-';
+                
+                const startDate = convertGoogleDate(startDateStr);
+                const endDate = convertGoogleDate(endDateStr);
+                
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return '-';
+                
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) {
+                    return 'วันเดียวเสร็จ';
+                } else if (diffDays === 1) {
+                    return '1 วัน';
+                } else if (diffDays < 7) {
+                    return `${diffDays} วัน`;
+                } else if (diffDays < 30) {
+                    const weeks = Math.floor(diffDays / 7);
+                    return `${weeks} สัปดาห์`;
+                } else {
+                    const months = Math.floor(diffDays / 30);
+                    return `${months} เดือน`;
+                }
             }
             
             /**
@@ -722,26 +822,36 @@
                 document.getElementById('detailJobType').textContent = currentJobType;
                 document.getElementById('detailJobId').textContent = job.jobId || 'N/A';
                 
+                // เพิ่มส่วนแสดงระยะเวลาดำเนินการ
+                const startDate = job.startDate ? formatThaiDate(job.startDate) : 'ยังไม่เริ่ม';
+                const endDate = job.endDate ? formatThaiDate(job.endDate) : 'ยังไม่สิ้นสุด';
+                const duration = calculateDuration(job.startDate, job.endDate);
+                
                 jobDetailsContainer.innerHTML = `
                     <div class="p-6 space-y-6">
                         ${createStatusSummaryHtml(job)}
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">ผู้แจ้งซ่อม</p>
-                                <p class="font-medium text-gray-900 dark:text-white">${job.fullName || 'ไม่ระบุ'}</p>
-                                <p class="text-sm text-gray-600 dark:text-gray-300">${job.department || 'ไม่ระบุแผนก'}</p>
-                            </div>
-                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">วันที่แจ้งซ่อม</p>
-                                <p class="font-medium text-gray-900 dark:text-white">${formatThaiDate(job.timestamp)}</p>
+                        <!-- เพิ่มส่วนแสดงระยะเวลาดำเนินการ -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ระยะเวลาดำเนินการ</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="text-center">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">วันที่เริ่ม</p>
+                                    <p class="font-medium text-gray-900 dark:text-white">${startDate}</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">วันที่สิ้นสุด</p>
+                                    <p class="font-medium text-gray-900 dark:text-white">${endDate}</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">ระยะเวลา</p>
+                                    <p class="font-medium text-gray-900 dark:text-white">${duration}</p>
+                                </div>
                             </div>
                         </div>
                         
                         ${createTypeSpecificHtml(job)}
-                        
                         ${createFileAttachmentsHtml(job)}
-                        
                         ${createProgressNotesHtml(job)}
                         
                         ${job.additionalNotes ? `
@@ -911,12 +1021,82 @@
                     fileUrls = job.imageUrls || [];
                 }
                 
-                // กรอง URL ที่ไม่ถูกต้องออก
-                const validUrls = fileUrls
+                // กรองเฉพาะ URL รูปภาพ
+                const imageUrls = fileUrls
                     .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
+                    .filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i))
                     .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
                 
-                if (validUrls.length === 0) {
+                // กรองไฟล์อื่นๆ ที่ไม่ใช่รูปภาพ
+                const otherFiles = fileUrls
+                    .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
+                    .filter(url => !url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i))
+                    .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
+                
+                // ส่วนแสดงรูปภาพ
+                let imagesSection = '';
+                if (imageUrls.length > 0) {
+                    imagesSection = `
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">รูปภาพแจ้งซ่อม (${imageUrls.length})</h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                ${imageUrls.map((url, index) => `
+                                    <div class="relative group cursor-pointer" onclick="openLightbox(imageUrls, ${index})">
+                                        <img src="${url}" alt="รูปภาพแจ้งซ่อม" 
+                                            class="w-full h-32 object-cover rounded-lg shadow hover:shadow-md transition-shadow"
+                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                            <i class="fas fa-expand text-white text-xl"></i>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // ส่วนแสดงไฟล์อื่นๆ
+                let filesSection = '';
+                if (otherFiles.length > 0) {
+                    filesSection = `
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบอื่นๆ (${otherFiles.length})</h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                ${otherFiles.map((url, index) => {
+                                    const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
+                                    const fileExtension = fileName.split('.').pop().toLowerCase();
+                                    
+                                    let iconClass = 'fas fa-file file-icon-default';
+                                    if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
+                                    else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
+                                    else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
+                                    else if (['ppt', 'pptx'].includes(fileExtension)) iconClass = 'fas fa-file-powerpoint ppt-icon';
+                                    else if (['zip', 'rar', '7z'].includes(fileExtension)) iconClass = 'fas fa-file-archive zip-icon';
+                                    else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) iconClass = 'fas fa-file-video video-icon';
+                                    else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) iconClass = 'fas fa-file-audio audio-icon';
+                                    
+                                    return `
+                                        <a href="${url}" target="_blank" 
+                                           class="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
+                                           title="${fileName}">
+                                            <div class="relative pt-[100%] bg-gray-100 dark:bg-gray-700">
+                                                <div class="absolute inset-0 flex items-center justify-center">
+                                                    <i class="${iconClass} file-icon"></i>
+                                                </div>
+                                            </div>
+                                            <div class="p-2 bg-white dark:bg-gray-800">
+                                                <p class="text-xs text-gray-600 dark:text-gray-300 truncate">${fileName}</p>
+                                            </div>
+                                        </a>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // ถ้าไม่มีไฟล์แนบใดๆ
+                if (imageUrls.length === 0 && otherFiles.length === 0) {
                     return `
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
                             <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ</h4>
@@ -928,76 +1108,12 @@
                     `;
                 }
                 
-                // แยก URL รูปภาพออกมา
-                const imageUrls = validUrls.filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i));
-                
+                // รวมส่วนแสดงผล
                 return `
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ (${validUrls.length})</h4>
-                        
-                        <div class="mb-4">
-                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                                ${validUrls.map((url, index) => {
-                                    const isImage = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) !== null;
-                                    const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
-                                    const fileExtension = fileName.split('.').pop().toLowerCase();
-                                    
-                                    let iconClass = 'fas fa-file file-icon-default';
-                                    if (isImage) iconClass = 'fas fa-image img-icon';
-                                    else if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
-                                    else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
-                                    else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
-                                    else if (['ppt', 'pptx'].includes(fileExtension)) iconClass = 'fas fa-file-powerpoint ppt-icon';
-                                    else if (['zip', 'rar', '7z'].includes(fileExtension)) iconClass = 'fas fa-file-archive zip-icon';
-                                    else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) iconClass = 'fas fa-file-video video-icon';
-                                    else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) iconClass = 'fas fa-file-audio audio-icon';
-                                    
-                                    return `
-                                        <a href="${url}" target="_blank" 
-                                           class="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 relative"
-                                           title="${fileName}">
-                                            <div class="relative pt-[100%] bg-gray-100 dark:bg-gray-700">
-                                                ${isImage ? `
-                                                    <img src="${url}" alt="ไฟล์แนบ" 
-                                                        class="absolute top-0 left-0 w-full h-full object-cover"
-                                                        onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                                                ` : `
-                                                    <div class="absolute inset-0 flex items-center justify-center">
-                                                        <i class="${iconClass} file-icon"></i>
-                                                    </div>
-                                                `}
-                                            </div>
-                                            <div class="p-2 bg-white dark:bg-gray-800">
-                                                <p class="text-xs text-gray-600 dark:text-gray-300 truncate">${fileName}</p>
-                                            </div>
-                                            ${isImage ? `
-                                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                    <i class="fas fa-expand text-white text-xl"></i>
-                                                </div>
-                                            ` : ''}
-                                        </a>
-                                    `;
-                                }).join('')}
-                            </div>
-                        </div>
-                        
-                        ${imageUrls.length > 0 ? `
-                            <div class="mt-6">
-                                <h5 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3">รูปภาพทั้งหมด</h5>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    ${imageUrls.map((url, index) => `
-                                        <div class="relative group cursor-pointer" onclick="openLightbox(imageUrls, ${index})">
-                                            <img src="${url}" alt="รูปภาพประกอบงานซ่อม" 
-                                                class="w-full h-48 object-cover rounded-lg shadow"
-                                                onerror="this.onerror=null;this.src='https://via.placeholder.com/400?text=Image+Not+Found'">
-                                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                <i class="fas fa-expand text-white text-xl"></i>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        ` : ''}
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ</h4>
+                        ${imagesSection}
+                        ${filesSection}
                     </div>
                 `;
             }
@@ -1128,10 +1244,8 @@
                 const day = date.getDate();
                 const month = thaiMonths[date.getMonth()];
                 const year = date.getFullYear() + 543;
-                const hours = date.getHours().toString().padStart(2, '0');
-                const minutes = date.getMinutes().toString().padStart(2, '0');
                 
-                return `${day} ${month} ${year} ${hours}:${minutes} น.`;
+                return `${day} ${month} ${year}`;
             }
             
             /**
@@ -1161,7 +1275,9 @@
                 
                 // ถ้าเป็น timestamp
                 if (typeof dateString === 'number') {
-                    return new Date(dateString);
+                    const date = new Date(dateString);
+                    date.setHours(0, 0, 0, 0); // ตั้งเวลาเป็น 00:00:00
+                    return date;
                 }
                 
                 // ถ้าเป็น string ที่มีรูปแบบวันที่
@@ -1173,7 +1289,7 @@
                             parseInt(isoFormat[1]),
                             parseInt(isoFormat[2]) - 1,
                             parseInt(isoFormat[3])
-                        ));
+                        );
                     }
                     
                     // รูปแบบ dd/mm/yyyy
@@ -1189,6 +1305,7 @@
                     // ลองแปลงเป็น Date object ตรงๆ
                     const parsedDate = new Date(dateString);
                     if (!isNaN(parsedDate.getTime())) {
+                        parsedDate.setHours(0, 0, 0, 0); // ตั้งเวลาเป็น 00:00:00
                         return parsedDate;
                     }
                 }
@@ -1199,7 +1316,7 @@
             /**
              * เปิด Lightbox สำหรับดูรูปภาพ
              */
-            function openLightbox(images, startIndex = 0) {
+            window.openLightbox = function(images, startIndex = 0) {
                 if (!images || images.length === 0) return;
                 
                 currentLightboxImages = images;
@@ -1214,20 +1331,19 @@
                 
                 lightbox.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
-            }
-            
-            /**
-             * ปิด Lightbox
-             */
-            function closeLightbox() {
-                document.getElementById('lightbox').style.display = 'none';
-                document.body.style.overflow = 'auto';
+                
+                // เพิ่มการตรวจสอบว่ามีรูปภาพก่อนหน้าหรือถัดไปหรือไม่
+                const prevButton = lightbox.querySelector('.lightbox-nav button:first-child');
+                const nextButton = lightbox.querySelector('.lightbox-nav button:last-child');
+                
+                prevButton.style.visibility = images.length > 1 ? 'visible' : 'hidden';
+                nextButton.style.visibility = images.length > 1 ? 'visible' : 'hidden';
             }
             
             /**
              * เปลี่ยนรูปภาพใน Lightbox
              */
-            function changeLightboxImage(step) {
+            window.changeLightboxImage = function(step) {
                 currentLightboxIndex += step;
                 
                 // Handle wrap-around
@@ -1242,6 +1358,20 @@
                 
                 lightboxImage.src = currentLightboxImages[currentLightboxIndex];
                 lightboxCaption.textContent = `รูปภาพ ${currentLightboxIndex + 1} จาก ${currentLightboxImages.length}`;
+                
+                // เพิ่มเอฟเฟกต์ fade-in เมื่อเปลี่ยนรูป
+                lightboxImage.style.opacity = '0';
+                setTimeout(() => {
+                    lightboxImage.style.opacity = '1';
+                }, 100);
+            }
+            
+            /**
+             * ปิด Lightbox
+             */
+            window.closeLightbox = function() {
+                document.getElementById('lightbox').style.display = 'none';
+                document.body.style.overflow = 'auto';
             }
             
             /**
