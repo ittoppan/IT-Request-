@@ -1,970 +1,179 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ติดตามงานแจ้งซ่อม</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <style>
-        :root {
-            --primary-color: #183263;
-            --primary-dark: #1d4ed8;
-            --secondary-color: #f59e0b;
-            --dark-color: #1e293b;
-            --light-color: #f8fafc;
-            --blue-500: #3b82f6;
-            --red-500: #ef4444;
-            --green-500: #10b981;
-            --yellow-500: #f59e0b;
-            --purple-500: #230075;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-        }
-        
-        body {
-            font-family: 'Kanit', sans-serif;
-            background-color: var(--light-color);
-            line-height: 1.6;
-            color: var(--dark-color);
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border-radius: 0.75rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .header-gradient {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            transition: all 0.3s ease;
-            color: white;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.65rem;
-            border-radius: 9999px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-        
-        .status-new { background-color: var(--blue-500); }
-        .status-pending { background-color: #f97316; }
-        .status-in-progress { background-color: var(--yellow-500); }
-        .status-completed { background-color: var(--green-500); }
-        .status-cancelled { background-color: #e3e3e3; }
-        
-        .priority-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.65rem;
-            border-radius: 9999px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-        
-        .priority-low { background-color: #e3e3e3; }
-        .priority-medium { background-color: #1d95ff; }
-        .priority-high { background-color: #f97316; }
-        .priority-critical { background-color: #ff0000; }
-        
-        .job-card {
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .job-card.selected {
-            border: 2px solid var(--primary-color);
-            box-shadow: 0 0 0 2px var(--primary-color);
-        }
-        
-        .loading-spinner {
-            border: 3px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top: 3px solid var(--blue-500);
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        
-        .status-tab {
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            background-color: rgba(255, 255, 255, 0.08);
-            color: #E2E8F0;
-            white-space: nowrap;
-        }
-        
-        .status-tab.active-tab-style {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #F8FAFC;
-            font-weight: 600;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1), inset 0 2px 5px rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.4);
-            border-left: 1px solid rgba(255, 255, 255, 0.4);
-            border-right: 1px solid rgba(255, 255, 255, 0.4);
-            border-bottom: none;
-        }
-        
-        .stat-card {
-            transition: all 0.3s ease;
-        }
-        
-        /* แท็บประเภทงาน */
-        .job-type-tabs {
-            display: flex;
-            border-bottom: 1px solid #e2e8f0;
-            margin-bottom: 1.5rem;
-        }
-        
-        .job-type-tab {
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            font-weight: 500;
-            color: #64748b;
-            transition: all 0.2s ease;
-        }
-        
-        .job-type-tab.active {
-            color: #1e40af;
-            border-bottom-color: #1e40af;
-            background-color: #eff6ff;
-        }
-        
-        /* การแสดงผลเฉพาะ EN */
-        .en-specific {
-            display: none;
-        }
-        
-        .show-en .en-specific {
-            display: block;
-        }
-        
-        .show-en .it-specific {
-            display: none;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .hide-scrollbar {
-            scrollbar-width: none;
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ติดตามงานของฉัน</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>body{font-family:'Kanit',sans-serif}</style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-    <div class="header-gradient text-white p-6 relative overflow-hidden shadow-lg">
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-blue-600/90"></div>
-        <div class="relative z-10 max-w-6xl mx-auto">
-            <div class="flex items-center gap-4 mb-4">
-                <button id="backBtn" class="inline-flex items-center px-4 py-2 text-sm border border-white/30 rounded-lg hover:bg-white/20 text-white transition-all duration-200 ease-in-out">
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    กลับ
-                </button>
-            </div>
-            <h1 class="text-3xl md:text-4xl font-bold mb-2">ติดตามงานแจ้งซ่อม</h1>
-            <p class="opacity-90 text-sm md:text-base">ตรวจสอบสถานะงานซ่อมของคุณได้อย่างรวดเร็วและง่ายดายที่นี่</p>
-        </div>
+<body class="bg-gray-100 text-gray-800">
+  <!-- Header -->
+  <header class="bg-blue-700 text-white p-4 shadow flex justify-between items-center">
+    <h1 class="text-xl font-semibold">ติดตามงานแจ้งซ่อม</h1>
+    <button id="backBtn" class="text-sm bg-white/20 px-3 py-1 rounded"><i class="fas fa-arrow-left mr-1"></i> กลับ</button>
+  </header>
+
+  <main class="max-w-4xl mx-auto p-4 space-y-4">
+    <!-- เลือกประเภท -->
+    <div class="flex gap-2">
+      <button data-type="IT" id="tabIT" class="typeTab flex-1 py-2 rounded bg-blue-600 text-white font-semibold">IT</button>
+      <button data-type="EN" id="tabEN" class="typeTab flex-1 py-2 rounded bg-gray-300 text-gray-700">EN</button>
     </div>
 
-    <div class="max-w-6xl mx-auto p-4 md:p-6 -mt-8 relative z-10">
-        <!-- แท็บเลือกประเภทงาน -->
-        <div class="job-type-tabs glass-card mb-4">
-            <div class="job-type-tab active" data-type="IT">งานซ่อม IT</div>
-            <div class="job-type-tab" data-type="EN">งานซ่อมเครื่องจักร (EN)</div>
-        </div>
-
-        <div id="loadingIndicator" class="flex flex-col justify-center items-center py-12 glass-card hidden">
-            <div class="loading-spinner"></div>
-            <span class="ml-3 text-gray-700 font-medium mt-4">กำลังโหลดข้อมูล... กรุณารอสักครู่</span>
-        </div>
-
-        <div id="mainContent" class="hidden">
-            <div id="dashboardSection" class="glass-card mb-8 animate-slide-up p-6 md:p-8 rounded-xl shadow-2xl backdrop-blur-md border border-white border-opacity-30">
-                <div class="flex items-center justify-between mb-8">
-                    <div class="flex items-center">
-                        <i class="fas fa-chart-pie mr-4 text-blue-600 text-2xl"></i>
-                        <h2 class="text-2xl font-bold text-gray-900 tracking-tight">ภาพรวมงานซ่อมของคุณ</h2>
-                    </div>
-                    <div class="text-sm text-gray-500 font-medium">
-                        อัปเดตล่าสุด: <span id="lastUpdatedTime" class="font-semibold text-gray-700">กำลังโหลด...</span>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="all" style="animation-delay: 100ms">
-                        <div class="text-4xl font-extrabold text-blue-700 mb-1" id="totalJobsCount">0</div>
-                        <div class="text-sm text-gray-600 font-medium">ทั้งหมด</div>
-                    </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="new" style="animation-delay: 200ms">
-                        <div class="text-4xl font-extrabold text-blue-500 mb-1" id="newJobsCount">0</div>
-                        <div class="text-sm text-gray-600 font-medium">แจ้งซ่อมใหม่</div>
-                    </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="pending" style="animation-delay: 300ms">
-                        <div class="text-4xl font-extrabold text-orange-500 mb-1" id="pendingJobsCount">0</div>
-                        <div class="text-sm text-gray-600 font-medium">รอดำเนินการ</div>
-                    </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="in-progress" style="animation-delay: 400ms">
-                        <div class="text-4xl font-extrabold text-yellow-500 mb-1" id="inProgressJobsCount">0</div>
-                        <div class="text-sm text-gray-600 font-medium">กำลังดำเนินการ</div>
-                    </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="completed" style="animation-delay: 500ms">
-                        <div class="text-4xl font-extrabold text-green-600 mb-1" id="completedJobsCount">0</div>
-                        <div class="text-sm text-gray-600 font-medium">เสร็จสิ้น</div>
-                    </div>
-                </div>
-
-                <!-- แท็บสถานะ -->
-                <div class="flex overflow-x-auto hide-scrollbar pb-2">
-                    <div class="status-tab active-tab-style mr-4 px-4 py-2 rounded-t-lg" data-status="all">ทั้งหมด</div>
-                    <div class="status-tab mr-4 px-4 py-2 rounded-t-lg" data-status="new">แจ้งซ่อมใหม่</div>
-                    <div class="status-tab mr-4 px-4 py-2 rounded-t-lg" data-status="pending">รอดำเนินการ</div>
-                    <div class="status-tab mr-4 px-4 py-2 rounded-t-lg" data-status="in-progress">กำลังดำเนินการ</div>
-                    <div class="status-tab px-4 py-2 rounded-t-lg" data-status="completed">เสร็จสิ้น</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-4 mb-4">
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-gray-800">
-                            รายการงานซ่อมของคุณ (<span id="jobCount">0</span> งาน)
-                            <span class="text-sm font-normal ml-2" id="currentJobType">(IT)</span>
-                        </h2>
-                        <button id="refreshBtn" class="text-blue-600 hover:text-blue-800 transition-colors">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                    
-                    <!-- ช่องค้นหา -->
-                    <div class="relative">
-                        <input type="text" id="jobSearch" placeholder="ค้นหาจากเลขที่งานหรือรายละเอียด..." 
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
-                    </div>
-                    
-                    <div id="jobsContainer" class="space-y-4"></div>
-                    
-                    <div id="noJobsFound" class="glass-card hidden">
-                        <div class="text-center pb-4 py-8">
-                            <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-500 font-medium">ไม่พบงานซ่อมในสถานะนี้</p>
-                            <p class="text-sm text-gray-400 mt-1">คุณสามารถตรวจสอบสถานะอื่นได้จากเมนูด้านบน</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:sticky lg:top-6 h-fit">
-                    <div id="detailHeader" class="hidden mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">
-                            <span id="detailJobType">IT</span> - <span id="detailJobId"></span>
-                        </h3>
-                    </div>
-                    
-                    <div id="emptyDetails" class="glass-card">
-                        <div class="text-center py-12">
-                            <i class="fas fa-info-circle text-4xl text-blue-400 mb-4"></i>
-                            <p class="text-gray-500 font-medium">เลือกงานจากรายการด้านซ้ายเพื่อดูรายละเอียด</p>
-                            <p class="text-sm text-gray-400 mt-1">ข้อมูลความคืบหน้าและรายละเอียดจะปรากฏที่นี่</p>
-                        </div>
-                    </div>
-                    
-                    <div id="jobDetailsContainer" class="glass-card animate-fade-in hidden"></div>
-                </div>
-            </div>
-        </div>
+    <!-- สถิติ -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+      <div class="bg-white rounded p-3 shadow"><div id="statAll" class="text-2xl font-bold text-blue-600">0</div><div class="text-xs">ทั้งหมด</div></div>
+      <div class="bg-white rounded p-3 shadow"><div id="statNew" class="text-2xl font-bold text-blue-500">0</div><div class="text-xs">ใหม่</div></div>
+      <div class="bg-white rounded p-3 shadow"><div id="statPending" class="text-2xl font-bold text-orange-500">0</div><div class="text-xs">รอดำเนินการ</div></div>
+      <div class="bg-white rounded p-3 shadow"><div id="statProgress" class="text-2xl font-bold text-yellow-500">0</div><div class="text-xs">กำลังทำ</div></div>
+      <div class="bg-white rounded p-3 shadow"><div id="statDone" class="text-2xl font-bold text-green-500">0</div><div class="text-xs">เสร็จ</div></div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // ค่าคงที่และตัวแปร
-            const liffId = '2007374280-GR1Q3YxJ';
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
-            
-            // ข้อมูลผู้ใช้
-            let userId = '';
-            let userDisplayName = '';
-            let userPictureUrl = '';
-            
-            // ข้อมูลงานซ่อม
-            let repairJobs = { IT: [], EN: [] };
-            let filteredJobs = [];
-            let selectedJobId = null;
-            let currentStatusFilter = 'all';
-            let currentJobType = 'IT';
+    <!-- กรองสถานะ -->
+    <div class="flex gap-1 flex-wrap">
+      <button data-st="all"   class="statusBtn bg-blue-600 text-white px-3 py-1 rounded text-sm">ทั้งหมด</button>
+      <button data-st="new"   class="statusBtn bg-blue-500 text-white px-3 py-1 rounded text-sm">ใหม่</button>
+      <button data-st="pending" class="statusBtn bg-orange-500 text-white px-3 py-1 rounded text-sm">รอดำเนินการ</button>
+      <button data-st="in-progress" class="statusBtn bg-yellow-500 text-white px-3 py-1 rounded text-sm">กำลังทำ</button>
+      <button data-st="completed" class="statusBtn bg-green-500 text-white px-3 py-1 rounded text-sm">เสร็จ</button>
+    </div>
 
-            // องค์ประกอบ DOM
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            const mainContent = document.getElementById('mainContent');
-            const jobsContainer = document.getElementById('jobsContainer');
-            const noJobsFound = document.getElementById('noJobsFound');
-            const jobDetailsContainer = document.getElementById('jobDetailsContainer');
-            const emptyDetails = document.getElementById('emptyDetails');
-            const detailHeader = document.getElementById('detailHeader');
-            const jobSearch = document.getElementById('jobSearch');
-            const refreshBtn = document.getElementById('refreshBtn');
-            const backBtn = document.getElementById('backBtn');
-            const statCards = document.querySelectorAll('.stat-card');
-            const statusTabs = document.querySelectorAll('.status-tab');
-            const jobTypeTabs = document.querySelectorAll('.job-type-tab');
+    <!-- รายการ -->
+    <div class="bg-white rounded shadow p-3">
+      <div class="flex justify-between items-center mb-2">
+        <span>รายการ (<span id="jobCount">0</span>)</span>
+        <button id="refreshBtn" class="text-blue-600"><i class="fas fa-sync-alt"></i></button>
+      </div>
+      <div id="jobList" class="space-y-3"></div>
+      <p id="emptyMsg" class="text-center text-gray-500 py-6 hidden">ไม่พบงาน</p>
+    </div>
 
-            /**
-             * เริ่มต้น LIFF แอปพลิเคชัน
-             */
-            async function initializeLiff() {
-                try {
-                    await liff.init({ liffId });
-                    
-                    if (!liff.isLoggedIn()) {
-                        liff.login();
-                        return;
-                    }
-                    
-                    const profile = await liff.getProfile();
-                    userId = profile.userId;
-                    userDisplayName = profile.displayName;
-                    userPictureUrl = profile.pictureUrl || '';
-                    
-                    await loadRepairJobs();
-                    
-                } catch (error) {
-                    console.error('LIFF initialization failed:', error);
-                    showError('เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF', error.message);
-                }
-            }
-            
-            /**
-             * แสดงข้อความผิดพลาด
-             * @param {string} title - หัวข้อข้อผิดพลาด
-             * @param {string} message - ข้อความรายละเอียด
-             */
-            function showError(title, message) {
-                loadingIndicator.innerHTML = `
-                    <div class="text-center p-6 bg-white rounded-lg shadow-md">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
-                        <p class="text-lg font-semibold text-gray-700 mb-2">${title}</p>
-                        <p class="text-sm text-gray-500 mb-4">${message || 'กรุณาลองเข้าใช้งานใหม่อีกครั้ง'}</p>
-                        <button onclick="window.location.reload()" class="btn-primary px-5 py-2 rounded-lg text-base">
-                            <i class="fas fa-sync-alt mr-2"></i> ลองใหม่
-                        </button>
-                    </div>
-                `;
-                loadingIndicator.classList.remove('hidden');
-                mainContent.classList.add('hidden');
-            }
-            
-            /**
-             * โหลดข้อมูลงานซ่อมจาก Google Apps Script
-             */
-            async function loadRepairJobs() {
-                try {
-                    loadingIndicator.classList.remove('hidden');
-                    mainContent.classList.add('hidden');
-                    
-                    // ดึงข้อมูลทั้ง IT และ EN พร้อมกัน
-                    const [itResponse, enResponse] = await Promise.all([
-                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}&formType=IT`),
-                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}&formType=EN`)
-                    ]);
-                    
-                    const itData = await itResponse.json();
-                    const enData = await enResponse.json();
-                    
-                    if (itData.status === 'success' && enData.status === 'success') {
-                        repairJobs = {
-                            IT: itData.data,
-                            EN: enData.data
-                        };
-                        
-                        updateDashboardStats();
-                        filterJobsByStatus(currentStatusFilter);
-                        
-                        // อัปเดตเวลาล่าสุด
-                        const now = new Date();
-                        document.getElementById('lastUpdatedTime').textContent = formatTime(now);
-                        
-                        loadingIndicator.classList.add('hidden');
-                        mainContent.classList.remove('hidden');
-                        
-                        checkNoJobsFound();
-                    } else {
-                        throw new Error(itData.message || enData.message || 'Failed to load repair jobs');
-                    }
-                } catch (error) {
-                    console.error('Error loading repair jobs:', error);
-                    showError('เกิดข้อผิดพลาดในการโหลดข้อมูล', error.message);
-                }
-            }
-            
-            /**
-             * อัปเดตสถิติบนแดชบอร์ด
-             */
-            function updateDashboardStats() {
-                const jobs = repairJobs[currentJobType];
-                const totalJobs = jobs.length;
-                const newJobs = jobs.filter(job => job.status === 'แจ้งซ่อมใหม่').length;
-                const pendingJobs = jobs.filter(job => job.status === 'รอดำเนินการ').length;
-                const inProgressJobs = jobs.filter(job => job.status === 'กำลังดำเนินการ').length;
-                const completedJobs = jobs.filter(job => job.status === 'เสร็จสิ้น').length;
-                
-                document.getElementById('totalJobsCount').textContent = totalJobs;
-                document.getElementById('newJobsCount').textContent = newJobs;
-                document.getElementById('pendingJobsCount').textContent = pendingJobs;
-                document.getElementById('inProgressJobsCount').textContent = inProgressJobs;
-                document.getElementById('completedJobsCount').textContent = completedJobs;
-            }
-            
-            /**
-             * กรองงานตามประเภท
-             * @param {string} type - ประเภทงาน ('IT' หรือ 'EN')
-             */
-            function filterJobsByType(type) {
-                currentJobType = type;
-                document.getElementById('currentJobType').textContent = `(${type})`;
-                document.body.classList.toggle('show-en', type === 'EN');
-                
-                // อัปเดตแท็บที่ active
-                jobTypeTabs.forEach(tab => {
-                    tab.classList.toggle('active', tab.dataset.type === type);
-                });
-                
-                // กรองงานตามสถานะที่เลือก
-                filterJobsByStatus(currentStatusFilter);
-                
-                // อัปเดตสถิติแดชบอร์ด
-                updateDashboardStats();
-            }
-            
-            /**
-             * กรองงานตามสถานะ
-             * @param {string} status - สถานะงาน ('all', 'new', 'pending', 'in-progress', 'completed')
-             */
-            function filterJobsByStatus(status) {
-                currentStatusFilter = status;
-                
-                // อัปเดตแท็บสถานะ
-                statusTabs.forEach(tab => {
-                    tab.classList.remove('active-tab-style');
-                    if (tab.dataset.status === status) {
-                        tab.classList.add('active-tab-style');
-                    }
-                });
-                
-                // กรองงานตามสถานะและประเภท
-                let jobs = [...repairJobs[currentJobType]];
-                
-                switch(status) {
-                    case 'new':
-                        jobs = jobs.filter(job => job.status === 'แจ้งซ่อมใหม่');
-                        break;
-                    case 'pending':
-                        jobs = jobs.filter(job => job.status === 'รอดำเนินการ');
-                        break;
-                    case 'in-progress':
-                        jobs = jobs.filter(job => job.status === 'กำลังดำเนินการ');
-                        break;
-                    case 'completed':
-                        jobs = jobs.filter(job => job.status === 'เสร็จสิ้น');
-                        break;
-                }
-                
-                filteredJobs = jobs;
-                renderJobList();
-                
-                // ล้างการเลือกงานถ้าไม่อยู่ในรายการที่กรองแล้ว
-                if (selectedJobId && !filteredJobs.some(job => job.jobId === selectedJobId)) {
-                    selectedJobId = null;
-                    jobDetailsContainer.classList.add('hidden');
-                    emptyDetails.classList.remove('hidden');
-                    detailHeader.classList.add('hidden');
-                }
-                
-                checkNoJobsFound();
-            }
-            
-            /**
-             * ตรวจสอบว่ามีงานที่พบหรือไม่
-             */
-            function checkNoJobsFound() {
-                const hasJobs = filteredJobs.length > 0;
-                noJobsFound.classList.toggle('hidden', hasJobs);
-            }
-            
-            /**
-             * แสดงรายการงานซ่อม
-             */
-            function renderJobList() {
-                jobsContainer.innerHTML = '';
-                document.getElementById('jobCount').textContent = filteredJobs.length;
-                
-                if (filteredJobs.length === 0) {
-                    checkNoJobsFound();
-                    return;
-                }
-                
-                filteredJobs.forEach((job, index) => {
-                    const jobCard = document.createElement('div');
-                    jobCard.className = `glass-card job-card cursor-pointer animate-slide-up p-4`;
-                    jobCard.style.animationDelay = `${index * 50}ms`;
-                    jobCard.id = `job-${job.jobId}`;
-                    jobCard.onclick = () => selectJob(job.jobId);
-                    
-                    // ข้อมูลสถานะและความเร่งด่วน
-                    const statusInfo = getStatusInfo(job.status);
-                    const priorityInfo = getPriorityInfo(job.urgency);
-                    
-                    // ข้อมูลปัญหา
-                    const problemInfo = currentJobType === 'IT' 
-                        ? job.problemType || 'ไม่ระบุประเภทปัญหา'
-                        : job.machineName ? `${job.machineName} (${job.jobType || 'ไม่ระบุ'})` : job.jobType || 'ไม่ระบุประเภทงาน';
-                    
-                    jobCard.innerHTML = `
-                        <div class="flex items-start justify-between mb-3">
-                            <div>
-                                <h3 class="font-bold text-gray-800 text-lg">${job.jobId || 'N/A'}</h3>
-                                <p class="text-gray-600 text-sm">${problemInfo}</p>
-                            </div>
-                            <div class="flex flex-col items-end gap-2">
-                                <span class="status-badge ${statusInfo.class}">
-                                    <i class="fas ${statusInfo.icon} mr-1"></i>
-                                    ${statusInfo.text}
-                                </span>
-                                ${priorityInfo ? `
-                                    <span class="priority-badge ${priorityInfo.class}">
-                                        ${priorityInfo.text}
-                                    </span>
-                                ` : ''}
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-2 text-sm text-gray-700">
-                            <div class="flex items-center">
-                                <i class="fas fa-user-circle mr-2 text-gray-500"></i>
-                                <span>${job.fullName || 'ไม่ระบุชื่อ'} (${job.department || 'ไม่ระบุแผนก'})</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-calendar-alt mr-2 text-gray-500"></i>
-                                <span>${formatDate(job.timestamp)}</span>
-                            </div>
-                        </div>
-                    `;
-                    
-                    jobsContainer.appendChild(jobCard);
-                });
+    <!-- รายละเอียด -->
+    <div id="detailBox" class="bg-white rounded shadow p-4 hidden">
+      <h3 class="font-semibold mb-2">รายละเอียด <span id="detailJobId"></span></h3>
+      <div id="detailContent" class="text-sm space-y-1"></div>
+    </div>
+  </main>
 
-                // เลือกงานเดิมถ้ายังอยู่ในรายการ
-                if (selectedJobId) {
-                    const prevSelectedCard = document.getElementById(`job-${selectedJobId}`);
-                    if (prevSelectedCard) {
-                        prevSelectedCard.classList.add('selected');
-                    }
-                }
-            }
-            
-            /**
-             * เลือกงานเพื่อดูรายละเอียด
-             * @param {string} jobId - ID งานที่เลือก
-             */
-            function selectJob(jobId) {
-                const selectedJob = filteredJobs.find(job => job.jobId === jobId);
-                if (!selectedJob) return;
-                
-                document.querySelectorAll('.job-card').forEach(card => {
-                    card.classList.remove('selected');
-                });
-                
-                const currentSelectedCard = document.getElementById(`job-${jobId}`);
-                if (currentSelectedCard) {
-                    currentSelectedCard.classList.add('selected');
-                }
+  <script>
+    const LIFF_ID = '2007374280-GR1Q3YxJ';                 // <-- แก้เป็น LIFF คุณ
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
 
-                selectedJobId = jobId;
-                renderJobDetails(selectedJob);
-            }
-            
-            /**
-             * แสดงรายละเอียดงาน
-             * @param {object} job - ข้อมูลงาน
-             */
-            function renderJobDetails(job) {
-                emptyDetails.classList.add('hidden');
-                detailHeader.classList.remove('hidden');
-                jobDetailsContainer.classList.remove('hidden');
-                
-                // ข้อมูลสถานะ
-                const statusInfo = getStatusInfo(job.status);
-                
-                // ส่วนไฟล์แนบ
-                const fileAttachmentsHtml = createFileAttachmentsHtml(job);
-                
-                // ส่วนความคืบหน้า
-                const progressNotesHtml = createProgressNotesHtml(job);
-                
-                // ส่วนข้อมูลเฉพาะประเภทงาน
-                const typeSpecificHtml = createTypeSpecificHtml(job);
-                
-                // ส่วนข้อมูลผู้รับผิดชอบและวันที่
-                const assignedInfoHtml = createAssignedInfoHtml(job);
-                
-                // สร้าง HTML ทั้งหมด
-                jobDetailsContainer.innerHTML = `
-                    <div class="p-6 space-y-6">
-                        <div class="flex items-center justify-between border-b pb-4 mb-4">
-                            <div class="flex items-center">
-                                <i class="fas ${statusInfo.icon} mr-3 text-${statusInfo.color}-500 text-xl"></i>
-                                <span class="text-lg font-semibold text-gray-800">สถานะ: ${statusInfo.text}</span>
-                            </div>
-                            <span class="status-badge ${statusInfo.class}">
-                                <i class="fas ${statusInfo.icon} mr-1"></i>
-                                ${statusInfo.text}
-                            </span>
-                        </div>
+    let userId = '', currentType = 'IT', currentStatus = 'all', jobs = [];
 
-                        ${assignedInfoHtml}
-                        ${typeSpecificHtml}
-                        ${fileAttachmentsHtml}
-                        ${progressNotesHtml}
+    const $ = sel => document.querySelector(sel);
+    const formatDate = d => new Date(d).toLocaleDateString('th-TH');
+    const statusMap = {
+      'แจ้งซ่อมใหม่': { cls:'bg-blue-500', text:'ใหม่' },
+      'รอดำเนินการ':   { cls:'bg-orange-500', text:'รอดำเนินการ' },
+      'กำลังดำเนินการ':{ cls:'bg-yellow-500', text:'กำลังทำ' },
+      'เสร็จสิ้น':      { cls:'bg-green-500', text:'เสร็จ' }
+    };
 
-                        <div class="text-right text-xs text-gray-500 pt-4 border-t mt-4">
-                            แจ้งซ่อมเมื่อ: ${formatDateTime(job.timestamp)}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            /**
-             * สร้าง HTML สำหรับข้อมูลผู้รับผิดชอบและวันที่
-             * @param {object} job - ข้อมูลงาน
-             * @returns {string} HTML string
-             */
-            function createAssignedInfoHtml(job) {
-                const assignedTo = job.assignedTo || job.responsible || 'ยังไม่มีผู้รับผิดชอบ';
-                const completionDate = job.estimatedCompletion || job.finishDate;
-                
-                return `
-                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 shadow-sm">
-                        <p class="text-sm text-gray-600 mb-1">
-                            <i class="fas fa-user-tie mr-2"></i> ผู้รับผิดชอบ: 
-                            <span class="font-medium">${assignedTo}</span>
-                        </p>
-                        ${completionDate ? `
-                            <p class="text-sm text-gray-600">
-                                <i class="fas fa-hourglass-half mr-2"></i> 
-                                ${currentJobType === 'IT' ? 'คาดว่าจะเสร็จ:' : 'วันที่เสร็จ:'} 
-                                <span class="font-medium">${formatDate(completionDate)}</span>
-                            </p>
-                        ` : ''}
-                    </div>
-                `;
-            }
-            
-            /**
-             * สร้าง HTML สำหรับข้อมูลเฉพาะประเภทงาน
-             * @param {object} job - ข้อมูลงาน
-             * @returns {string} HTML string
-             */
-            function createTypeSpecificHtml(job) {
-                if (currentJobType === 'IT') {
-                    return `
-                        <div>
-                            <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลปัญหา</h4>
-                            <ul class="space-y-2 text-sm text-gray-700">
-                                <li><strong>ประเภทปัญหา:</strong> ${job.problemType || 'ไม่ระบุ'}</li>
-                                <li><strong>รายละเอียด:</strong> ${job.problemDetails || 'ไม่มีรายละเอียดเพิ่มเติม'}</li>
-                                <li><strong>อุปกรณ์:</strong> ${job.device || 'ไม่ระบุ'}</li>
-                                <li><strong>ความเร่งด่วน:</strong> ${job.urgency || 'ไม่ระบุ'}</li>
-                                <li><strong>สำนักงาน:</strong> ${job.office || 'ไม่ระบุ'}</li>
-                            </ul>
-                        </div>
-                    `;
-                } else {
-                    return `
-                        <div>
-                            <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลเครื่องจักร</h4>
-                            <ul class="space-y-2 text-sm text-gray-700">
-                                <li><strong>ชื่อเครื่องจักร:</strong> ${job.machineName || 'ไม่ระบุ'}</li>
-                                <li><strong>สถานะเครื่อง:</strong> ${job.machineStatus || 'ไม่ระบุ'}</li>
-                                <li><strong>ประเภทงาน:</strong> ${job.jobType || 'ไม่ระบุ'}</li>
-                                <li><strong>รายละเอียดปัญหา:</strong> ${job.problemDescription || 'ไม่มีรายละเอียด'}</li>
-                                <li><strong>สาเหตุ:</strong> ${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</li>
-                            </ul>
-                        </div>
-                        <div class="en-specific">
-                            <h4 class="font-semibold mb-3 text-gray-700">การซ่อมบำรุง</h4>
-                            <ul class="space-y-2 text-sm text-gray-700">
-                                <li><strong>รายละเอียดการซ่อม:</strong> ${job.maintenanceDescription || 'ไม่มีข้อมูล'}</li>
-                                <li><strong>การดำเนินการ:</strong> ${job.maintenanceAction || 'ไม่ระบุ'}</li>
-                                <li><strong>อะไหล่ที่ใช้:</strong> ${job.sparePartsUsed || 'ไม่มี'}</li>
-                                <li><strong>จำนวน:</strong> ${job.quantity || '0'}</li>
-                            </ul>
-                        </div>
-                    `;
-                }
-            }
-            
-            /**
-             * สร้าง HTML สำหรับไฟล์แนบ
-             * @param {object} job - ข้อมูลงาน
-             * @returns {string} HTML string
-             */
-            function createFileAttachmentsHtml(job) {
-                const urls = job.imageViewUrls || job.driveUrls || [];
-                if (urls.length === 0) return '';
-                
-                // แปลง string URLs เป็น array ถ้าเป็น string
-                const urlArray = typeof urls === 'string' ? urls.split(',').map(url => url.trim()) : urls;
-                const validUrls = urlArray.filter(url => url.length > 0);
-                
-                if (validUrls.length === 0) return '';
-                
-                return `
-                    <div>
-                        <h4 class="font-semibold mb-3 text-gray-700">ไฟล์แนบประกอบปัญหา (${validUrls.length} รูป)</h4>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                            ${validUrls.map(url => `
-                                <a href="${url}" target="_blank" class="block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-                                    <img src="${url}" alt="ไฟล์แนบ" class="w-full h-24 object-cover" onerror="this.style.display='none'">
-                                </a>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            /**
-             * สร้าง HTML สำหรับบันทึกความคืบหน้า
-             * @param {object} job - ข้อมูลงาน
-             * @returns {string} HTML string
-             */
-            function createProgressNotesHtml(job) {
-                const notes = job.notes || job.maintenanceNote || '';
-                if (!notes || notes.length === 0) return '';
-                
-                // แปลงเป็น array ถ้าเป็น string
-                const notesArray = typeof notes === 'string' ? notes.split('\n').filter(n => n.trim().length > 0) : notes;
-                
-                if (notesArray.length === 0) return '';
-                
-                return `
-                    <div>
-                        <h4 class="font-semibold mb-3 text-gray-700">ความคืบหน้าการดำเนินงาน</h4>
-                        <div class="space-y-3">
-                            ${notesArray.map(note => `
-                                <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                                    <p class="text-sm text-gray-700">${note}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            /**
-             * ข้อมูลสถานะงาน
-             * @param {string} status - สถานะงาน
-             * @returns {object} ข้อมูลสถานะ
-             */
-            function getStatusInfo(status) {
-                switch(status) {
-                    case 'แจ้งซ่อมใหม่':
-                        return { class: 'status-new', icon: 'fa-file-circle-plus', text: 'แจ้งซ่อมใหม่', color: 'blue' };
-                    case 'รอดำเนินการ':
-                        return { class: 'status-pending', icon: 'fa-clock', text: 'รอดำเนินการ', color: 'orange' };
-                    case 'กำลังดำเนินการ':
-                        return { class: 'status-in-progress', icon: 'fa-tools', text: 'กำลังดำเนินการ', color: 'yellow' };
-                    case 'เสร็จสิ้น':
-                        return { class: 'status-completed', icon: 'fa-check-circle', text: 'เสร็จสิ้น', color: 'green' };
-                    case 'ยกเลิก':
-                        return { class: 'status-cancelled', icon: 'fa-times-circle', text: 'ยกเลิก', color: 'gray' };
-                    default:
-                        return { class: 'status-pending', icon: 'fa-clock', text: status || 'ไม่ทราบสถานะ', color: 'gray' };
-                }
-            }
-            
-            /**
-             * ข้อมูลความเร่งด่วน
-             * @param {string} priority - ระดับความเร่งด่วน
-             * @returns {object|null} ข้อมูลความเร่งด่วน
-             */
-            function getPriorityInfo(priority) {
-                if (!priority) return null;
-                
-                switch(priority.toLowerCase()) {
-                    case 'ต่ำ':
-                        return { class: 'priority-low', text: 'ต่ำ' };
-                    case 'ปานกลาง':
-                    case 'normal':
-                        return { class: 'priority-medium', text: 'ปานกลาง' };
-                    case 'สูง':
-                    case 'high':
-                        return { class: 'priority-high', text: 'สูง' };
-                    case 'ด่วนมาก':
-                    case 'critical':
-                        return { class: 'priority-critical', text: 'ด่วนมาก' };
-                    default:
-                        return { class: 'priority-medium', text: priority };
-                }
-            }
-            
-            /**
-             * จัดรูปแบบวันที่
-             * @param {string} dateString - วันที่ในรูปแบบ string
-             * @returns {string} วันที่ที่จัดรูปแบบแล้ว
-             */
-            function formatDate(dateString) {
-                if (!dateString) return 'ไม่ระบุ';
-                const date = new Date(dateString);
-                return date.toLocaleDateString('th-TH', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
-            }
-            
-            /**
-             * จัดรูปแบบวันที่และเวลา
-             * @param {string} dateTimeString - วันที่และเวลาในรูปแบบ string
-             * @returns {string} วันที่และเวลาที่จัดรูปแบบแล้ว
-             */
-            function formatDateTime(dateTimeString) {
-                if (!dateTimeString) return 'ไม่ระบุ';
-                const date = new Date(dateTimeString);
-                return date.toLocaleString('th-TH', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                });
-            }
-            
-            /**
-             * จัดรูปแบบเวลา
-             * @param {Date} dateObj - วัตถุ Date
-             * @returns {string} เวลาที่จัดรูปแบบแล้ว
-             */
-            function formatTime(dateObj) {
-                return dateObj.toLocaleTimeString('th-TH', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                });
-            }
-            
-            /**
-             * ตั้งค่าการค้นหา
-             */
-            function setupSearch() {
-                jobSearch.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-                    
-                    if (searchTerm === '') {
-                        filterJobsByStatus(currentStatusFilter);
-                        return;
-                    }
-                    
-                    filteredJobs = repairJobs[currentJobType].filter(job => {
-                        return (
-                            (job.jobId && job.jobId.toLowerCase().includes(searchTerm)) ||
-                            (job.problemDetails && job.problemDetails.toLowerCase().includes(searchTerm)) ||
-                            (job.problemDescription && job.problemDescription.toLowerCase().includes(searchTerm)) ||
-                            (job.machineName && job.machineName.toLowerCase().includes(searchTerm)) ||
-                            (job.problemType && job.problemType.toLowerCase().includes(searchTerm)) ||
-                            (job.jobType && job.jobType.toLowerCase().includes(searchTerm))
-                        );
-                    });
-                    
-                    renderJobList();
-                    checkNoJobsFound();
-                });
-            }
-            
-            /**
-             * กลับไปหน้าก่อนหน้า
-             */
-            function goBack() {
-                if (liff.isInClient()) {
-                    liff.closeWindow();
-                } else {
-                    window.location.href = 'https://liff.line.me/2007374280-GEYwyNdl';
-                }
-            }
-            
-            // ตั้งค่า Event Listeners
-            statCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    filterJobsByStatus(this.dataset.status);
-                });
-            });
-            
-            statusTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    filterJobsByStatus(this.dataset.status);
-                });
-            });
-            
-            jobTypeTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    filterJobsByType(this.dataset.type);
-                });
-            });
-            
-            refreshBtn.addEventListener('click', loadRepairJobs);
-            backBtn.addEventListener('click', goBack);
-            
-            // เริ่มต้นแอปพลิเคชัน
-            window.onload = function() {
-                initializeLiff();
-                setupSearch();
-            };
-        });
-    </script>
+    async function loadJobs() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getRepairJobs&userId=${userId}&formType=${currentType}`);
+        const data = await res.json();
+        if (data.status === 'success') {
+          jobs = data.data;
+          filterJobs();
+        } else alert(data.message);
+      } catch (e) { alert('โหลดข้อมูลไม่สำเร็จ'); }
+    }
+
+    function filterJobs() {
+      let list = jobs;
+      switch (currentStatus) {
+        case 'new':    list = list.filter(j => j.status === 'แจ้งซ่อมใหม่'); break;
+        case 'pending':list = list.filter(j => j.status === 'รอดำเนินการ'); break;
+        case 'in-progress':list = list.filter(j => j.status === 'กำลังดำเนินการ'); break;
+        case 'completed':list = list.filter(j => j.status === 'เสร็จสิ้น'); break;
+      }
+      renderList(list);
+      updateStats(list);
+    }
+
+    function updateStats(list) {
+      $('#statAll').textContent = jobs.length;
+      $('#statNew').textContent = jobs.filter(j => j.status === 'แจ้งซ่อมใหม่').length;
+      $('#statPending').textContent = jobs.filter(j => j.status === 'รอดำเนินการ').length;
+      $('#statProgress').textContent = jobs.filter(j => j.status === 'กำลังดำเนินการ').length;
+      $('#statDone').textContent = jobs.filter(j => j.status === 'เสร็จสิ้น').length;
+    }
+
+    function renderList(list) {
+      const box = $('#jobList'); box.innerHTML = '';
+      $('#jobCount').textContent = list.length;
+      $('#emptyMsg').classList.toggle('hidden', list.length);
+      list.forEach(j=>{
+        const card = document.createElement('div');
+        card.className='border rounded-lg p-3 cursor-pointer hover:bg-blue-50';
+        card.innerHTML=`
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-bold text-blue-700">${j.jobId}</div>
+              <div class="text-sm text-gray-600">${j.fullName || ''} (${j.department || ''})</div>
+            </div>
+            <span class="px-2 py-1 rounded-full text-xs text-white ${statusMap[j.status]?.cls||'bg-gray-400'}">${statusMap[j.status]?.text||j.status}</span>
+          </div>
+          <div class="text-xs text-gray-500 mt-1">${currentType==='IT'?(j.problemType||'-'):(j.machineName||'-')}</div>
+          <div class="text-xs text-gray-400">${formatDate(j.timestamp)}</div>
+        `;
+        card.onclick = ()=> showDetail(j);
+        box.appendChild(card);
+      });
+    }
+
+    function showDetail(j) {
+      $('#detailJobId').textContent = j.jobId;
+      $('#detailContent').innerHTML=`
+        <p><strong>ผู้แจ้ง:</strong> ${j.fullName || ''} (${j.department || ''})</p>
+        <p><strong>สถานะ:</strong> ${j.status}</p>
+        <p><strong>วันที่แจ้ง:</strong> ${formatDate(j.timestamp)}</p>
+        ${currentType==='IT' ? `
+          <p><strong>ประเภทปัญหา:</strong> ${j.problemType || '-'}</p>
+          <p><strong>รายละเอียด:</strong> ${j.problemDetails || '-'}</p>
+          <p><strong>อุปกรณ์:</strong> ${j.device || '-'}</p>
+        ` : `
+          <p><strong>เครื่องจักร:</strong> ${j.machineName || '-'}</p>
+          <p><strong>ประเภทงาน:</strong> ${j.jobType || '-'}</p>
+          <p><strong>ปัญหา:</strong> ${j.problemDescription || '-'}</p>
+        `}
+      `;
+      $('#detailBox').classList.remove('hidden');
+    }
+
+    /* Event */
+    document.addEventListener('click', e=>{
+      if(e.target.classList.contains('typeTab')){
+        currentType=e.target.dataset.type;
+        document.querySelectorAll('.typeTab').forEach(t=>t.className='typeTab flex-1 py-2 rounded bg-gray-300 text-gray-700');
+        e.target.className='typeTab flex-1 py-2 rounded bg-blue-600 text-white font-semibold';
+        loadJobs();
+      }
+      if(e.target.classList.contains('statusBtn')){
+        currentStatus=e.target.dataset.st;
+        document.querySelectorAll('.statusBtn').forEach(b=>b.className='statusBtn bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm');
+        e.target.className='statusBtn bg-blue-600 text-white px-3 py-1 rounded text-sm';
+        filterJobs();
+      }
+    });
+    $('#refreshBtn').onclick = loadJobs;
+    $('#backBtn').onclick = ()=> liff.isInClient()?liff.closeWindow():history.back();
+
+    /* LIFF */
+    async function initLiff(){
+      await liff.init({liffId:LIFF_ID});
+      if(!liff.isLoggedIn()){liff.login();return;}
+      const p=await liff.getProfile();
+      userId=p.userId;
+      loadJobs();
+    }
+    window.onload = initLiff;
+  </script>
 </body>
 </html>
