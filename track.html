@@ -401,56 +401,60 @@
             /**
              * โหลดข้อมูลงานซ่อมจาก Google Apps Script
              */
-           async function initializeLiff() {
-    try {
-        await liff.init({ liffId });
-        
-        if (!liff.isLoggedIn()) {
-            liff.login();
-            return;
-        }
-        
-        const profile = await liff.getProfile();
-        // เพิ่มการตรวจสอบว่ามีข้อมูล profile หรือไม่
-        if (!profile || !profile.userId) {
-            throw new Error('ไม่สามารถรับข้อมูลโปรไฟล์จาก LINE ได้');
-        }
-        
-        userId = profile.userId;
-        userDisplayName = profile.displayName || 'ไม่ระบุชื่อ';
-        userPictureUrl = profile.pictureUrl || '';
-        
-        await loadRepairJobs();
-        
-    } catch (error) {
-        console.error('LIFF initialization failed:', error);
-        // แสดงข้อความผิดพลาดที่เข้าใจง่ายขึ้น
-        showError('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'กรุณาลองใหม่อีกครั้งหรือติดต่อผู้ดูแลระบบ');
-    }
-}
-
-async function loadRepairJobs() {
-    try {
-        // เพิ่มการตรวจสอบว่า userId มีค่าหรือไม่
-        if (!userId) {
-            throw new Error('ไม่พบข้อมูลผู้ใช้ (userId)');
-        }
-        
-        loadingIndicator.classList.remove('hidden');
-        mainContent.classList.add('hidden');
-        
-        // ดึงข้อมูลทั้ง IT และ EN พร้อมกัน
-        const [itResponse, enResponse] = await Promise.all([
-            fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT`),
-            fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN`)
-        ]);
-        
-        // ...โค้ดเดิม...
-    } catch (error) {
-        console.error('Error loading repair jobs:', error);
-        showError('โหลดข้อมูลงานซ่อมไม่สำเร็จ', error.message || 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
-    }
-}
+            async function loadRepairJobs() {
+                try {
+                    if (!userId) {
+                        throw new Error('ไม่พบข้อมูลผู้ใช้ (userId)');
+                    }
+                    
+                    loadingIndicator.classList.remove('hidden');
+                    mainContent.classList.add('hidden');
+                    
+                    // ดึงข้อมูลทั้ง IT และ EN พร้อมกัน
+                    const [itResponse, enResponse] = await Promise.all([
+                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT`),
+                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN`)
+                    ]);
+                    
+                    // ตรวจสอบสถานะการตอบกลับ
+                    if (!itResponse.ok || !enResponse.ok) {
+                        throw new Error('การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา');
+                    }
+                    
+                    const [itData, enData] = await Promise.all([
+                        itResponse.json(),
+                        enResponse.json()
+                    ]);
+                    
+                    // ตรวจสอบสถานะการตอบกลับจาก API
+                    if (itData.status === 'error' || enData.status === 'error') {
+                        throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
+                    }
+                    
+                    // บันทึกข้อมูลงานซ่อม
+                    repairJobs.IT = itData.data || [];
+                    repairJobs.EN = enData.data || [];
+                    
+                    // อัปเดต UI
+                    updateDashboardStats();
+                    filterJobsByType(currentJobType);
+                    
+                    // ซ่อนตัวโหลดและแสดงเนื้อหาหลัก
+                    loadingIndicator.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                    
+                    // อัปเดตเวลาล่าสุด
+                    document.getElementById('lastUpdatedTime').textContent = new Date().toLocaleString('th-TH', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                    
+                } catch (error) {
+                    console.error('Error loading repair jobs:', error);
+                    showError('โหลดข้อมูลงานซ่อมไม่สำเร็จ', error.message || 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
+                }
+            }
             
             /**
              * อัปเดตสถิติบนแดชบอร์ด
@@ -890,19 +894,6 @@ async function loadRepairJobs() {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                });
-            }
-            
-            /**
-             * จัดรูปแบบเวลา
-             * @param {Date} dateObj - วัตถุ Date
-             * @returns {string} เวลาที่จัดรูปแบบแล้ว
-             */
-            function formatTime(dateObj) {
-                return dateObj.toLocaleTimeString('th-TH', {
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: false
