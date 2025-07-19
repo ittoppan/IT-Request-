@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบติดตามงานแจ้งซ่อม</title>
-    <!-- Replace CDN with local Tailwind CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -44,42 +43,23 @@
         }
         
         .status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
+            @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
         }
         
-        .status-new { background-color: #dbeafe; color: #1e40af; }
-        .dark .status-new { background-color: #1e3a8a; color: #dbeafe; }
-        .status-pending { background-color: #ffedd5; color: #9a3412; }
-        .dark .status-pending { background-color: #9a3412; color: #ffedd5; }
-        .status-in-progress { background-color: #fef3c7; color: #92400e; }
-        .dark .status-in-progress { background-color: #92400e; color: #fef3c7; }
-        .status-completed { background-color: #dcfce7; color: #166534; }
-        .dark .status-completed { background-color: #166534; color: #dcfce7; }
-        .status-cancelled { background-color: #f3f4f6; color: #374151; }
-        .dark .status-cancelled { background-color: #374151; color: #f3f4f6; }
+        .status-new { @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100; }
+        .status-pending { @apply bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100; }
+        .status-in-progress { @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100; }
+        .status-completed { @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100; }
+        .status-cancelled { @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100; }
         
         .priority-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
+            @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
         }
         
-        .priority-low { background-color: #f3f4f6; color: #374151; }
-        .dark .priority-low { background-color: #374151; color: #f3f4f6; }
-        .priority-medium { background-color: #dbeafe; color: #1e40af; }
-        .dark .priority-medium { background-color: #1e3a8a; color: #dbeafe; }
-        .priority-high { background-color: #ffedd5; color: #9a3412; }
-        .dark .priority-high { background-color: #9a3412; color: #ffedd5; }
-        .priority-critical { background-color: #fee2e2; color: #991b1b; }
-        .dark .priority-critical { background-color: #991b1b; color: #fee2e2; }
+        .priority-low { @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100; }
+        .priority-medium { @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100; }
+        .priority-high { @apply bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100; }
+        .priority-critical { @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100; }
         
         .animate-fade-in {
             animation: fadeIn 0.5s ease-in-out;
@@ -91,14 +71,14 @@
         }
         
         .file-icon {
-            font-size: 1.5rem;
+            @apply text-4xl;
         }
         
-        .pdf-icon { color: #ef4444; }
-        .doc-icon { color: #3b82f6; }
-        .xls-icon { color: #10b981; }
-        .img-icon { color: #8b5cf6; }
-        .file-icon-default { color: #9ca3af; }
+        .pdf-icon { @apply text-red-500; }
+        .doc-icon { @apply text-blue-500; }
+        .xls-icon { @apply text-green-500; }
+        .img-icon { @apply text-purple-500; }
+        .file-icon-default { @apply text-gray-400; }
         
         /* Lightbox styles */
         .lightbox {
@@ -1061,7 +1041,7 @@
                             <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">รูปภาพแจ้งซ่อม (${imageUrls.length})</h4>
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 ${imageUrls.map((url, index) => `
-                                    <div class="relative group cursor-pointer" onclick="openLightbox(${JSON.stringify(imageUrls)}, ${index})">
+                                    <div class="relative group cursor-pointer" onclick="openLightbox(imageUrls, ${index})">
                                         <img src="${url}" alt="รูปภาพแจ้งซ่อม" 
                                             class="w-full h-32 object-cover rounded-lg shadow hover:shadow-md transition-shadow"
                                             onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
@@ -1193,17 +1173,17 @@
             function getStatusInfo(status) {
                 switch(status) {
                     case 'แจ้งซ่อมใหม่':
-                        return { class: 'status-new', icon: 'fas fa-file-circle-plus', text: 'แจ้งซ่อมใหม่', color: 'blue' };
+                        return { class: 'status-new', icon: 'fas fa-file-circle-plus text-blue-500', text: 'แจ้งซ่อมใหม่', color: 'blue' };
                     case 'รอดำเนินการ':
-                        return { class: 'status-pending', icon: 'fas fa-clock', text: 'รอดำเนินการ', color: 'orange' };
+                        return { class: 'status-pending', icon: 'fas fa-clock text-orange-500', text: 'รอดำเนินการ', color: 'orange' };
                     case 'กำลังดำเนินการ':
-                        return { class: 'status-in-progress', icon: 'fas fa-tools', text: 'กำลังดำเนินการ', color: 'yellow' };
+                        return { class: 'status-in-progress', icon: 'fas fa-tools text-yellow-500', text: 'กำลังดำเนินการ', color: 'yellow' };
                     case 'เสร็จสิ้น':
-                        return { class: 'status-completed', icon: 'fas fa-check-circle', text: 'เสร็จสิ้น', color: 'green' };
+                        return { class: 'status-completed', icon: 'fas fa-check-circle text-green-500', text: 'เสร็จสิ้น', color: 'green' };
                     case 'ยกเลิก':
-                        return { class: 'status-cancelled', icon: 'fas fa-times-circle', text: 'ยกเลิก', color: 'gray' };
+                        return { class: 'status-cancelled', icon: 'fas fa-times-circle text-gray-500', text: 'ยกเลิก', color: 'gray' };
                     default:
-                        return { class: 'status-pending', icon: 'fas fa-clock', text: status || 'ไม่ทราบสถานะ', color: 'gray' };
+                        return { class: 'status-pending', icon: 'fas fa-clock text-gray-500', text: status || 'ไม่ทราบสถานะ', color: 'gray' };
                 }
             }
             
@@ -1309,7 +1289,7 @@
                             parseInt(isoFormat[1]),
                             parseInt(isoFormat[2]) - 1,
                             parseInt(isoFormat[3])
-                        ));
+                        );
                     }
                     
                     // รูปแบบ dd/mm/yyyy
