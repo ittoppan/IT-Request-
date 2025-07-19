@@ -551,19 +551,15 @@
                     loadingIndicator.classList.remove('hidden');
                     mainContent.classList.add('hidden');
                     
-                    // ดึงข้อมูลทั้ง IT และ EN พร้อมกัน
-                    const [itResponse, enResponse] = await Promise.all([
-                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}&formType=IT`),
-                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}&formType=EN`)
-                    ]);
+                    // ดึงข้อมูลงานซ่อม
+                    const response = await fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}&formType=all`);
+                    const data = await response.json();
                     
-                    const itData = await itResponse.json();
-                    const enData = await enResponse.json();
-                    
-                    if (itData.status === 'success' && enData.status === 'success') {
+                    if (data.status === 'success') {
+                        // แบ่งข้อมูลเป็น IT และ EN
                         repairJobs = {
-                            IT: itData.data,
-                            EN: enData.data
+                            IT: data.data.filter(job => job.formType === 'IT'),
+                            EN: data.data.filter(job => job.formType === 'EN')
                         };
                         
                         updateDashboardStats();
@@ -578,7 +574,7 @@
                         
                         checkNoJobsFound();
                     } else {
-                        throw new Error(itData.message || enData.message || 'Failed to load repair jobs');
+                        throw new Error(data.message || 'Failed to load repair jobs');
                     }
                 } catch (error) {
                     console.error('Error loading repair jobs:', error);
@@ -886,6 +882,10 @@
                 detailHeader.classList.remove('hidden');
                 jobDetailsContainer.classList.remove('hidden');
                 
+                // ตั้งค่าข้อมูลส่วนหัว
+                document.getElementById('detailJobType').textContent = job.formType || 'IT';
+                document.getElementById('detailJobId').textContent = job.jobId || '';
+                
                 // ข้อมูลสถานะ
                 const statusInfo = getStatusInfo(job.status);
                 
@@ -1098,7 +1098,7 @@
              * @returns {string} HTML string
              */
             function createTypeSpecificHtml(job) {
-                if (currentJobType === 'IT') {
+                if (job.formType === 'IT') {
                     return `
                         <div>
                             <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลปัญหา</h4>
@@ -1142,12 +1142,19 @@
              * @returns {string} HTML string
              */
             function createFileAttachmentsHtml(job) {
-                const urls = job.imageViewUrls || job.driveUrls || [];
-                if (urls.length === 0) return '';
+                let urls = [];
                 
-                // แปลง string URLs เป็น array ถ้าเป็น string
-                const urlArray = typeof urls === 'string' ? urls.split(',').map(url => url.trim()) : urls;
-                const validUrls = urlArray.filter(url => url.length > 0);
+                if (job.formType === 'IT') {
+                    urls = job.imageViewUrls || job.driveUrls || [];
+                } else {
+                    // สำหรับงาน EN
+                    if (job.photo1) urls = urls.concat(job.photo1.split(',').map(url => url.trim()));
+                    if (job.photo2) urls = urls.concat(job.photo2.split(',').map(url => url.trim()));
+                    if (job.photo3) urls = urls.concat(job.photo3.split(',').map(url => url.trim()));
+                }
+                
+                // กรอง URL ที่ไม่ถูกต้อง
+                const validUrls = urls.filter(url => url.length > 0 && url.startsWith('http'));
                 
                 if (validUrls.length === 0) return '';
                 
@@ -1171,7 +1178,14 @@
              * @returns {string} HTML string
              */
             function createProgressNotesHtml(job) {
-                const notes = job.notes || job.maintenanceNote || '';
+                let notes = '';
+                
+                if (job.formType === 'IT') {
+                    notes = job.notes || '';
+                } else {
+                    notes = job.maintenanceNote || '';
+                }
+                
                 if (!notes || notes.length === 0) return '';
                 
                 // แปลงเป็น array ถ้าเป็น string
