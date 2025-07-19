@@ -2,184 +2,200 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <title>ติดตามงานแจ้งซ่อม</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ติดตามงานแจ้งซ่อม (เฉพาะของฉัน)</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <style>body{font-family:'Kanit',sans-serif}</style>
+  <script>
+    /* ---- ค่าคงที่ ---- */
+    const LIFF_ID = '2007374280-GR1Q3YxJ';                 // <-- แก้เป็น LIFF คุณ
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
+
+    let userId = '';
+    let currentType = 'IT';
+    let currentStatus = 'all';
+    let jobs = [];          // งานทั้งหมดของผู้ใช้
+    let filteredJobs = [];  // งานที่ผ่านการกรองแล้ว
+  </script>
+  <style>body{font-family:'Kanit',sans-serif;}</style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors">
+<body class="bg-gray-100 text-gray-800">
   <!-- Header -->
-  <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg">
-    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-      <h1 class="text-2xl font-bold">ติดตามงานแจ้งซ่อม</h1>
-      <button id="backBtn" class="text-sm border border-white/30 px-3 py-1 rounded hover:bg-white/20">
-        <i class="fas fa-arrow-left mr-1"></i> กลับ
-      </button>
-    </div>
+  <header class="bg-blue-700 text-white p-4 shadow flex justify-between items-center">
+    <h1 class="text-xl font-semibold">ติดตามงานแจ้งซ่อม</h1>
+    <button id="backBtn" class="text-sm bg-white/20 px-3 py-1 rounded"><i class="fas fa-arrow-left mr-1"></i> กลับ</button>
   </header>
 
   <!-- Main -->
-  <main class="max-w-4xl mx-auto p-4 space-y-6">
+  <main class="max-w-4xl mx-auto p-4 space-y-4">
     <!-- เลือกประเภท -->
     <div class="flex gap-2">
-      <button data-type="IT" id="btnIT" class="typeBtn flex-1 py-2 rounded-lg bg-blue-500 text-white font-semibold">IT</button>
-      <button data-type="EN" id="btnEN" class="typeBtn flex-1 py-2 rounded-lg bg-gray-300 text-gray-700">EN</button>
+      <button data-type="IT" id="tabIT" class="typeTab flex-1 py-2 rounded bg-blue-600 text-white font-semibold">IT</button>
+      <button data-type="EN" id="tabEN" class="typeTab flex-1 py-2 rounded bg-gray-300 text-gray-700">EN</button>
     </div>
 
     <!-- สถิติ -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-      <div class="bg-white dark:bg-gray-800 p-3 rounded shadow"><div id="total" class="text-2xl font-bold text-blue-600">0</div><div class="text-xs">ทั้งหมด</div></div>
-      <div class="bg-white dark:bg-gray-800 p-3 rounded shadow"><div id="new" class="text-2xl font-bold text-blue-500">0</div><div class="text-xs">ใหม่</div></div>
-      <div class="bg-white dark:bg-gray-800 p-3 rounded shadow"><div id="progress" class="text-2xl font-bold text-yellow-500">0</div><div class="text-xs">กำลังทำ</div></div>
-      <div class="bg-white dark:bg-gray-800 p-3 rounded shadow"><div id="done" class="text-2xl font-bold text-green-500">0</div><div class="text-xs">เสร็จ</div></div>
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+      <div class="bg-white rounded p-3 shadow"><div id="statAll" class="text-2xl font-bold text-blue-600">0</div><div class="text-xs">ทั้งหมด</div></div>
+      <div class="bg-white rounded p-3 shadow"><div id="statNew" class="text-2xl font-bold text-blue-500">0</div><div class="text-xs">ใหม่</div></div>
+      <div class="bg-white rounded p-3 shadow"><div id="statPending" class="text-2xl font-bold text-orange-500">0</div><div class="text-xs">รอดำเนินการ</div></div>
+      <div class="bg-white rounded p-3 shadow"><div id="statProgress" class="text-2xl font-bold text-yellow-500">0</div><div class="text-xs">กำลังทำ</div></div>
+      <div class="bg-white rounded p-3 shadow"><div id="statDone" class="text-2xl font-bold text-green-500">0</div><div class="text-xs">เสร็จ</div></div>
     </div>
 
     <!-- กรองสถานะ -->
-    <div class="flex gap-2 flex-wrap">
-      <button data-st="all" class="statusBtn bg-blue-600 text-white px-3 py-1 rounded text-sm">ทั้งหมด</button>
-      <button data-st="แจ้งซ่อมใหม่" class="statusBtn bg-blue-500 text-white px-3 py-1 rounded text-sm">ใหม่</button>
-      <button data-st="กำลังดำเนินการ" class="statusBtn bg-yellow-500 text-white px-3 py-1 rounded text-sm">กำลังทำ</button>
-      <button data-st="เสร็จสิ้น" class="statusBtn bg-green-500 text-white px-3 py-1 rounded text-sm">เสร็จ</button>
+    <div class="flex gap-1 flex-wrap">
+      <button data-st="all"   class="statusBtn bg-blue-600 text-white px-3 py-1 rounded text-sm">ทั้งหมด</button>
+      <button data-st="new"   class="statusBtn bg-blue-500 text-white px-3 py-1 rounded text-sm">ใหม่</button>
+      <button data-st="pending" class="statusBtn bg-orange-500 text-white px-3 py-1 rounded text-sm">รอดำเนินการ</button>
+      <button data-st="in-progress" class="statusBtn bg-yellow-500 text-white px-3 py-1 rounded text-sm">กำลังทำ</button>
+      <button data-st="completed" class="statusBtn bg-green-500 text-white px-3 py-1 rounded text-sm">เสร็จ</button>
     </div>
 
     <!-- รายการ -->
-    <div class="bg-white dark:bg-gray-800 rounded shadow p-4">
-      <div class="flex justify-between items-center mb-3">
-        <h2 class="font-semibold">รายการ (<span id="count">0</span>)</h2>
-        <button id="refresh" class="text-blue-600 hover:text-blue-800"><i class="fas fa-sync-alt"></i></button>
+    <div class="bg-white rounded shadow p-3">
+      <div class="flex justify-between items-center mb-2">
+        <span>รายการ (<span id="jobCount">0</span>)</span>
+        <button id="refreshBtn" class="text-blue-600"><i class="fas fa-sync-alt"></i></button>
       </div>
-      <ul id="jobList" class="space-y-3"></ul>
+      <div id="jobList" class="space-y-3"></div>
       <p id="emptyMsg" class="text-center text-gray-500 py-6 hidden">ไม่พบงาน</p>
     </div>
 
-    <!-- รายละเอียดงาน -->
-    <div id="detailBox" class="bg-white dark:bg-gray-800 rounded shadow p-4 hidden">
+    <!-- รายละเอียด -->
+    <div id="detailBox" class="bg-white rounded shadow p-4 hidden">
       <h3 class="font-semibold mb-2">รายละเอียด <span id="detailJobId"></span></h3>
       <div id="detailContent" class="text-sm space-y-1"></div>
     </div>
   </main>
 
   <script>
-    const LIFF_ID = '2007374280-GR1Q3YxJ';         // <-- แก้เป็น LIFF คุณ
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
+    /* ---------- ฟังก์ชันช่วย ---------- */
+    const $ = sel => document.querySelector(sel);
+    const formatDate = d => new Date(d).toLocaleDateString('th-TH');
+    const statusMap = {
+      'แจ้งซ่อมใหม่': { cls:'bg-blue-500', text:'ใหม่' },
+      'รอดำเนินการ':   { cls:'bg-orange-500', text:'รอดำเนินการ' },
+      'กำลังดำเนินการ':{ cls:'bg-yellow-500', text:'กำลังทำ' },
+      'เสร็จสิ้น':      { cls:'bg-green-500', text:'เสร็จ' }
+    };
 
-    let userId = '';
-    let currentType = 'IT';
-    let currentStatus = 'all';
-    let jobs = [];
-
-    /* ---------- เริ่ม LIFF ---------- */
-    async function initLiff() {
-      await liff.init({ liffId: LIFF_ID });
-      if (!liff.isLoggedIn()) { liff.login(); return; }
-      const profile = await liff.getProfile();
-      userId = profile.userId;
-      loadJobs();
-    }
-
-    /* ---------- โหลดงาน ---------- */
+    /* ---------- โหลดข้อมูล ---------- */
     async function loadJobs() {
+      $('#loadingIndicator')?.classList?.remove('hidden');
       try {
         const res = await fetch(`${SCRIPT_URL}?action=getRepairJobs&userId=${userId}&formType=${currentType}`);
         const data = await res.json();
         if (data.status === 'success') {
           jobs = data.data;
-          render();
+          filterJobs();
         } else {
-          alert(data.message || 'ไม่สามารถโหลดข้อมูลได้');
+          alert(data.message);
         }
       } catch (e) {
         alert('โหลดข้อมูลไม่สำเร็จ');
       }
+      $('#loadingIndicator')?.classList?.add('hidden');
     }
 
-    /* ---------- แสดงผล ---------- */
-    function render() {
-      // สถิติ
-      ['total','new','progress','done'].forEach(k=>document.getElementById(k).textContent=0);
-      const stat = {
-        total: jobs.length,
-        new: jobs.filter(j=>j.status==='แจ้งซ่อมใหม่').length,
-        progress: jobs.filter(j=>j.status==='กำลังดำเนินการ').length,
-        done: jobs.filter(j=>j.status==='เสร็จสิ้น').length
+    function filterJobs() {
+      let list = jobs;
+      switch (currentStatus) {
+        case 'new':    list = list.filter(j => j.status === 'แจ้งซ่อมใหม่'); break;
+        case 'pending':list = list.filter(j => j.status === 'รอดำเนินการ'); break;
+        case 'in-progress':list = list.filter(j => j.status === 'กำลังดำเนินการ'); break;
+        case 'completed':list = list.filter(j => j.status === 'เสร็จสิ้น'); break;
+      }
+      filteredJobs = list;
+      renderList();
+      updateStats();
+    }
+
+    function updateStats() {
+      const s = {
+        all: jobs.length,
+        new: jobs.filter(j => j.status === 'แจ้งซ่อมใหม่').length,
+        pending: jobs.filter(j => j.status === 'รอดำเนินการ').length,
+        progress: jobs.filter(j => j.status === 'กำลังดำเนินการ').length,
+        completed: jobs.filter(j => j.status === 'เสร็จสิ้น').length,
       };
-      ['total','new','progress','done'].forEach(k=>document.getElementById(k).textContent=stat[k]);
+      Object.keys(s).forEach(k => $(`#stat${k.charAt(0).toUpperCase()+k.slice(1)}`).textContent = s[k]);
+    }
 
-      // กรองตามสถานะ
-      let filtered = jobs;
-      if (currentStatus !== 'all') filtered = filtered.filter(j=>j.status===currentStatus);
-
-      // แสดงรายการ
-      const list = document.getElementById('jobList');
-      list.innerHTML = '';
-      document.getElementById('count').textContent = filtered.length;
-      document.getElementById('emptyMsg').classList.toggle('hidden', filtered.length);
-
-      filtered.forEach(job=>{
-        const li = document.createElement('li');
-        li.className='border rounded-lg p-3 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700';
-        li.innerHTML=`
-          <div class="flex justify-between items-center">
+    function renderList() {
+      const box = $('#jobList'); box.innerHTML = '';
+      $('#jobCount').textContent = filteredJobs.length;
+      $('#emptyMsg').classList.toggle('hidden', filteredJobs.length);
+      filteredJobs.forEach((j,i)=>{
+        const card = document.createElement('div');
+        card.className='border rounded-lg p-3 cursor-pointer hover:bg-blue-50';
+        card.innerHTML=`
+          <div class="flex justify-between items-start">
             <div>
-              <span class="font-bold">${job.jobId}</span>
-              <p class="text-xs text-gray-600">${currentType==='IT'?(job.problemType||'-'):job.machineName}</p>
+              <div class="font-bold text-blue-700">${j.jobId}</div>
+              <div class="text-sm text-gray-600">${j.fullName || ''} (${j.department || ''})</div>
             </div>
-            <span class="text-xs px-2 py-1 rounded-full text-white ${statusColor(job.status)}">${job.status}</span>
+            <span class="px-2 py-1 rounded-full text-xs text-white ${statusMap[j.status]?.cls||'bg-gray-400'}">${statusMap[j.status]?.text||j.status}</span>
           </div>
+          <div class="text-xs text-gray-500 mt-1">${currentType==='IT'?(j.problemType||'-'):(j.machineName||'-')}</div>
+          <div class="text-xs text-gray-400">${formatDate(j.timestamp)}</div>
         `;
-        li.onclick = ()=>showDetail(job);
-        list.appendChild(li);
+        card.onclick = ()=> showDetail(j);
+        box.appendChild(card);
       });
     }
 
-    /* ---------- สีสถานะ ---------- */
-    function statusColor(s){
-      switch(s){
-        case 'แจ้งซ่อมใหม่': return 'bg-blue-500';
-        case 'กำลังดำเนินการ': return 'bg-yellow-500';
-        case 'เสร็จสิ้น': return 'bg-green-500';
-        default: return 'bg-gray-400';
-      }
-    }
-
-    /* ---------- รายละเอียด ---------- */
-    function showDetail(job){
-      document.getElementById('detailBox').classList.remove('hidden');
-      document.getElementById('detailJobId').textContent = job.jobId;
-      const c = document.getElementById('detailContent');
-      c.innerHTML = `
-        <p><strong>ผู้แจ้ง:</strong> ${job.fullName} (${job.department})</p>
-        <p><strong>สถานะ:</strong> ${job.status}</p>
-        ${job.start ? `<p><strong>เริ่ม:</strong> ${job.start}</p>`:''}
-        ${job.end ? `<p><strong>เสร็จ:</strong> ${job.end}</p>`:''}
-        ${job.time ? `<p><strong>ใช้เวลา:</strong> ${job.time} ชม.</p>`:''}
-        ${job.notes ? `<p><strong>หมายเหตุ:</strong> ${job.notes}</p>`:''}
-        ${job.imageViewerUrls ? `<p><strong>ไฟล์แนบ:</strong> <a href="${job.imageViewerUrls}" target="_blank" class="text-blue-600 underline">ดูรูป</a></p>`:''}
+    function showDetail(j) {
+      $('#detailJobId').textContent = j.jobId;
+      $('#detailContent').innerHTML=`
+        <p><strong>ผู้แจ้ง:</strong> ${j.fullName || ''} (${j.department || ''})</p>
+        <p><strong>สถานะ:</strong> ${j.status}</p>
+        <p><strong>วันที่แจ้ง:</strong> ${formatDate(j.timestamp)}</p>
+        ${currentType==='IT' ? `
+          <p><strong>ประเภทปัญหา:</strong> ${j.problemType || '-'}</p>
+          <p><strong>รายละเอียด:</strong> ${j.problemDetails || '-'}</p>
+          <p><strong>อุปกรณ์:</strong> ${j.device || '-'}</p>
+          ${j.start ? `<p><strong>เริ่ม:</strong> ${formatDate(j.start)}</p>`:''}
+          ${j.end ? `<p><strong>เสร็จ:</strong> ${formatDate(j.end)}</p>`:''}
+          ${j.time ? `<p><strong>ใช้เวลา:</strong> ${j.time} ชม.</p>`:''}
+        ` : `
+          <p><strong>เครื่องจักร:</strong> ${j.machineName || '-'}</p>
+          <p><strong>ประเภทงาน:</strong> ${j.jobType || '-'}</p>
+          <p><strong>ปัญหา:</strong> ${j.problemDescription || '-'}</p>
+        `}
       `;
+      $('#detailBox').classList.remove('hidden');
     }
 
     /* ---------- Event ---------- */
-    document.getElementById('typeSelector').addEventListener('click', e=>{
-      if(!e.target.classList.contains('typeBtn')) return;
-      document.querySelectorAll('.typeBtn').forEach(b=>b.classList.replace('bg-blue-500','bg-gray-300').classList.replace('text-white','text-gray-700'));
-      e.target.classList.replace('bg-gray-300','bg-blue-500').classList.replace('text-gray-700','text-white');
-      currentType = e.target.dataset.type;
-      loadJobs();
-    });
     document.addEventListener('click', e=>{
-      if(!e.target.classList.contains('statusBtn')) return;
-      document.querySelectorAll('.statusBtn').forEach(b=>b.classList.remove('ring-2'));
-      e.target.classList.add('ring-2');
-      currentStatus = e.target.dataset.st;
-      render();
+      if(e.target.classList.contains('typeTab')){
+        currentType=e.target.dataset.type;
+        document.querySelectorAll('.typeTab').forEach(t=>t.className='typeTab flex-1 py-2 rounded bg-gray-300 text-gray-700');
+        e.target.className='typeTab flex-1 py-2 rounded bg-blue-600 text-white font-semibold';
+        loadJobs();
+      }
+      if(e.target.classList.contains('statusBtn')){
+        currentStatus=e.target.dataset.st;
+        document.querySelectorAll('.statusBtn').forEach(b=>b.className='statusBtn bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm');
+        e.target.className='statusBtn bg-blue-600 text-white px-3 py-1 rounded text-sm';
+        filterJobs();
+      }
     });
-    document.getElementById('refresh').onclick = loadJobs;
-    document.getElementById('backBtn').onclick = ()=>liff.isInClient()?liff.closeWindow():history.back();
+    $('#refreshBtn').onclick = loadJobs;
+    $('#backBtn').onclick = ()=> liff.isInClient()?liff.closeWindow():history.back();
 
-    initLiff();
+    /* ---------- LIFF ---------- */
+    async function initLiff(){
+      await liff.init({liffId:LIFF_ID});
+      if(!liff.isLoggedIn()){liff.login();return;}
+      const p=await liff.getProfile();
+      userId=p.userId;
+      loadJobs();
+    }
+    window.onload = initLiff;
   </script>
 </body>
 </html>
