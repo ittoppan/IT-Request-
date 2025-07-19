@@ -4,19 +4,13 @@
   <meta charset="UTF-8" />
   <title>ติดตามงานแจ้งซ่อม</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <!-- Tailwind + Font -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- LIFF SDK -->
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <style>
-    body { font-family: 'Kanit', sans-serif; }
-    .glass { @apply bg-white/60 backdrop-blur-sm border border-white/30 rounded-xl shadow-lg }
-  </style>
+  <style>body{font-family:'Kanit',sans-serif}</style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-100 min-h-screen">
-
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors">
   <!-- Header -->
   <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg">
     <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -30,42 +24,51 @@
   <!-- Main -->
   <main class="max-w-4xl mx-auto p-4 space-y-6">
     <!-- เลือกประเภท -->
-    <div id="typeSelector" class="flex gap-2">
-      <button data-type="IT" class="typeBtn flex-1 py-2 rounded-lg bg-blue-500 text-white font-semibold">งานซ่อม IT</button>
-      <button data-type="EN" class="typeBtn flex-1 py-2 rounded-lg bg-gray-200 text-gray-700">งานซ่อม EN</button>
+    <div class="flex gap-2">
+      <button data-type="IT" id="btnIT" class="typeBtn flex-1 py-2 rounded-lg bg-blue-500 text-white font-semibold">IT</button>
+      <button data-type="EN" id="btnEN" class="typeBtn flex-1 py-2 rounded-lg bg-gray-300 text-gray-700">EN</button>
     </div>
 
     <!-- สถิติ -->
-    <div id="stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-      <div class="glass p-3"><div id="total" class="text-2xl font-bold text-blue-600">0</div><div class="text-xs">ทั้งหมด</div></div>
-      <div class="glass p-3"><div id="new" class="text-2xl font-bold text-blue-500">0</div><div class="text-xs">ใหม่</div></div>
-      <div class="glass p-3"><div id="progress" class="text-2xl font-bold text-yellow-500">0</div><div class="text-xs">กำลังทำ</div></div>
-      <div class="glass p-3"><div id="done" class="text-2xl font-bold text-green-500">0</div><div class="text-xs">เสร็จ</div></div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+      <div class="bg-white dark:bg-gray-800 p-3 rounded shadow"><div id="total" class="text-2xl font-bold text-blue-600">0</div><div class="text-xs">ทั้งหมด</div></div>
+      <div class="bg-white dark:bg-gray-800 p-3 rounded shadow"><div id="new" class="text-2xl font-bold text-blue-500">0</div><div class="text-xs">ใหม่</div></div>
+      <div class="bg-white dark:bg-gray-800 p-3 rounded shadow"><div id="progress" class="text-2xl font-bold text-yellow-500">0</div><div class="text-xs">กำลังทำ</div></div>
+      <div class="bg-white dark:bg-gray-800 p-3 rounded shadow"><div id="done" class="text-2xl font-bold text-green-500">0</div><div class="text-xs">เสร็จ</div></div>
     </div>
 
-    <!-- รายการงาน -->
-    <div class="glass p-4">
+    <!-- กรองสถานะ -->
+    <div class="flex gap-2 flex-wrap">
+      <button data-st="all" class="statusBtn bg-blue-600 text-white px-3 py-1 rounded text-sm">ทั้งหมด</button>
+      <button data-st="แจ้งซ่อมใหม่" class="statusBtn bg-blue-500 text-white px-3 py-1 rounded text-sm">ใหม่</button>
+      <button data-st="กำลังดำเนินการ" class="statusBtn bg-yellow-500 text-white px-3 py-1 rounded text-sm">กำลังทำ</button>
+      <button data-st="เสร็จสิ้น" class="statusBtn bg-green-500 text-white px-3 py-1 rounded text-sm">เสร็จ</button>
+    </div>
+
+    <!-- รายการ -->
+    <div class="bg-white dark:bg-gray-800 rounded shadow p-4">
       <div class="flex justify-between items-center mb-3">
-        <h2 class="font-semibold text-gray-700">รายการ (<span id="count">0</span>)</h2>
+        <h2 class="font-semibold">รายการ (<span id="count">0</span>)</h2>
         <button id="refresh" class="text-blue-600 hover:text-blue-800"><i class="fas fa-sync-alt"></i></button>
       </div>
       <ul id="jobList" class="space-y-3"></ul>
-      <p id="emptyMsg" class="text-center text-gray-500 py-6 hidden">ไม่มีงานในขณะนี้</p>
+      <p id="emptyMsg" class="text-center text-gray-500 py-6 hidden">ไม่พบงาน</p>
     </div>
 
     <!-- รายละเอียดงาน -->
-    <div id="detailBox" class="glass p-4 hidden">
+    <div id="detailBox" class="bg-white dark:bg-gray-800 rounded shadow p-4 hidden">
       <h3 class="font-semibold mb-2">รายละเอียด <span id="detailJobId"></span></h3>
-      <div id="detailContent" class="text-sm space-y-2"></div>
+      <div id="detailContent" class="text-sm space-y-1"></div>
     </div>
   </main>
 
   <script>
-    const LIFF_ID = '2007374280-GR1Q3YxJ';          // <-- แก้เป็น LIFF ID ของคุณ
+    const LIFF_ID = '2007374280-GR1Q3YxJ';         // <-- แก้เป็น LIFF คุณ
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
 
     let userId = '';
     let currentType = 'IT';
+    let currentStatus = 'all';
     let jobs = [];
 
     /* ---------- เริ่ม LIFF ---------- */
@@ -79,23 +82,24 @@
 
     /* ---------- โหลดงาน ---------- */
     async function loadJobs() {
-      toggleLoading(true);
       try {
         const res = await fetch(`${SCRIPT_URL}?action=getRepairJobs&userId=${userId}&formType=${currentType}`);
         const data = await res.json();
         if (data.status === 'success') {
           jobs = data.data;
           render();
+        } else {
+          alert(data.message || 'ไม่สามารถโหลดข้อมูลได้');
         }
       } catch (e) {
         alert('โหลดข้อมูลไม่สำเร็จ');
       }
-      toggleLoading(false);
     }
 
     /* ---------- แสดงผล ---------- */
     function render() {
       // สถิติ
+      ['total','new','progress','done'].forEach(k=>document.getElementById(k).textContent=0);
       const stat = {
         total: jobs.length,
         new: jobs.filter(j=>j.status==='แจ้งซ่อมใหม่').length,
@@ -104,22 +108,26 @@
       };
       ['total','new','progress','done'].forEach(k=>document.getElementById(k).textContent=stat[k]);
 
-      // รายการ
+      // กรองตามสถานะ
+      let filtered = jobs;
+      if (currentStatus !== 'all') filtered = filtered.filter(j=>j.status===currentStatus);
+
+      // แสดงรายการ
       const list = document.getElementById('jobList');
       list.innerHTML = '';
-      document.getElementById('count').textContent=jobs.length;
-      document.getElementById('emptyMsg').classList.toggle('hidden', jobs.length);
+      document.getElementById('count').textContent = filtered.length;
+      document.getElementById('emptyMsg').classList.toggle('hidden', filtered.length);
 
-      jobs.forEach(job=>{
+      filtered.forEach(job=>{
         const li = document.createElement('li');
-        li.className='border rounded-lg p-3 cursor-pointer hover:bg-blue-50';
+        li.className='border rounded-lg p-3 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700';
         li.innerHTML=`
           <div class="flex justify-between items-center">
             <div>
               <span class="font-bold">${job.jobId}</span>
               <p class="text-xs text-gray-600">${currentType==='IT'?(job.problemType||'-'):job.machineName}</p>
             </div>
-            <span class="status text-xs px-2 py-1 rounded-full text-white ${statusColor(job.status)}">${job.status}</span>
+            <span class="text-xs px-2 py-1 rounded-full text-white ${statusColor(job.status)}">${job.status}</span>
           </div>
         `;
         li.onclick = ()=>showDetail(job);
@@ -137,7 +145,7 @@
       }
     }
 
-    /* ---------- แสดงรายละเอียด ---------- */
+    /* ---------- รายละเอียด ---------- */
     function showDetail(job){
       document.getElementById('detailBox').classList.remove('hidden');
       document.getElementById('detailJobId').textContent = job.jobId;
@@ -153,17 +161,20 @@
       `;
     }
 
-    /* ---------- UI ---------- */
-    function toggleLoading(show){
-      document.body.classList.toggle('opacity-50', show);
-    }
+    /* ---------- Event ---------- */
     document.getElementById('typeSelector').addEventListener('click', e=>{
-      if(e.target.classList.contains('typeBtn')){
-        document.querySelectorAll('.typeBtn').forEach(b=>b.classList.replace('bg-blue-500','bg-gray-200').classList.replace('text-white','text-gray-700'));
-        e.target.classList.replace('bg-gray-200','bg-blue-500').classList.replace('text-gray-700','text-white');
-        currentType = e.target.dataset.type;
-        loadJobs();
-      }
+      if(!e.target.classList.contains('typeBtn')) return;
+      document.querySelectorAll('.typeBtn').forEach(b=>b.classList.replace('bg-blue-500','bg-gray-300').classList.replace('text-white','text-gray-700'));
+      e.target.classList.replace('bg-gray-300','bg-blue-500').classList.replace('text-gray-700','text-white');
+      currentType = e.target.dataset.type;
+      loadJobs();
+    });
+    document.addEventListener('click', e=>{
+      if(!e.target.classList.contains('statusBtn')) return;
+      document.querySelectorAll('.statusBtn').forEach(b=>b.classList.remove('ring-2'));
+      e.target.classList.add('ring-2');
+      currentStatus = e.target.dataset.st;
+      render();
     });
     document.getElementById('refresh').onclick = loadJobs;
     document.getElementById('backBtn').onclick = ()=>liff.isInClient()?liff.closeWindow():history.back();
