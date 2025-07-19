@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -159,6 +160,54 @@
             color: white;
             padding: 10px;
             background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        .dark ::-webkit-scrollbar-track {
+            background: #2d3748;
+        }
+        
+        .dark ::-webkit-scrollbar-thumb {
+            background: #4a5568;
+        }
+        
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 0.25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-rotate 0.75s linear infinite;
+        }
+        
+        @keyframes spinner-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -469,6 +518,19 @@
                 `;
                 loadingIndicator.classList.remove('hidden');
                 mainContent.classList.add('hidden');
+            }
+            
+            /**
+             * แสดงการแจ้งเตือนด้วย SweetAlert2
+             */
+            function showAlert(icon, title, text, confirmButtonText = 'ตกลง') {
+                return Swal.fire({
+                    icon,
+                    title,
+                    text,
+                    confirmButtonText,
+                    confirmButtonColor: '#3B82F6',
+                });
             }
             
             /**
@@ -1315,9 +1377,18 @@
                 });
             });
             
-            refreshBtn.addEventListener('click', loadRepairJobs);
+            refreshBtn.addEventListener('click', function() {
+                loadRepairJobs();
+                showAlert('success', 'กำลังโหลดข้อมูล', 'ระบบกำลังอัปเดตข้อมูลงานซ่อมล่าสุด');
+            });
+            
             backBtn.addEventListener('click', goBack);
             themeToggle.addEventListener('click', toggleDarkMode);
+            
+            // เปิด Lightbox จาก global scope
+            window.openLightbox = openLightbox;
+            window.closeLightbox = closeLightbox;
+            window.changeLightboxImage = changeLightboxImage;
             
             // เริ่มต้นแอปพลิเคชัน
             window.onload = function() {
