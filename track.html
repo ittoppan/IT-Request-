@@ -513,21 +513,48 @@
             /**
              * เริ่มต้น LIFF แอปพลิเคชัน
              */
-            async function initializeLiff() {
-                try {
-                    await liff.init({ liffId });
-                    
-                    if (!liff.isLoggedIn()) {
-                        liff.login();
-                        return;
-                    }
-                    
-                    const profile = await liff.getProfile();
-                    userId = profile.userId;
-                    userDisplayName = profile.displayName;
-                    userPictureUrl = profile.pictureUrl || '';
-                    
-                    await loadRepairJobs();
+          
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId });
+                if (!liff.isLoggedIn()) {
+                    Swal.fire({
+                        title: 'กรุณาเข้าสู่ระบบ LINE',
+                        text: 'คุณต้องเข้าสู่ระบบ LINE เพื่อใช้งานฟอร์มแจ้งซ่อมนี้',
+                        icon: 'info',
+                        confirmButtonText: 'เข้าสู่ระบบ LINE'
+                    }).then(result => { if (result.isConfirmed) liff.login(); });
+                    return;
+                }
+                const profile = await liff.getProfile();
+                document.getElementById('lineUserId').value = profile.userId;
+                document.getElementById('lineDisplayName').value = profile.displayName;
+                document.getElementById('linePictureUrl').value = profile.pictureUrl || '';
+                const profilePictureElement = document.getElementById('profilePicture');
+                if (profile.pictureUrl) profilePictureElement.src = profile.pictureUrl;
+            } catch (error) {
+                Swal.fire({
+                    title: 'เกิดข้อผิดพลาด',
+                    text: `ไม่สามารถเริ่มต้น LIFF ได้: ${error.message}`,
+                    icon: 'error'
+                });
+            }
+        }
+
+        document.getElementById('repairForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (typeof liff === 'undefined' || !liff.isLoggedIn()) {
+                Swal.fire({ title: 'กรุณาเข้าสู่ระบบ', icon: 'warning' });
+                return;
+            }
+            
+            Swal.fire({ 
+                title: 'กำลังส่งข้อมูล...', 
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading() 
+            });
+
                     
                     // ตั้งค่า real-time updates
                     setupRealTimeUpdates();
