@@ -965,6 +965,31 @@
                 setupSearch();
             };
         });
+async function getUserProfile() {
+    try {
+        await liff.init({ liffId: 'YOUR_LIFF_ID' }); // ← ✅ ใส่ LIFF ID จริงของคุณ
+
+        if (!liff.isLoggedIn()) {
+            liff.login();
+            return;
+        }
+
+        const profile = await liff.getProfile();
+        const userId = profile.userId;
+
+        document.getElementById('userId').value = userId;
+        getData(userId);
+    } catch (error) {
+        console.error('เกิดข้อผิดพลาดใน getUserProfile:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'ไม่สามารถโหลดข้อมูลผู้ใช้',
+            text: 'กรุณาลองใหม่หรือตรวจสอบว่าเปิดผ่าน LIFF แล้วหรือยัง',
+        });
+    }
+}
+
+
     </script>
 </body>
 </html>
