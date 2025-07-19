@@ -195,146 +195,6 @@
         .hide-scrollbar {
             scrollbar-width: none;
         }
-        
-        /* เพิ่มสไตล์ใหม่สำหรับไทม์ไลน์ */
-        .timeline {
-            position: relative;
-            padding-left: 1.5rem;
-            margin: 1.5rem 0;
-        }
-        
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 7px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background-color: #e2e8f0;
-        }
-        
-        .timeline-item {
-            position: relative;
-            padding-bottom: 1.5rem;
-        }
-        
-        .timeline-dot {
-            position: absolute;
-            left: -1.5rem;
-            top: 0;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: #3b82f6;
-            border: 3px solid white;
-            z-index: 10;
-        }
-        
-        .timeline-date {
-            font-size: 0.75rem;
-            color: #64748b;
-            margin-bottom: 0.25rem;
-        }
-        
-        .timeline-content {
-            background: #f8fafc;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            border: 1px solid #e2e8f0;
-        }
-        
-        /* สไตล์สำหรับการแชร์ */
-        .share-section {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: #f1f5f9;
-            border-radius: 0.75rem;
-        }
-        
-        /* สไตล์สำหรับปุ่มแชร์ */
-        .share-btn {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            background: #f1f5f9;
-            color: #334155;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        
-        .share-btn:hover {
-            background: #e2e8f0;
-        }
-        
-        .share-btn i {
-            margin-right: 0.5rem;
-        }
-        
-        /* สไตล์สำหรับการแจ้งเตือน */
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #10B981;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            z-index: 1000;
-            animation: slideIn 0.3s, fadeOut 0.5s 2.5s;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-        
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-        
-        /* สไตล์สำหรับปุ่มติดตาม */
-        .follow-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            color: #cbd5e1;
-            transition: all 0.2s;
-            z-index: 10;
-        }
-        
-        .follow-btn.following {
-            color: #f59e0b;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .dashboard-section {
-                padding: 1rem;
-            }
-            
-            .stat-card {
-                padding: 1rem 0.5rem;
-            }
-            
-            .job-card {
-                padding: 0.75rem;
-            }
-            
-            .job-details {
-                padding: 1rem;
-            }
-            
-            .status-tabs {
-                flex-wrap: wrap;
-            }
-            
-            .status-tab {
-                margin-bottom: 0.5rem;
-            }
-        }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -359,25 +219,13 @@
             <div class="job-type-tab" data-type="EN">งานซ่อมเครื่องจักร (EN)</div>
         </div>
 
-        <div id="loadingIndicator" class="flex flex-col justify-center items-center py-12 glass-card">
+        <div id="loadingIndicator" class="flex flex-col justify-center items-center py-12 glass-card hidden">
             <div class="loading-spinner"></div>
             <span class="ml-3 text-gray-700 font-medium mt-4">กำลังโหลดข้อมูล... กรุณารอสักครู่</span>
         </div>
 
-        <!-- ส่วนแสดงข้อผิดพลาด -->
-        <div id="errorContainer" class="glass-card hidden p-6 mb-6">
-            <div class="text-center">
-                <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
-                <h2 class="text-xl font-semibold text-gray-800 mb-2">เกิดข้อผิดพลาด</h2>
-                <p id="errorMessage" class="text-gray-600 mb-4">ไม่สามารถโหลดข้อมูลได้</p>
-                <button id="retryButton" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-sync-alt mr-2"></i> โหลดใหม่
-                </button>
-            </div>
-        </div>
-
         <div id="mainContent" class="hidden">
-            <div id="dashboardSection" class="glass-card mb-8 p-6 md:p-8 rounded-xl shadow-2xl backdrop-blur-md border border-white border-opacity-30">
+            <div id="dashboardSection" class="glass-card mb-8 animate-slide-up p-6 md:p-8 rounded-xl shadow-2xl backdrop-blur-md border border-white border-opacity-30">
                 <div class="flex items-center justify-between mb-8">
                     <div class="flex items-center">
                         <i class="fas fa-chart-pie mr-4 text-blue-600 text-2xl"></i>
@@ -389,23 +237,23 @@
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer" data-status="all">
+                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="all" style="animation-delay: 100ms">
                         <div class="text-4xl font-extrabold text-blue-700 mb-1" id="totalJobsCount">0</div>
                         <div class="text-sm text-gray-600 font-medium">ทั้งหมด</div>
                     </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer" data-status="new">
+                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="new" style="animation-delay: 200ms">
                         <div class="text-4xl font-extrabold text-blue-500 mb-1" id="newJobsCount">0</div>
                         <div class="text-sm text-gray-600 font-medium">แจ้งซ่อมใหม่</div>
                     </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer" data-status="pending">
+                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="pending" style="animation-delay: 300ms">
                         <div class="text-4xl font-extrabold text-orange-500 mb-1" id="pendingJobsCount">0</div>
                         <div class="text-sm text-gray-600 font-medium">รอดำเนินการ</div>
                     </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer" data-status="in-progress">
+                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="in-progress" style="animation-delay: 400ms">
                         <div class="text-4xl font-extrabold text-yellow-500 mb-1" id="inProgressJobsCount">0</div>
                         <div class="text-sm text-gray-600 font-medium">กำลังดำเนินการ</div>
                     </div>
-                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer" data-status="completed">
+                    <div class="stat-card glass-card p-5 text-center rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in cursor-pointer" data-status="completed" style="animation-delay: 500ms">
                         <div class="text-4xl font-extrabold text-green-600 mb-1" id="completedJobsCount">0</div>
                         <div class="text-sm text-gray-600 font-medium">เสร็จสิ้น</div>
                     </div>
@@ -466,7 +314,7 @@
                         </div>
                     </div>
                     
-                    <div id="jobDetailsContainer" class="glass-card hidden"></div>
+                    <div id="jobDetailsContainer" class="glass-card animate-fade-in hidden"></div>
                 </div>
             </div>
         </div>
@@ -489,8 +337,6 @@
             let selectedJobId = null;
             let currentStatusFilter = 'all';
             let currentJobType = 'IT';
-            let lastUpdateTime = new Date();
-            let updateInterval = null;
 
             // องค์ประกอบ DOM
             const loadingIndicator = document.getElementById('loadingIndicator');
@@ -506,58 +352,25 @@
             const statCards = document.querySelectorAll('.stat-card');
             const statusTabs = document.querySelectorAll('.status-tab');
             const jobTypeTabs = document.querySelectorAll('.job-type-tab');
-            const errorContainer = document.getElementById('errorContainer');
-            const errorMessage = document.getElementById('errorMessage');
-            const retryButton = document.getElementById('retryButton');
 
             /**
              * เริ่มต้น LIFF แอปพลิเคชัน
              */
-          
-        async function initializeLiff() {
-            try {
-                await liff.init({ liffId });
-                if (!liff.isLoggedIn()) {
-                    Swal.fire({
-                        title: 'กรุณาเข้าสู่ระบบ LINE',
-                        text: 'คุณต้องเข้าสู่ระบบ LINE เพื่อใช้งานฟอร์มแจ้งซ่อมนี้',
-                        icon: 'info',
-                        confirmButtonText: 'เข้าสู่ระบบ LINE'
-                    }).then(result => { if (result.isConfirmed) liff.login(); });
-                    return;
-                }
-                const profile = await liff.getProfile();
-                document.getElementById('lineUserId').value = profile.userId;
-                document.getElementById('lineDisplayName').value = profile.displayName;
-                document.getElementById('linePictureUrl').value = profile.pictureUrl || '';
-                const profilePictureElement = document.getElementById('profilePicture');
-                if (profile.pictureUrl) profilePictureElement.src = profile.pictureUrl;
-            } catch (error) {
-                Swal.fire({
-                    title: 'เกิดข้อผิดพลาด',
-                    text: `ไม่สามารถเริ่มต้น LIFF ได้: ${error.message}`,
-                    icon: 'error'
-                });
-            }
-        }
-
-        document.getElementById('repairForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (typeof liff === 'undefined' || !liff.isLoggedIn()) {
-                Swal.fire({ title: 'กรุณาเข้าสู่ระบบ', icon: 'warning' });
-                return;
-            }
-            
-            Swal.fire({ 
-                title: 'กำลังส่งข้อมูล...', 
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading() 
-            });
-
+            async function initializeLiff() {
+                try {
+                    await liff.init({ liffId });
                     
-                    // ตั้งค่า real-time updates
-                    setupRealTimeUpdates();
+                    if (!liff.isLoggedIn()) {
+                        liff.login();
+                        return;
+                    }
+                    
+                    const profile = await liff.getProfile();
+                    userId = profile.userId;
+                    userDisplayName = profile.displayName;
+                    userPictureUrl = profile.pictureUrl || '';
+                    
+                    await loadRepairJobs();
                     
                 } catch (error) {
                     console.error('LIFF initialization failed:', error);
@@ -571,14 +384,18 @@
              * @param {string} message - ข้อความรายละเอียด
              */
             function showError(title, message) {
-                loadingIndicator.classList.add('hidden');
-                errorContainer.classList.remove('hidden');
-                mainContent.classList.add('hidden');
-                
-                errorMessage.innerHTML = `
-                    ${title ? `<strong>${title}</strong><br>` : ''}
-                    ${message || 'กรุณาลองเข้าใช้งานใหม่อีกครั้ง'}
+                loadingIndicator.innerHTML = `
+                    <div class="text-center p-6 bg-white rounded-lg shadow-md">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                        <p class="text-lg font-semibold text-gray-700 mb-2">${title}</p>
+                        <p class="text-sm text-gray-500 mb-4">${message || 'กรุณาลองเข้าใช้งานใหม่อีกครั้ง'}</p>
+                        <button onclick="window.location.reload()" class="btn-primary px-5 py-2 rounded-lg text-base">
+                            <i class="fas fa-sync-alt mr-2"></i> ลองใหม่
+                        </button>
+                    </div>
                 `;
+                loadingIndicator.classList.remove('hidden');
+                mainContent.classList.add('hidden');
             }
             
             /**
@@ -587,86 +404,41 @@
             async function loadRepairJobs() {
                 try {
                     loadingIndicator.classList.remove('hidden');
-                    errorContainer.classList.add('hidden');
                     mainContent.classList.add('hidden');
                     
-                    // ตรวจสอบ userId
-                    if (!userId) {
-                        throw new Error('ไม่พบข้อมูลผู้ใช้ (userId)');
-                    }
+                    // ดึงข้อมูลทั้ง IT และ EN พร้อมกัน
+                    const [itResponse, enResponse] = await Promise.all([
+                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}&formType=IT`),
+                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}&formType=EN`)
+                    ]);
                     
-                    // ดึงข้อมูลงานซ่อม
-                    const response = await fetch(`${scriptUrl}?action=getRepairJobs&userId=${userId}&formType=all`);
-                    const data = await response.json();
+                    const itData = await itResponse.json();
+                    const enData = await enResponse.json();
                     
-                    if (data.status === 'success') {
-                        // แบ่งข้อมูลเป็น IT และ EN
+                    if (itData.status === 'success' && enData.status === 'success') {
                         repairJobs = {
-                            IT: data.data.filter(job => job.formType === 'IT'),
-                            EN: data.data.filter(job => job.formType === 'EN')
+                            IT: itData.data,
+                            EN: enData.data
                         };
                         
                         updateDashboardStats();
                         filterJobsByStatus(currentStatusFilter);
                         
                         // อัปเดตเวลาล่าสุด
-                        lastUpdateTime = new Date();
-                        document.getElementById('lastUpdatedTime').textContent = formatTime(lastUpdateTime);
+                        const now = new Date();
+                        document.getElementById('lastUpdatedTime').textContent = formatTime(now);
                         
                         loadingIndicator.classList.add('hidden');
                         mainContent.classList.remove('hidden');
                         
                         checkNoJobsFound();
                     } else {
-                        throw new Error(data.message || 'Failed to load repair jobs');
+                        throw new Error(itData.message || enData.message || 'Failed to load repair jobs');
                     }
                 } catch (error) {
                     console.error('Error loading repair jobs:', error);
                     showError('เกิดข้อผิดพลาดในการโหลดข้อมูล', error.message);
                 }
-            }
-            
-            /**
-             * ตั้งค่า real-time updates
-             */
-            function setupRealTimeUpdates() {
-                // ตรวจสอบการอัปเดตทุก 1 นาที
-                updateInterval = setInterval(async () => {
-                    try {
-                        const response = await fetch(`${scriptUrl}?action=checkUpdates&userId=${userId}&lastUpdate=${lastUpdateTime.toISOString()}`);
-                        const data = await response.json();
-                        
-                        if (data.updated) {
-                            await loadRepairJobs();
-                            showNotification('มีการอัปเดตสถานะงานใหม่');
-                        }
-                    } catch (error) {
-                        console.error('Error checking for updates:', error);
-                    }
-                }, 60000); // ทุก 1 นาที
-            }
-            
-            /**
-             * แสดงการแจ้งเตือน
-             * @param {string} message - ข้อความแจ้งเตือน
-             */
-            function showNotification(message) {
-                // แสดงการแจ้งเตือนในแอป
-                const notification = document.createElement('div');
-                notification.className = 'notification';
-                notification.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-bell mr-2"></i>
-                        <span>${message}</span>
-                    </div>
-                `;
-                
-                document.body.appendChild(notification);
-                
-                // ลบการแจ้งเตือนหลังจาก 3 วินาที
-                setTimeout(() => {
-                    notification.remove();
-                }, 3000);
             }
             
             /**
@@ -767,8 +539,6 @@
              * แสดงรายการงานซ่อม
              */
             function renderJobList() {
-                if (!jobsContainer) return;
-                
                 jobsContainer.innerHTML = '';
                 document.getElementById('jobCount').textContent = filteredJobs.length;
                 
@@ -779,7 +549,8 @@
                 
                 filteredJobs.forEach((job, index) => {
                     const jobCard = document.createElement('div');
-                    jobCard.className = `glass-card job-card cursor-pointer p-4 relative`;
+                    jobCard.className = `glass-card job-card cursor-pointer animate-slide-up p-4`;
+                    jobCard.style.animationDelay = `${index * 50}ms`;
                     jobCard.id = `job-${job.jobId}`;
                     jobCard.onclick = () => selectJob(job.jobId);
                     
@@ -793,10 +564,6 @@
                         : job.machineName ? `${job.machineName} (${job.jobType || 'ไม่ระบุ'})` : job.jobType || 'ไม่ระบุประเภทงาน';
                     
                     jobCard.innerHTML = `
-                        <button class="follow-btn" data-job="${job.jobId}">
-                            <i class="far fa-star"></i>
-                        </button>
-                        
                         <div class="flex items-start justify-between mb-3">
                             <div>
                                 <h3 class="font-bold text-gray-800 text-lg">${job.jobId || 'N/A'}</h3>
@@ -828,28 +595,6 @@
                     `;
                     
                     jobsContainer.appendChild(jobCard);
-                    
-                    // ตั้งค่าปุ่มติดตาม
-                    const followBtn = jobCard.querySelector('.follow-btn');
-                    const isFollowing = checkIfFollowing(job.jobId);
-                    
-                    if (isFollowing) {
-                        followBtn.innerHTML = '<i class="fas fa-star"></i>';
-                        followBtn.classList.add('following');
-                    }
-                    
-                    followBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        toggleFollowJob(job.jobId);
-                        
-                        if (followBtn.classList.contains('following')) {
-                            followBtn.innerHTML = '<i class="far fa-star"></i>';
-                            followBtn.classList.remove('following');
-                        } else {
-                            followBtn.innerHTML = '<i class="fas fa-star"></i>';
-                            followBtn.classList.add('following');
-                        }
-                    });
                 });
 
                 // เลือกงานเดิมถ้ายังอยู่ในรายการ
@@ -859,34 +604,6 @@
                         prevSelectedCard.classList.add('selected');
                     }
                 }
-            }
-            
-            /**
-             * ตรวจสอบว่าติดตามงานนี้อยู่หรือไม่
-             * @param {string} jobId - ID งาน
-             */
-            function checkIfFollowing(jobId) {
-                const followedJobs = JSON.parse(localStorage.getItem('followedJobs') || '[]');
-                return followedJobs.includes(jobId);
-            }
-            
-            /**
-             * สลับสถานะการติดตามงาน
-             * @param {string} jobId - ID งาน
-             */
-            function toggleFollowJob(jobId) {
-                let followedJobs = JSON.parse(localStorage.getItem('followedJobs') || '[]');
-                const index = followedJobs.indexOf(jobId);
-                
-                if (index === -1) {
-                    followedJobs.push(jobId);
-                    showNotification(`ติดตามงาน ${jobId} แล้ว`);
-                } else {
-                    followedJobs.splice(index, 1);
-                    showNotification(`เลิกติดตามงาน ${jobId} แล้ว`);
-                }
-                
-                localStorage.setItem('followedJobs', JSON.stringify(followedJobs));
             }
             
             /**
@@ -915,15 +632,9 @@
              * @param {object} job - ข้อมูลงาน
              */
             function renderJobDetails(job) {
-                if (!jobDetailsContainer || !emptyDetails || !detailHeader) return;
-                
                 emptyDetails.classList.add('hidden');
                 detailHeader.classList.remove('hidden');
                 jobDetailsContainer.classList.remove('hidden');
-                
-                // ตั้งค่าข้อมูลส่วนหัว
-                document.getElementById('detailJobType').textContent = job.formType || 'IT';
-                document.getElementById('detailJobId').textContent = job.jobId || '';
                 
                 // ข้อมูลสถานะ
                 const statusInfo = getStatusInfo(job.status);
@@ -939,12 +650,6 @@
                 
                 // ส่วนข้อมูลผู้รับผิดชอบและวันที่
                 const assignedInfoHtml = createAssignedInfoHtml(job);
-                
-                // ไทม์ไลน์สถานะ
-                const timelineHtml = renderStatusTimeline(job);
-                
-                // ส่วนแชร์งาน
-                const shareSectionHtml = setupShareFeature(job);
                 
                 // สร้าง HTML ทั้งหมด
                 jobDetailsContainer.innerHTML = `
@@ -964,157 +669,12 @@
                         ${typeSpecificHtml}
                         ${fileAttachmentsHtml}
                         ${progressNotesHtml}
-                        ${timelineHtml}
-                        ${shareSectionHtml}
 
                         <div class="text-right text-xs text-gray-500 pt-4 border-t mt-4">
                             แจ้งซ่อมเมื่อ: ${formatDateTime(job.timestamp)}
                         </div>
                     </div>
                 `;
-                
-                // ตั้งค่าปุ่มแชร์
-                setupShareButtons(job);
-            }
-            
-            /**
-             * สร้างไทม์ไลน์สถานะ
-             * @param {object} job - ข้อมูลงาน
-             */
-            function renderStatusTimeline(job) {
-                const statusUpdates = [
-                    { 
-                        date: job.timestamp, 
-                        status: 'แจ้งซ่อมใหม่', 
-                        description: 'ระบบได้รับคำแจ้งซ่อมเรียบร้อย',
-                        icon: 'fa-file-circle-plus',
-                        color: 'bg-blue-500'
-                    }
-                ];
-
-                if (job.start) {
-                    statusUpdates.push({
-                        date: job.start,
-                        status: 'เริ่มดำเนินการ',
-                        description: job.assignedTo ? `${job.assignedTo} เริ่มดำเนินการแก้ไข` : 'เริ่มดำเนินการซ่อม',
-                        icon: 'fa-tools',
-                        color: 'bg-yellow-500'
-                    });
-                }
-
-                if (job.end) {
-                    statusUpdates.push({
-                        date: job.end,
-                        status: 'เสร็จสิ้น',
-                        description: `ใช้เวลาซ่อมทั้งหมด ${job.time || '0'} ชั่วโมง`,
-                        icon: 'fa-check-circle',
-                        color: 'bg-green-500'
-                    });
-                }
-
-                // เรียงลำดับตามวันที่
-                statusUpdates.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-                return `
-                    <div class="mt-6">
-                        <h3 class="font-semibold text-lg mb-4 text-gray-800">
-                            <i class="fas fa-history mr-2"></i> ประวัติการอัปเดตสถานะ
-                        </h3>
-                        <div class="timeline">
-                            ${statusUpdates.map(update => `
-                                <div class="timeline-item">
-                                    <div class="timeline-dot ${update.color}"></div>
-                                    <div class="timeline-date">${formatDateTime(update.date)}</div>
-                                    <div class="timeline-content">
-                                        <div class="font-medium">${update.status}</div>
-                                        <p class="text-sm text-gray-600 mt-1">${update.description}</p>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            /**
-             * สร้างส่วนแชร์งาน
-             * @param {object} job - ข้อมูลงาน
-             */
-            function setupShareFeature(job) {
-                const jobLink = `${window.location.origin}${window.location.pathname}?jobId=${job.jobId}`;
-                
-                return `
-                    <div class="share-section mt-6">
-                        <h3 class="font-semibold text-gray-800 mb-3">
-                            <i class="fas fa-share-alt mr-2"></i> แชร์สถานะงาน
-                        </h3>
-                        <div class="flex items-center gap-2 mb-3">
-                            <input type="text" id="shareLink" value="${jobLink}" 
-                                   readonly class="flex-1 px-3 py-2 border border-gray-300 rounded-lg">
-                            <button id="copyShareBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <div class="flex gap-3">
-                            <button class="share-btn" data-share="line">
-                                <i class="fab fa-line text-green-500 mr-2"></i> LINE
-                            </button>
-                            <button class="share-btn" data-share="facebook">
-                                <i class="fab fa-facebook text-blue-600 mr-2"></i> Facebook
-                            </button>
-                            <button class="share-btn" data-share="email">
-                                <i class="fas fa-envelope text-gray-600 mr-2"></i> อีเมล
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            /**
-             * ตั้งค่าปุ่มแชร์
-             * @param {object} job - ข้อมูลงาน
-             */
-            function setupShareButtons(job) {
-                const jobLink = `${window.location.origin}${window.location.pathname}?jobId=${job.jobId}`;
-                const jobTitle = `สถานะงานซ่อม ${job.jobId}`;
-                
-                // คัดลอกลิงก์
-                const copyBtn = document.getElementById('copyShareBtn');
-                if (copyBtn) {
-                    copyBtn.addEventListener('click', () => {
-                        navigator.clipboard.writeText(jobLink).then(() => {
-                            showNotification('คัดลอกลิงก์ไปยังคลิปบอร์ดแล้ว');
-                        });
-                    });
-                }
-                
-                // แชร์ผ่าน LINE
-                const lineBtn = document.querySelector('[data-share="line"]');
-                if (lineBtn) {
-                    lineBtn.addEventListener('click', () => {
-                        const shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(`${jobTitle}: ${jobLink}`)}`;
-                        window.open(shareUrl, '_blank');
-                    });
-                }
-                
-                // แชร์ผ่าน Facebook
-                const fbBtn = document.querySelector('[data-share="facebook"]');
-                if (fbBtn) {
-                    fbBtn.addEventListener('click', () => {
-                        const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(jobLink)}`;
-                        window.open(shareUrl, '_blank');
-                    });
-                }
-                
-                // แชร์ผ่านอีเมล
-                const emailBtn = document.querySelector('[data-share="email"]');
-                if (emailBtn) {
-                    emailBtn.addEventListener('click', () => {
-                        const subject = encodeURIComponent(jobTitle);
-                        const body = encodeURIComponent(`ตรวจสอบสถานะงานซ่อมของฉัน: ${jobLink}`);
-                        window.location.href = `mailto:?subject=${subject}&body=${body}`;
-                    });
-                }
             }
             
             /**
@@ -1149,7 +709,7 @@
              * @returns {string} HTML string
              */
             function createTypeSpecificHtml(job) {
-                if (job.formType === 'IT') {
+                if (currentJobType === 'IT') {
                     return `
                         <div>
                             <h4 class="font-semibold mb-3 text-gray-700">ข้อมูลปัญหา</h4>
@@ -1193,22 +753,12 @@
              * @returns {string} HTML string
              */
             function createFileAttachmentsHtml(job) {
-                let urls = [];
+                const urls = job.imageViewUrls || job.driveUrls || [];
+                if (urls.length === 0) return '';
                 
-                if (job.formType === 'IT') {
-                    urls = job.imageViewUrls || job.driveUrls || [];
-                    if (typeof urls === 'string') {
-                        urls = urls.split(',').map(url => url.trim());
-                    }
-                } else {
-                    // สำหรับงาน EN
-                    if (job.photo1) urls = urls.concat(job.photo1.split(',').map(url => url.trim()));
-                    if (job.photo2) urls = urls.concat(job.photo2.split(',').map(url => url.trim()));
-                    if (job.photo3) urls = urls.concat(job.photo3.split(',').map(url => url.trim()));
-                }
-                
-                // กรอง URL ที่ไม่ถูกต้อง
-                const validUrls = urls.filter(url => url && url.length > 0 && url.startsWith('http'));
+                // แปลง string URLs เป็น array ถ้าเป็น string
+                const urlArray = typeof urls === 'string' ? urls.split(',').map(url => url.trim()) : urls;
+                const validUrls = urlArray.filter(url => url.length > 0);
                 
                 if (validUrls.length === 0) return '';
                 
@@ -1232,14 +782,7 @@
              * @returns {string} HTML string
              */
             function createProgressNotesHtml(job) {
-                let notes = '';
-                
-                if (job.formType === 'IT') {
-                    notes = job.notes || '';
-                } else {
-                    notes = job.maintenanceNote || '';
-                }
-                
+                const notes = job.notes || job.maintenanceNote || '';
                 if (!notes || notes.length === 0) return '';
                 
                 // แปลงเป็น array ถ้าเป็น string
@@ -1359,8 +902,6 @@
              * ตั้งค่าการค้นหา
              */
             function setupSearch() {
-                if (!jobSearch) return;
-                
                 jobSearch.addEventListener('input', function() {
                     const searchTerm = this.value.toLowerCase();
                     
@@ -1397,48 +938,30 @@
             }
             
             // ตั้งค่า Event Listeners
-            if (statCards) {
-                statCards.forEach(card => {
-                    card.addEventListener('click', function() {
-                        filterJobsByStatus(this.dataset.status);
-                    });
+            statCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    filterJobsByStatus(this.dataset.status);
                 });
-            }
+            });
             
-            if (statusTabs) {
-                statusTabs.forEach(tab => {
-                    tab.addEventListener('click', function() {
-                        filterJobsByStatus(this.dataset.status);
-                    });
+            statusTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    filterJobsByStatus(this.dataset.status);
                 });
-            }
+            });
             
-            if (jobTypeTabs) {
-                jobTypeTabs.forEach(tab => {
-                    tab.addEventListener('click', function() {
-                        filterJobsByType(this.dataset.type);
-                    });
+            jobTypeTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    filterJobsByType(this.dataset.type);
                 });
-            }
+            });
             
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', loadRepairJobs);
-            }
-            
-            if (backBtn) {
-                backBtn.addEventListener('click', goBack);
-            }
-            
-            if (retryButton) {
-                retryButton.addEventListener('click', loadRepairJobs);
-            }
+            refreshBtn.addEventListener('click', loadRepairJobs);
+            backBtn.addEventListener('click', goBack);
             
             // เริ่มต้นแอปพลิเคชัน
             window.onload = function() {
-                // เริ่มต้น LIFF
                 initializeLiff();
-                
-                // ตั้งค่าการค้นหา
                 setupSearch();
             };
         });
