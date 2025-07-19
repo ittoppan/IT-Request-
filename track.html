@@ -736,7 +736,7 @@
                                 <div class="flex items-center">
                                     <i class="fas fa-user-circle mr-2"></i>
                                     <span>${job.fullName || 'ไม่ระบุชื่อ'}</span>
-                                     <span>${job.department || 'ไม่ระบุแผนก'}</span>
+                                    <span>${(job.department || 'ไม่ระบุแผนก')}</span>
                                 </div>
                                 <div class="flex items-center">
                                     <i class="fas fa-calendar-alt mr-2"></i>
@@ -884,14 +884,7 @@
                                         <p class="text-sm text-gray-500 dark:text-gray-400">ชื่อเครื่องจักร</p>
                                         <p class="text-gray-900 dark:text-white">${job.machineName || 'ไม่ระบุ'}</p>
                                     </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">รหัสเครื่องจักร</p>
-                                        <p class="text-gray-900 dark:text-white">${job.machineCode || 'ไม่ระบุ'}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">สถานที่ตั้ง</p>
-                                        <p class="text-gray-900 dark:text-white">${job.machineLocation || 'ไม่ระบุ'}</p>
-                                    </div>
+
                                     <div>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">ประเภทงาน</p>
                                         <p class="text-gray-900 dark:text-white">${job.jobType || 'ไม่ระบุ'}</p>
@@ -908,11 +901,11 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">ผู้ตรวจพบปัญหา</p>
-                                        <p class="text-gray-900 dark:text-white">${job.reportedBy || 'ไม่ระบุ'}</p>
+                                        <p class="text-gray-900 dark:text-white">${job.fullName || 'ไม่ระบุ'}</p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">วันที่พบปัญหา</p>
-                                        <p class="text-gray-900 dark:text-white">${formatDate(job.problemDate) || 'ไม่ระบุ'}</p>
+                                        <p class="text-gray-900 dark:text-white">${formatDate(job.timestamp) || 'ไม่ระบุ'}</p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">สาเหตุ</p>
@@ -940,10 +933,7 @@
                                         <p class="text-sm text-gray-500 dark:text-gray-400">จำนวน</p>
                                         <p class="text-gray-900 dark:text-white">${job.quantity || '0'} ${job.unit || 'ชิ้น'}</p>
                                     </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">หมายเลขอะไหล่</p>
-                                        <p class="text-gray-900 dark:text-white">${job.partNumber || 'ไม่ระบุ'}</p>
-                                    </div>
+                                
                                     <div>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">ค่าใช้จ่าย</p>
                                         <p class="text-gray-900 dark:text-white">${job.cost ? '฿' + job.cost : 'ไม่ระบุ'}</p>
