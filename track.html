@@ -948,29 +948,28 @@
             /**
              * สร้าง HTML สำหรับไฟล์แนบ
              */
-           function createFileAttachmentsHtml(job) {
-    // ดึง URL ของไฟล์แนบทั้งหมด
+          function createFileAttachmentsHtml(job) {
     let fileUrls = [];
 
-    // currentJobType ต้องถูกกำหนดค่าไว้ก่อนเรียกใช้ฟังก์ชันนี้
-    // เช่น currentJobType = 'IT'; หรือ currentJobType = 'EN';
-    // สมมติว่า currentJobType ถูกส่งมาจากที่อื่น หรือถูกกำหนดเป็น Global Variable
-    // ถ้า currentJobType ไม่ได้ถูกกำหนด จะต้องพิจารณาว่าควรมีค่าเริ่มต้นเป็นอะไร
+    // **** สำคัญ: คุณต้องมั่นใจว่า 'currentJobType' ถูกกำหนดค่าไว้ก่อนเรียกใช้ฟังก์ชันนี้ ****
+    // เช่น:
+    // let currentJobType = 'IT'; // หรือ 'EN' ขึ้นอยู่กับประเภทงานปัจจุบัน
+    // หรือถ้ามาจาก object job โดยตรง:
+    // const currentJobType = job.type; // ถ้า job มี property ชื่อ 'type'
+    // ถ้าไม่มีการกำหนด 'currentJobType' โปรดระบุค่าเริ่มต้นหรือให้มั่นใจว่ามันถูกส่งมา
     // ตัวอย่าง: ถ้าต้องการให้เป็น 'EN' โดย default ให้เพิ่มบรรทัดนี้:
-    // const currentJobType = window.currentJobType || 'EN';
+    // const currentJobType = window.currentJobType || 'EN'; // สำหรับการใช้งานในเบราว์เซอร์
 
     if (currentJobType === 'IT') {
-        // สำหรับงาน IT: รวมทั้ง imageUrls และ driveUrls
         fileUrls = [...(job.imageUrls || []), ...(job.driveUrls || [])];
     } else {
-        // สำหรับงาน EN: รวมรูปภาพจากทุกคอลัมน์
         fileUrls = job.imageUrls || [];
     }
 
     // กรอง URL ที่ไม่ถูกต้องออกและเอาค่าซ้ำออก
     const validUrls = fileUrls
         .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
-        .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
+        .filter((url, index, self) => self.indexOf(url) === index); // ลบ URL ซ้ำ
 
     if (validUrls.length === 0) {
         return `
@@ -984,7 +983,7 @@
         `;
     }
 
-    // แยก URL รูปภาพออกมา
+    // แยก URL รูปภาพออกมาต่างหากสำหรับแกลเลอรีภาพขยาย
     const imageUrls = validUrls.filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i));
 
     return `
@@ -998,9 +997,9 @@
                         const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
                         const fileExtension = fileName.split('.').pop().toLowerCase();
                         
+                        // กำหนด class ไอคอนสำหรับไฟล์ที่ไม่ใช่รูปภาพ
                         let iconClass = 'fas fa-file file-icon-default';
-                        if (isImage) iconClass = 'fas fa-image img-icon'; // จะไม่ถูกใช้ถ้า isImage เป็นจริงใน template
-                        else if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
+                        if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
                         else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
                         else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
                         else if (['ppt', 'pptx'].includes(fileExtension)) iconClass = 'fas fa-file-powerpoint ppt-icon';
@@ -1057,7 +1056,6 @@
         </div>
     `;
 }
-            
             /**
              * สร้าง HTML สำหรับบันทึกความคืบหน้า
              */
