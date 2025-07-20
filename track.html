@@ -64,7 +64,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Lightbox styles */
+      
        
         /* Custom scrollbar */
         ::-webkit-scrollbar {
@@ -324,29 +324,7 @@
         </div>
     </main>
 
-    <!-- Lightbox สำหรับดูรูปภาพแบบเต็มหน้าจอ -->
-    <div id="lightbox" class="lightbox">
-        <button class="lightbox-close" onclick="closeLightbox()">
-            <i class="fas fa-times"></i>
-        </button>
-        
-        <div class="lightbox-nav">
-            <button onclick="changeLightboxImage(-1)">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button onclick="changeLightboxImage(1)">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-        
-        <div class="lightbox-content">
-            <img id="lightbox-image" src="" alt="">
-        </div>
-        
-        <div class="lightbox-caption">
-            <span id="lightbox-caption"></span>
-        </div>
-    </div>
+   
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -370,9 +348,7 @@
             let currentStatusFilter = 'all';
             let currentJobType = 'IT';
 
-            // Lightbox ตัวแปร
-            let currentLightboxImages = [];
-            let currentLightboxIndex = 0;
+           
 
             // องค์ประกอบ DOM
             const loadingIndicator = document.getElementById('loadingIndicator');
@@ -938,18 +914,21 @@
     let imageObjects = [];
 
     if (currentJobType === 'IT') {
+        // ตรวจสอบให้แน่ใจว่า imageViewerUrls ถูกประมวลผลเป็นอาร์เรย์ของสตริง
         const urls = typeof job.imageViewerUrls === 'string'
-            ? job.imageViewerUrls.split(',').map(url => url.trim())
-            : (job.imageViewerUrls || []);
+            ? job.imageViewerUrls.split(',').map(url => url.trim()).filter(Boolean) // เพิ่ม .filter(Boolean) เพื่อลบสตริงว่าง
+            : (job.imageViewerUrls || []).filter(Boolean); // ตรวจสอบให้แน่ใจว่าเป็นอาร์เรย์และกรองค่าว่าง/null ออก
+
         imageObjects = urls.map((url, index) => ({
             url,
             caption: `รูปที่ ${index + 1}`
         }));
     } else {
+        // กรอง URL ที่เป็น null/undefined/สตริงว่าง ออกไปทันที
         imageObjects = [
             { url: job.photo2, caption: 'รูปก่อนซ่อม' },
             { url: job.photo3, caption: 'รูปหลังซ่อม' }
-        ].filter(obj => obj.url);
+        ].filter(obj => obj.url && obj.url.trim() !== ''); // กรอง URL ที่ไม่ถูกต้องออกไป
     }
 
     if (imageObjects.length === 0) {
@@ -964,22 +943,26 @@
         `;
     }
 
+    // สร้างชื่อแกลเลอรีที่ไม่ซ้ำกันสำหรับ Lightbox2 โดยอิงจาก jobId
+    // สิ่งนี้จะจัดกลุ่มรูปภาพทั้งหมดของงานเดียวให้อยู่ในแกลเลอรี Lightbox เดียวกัน
+    const lightboxGalleryName = `job-gallery-${job.jobId || 'unknown'}`;
+
     return `
         <div class="bg-white p-6 rounded-lg shadow">
             <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ (${imageObjects.length})</h4>
             <div class="gallery-grid grid grid-cols-2 md:grid-cols-3 gap-4">
                 ${imageObjects.map(img => `
-                    <div class="cursor-pointer" onclick="openModal('${img.url}')">
-                        <img src="${img.url}" alt="${img.caption}" class="rounded shadow-md w-full h-auto object-cover"
-                            onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                        <div class="text-center mt-2 text-sm text-gray-700">${img.caption}</div>
+                    <div class="gallery-item"> <a href="${img.url}" data-lightbox="${lightboxGalleryName}" data-title="${img.caption}" class="block w-full h-full">
+                            <img src="${img.url}" alt="${img.caption}" class="rounded shadow-md w-full h-auto object-cover" loading="lazy"
+                                onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                            <div class="text-center mt-2 text-sm text-gray-700">${img.caption}</div>
+                        </a>
                     </div>
                 `).join('')}
             </div>
         </div>
     `;
 }
-
 
             
             /**
@@ -1191,54 +1174,7 @@ function convertGoogleDate(dateString) {
     return new Date(NaN);
 }
             
-            /**
-             * เปิด Lightbox สำหรับดูรูปภาพ
-             */
-            function openLightbox(images, startIndex = 0) {
-                if (!images || images.length === 0) return;
-                
-                currentLightboxImages = images;
-                currentLightboxIndex = startIndex;
-                
-                const lightbox = document.getElementById('lightbox');
-                const lightboxImage = document.getElementById('lightbox-image');
-                const lightboxCaption = document.getElementById('lightbox-caption');
-                
-                lightboxImage.src = images[startIndex];
-                lightboxCaption.textContent = `รูปภาพ ${startIndex + 1} จาก ${images.length}`;
-                
-                lightbox.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            }
-            
-            /**
-             * ปิด Lightbox
-             */
-            function closeLightbox() {
-                document.getElementById('lightbox').style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
-            
-            /**
-             * เปลี่ยนรูปภาพใน Lightbox
-             */
-            function changeLightboxImage(step) {
-                currentLightboxIndex += step;
-                
-                // Handle wrap-around
-                if (currentLightboxIndex >= currentLightboxImages.length) {
-                    currentLightboxIndex = 0;
-                } else if (currentLightboxIndex < 0) {
-                    currentLightboxIndex = currentLightboxImages.length - 1;
-                }
-                
-                const lightboxImage = document.getElementById('lightbox-image');
-                const lightboxCaption = document.getElementById('lightbox-caption');
-                
-                lightboxImage.src = currentLightboxImages[currentLightboxIndex];
-                lightboxCaption.textContent = `รูปภาพ ${currentLightboxIndex + 1} จาก ${currentLightboxImages.length}`;
-            }
-            
+           
             /**
              * ตั้งค่าการค้นหา
              */
