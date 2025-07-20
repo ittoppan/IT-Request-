@@ -958,50 +958,50 @@
              * สร้าง HTML สำหรับแกลเลอรี่รูปภาพ
              */
             function createImageGalleryHtml(job) {
-                // ดึง URL ของรูปภาพทั้งหมด
-                let imageUrls = [];
-                
-                if (currentJobType === 'IT') {
-                    // สำหรับงาน IT: รวมทั้ง imageUrls และ driveUrls ที่เป็นรูปภาพ
-                    imageUrls = [
-                        ...(job.imageUrls || []).filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i)),
-                        ...(job.driveUrls || []).filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i))
-                    ];
-                } else {
-                    // สำหรับงาน EN: รวมรูปภาพจาก imageUrls
-                    imageUrls = (job.imageUrls || []).filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i));
-                }
-                
-                if (imageUrls.length === 0) {
+    let imageUrls = [];
+
+    if (currentJobType === 'IT') {
+        imageUrls = [
+            ...(job.imageViewerUrls || []),
+            ...(job.googleDriveUrls || [])
+        ];
+    } else {
+        imageUrls = [
+            job.photo1, job.photo2, job.photo3
+        ].filter(Boolean); // ตัด null/undefined ออก
+    }
+
+    if (imageUrls.length === 0) {
+        return `
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ</h4>
+                <div class="text-center py-4 text-gray-500">
+                    <i class="fas fa-image text-3xl mb-2"></i>
+                    <p>ไม่มีรูปภาพประกอบ</p>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ (${imageUrls.length})</h4>
+            <div class="gallery-grid">
+                ${imageUrls.map((url, index) => {
+                    const fileName = decodeURIComponent(url.split('/').pop().split('?')[0]);
                     return `
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ</h4>
-                            <div class="text-center py-4 text-gray-500">
-                                <i class="fas fa-image text-3xl mb-2"></i>
-                                <p>ไม่มีรูปภาพประกอบ</p>
-                            </div>
+                        <div class="gallery-item" onclick="openLightbox(${JSON.stringify(imageUrls)}, ${index})">
+                            <img src="${url}" alt="รูปภาพประกอบงานซ่อม" 
+                                onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                            <div class="image-overlay">${fileName}</div>
                         </div>
                     `;
-                }
-                
-                return `
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ (${imageUrls.length})</h4>
-                        <div class="gallery-grid">
-                            ${imageUrls.map((url, index) => {
-                                const fileName = url.split('/').pop() || `รูปภาพ ${index + 1}`;
-                                return `
-                                    <div class="gallery-item" onclick="openLightbox(${JSON.stringify(imageUrls)}, ${index})">
-                                        <img src="${url}" alt="รูปภาพประกอบงานซ่อม" 
-                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                                        <div class="image-overlay">${fileName}</div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            }
+                }).join('')}
+            </div>
+        </div>
+    `;
+}
+
             
             /**
              * สร้าง HTML สำหรับบันทึกความคืบหน้า
