@@ -9,11 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet" />
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 
     <style>
@@ -65,8 +62,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-      
-       
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -148,6 +143,49 @@
         .gallery-item:hover .image-overlay {
             opacity: 1;
         }
+
+        /* Job card styles */
+        .job-card {
+            transition: all 0.2s ease;
+        }
+        
+        .job-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Detail section styles */
+        .detail-section {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .detail-section h4 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Responsive table */
+        .responsive-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .responsive-table th, 
+        .responsive-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .responsive-table th {
+            font-weight: 500;
+            color: #666;
+            width: 30%;
+        }
     </style>
 </head>
 <body class="min-h-full bg-gradient-to-br from-gray-50 to-gray-100">
@@ -175,11 +213,11 @@
                     </div>
                 </div>
                 <div class="mt-4 md:mt-0 flex items-center justify-end"> 
-    <div id="userProfile" class="hidden flex items-center space-x-2 bg-blue-600 text-white rounded-full pl-2 pr-4 py-1 shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer">
-        <img id="userAvatar" class="w-10 h-10 rounded-full border-2 border-white object-cover" src="" alt="รูปโปรไฟล์"> 
-        <span id="fullName" class="font-semibold text-lg tracking-wide"></span> 
-    </div>
-</div>
+                    <div id="userProfile" class="hidden flex items-center space-x-2 bg-blue-600 text-white rounded-full pl-2 pr-4 py-1 shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer">
+                        <img id="userAvatar" class="w-10 h-10 rounded-full border-2 border-white object-cover" src="" alt="รูปโปรไฟล์"> 
+                        <span id="fullName" class="font-semibold text-lg tracking-wide"></span> 
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -239,25 +277,6 @@
                         <div class="text-sm text-gray-600">เสร็จสิ้น</div>
                     </div>
                 </div>
-
-                <!-- แท็บสถานะ 
-                <div class="flex overflow-x-auto scrollbar-hide border-b border-gray-200">
-                    <button class="status-tab active px-4 py-2 font-medium text-sm whitespace-nowrap border-b-2 border-blue-500 text-blue-600" data-status="all">
-                        ทั้งหมด
-                    </button>
-                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 hover:text-gray-700" data-status="new">
-                        แจ้งซ่อมใหม่
-                    </button>
-                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 hover:text-gray-700" data-status="pending">
-                        รอดำเนินการ
-                    </button>
-                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 hover:text-gray-700" data-status="in-progress">
-                        กำลังดำเนินการ
-                    </button>
-                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 hover:text-gray-700" data-status="completed">
-                        เสร็จสิ้น
-                    </button>
-                </div> -->
             </section>
 
             <!-- ส่วนรายการงานและรายละเอียด -->
@@ -325,8 +344,6 @@
         </div>
     </main>
 
-   
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // ค่าคงที่และตัวแปร
@@ -337,10 +354,6 @@
             let userId = '';
             let userDisplayName = '';
             let userPictureUrl = '';
-        
-
-           
-
             
             // ข้อมูลงานซ่อม
             let repairJobs = { IT: [], EN: [] };
@@ -348,8 +361,6 @@
             let selectedJobId = null;
             let currentStatusFilter = 'all';
             let currentJobType = 'IT';
-
-           
 
             // องค์ประกอบ DOM
             const loadingIndicator = document.getElementById('loadingIndicator');
@@ -372,77 +383,55 @@
             /**
              * เริ่มต้น LIFF แอปพลิเคชัน
              */
-           async function initializeLiff() {
-    try {
-        await liff.init({ liffId });
+            async function initializeLiff() {
+                try {
+                    await liff.init({ liffId });
 
-        if (!liff.isLoggedIn()) {
-            liff.login();
-            return;
-        }
+                    if (!liff.isLoggedIn()) {
+                        liff.login();
+                        return;
+                    }
 
-        const profile = await liff.getProfile();
-        userId = profile.userId;
-        userDisplayName = profile.displayName;
-        userPictureUrl = profile.pictureUrl || '';
+                    const profile = await liff.getProfile();
+                    userId = profile.userId;
+                    userDisplayName = profile.displayName;
+                    userPictureUrl = profile.pictureUrl || '';
 
-        // แสดงข้อมูลผู้ใช้
-        if (userPictureUrl) {
-            userAvatar.src = userPictureUrl;
-            userAvatar.alt = userDisplayName;
-        }
-        fullNameSpan.textContent = userDisplayName; // <<< แก้ไขจุดที่ 1: เปลี่ยน userName เป็น fullNameSpan
-        userProfile.classList.remove('hidden');
+                    // แสดงข้อมูลผู้ใช้
+                    if (userPictureUrl) {
+                        userAvatar.src = userPictureUrl;
+                        userAvatar.alt = userDisplayName;
+                    }
+                    fullNameSpan.textContent = userDisplayName;
+                    userProfile.classList.remove('hidden');
 
-        await loadRepairJobs();
+                    await loadRepairJobs();
 
-        // หลังจากโหลดงานซ่อมเสร็จแล้ว ให้อัพเดตชื่อด้วยชื่อจริงจากชีท
-        let realFullName = userDisplayName; // ตั้งต้นด้วยชื่อ LINE
+                    // หลังจากโหลดงานซ่อมเสร็จแล้ว ให้อัพเดตชื่อด้วยชื่อจริงจากชีท
+                    let realFullName = userDisplayName; // ตั้งต้นด้วยชื่อ LINE
 
-        if (repairJobs.IT.length > 0 && repairJobs.IT[0].fullName) {
-            realFullName = repairJobs.IT[0].fullName;
-        } else if (repairJobs.EN.length > 0 && repairJobs.EN[0].fullName) {
-            realFullName = repairJobs.EN[0].fullName;
-        }
+                    if (repairJobs.IT.length > 0 && repairJobs.IT[0].fullName) {
+                        realFullName = repairJobs.IT[0].fullName;
+                    } else if (repairJobs.EN.length > 0 && repairJobs.EN[0].fullName) {
+                        realFullName = repairJobs.EN[0].fullName;
+                    }
 
-        fullNameSpan.textContent = realFullName; // <<< แก้ไขจุดที่ 2: เปลี่ยน userName เป็น fullNameSpan
-        console.log("ชื่อที่แสดงใน UI:", realFullName);
+                    fullNameSpan.textContent = realFullName;
+                    console.log("ชื่อที่แสดงใน UI:", realFullName);
 
-    } catch (error) {
-        console.error('LIFF initialization failed:', error);
-        // ตรวจสอบให้แน่ใจว่าฟังก์ชัน showError ถูกกำหนดและสามารถเข้าถึงได้
-        showError('เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF', error.message);
-    } finally {
-        // ตรวจสอบให้แน่ใจว่า loadingIndicator และ mainContent เป็น Element ที่ระบุถูกต้อง
-        if (loadingIndicator && mainContent) {
-            loadingIndicator.classList.add('hidden');
-            mainContent.classList.remove('hidden');
-        } else {
-            console.warn("ไม่พบ Element ตัวบ่งชี้การโหลด หรือเนื้อหาหลัก");
-        }
-    }
-}
+                } catch (error) {
+                    console.error('LIFF initialization failed:', error);
+                    showError('เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF', error.message);
+                } finally {
+                    if (loadingIndicator && mainContent) {
+                        loadingIndicator.classList.add('hidden');
+                        mainContent.classList.remove('hidden');
+                    } else {
+                        console.warn("ไม่พบ Element ตัวบ่งชี้การโหลด หรือเนื้อหาหลัก");
+                    }
+                }
+            }
 
-        // === จุดเริ่มต้นการทำงานของ JavaScript: เมื่อ DOM โหลดเสร็จสมบูรณ์ ===
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log("DOM fully loaded and parsed. Initializing LIFF...");
-            await initializeLiff();
-        });
-
-        // เพิ่มฟังก์ชัน showError (ถ้ายังไม่มี)
-        function showError(title, message) {
-            console.error(title, message);
-            alert(`${title}\n${message}`); // ตัวอย่างการแสดง alert ง่ายๆ
-        }
-
-        // เพิ่มฟังก์ชัน toArray (ถ้ายังไม่มี)
-        function toArray(input) {
-            if (!input) return [];
-            if (Array.isArray(input)) return input;
-            if (typeof input === 'string') return input.split(',').map(s => s.trim()).filter(Boolean);
-            return [];
-        }
-            
             /**
              * แสดงข้อความผิดพลาด
              */
@@ -485,60 +474,55 @@
              * โหลดข้อมูลงานซ่อม
              */
             async function loadRepairJobs() {
-  function toArray(input) {
-    if (!input) return [];
-    if (Array.isArray(input)) return input;
-    if (typeof input === 'string') return input.split(',').map(s => s.trim()).filter(Boolean);
-    return [];
-  }
-
-  try {
-    if (!userId) {
-      throw new Error('ไม่พบข้อมูลผู้ใช้');
-    }
-    
-    loadingIndicator.classList.remove('hidden');
-    mainContent.classList.add('hidden');
-    
-    const timestamp = new Date().getTime();
-    const [itResponse, enResponse] = await Promise.all([
-      fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT&t=${timestamp}`),
-      fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN&t=${timestamp}`)
-    ]);
-    
-    if (!itResponse.ok || !enResponse.ok) {
-      throw new Error(`การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา: ${itResponse.status}`);
-    }
-    
-    const [itData, enData] = await Promise.all([
-      itResponse.json(),
-      enResponse.json()
-    ]);
-    
-    if (itData.status === 'error' || enData.status === 'error') {
-      throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
-    }
-    
-    // Process IT jobs
-    repairJobs.IT = (itData.data || []).map(job => {
-      return {
-        ...job,
-        imageUrls: toArray(job.imageViewerUrls),
-        driveUrls: toArray(job.googleDriveUrls)
-      };
-    });
-    
-    // Process EN jobs
-    repairJobs.EN = (enData.data || []).map(job => {
-      return {
-        ...job,
-        imageUrls: [
-          job.photo1,
-          job.photo2,
-          job.photo3
-        ].filter(url => url && url.trim() !== '')
-      };
-    });
+                try {
+                    if (!userId) {
+                        throw new Error('ไม่พบข้อมูลผู้ใช้');
+                    }
+                    
+                    loadingIndicator.classList.remove('hidden');
+                    mainContent.classList.add('hidden');
+                    
+                    const timestamp = new Date().getTime();
+                    const [itResponse, enResponse] = await Promise.all([
+                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT&t=${timestamp}`),
+                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN&t=${timestamp}`)
+                    ]);
+                    
+                    if (!itResponse.ok || !enResponse.ok) {
+                        throw new Error(`การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา: ${itResponse.status}`);
+                    }
+                    
+                    const [itData, enData] = await Promise.all([
+                        itResponse.json(),
+                        enResponse.json()
+                    ]);
+                    
+                    if (itData.status === 'error' || enData.status === 'error') {
+                        throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
+                    }
+                    
+                    // Process IT jobs
+                    repairJobs.IT = (itData.data?.jobs || []).map(job => {
+                        return {
+                            ...job,
+                            ...job.details, // รวมข้อมูลจาก details เข้ามาใน object หลัก
+                            imageUrls: toArray(job.images?.viewerUrls || job.imageViewerUrls),
+                            driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
+                        };
+                    });
+                    
+                    // Process EN jobs
+                    repairJobs.EN = (enData.data?.jobs || []).map(job => {
+                        return {
+                            ...job,
+                            ...job.details, // รวมข้อมูลจาก details เข้ามาใน object หลัก
+                            imageUrls: [
+                                job.photo2,
+                                job.photo3
+                            ].filter(url => url && url.trim() !== ''),
+                            driveUrls: toArray(job.photo1)
+                        };
+                    });
                     
                     updateDashboardStats();
                     filterJobsByType(currentJobType);
@@ -556,6 +540,16 @@
                     console.error('Error loading repair jobs:', error);
                     showError('โหลดข้อมูลงานซ่อมไม่สำเร็จ', error.message || 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
                 }
+            }
+            
+            /**
+             * แปลงข้อมูลเป็นอาร์เรย์
+             */
+            function toArray(input) {
+                if (!input) return [];
+                if (Array.isArray(input)) return input;
+                if (typeof input === 'string') return input.split(',').map(s => s.trim()).filter(Boolean);
+                return [];
             }
             
             /**
@@ -597,10 +591,8 @@
             function filterJobsByStatus(status) {
                 currentStatusFilter = status;
                 
-                statusTabs.forEach(tab => {
-                    tab.classList.toggle('border-blue-500', tab.dataset.status === status);
-                    tab.classList.toggle('text-blue-600', tab.dataset.status === status);
-                    tab.classList.toggle('text-gray-500', tab.dataset.status !== status);
+                statCards.forEach(card => {
+                    card.classList.toggle('bg-blue-50', card.dataset.status === status);
                 });
                 
                 let jobs = [...repairJobs[currentJobType]];
@@ -656,7 +648,9 @@
                 
                 filteredJobs.forEach((job, index) => {
                     const jobCard = document.createElement('div');
-                    jobCard.className = `bg-white rounded-lg shadow overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md ${selectedJobId === job.jobId ? 'ring-2 ring-blue-500' : ''}`;
+                    jobCard.className = `bg-white rounded-lg shadow overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md job-card ${
+                        selectedJobId === job.jobId ? 'ring-2 ring-blue-500' : ''
+                    }`;
                     jobCard.id = `job-${job.jobId}`;
                     jobCard.onclick = () => selectJob(job.jobId);
                     
@@ -731,7 +725,7 @@
                 detailHeader.classList.remove('hidden');
                 jobDetailsContainer.classList.remove('hidden');
                 
-                document.getElementById('detailJobType').textContent = currentJobType;
+                document.getElementById('detailJobType').textContent = currentJobType === 'IT' ? 'งานซ่อม IT' : 'งานซ่อมเครื่องจักร';
                 document.getElementById('detailJobId').textContent = job.jobId || 'N/A';
                 
                 jobDetailsContainer.innerHTML = `
@@ -756,14 +750,16 @@
                         
                         ${createProgressNotesHtml(job)}
                         
-                        ${job.additionalNotes ? `
-                            <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                                <h4 class="font-semibold text-yellow-800 mb-2">หมายเหตุเพิ่มเติม</h4>
-                                <p class="text-sm text-yellow-700">${job.additionalNotes}</p>
-                            </div>
-                        ` : ''}
+                        ${createAdditionalInfoHtml(job)}
                     </div>
                 `;
+                
+                // เปิดใช้งาน Lightbox สำหรับรูปภาพ
+                lightbox.option({
+                    'resizeDuration': 200,
+                    'wrapAround': true,
+                    'alwaysShowNavOnTouchDevices': true
+                });
             }
             
             /**
@@ -801,94 +797,115 @@
             function createTypeSpecificHtml(job) {
                 if (currentJobType === 'IT') {
                     return `
-                        <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="detail-section">
                             <h4 class="text-lg font-semibold text-gray-900 mb-4">ข้อมูลปัญหา</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <p class="text-sm text-gray-500">ประเภทปัญหา</p>
-                                    <p class="text-gray-900">${job.problemType || 'ไม่ระบุ'}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-500">อุปกรณ์</p>
-                                    <p class="text-gray-900">${job.device || 'ไม่ระบุ'}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-500">ความเร่งด่วน</p>
-                                    <p class="text-gray-900">${job.urgency || 'ไม่ระบุ'}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-500">สำนักงาน</p>
-                                    <p class="text-gray-900">${job.office || 'ไม่ระบุ'}</p>
-                                </div>
-                            </div>
+                            <table class="responsive-table">
+                                <tr>
+                                    <th>ประเภทปัญหา</th>
+                                    <td>${job.problemType || 'ไม่ระบุ'}</td>
+                                </tr>
+                                <tr>
+                                    <th>อุปกรณ์</th>
+                                    <td>${job.device || 'ไม่ระบุ'}</td>
+                                </tr>
+                                <tr>
+                                    <th>ความเร่งด่วน</th>
+                                    <td>${job.urgency || 'ไม่ระบุ'}</td>
+                                </tr>
+                                <tr>
+                                    <th>สำนักงาน</th>
+                                    <td>${job.office || 'ไม่ระบุ'}</td>
+                                </tr>
+                                <tr>
+                                    <th>อีเมล</th>
+                                    <td>${job.email || 'ไม่ระบุ'}</td>
+                                </tr>
+                                <tr>
+                                    <th>เบอร์โทร</th>
+                                    <td>${job.phone || 'ไม่ระบุ'}</td>
+                                </tr>
+                            </table>
                             <div class="mt-4">
                                 <p class="text-sm text-gray-500">รายละเอียดปัญหา</p>
-                                <p class="text-gray-900 mt-1">${job.problemDetails || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
+                                <p class="text-gray-900 mt-1 whitespace-pre-line">${job.problemDetails || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
                             </div>
                         </div>
                     `;
                 } else {
                     return `
                         <div class="space-y-6">
-                            <div class="bg-white p-6 rounded-lg shadow">
+                            <div class="detail-section">
                                 <h4 class="text-lg font-semibold text-gray-900 mb-4">ข้อมูลเครื่องจักร</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <p class="text-sm text-gray-500">ชื่อเครื่องจักร</p>
-                                        <p class="text-gray-900">${job.machineName || 'ไม่ระบุ'}</p>
-                                    </div>
-                             
-                                    <div>
-                                        <p class="text-sm text-gray-500">ประเภทงาน</p>
-                                        <p class="text-gray-900">${job.jobType || 'ไม่ระบุ'}</p>
-                                    </div>
-                                </div>
+                                <table class="responsive-table">
+                                    <tr>
+                                        <th>ชื่อเครื่องจักร</th>
+                                        <td>${job.machineName || 'ไม่ระบุ'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>ประเภทงาน</th>
+                                        <td>${job.jobType || 'ไม่ระบุ'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>สถานะเครื่อง</th>
+                                        <td>${job.machineStatus || 'ไม่ระบุ'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>ความเร่งด่วน</th>
+                                        <td>${job.urgency || 'ไม่ระบุ'}</td>
+                                    </tr>
+                                </table>
                                 <div class="mt-4">
                                     <p class="text-sm text-gray-500">รายละเอียดปัญหา</p>
-                                    <p class="text-gray-900 mt-1">${job.problemDescription || 'ไม่มีรายละเอียด'}</p>
+                                    <p class="text-gray-900 mt-1 whitespace-pre-line">${job.problemDescription || 'ไม่มีรายละเอียด'}</p>
                                 </div>
                             </div>
                             
-                            <div class="bg-white p-6 rounded-lg shadow en-specific">
+                            <div class="detail-section">
                                 <h4 class="text-lg font-semibold text-gray-900 mb-4">การซ่อมบำรุง</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <p class="text-sm text-gray-500">ผู้ตรวจพบปัญหา</p>
-                                        <p class="text-gray-900">${job.fullName || 'ไม่ระบุ'}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500">วันที่พบปัญหา</p>
-                                        <p class="text-gray-900">${formatDate(job.timestamp) || 'ไม่ระบุ'}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500">สาเหตุ</p>
-                                        <p class="text-gray-900">${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</p>
-                                    </div>
-                                    
-                                </div>
+                                <table class="responsive-table">
+                                    <tr>
+                                        <th>ผู้ตรวจพบปัญหา</th>
+                                        <td>${job.fullName || 'ไม่ระบุ'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>วันที่พบปัญหา</th>
+                                        <td>${formatDate(job.timestamp) || 'ไม่ระบุ'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>สาเหตุ</th>
+                                        <td>${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>การดำเนินการ</th>
+                                        <td>${job.maintenanceAction || 'ไม่ระบุ'}</td>
+                                    </tr>
+                                </table>
                                 <div class="mt-4">
                                     <p class="text-sm text-gray-500">รายละเอียดการซ่อม</p>
-                                    <p class="text-gray-900 mt-1">${job.maintenanceDescription || 'ไม่มีข้อมูล'}</p>
+                                    <p class="text-gray-900 mt-1 whitespace-pre-line">${job.maintenanceDescription || 'ไม่มีข้อมูล'}</p>
                                 </div>
                             </div>
                             
-                            <div class="bg-white p-6 rounded-lg shadow en-specific">
+                            <div class="detail-section">
                                 <h4 class="text-lg font-semibold text-gray-900 mb-4">อะไหล่และวัสดุ</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <p class="text-sm text-gray-500">อะไหล่ที่ใช้</p>
-                                        <p class="text-gray-900">${job.sparePartsUsed || 'ไม่มี'}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500">จำนวน</p>
-                                        <p class="text-gray-900">${job.quantity || '0'} ${job.unit || 'ชิ้น'}</p>
-                                    </div>
-                                    
-                                    <div>
-                                        <p class="text-sm text-gray-500">ค่าใช้จ่าย</p>
-                                        <p class="text-gray-900">${job.cost ? '฿' + job.cost : 'ไม่ระบุ'}</p>
-                                    </div>
-                                </div>
+                                <table class="responsive-table">
+                                    <tr>
+                                        <th>อะไหล่ที่ใช้</th>
+                                        <td>${job.sparePartsUsed || 'ไม่มี'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>จำนวน</th>
+                                        <td>${job.quantity || '0'} ${job.unit || 'ชิ้น'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>ผู้รับผิดชอบ</th>
+                                        <td>${job.responsible || 'ไม่ระบุ'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>ผู้ตรวจสอบ</th>
+                                        <td>${job.checkedBy || 'ไม่ระบุ'}</td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     `;
@@ -899,59 +916,54 @@
              * สร้าง HTML สำหรับแกลเลอรี่รูปภาพ
              */
             function createImageGalleryHtml(job) {
-    let imageObjects = [];
+                let imageObjects = [];
 
-    if (currentJobType === 'IT') {
-        // ตรวจสอบให้แน่ใจว่า imageViewerUrls ถูกประมวลผลเป็นอาร์เรย์ของสตริง
-        const urls = typeof job.imageViewerUrls === 'string'
-            ? job.imageViewerUrls.split(',').map(url => url.trim()).filter(Boolean) // เพิ่ม .filter(Boolean) เพื่อลบสตริงว่าง
-            : (job.imageViewerUrls || []).filter(Boolean); // ตรวจสอบให้แน่ใจว่าเป็นอาร์เรย์และกรองค่าว่าง/null ออก
+                if (currentJobType === 'IT') {
+                    // สำหรับงาน IT
+                    const urls = toArray(job.imageUrls || job.imageViewerUrls);
+                    imageObjects = urls.map((url, index) => ({
+                        url,
+                        caption: `รูปประกอบ ${index + 1}`
+                    }));
+                } else {
+                    // สำหรับงาน EN
+                    imageObjects = [
+                        { url: job.photo2, caption: 'รูปก่อนซ่อม' },
+                        { url: job.photo3, caption: 'รูปหลังซ่อม' }
+                    ].filter(obj => obj.url && obj.url.trim() !== '');
+                }
 
-        imageObjects = urls.map((url, index) => ({
-            url,
-            caption: `รูปที่ ${index + 1}`
-        }));
-    } else {
-        // กรอง URL ที่เป็น null/undefined/สตริงว่าง ออกไปทันที
-        imageObjects = [
-            { url: job.photo2, caption: 'รูปก่อนซ่อม' },
-            { url: job.photo3, caption: 'รูปหลังซ่อม' }
-        ].filter(obj => obj.url && obj.url.trim() !== ''); // กรอง URL ที่ไม่ถูกต้องออกไป
-    }
+                if (imageObjects.length === 0) {
+                    return `
+                        <div class="detail-section">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ</h4>
+                            <div class="text-center py-4 text-gray-500">
+                                <i class="fas fa-image text-3xl mb-2"></i>
+                                <p>ไม่มีรูปภาพประกอบ</p>
+                            </div>
+                        </div>
+                    `;
+                }
 
-    if (imageObjects.length === 0) {
-        return `
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ</h4>
-                <div class="text-center py-4 text-gray-500">
-                    <i class="fas fa-image text-3xl mb-2"></i>
-                    <p>ไม่มีรูปภาพประกอบ</p>
-                </div>
-            </div>
-        `;
-    }
+                const lightboxGalleryName = `job-gallery-${job.jobId || 'unknown'}`;
 
-    // สร้างชื่อแกลเลอรีที่ไม่ซ้ำกันสำหรับ Lightbox2 โดยอิงจาก jobId
-    // สิ่งนี้จะจัดกลุ่มรูปภาพทั้งหมดของงานเดียวให้อยู่ในแกลเลอรี Lightbox เดียวกัน
-    const lightboxGalleryName = `job-gallery-${job.jobId || 'unknown'}`;
-
-    return `
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ (${imageObjects.length})</h4>
-            <div class="gallery-grid grid grid-cols-2 md:grid-cols-3 gap-4">
-                ${imageObjects.map(img => `
-                    <div class="gallery-item"> <a href="${img.url}" data-lightbox="${lightboxGalleryName}" data-title="${img.caption}" class="block w-full h-full">
-                            <img src="${img.url}" alt="${img.caption}" class="rounded shadow-md w-full h-auto object-cover" loading="lazy"
-                                onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                            <div class="text-center mt-2 text-sm text-gray-700">${img.caption}</div>
-                        </a>
+                return `
+                    <div class="detail-section">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ (${imageObjects.length})</h4>
+                        <div class="gallery-grid">
+                            ${imageObjects.map(img => `
+                                <div class="gallery-item">
+                                    <a href="${img.url}" data-lightbox="${lightboxGalleryName}" data-title="${img.caption}" class="block w-full h-full">
+                                        <img src="${img.url}" alt="${img.caption}" class="rounded shadow-md w-full h-auto object-cover" loading="lazy"
+                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                                        <div class="text-center mt-2 text-sm text-gray-700">${img.caption}</div>
+                                    </a>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-}
-
+                `;
+            }
             
             /**
              * สร้าง HTML สำหรับบันทึกความคืบหน้า
@@ -965,7 +977,7 @@
                 
                 if (!notes || notes.length === 0) {
                     return `
-                        <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="detail-section">
                             <h4 class="text-lg font-semibold text-gray-900 mb-4">บันทึกความคืบหน้า</h4>
                             <div class="text-center py-4 text-gray-500">
                                 <i class="fas fa-info-circle text-3xl mb-2"></i>
@@ -978,7 +990,7 @@
                 const notesArray = typeof notes === 'string' ? notes.split('\n').filter(n => n.trim().length > 0) : notes;
                 
                 return `
-                    <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="detail-section">
                         <h4 class="text-lg font-semibold text-gray-900 mb-4">บันทึกความคืบหน้า (${notesArray.length})</h4>
                         <div class="space-y-3">
                             ${notesArray.map((note, index) => `
@@ -987,7 +999,7 @@
                                         <span class="text-blue-600 font-medium text-sm">${index + 1}</span>
                                     </div>
                                     <div class="min-w-0 flex-1">
-                                        <p class="text-sm text-gray-800">${note}</p>
+                                        <p class="text-sm text-gray-800 whitespace-pre-line">${note}</p>
                                         ${job.noteDates && job.noteDates[index] ? `
                                             <p class="mt-1 text-xs text-gray-500">
                                                 <i class="far fa-clock mr-1"></i>
@@ -1003,22 +1015,111 @@
             }
             
             /**
+             * สร้าง HTML สำหรับข้อมูลเพิ่มเติม
+             */
+            function createAdditionalInfoHtml(job) {
+                if (currentJobType === 'IT') {
+                    return `
+                        <div class="detail-section">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">ข้อมูลเพิ่มเติม</h4>
+                            <table class="responsive-table">
+                                <tr>
+                                    <th>ผู้รับผิดชอบ</th>
+                                    <td>${job.assignedTo || 'ยังไม่ระบุ'}</td>
+                                </tr>
+                                <tr>
+                                    <th>หมายเหตุ</th>
+                                    <td>${job.notes || 'ไม่มี'}</td>
+                                </tr>
+                                <tr>
+                                    <th>วันที่เริ่ม</th>
+                                    <td>${formatDate(job.start) || 'ยังไม่เริ่ม'}</td>
+                                </tr>
+                                <tr>
+                                    <th>วันที่เสร็จ</th>
+                                    <td>${formatDate(job.end) || 'ยังไม่เสร็จ'}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="detail-section">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">ข้อมูลเพิ่มเติม</h4>
+                            <table class="responsive-table">
+                                <tr>
+                                    <th>ผู้รับผิดชอบ</th>
+                                    <td>${job.responsible || 'ยังไม่ระบุ'}</td>
+                                </tr>
+                                <tr>
+                                    <th>ผู้ตรวจสอบ</th>
+                                    <td>${job.checkedBy || 'ยังไม่ตรวจสอบ'}</td>
+                                </tr>
+                                <tr>
+                                    <th>วันที่เริ่ม</th>
+                                    <td>${formatDate(job.start) || 'ยังไม่เริ่ม'}</td>
+                                </tr>
+                                <tr>
+                                    <th>วันที่เสร็จ</th>
+                                    <td>${formatDate(job.end) || 'ยังไม่เสร็จ'}</td>
+                                </tr>
+                                <tr>
+                                    <th>เวลาที่ใช้</th>
+                                    <td>${job.time || 'ไม่ระบุ'}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    `;
+                }
+            }
+            
+            /**
              * ข้อมูลสถานะงาน
              */
             function getStatusInfo(status) {
                 switch(status) {
                     case 'แจ้งซ่อมใหม่':
-                        return { class: 'status-new', icon: 'fas fa-file-circle-plus text-blue-500', text: 'แจ้งซ่อมใหม่', color: 'blue' };
+                        return { 
+                            class: 'status-new', 
+                            icon: 'fas fa-file-circle-plus', 
+                            text: 'แจ้งซ่อมใหม่', 
+                            color: 'blue' 
+                        };
                     case 'รอดำเนินการ':
-                        return { class: 'status-pending', icon: 'fas fa-clock text-orange-500', text: 'รอดำเนินการ', color: 'orange' };
+                        return { 
+                            class: 'status-pending', 
+                            icon: 'fas fa-clock', 
+                            text: 'รอดำเนินการ', 
+                            color: 'orange' 
+                        };
                     case 'กำลังดำเนินการ':
-                        return { class: 'status-in-progress', icon: 'fas fa-tools text-yellow-500', text: 'กำลังดำเนินการ', color: 'yellow' };
+                        return { 
+                            class: 'status-in-progress', 
+                            icon: 'fas fa-tools', 
+                            text: 'กำลังดำเนินการ', 
+                            color: 'yellow' 
+                        };
                     case 'เสร็จสิ้น':
-                        return { class: 'status-completed', icon: 'fas fa-check-circle text-green-500', text: 'เสร็จสิ้น', color: 'green' };
+                        return { 
+                            class: 'status-completed', 
+                            icon: 'fas fa-check-circle', 
+                            text: 'เสร็จสิ้น', 
+                            color: 'green' 
+                        };
                     case 'ยกเลิก':
-                        return { class: 'status-cancelled', icon: 'fas fa-times-circle text-gray-500', text: 'ยกเลิก', color: 'gray' };
+                        return { 
+                            class: 'status-cancelled', 
+                            icon: 'fas fa-times-circle', 
+                            text: 'ยกเลิก', 
+                            color: 'gray' 
+                        };
                     default:
-                        return { class: 'status-pending', icon: 'fas fa-clock text-gray-500', text: status || 'ไม่ทราบสถานะ', color: 'gray' };
+                        return { 
+                            class: 'status-pending', 
+                            icon: 'fas fa-clock', 
+                            text: status || 'ไม่ทราบสถานะ', 
+                            color: 'gray' 
+                        };
                 }
             }
             
@@ -1028,20 +1129,38 @@
             function getPriorityInfo(priority) {
                 if (!priority) return null;
                 
-                switch(priority.toLowerCase()) {
-                    case 'ต่ำ':
-                        return { class: 'priority-low', text: 'ต่ำ', color: 'gray' };
-                    case 'ปานกลาง':
-                    case 'normal':
-                        return { class: 'priority-medium', text: 'ปานกลาง', color: 'blue' };
-                    case 'สูง':
-                    case 'high':
-                        return { class: 'priority-high', text: 'สูง', color: 'orange' };
-                    case 'ด่วนมาก':
-                    case 'critical':
-                        return { class: 'priority-critical', text: 'ด่วนมาก', color: 'red' };
-                    default:
-                        return { class: 'priority-medium', text: priority, color: 'blue' };
+                const priorityText = priority.toLowerCase();
+                
+                if (priorityText.includes('ต่ำ') || priorityText.includes('low')) {
+                    return { 
+                        class: 'priority-low', 
+                        text: 'ต่ำ', 
+                        color: 'gray' 
+                    };
+                } else if (priorityText.includes('ปานกลาง') || priorityText.includes('normal')) {
+                    return { 
+                        class: 'priority-medium', 
+                        text: 'ปานกลาง', 
+                        color: 'blue' 
+                    };
+                } else if (priorityText.includes('สูง') || priorityText.includes('high')) {
+                    return { 
+                        class: 'priority-high', 
+                        text: 'สูง', 
+                        color: 'orange' 
+                    };
+                } else if (priorityText.includes('ด่วนมาก') || priorityText.includes('critical')) {
+                    return { 
+                        class: 'priority-critical', 
+                        text: 'ด่วนมาก', 
+                        color: 'red' 
+                    };
+                } else {
+                    return { 
+                        class: 'priority-medium', 
+                        text: priority, 
+                        color: 'blue' 
+                    };
                 }
             }
             
@@ -1064,105 +1183,89 @@
             /**
              * จัดรูปแบบวันที่ภาษาไทย
              */
-           function formatThaiDate(dateString) {
-    if (!dateString) return 'ไม่ระบุ';
+            function formatThaiDate(dateString) {
+                if (!dateString) return 'ไม่ระบุ';
 
-    const date = convertGoogleDate(dateString);
-    if (isNaN(date.getTime())) return 'ไม่ระบุ';
+                const date = convertGoogleDate(dateString);
+                if (isNaN(date.getTime())) return 'ไม่ระบุ';
 
-    const thaiMonths = [
-        'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน',
-        'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
-        'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-    ];
+                const thaiMonths = [
+                    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน',
+                    'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
+                    'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+                ];
 
-    const day = date.getDate();
-    const month = thaiMonths[date.getMonth()];
-    const year = date.getFullYear() + 543; // แปลงเป็นปีพุทธศักราช
+                const day = date.getDate();
+                const month = thaiMonths[date.getMonth()];
+                const year = date.getFullYear() + 543; // แปลงเป็นปีพุทธศักราช
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
 
-    // ดึงชั่วโมงและนาทีจริงจากข้อมูล และจัดรูปแบบให้มี 2 หลัก
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-
-    // คืนค่าเป็น วัน เดือน ปี ชั่วโมง:นาที น.
-    return `${day} ${month} ${year} ${hours}:${minutes} น.`;
-}
+                return `${day} ${month} ${year} ${hours}:${minutes} น.`;
+            }
             
             /**
              * จัดรูปแบบวันที่และเวลา
              */
-           function formatDateTime(dateTimeString) {
-    if (!dateTimeString) return 'ไม่ระบุ';
+            function formatDateTime(dateTimeString) {
+                if (!dateTimeString) return 'ไม่ระบุ';
 
-    const date = convertGoogleDate(dateTimeString);
-    if (isNaN(date.getTime())) return 'ไม่ระบุ';
+                const date = convertGoogleDate(dateTimeString);
+                if (isNaN(date.getTime())) return 'ไม่ระบุ';
 
-    return date.toLocaleString('th-TH', {
-        year: 'numeric',
-        month: 'short', // หรือ 'long' หากต้องการชื่อเดือนเต็ม
-        day: 'numeric',
-        hour: '2-digit',   // แสดงชั่วโมงแบบ 2 หลัก
-        minute: '2-digit', // แสดงนาทีแบบ 2 หลัก
-        hour12: false      // ใช้รูปแบบ 24 ชั่วโมง
-        // ไม่ได้ระบุ 'second' จึงจะไม่แสดงวินาที
-    });
-}
+                return date.toLocaleString('th-TH', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            }
             
             /**
              * แปลงรูปแบบวันที่จาก Google Sheets
              */
-           /**
- * แปลงรูปแบบวันที่จาก Google Sheets
- */
-function convertGoogleDate(dateString) {
-    if (!dateString) return new Date(NaN);
+            function convertGoogleDate(dateString) {
+                if (!dateString) return new Date(NaN);
 
-    if (typeof dateString === 'number') {
-        return new Date(dateString);
-    }
+                if (typeof dateString === 'number') {
+                    return new Date(dateString);
+                }
 
-    if (typeof dateString === 'string') {
-        const isoDateFormat = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-        if (isoDateFormat) {
-            return new Date(Date.UTC(
-                parseInt(isoDateFormat[1]),
-                parseInt(isoDateFormat[2]) - 1,
-                parseInt(isoDateFormat[3])
-            ));
-        }
+                if (typeof dateString === 'string') {
+                    // Format: dd/MM/yyyy HH:mm:ss
+                    const dateTimeSlashFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})\s(\d{2}):(\d{2}):(\d{2})$/);
+                    if (dateTimeSlashFormat) {
+                        return new Date(
+                            parseInt(dateTimeSlashFormat[3]),
+                            parseInt(dateTimeSlashFormat[2]) - 1,
+                            parseInt(dateTimeSlashFormat[1]),
+                            parseInt(dateTimeSlashFormat[4]),
+                            parseInt(dateTimeSlashFormat[5]),
+                            parseInt(dateTimeSlashFormat[6])
+                        );
+                    }
 
-        // *** ตรวจสอบว่ามีส่วนนี้อยู่และถูกต้องในโค้ดของคุณ ***
-        const dateTimeSlashFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})\s(\d{2}):(\d{2}):(\d{2})$/);
-        if (dateTimeSlashFormat) {
-            return new Date(
-                parseInt(dateTimeSlashFormat[3]),
-                parseInt(dateTimeSlashFormat[2]) - 1,
-                parseInt(dateTimeSlashFormat[1]),
-                parseInt(dateTimeSlashFormat[4]),
-                parseInt(dateTimeSlashFormat[5]),
-                parseInt(dateTimeSlashFormat[6])
-            );
-        }
-        // *************************************************
+                    // Format: dd/MM/yyyy
+                    const slashDateFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+                    if (slashDateFormat) {
+                        return new Date(
+                            parseInt(slashDateFormat[3]),
+                            parseInt(slashDateFormat[2]) - 1,
+                            parseInt(slashDateFormat[1])
+                        );
+                    }
 
-        const slashDateFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-        if (slashDateFormat) {
-            return new Date(
-                parseInt(slashDateFormat[3]),
-                parseInt(slashDateFormat[2]) - 1,
-                parseInt(slashDateFormat[1])
-            );
-        }
-
-        const parsedDate = new Date(dateString);
-        if (!isNaN(parsedDate.getTime())) {
-            return parsedDate;
-        }
-    }
-    return new Date(NaN);
-}
+                    // Try parsing as ISO format
+                    const parsedDate = new Date(dateString);
+                    if (!isNaN(parsedDate.getTime())) {
+                        return parsedDate;
+                    }
+                }
+                return new Date(NaN);
+            }
             
-           
             /**
              * ตั้งค่าการค้นหา
              */
@@ -1182,7 +1285,8 @@ function convertGoogleDate(dateString) {
                             (job.problemDescription && job.problemDescription.toLowerCase().includes(searchTerm)) ||
                             (job.machineName && job.machineName.toLowerCase().includes(searchTerm)) ||
                             (job.problemType && job.problemType.toLowerCase().includes(searchTerm)) ||
-                            (job.jobType && job.jobType.toLowerCase().includes(searchTerm))
+                            (job.jobType && job.jobType.toLowerCase().includes(searchTerm)) ||
+                            (job.fullName && job.fullName.toLowerCase().includes(searchTerm))
                         );
                     });
                     
@@ -1209,12 +1313,6 @@ function convertGoogleDate(dateString) {
                 });
             });
             
-            statusTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    filterJobsByStatus(this.dataset.status);
-                });
-            });
-            
             jobTypeTabs.forEach(tab => {
                 tab.addEventListener('click', function() {
                     filterJobsByType(this.dataset.type);
@@ -1228,19 +1326,12 @@ function convertGoogleDate(dateString) {
             
             backBtn.addEventListener('click', goBack);
             
-      
-            
             // เริ่มต้นแอปพลิเคชัน
             window.onload = function() {
                 initializeLiff();
                 setupSearch();
             };
         });
-        
-
-
     </script>
-
-
 </body>
 </html>
