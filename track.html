@@ -58,16 +58,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .file-icon {
-            @apply text-4xl;
-        }
-        
-        .pdf-icon { @apply text-red-500; }
-        .doc-icon { @apply text-blue-500; }
-        .xls-icon { @apply text-green-500; }
-        .img-icon { @apply text-purple-500; }
-        .file-icon-default { @apply text-gray-400; }
-        
         /* Lightbox styles */
         .lightbox {
             display: none;
@@ -183,6 +173,52 @@
         @keyframes spinner-rotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        /* Gallery styles */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            aspect-ratio: 1;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.03);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        
+        .gallery-item .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gallery-item:hover .image-overlay {
+            opacity: 1;
         }
     </style>
 </head>
@@ -762,7 +798,7 @@
                         
                         ${createTypeSpecificHtml(job)}
                         
-                        ${createFileAttachmentsHtml(job)}
+                        ${createImageGalleryHtml(job)}
                         
                         ${createProgressNotesHtml(job)}
                         
@@ -919,107 +955,50 @@
             }
             
             /**
-             * สร้าง HTML สำหรับไฟล์แนบ
+             * สร้าง HTML สำหรับแกลเลอรี่รูปภาพ
              */
-            function createFileAttachmentsHtml(job) {
-                // ดึง URL ของไฟล์แนบทั้งหมด
-                let fileUrls = [];
+            function createImageGalleryHtml(job) {
+                // ดึง URL ของรูปภาพทั้งหมด
+                let imageUrls = [];
                 
                 if (currentJobType === 'IT') {
-                    // สำหรับงาน IT: รวมทั้ง imageUrls และ driveUrls
-                    fileUrls = [...(job.imageUrls || []), ...(job.driveUrls || [])];
+                    // สำหรับงาน IT: รวมทั้ง imageUrls และ driveUrls ที่เป็นรูปภาพ
+                    imageUrls = [
+                        ...(job.imageUrls || []).filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i)),
+                        ...(job.driveUrls || []).filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i))
+                    ];
                 } else {
-                    // สำหรับงาน EN: รวมรูปภาพจากทุกคอลัมน์
-                    fileUrls = job.imageUrls || [];
+                    // สำหรับงาน EN: รวมรูปภาพจาก imageUrls
+                    imageUrls = (job.imageUrls || []).filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i));
                 }
                 
-                // กรอง URL ที่ไม่ถูกต้องออก
-                const validUrls = fileUrls
-                    .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
-                    .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
-                
-                if (validUrls.length === 0) {
+                if (imageUrls.length === 0) {
                     return `
                         <div class="bg-white p-6 rounded-lg shadow">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-4">ไฟล์แนบประกอบ</h4>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ</h4>
                             <div class="text-center py-4 text-gray-500">
-                                <i class="fas fa-paperclip text-3xl mb-2"></i>
-                                <p>ไม่มีไฟล์แนบ</p>
+                                <i class="fas fa-image text-3xl mb-2"></i>
+                                <p>ไม่มีรูปภาพประกอบ</p>
                             </div>
                         </div>
                     `;
                 }
                 
-                // แยก URL รูปภาพออกมา
-                const imageUrls = validUrls.filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i));
-                
                 return `
                     <div class="bg-white p-6 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">ไฟล์แนบประกอบ (${validUrls.length})</h4>
-                        
-                        <div class="mb-4">
-                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                                ${validUrls.map((url, index) => {
-                                    const isImage = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) !== null;
-                                    const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
-                                    const fileExtension = fileName.split('.').pop().toLowerCase();
-                                    
-                                    let iconClass = 'fas fa-file file-icon-default';
-                                    if (isImage) iconClass = 'fas fa-image img-icon';
-                                    else if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
-                                    else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
-                                    else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
-                                    else if (['ppt', 'pptx'].includes(fileExtension)) iconClass = 'fas fa-file-powerpoint ppt-icon';
-                                    else if (['zip', 'rar', '7z'].includes(fileExtension)) iconClass = 'fas fa-file-archive zip-icon';
-                                    else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) iconClass = 'fas fa-file-video video-icon';
-                                    else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) iconClass = 'fas fa-file-audio audio-icon';
-                                    
-                                    return `
-                                        <a href="${url}" target="_blank" 
-                                           class="group block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 relative"
-                                           title="${fileName}">
-                                            <div class="relative pt-[100%] bg-gray-100">
-                                                ${isImage ? `
-                                                    <img src="${url}" alt="ไฟล์แนบ" 
-                                                        class="absolute top-0 left-0 w-full h-full object-cover"
-                                                        onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                                                ` : `
-                                                    <div class="absolute inset-0 flex items-center justify-center">
-                                                        <i class="${iconClass} file-icon"></i>
-                                                    </div>
-                                                `}
-                                            </div>
-                                            <div class="p-2 bg-white">
-                                                <p class="text-xs text-gray-600 truncate">${fileName}</p>
-                                            </div>
-                                            ${isImage ? `
-                                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                    <i class="fas fa-expand text-white text-xl"></i>
-                                                </div>
-                                            ` : ''}
-                                        </a>
-                                    `;
-                                }).join('')}
-                            </div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ (${imageUrls.length})</h4>
+                        <div class="gallery-grid">
+                            ${imageUrls.map((url, index) => {
+                                const fileName = url.split('/').pop() || `รูปภาพ ${index + 1}`;
+                                return `
+                                    <div class="gallery-item" onclick="openLightbox(${JSON.stringify(imageUrls)}, ${index})">
+                                        <img src="${url}" alt="รูปภาพประกอบงานซ่อม" 
+                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                                        <div class="image-overlay">${fileName}</div>
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
-                        
-                        ${imageUrls.length > 0 ? `
-                            <div class="mt-6">
-                                <h5 class="text-md font-semibold text-gray-800 mb-3">รูปภาพทั้งหมด</h5>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    ${imageUrls.map((url, index) => `
-                                        <div class="relative group cursor-pointer" onclick="openLightbox(imageUrls, ${index})">
-                                            <img src="${url}" alt="รูปภาพประกอบงานซ่อม" 
-                                                class="w-full h-48 object-cover rounded-lg shadow"
-                                                onerror="this.onerror=null;this.src='https://via.placeholder.com/400?text=Image+Not+Found'">
-                                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                <i class="fas fa-expand text-white text-xl"></i>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        ` : ''}
                     </div>
                 `;
             }
