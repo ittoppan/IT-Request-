@@ -14,19 +14,11 @@
             --primary-color: #2563eb;
             --primary-dark: #1e40af;
             --secondary-color: #f59e0b;
-            --dark-color: #1e293b;
-            --light-color: #f8fafc;
         }
         
         body {
             font-family: 'Kanit', sans-serif;
             line-height: 1.6;
-            transition: all 0.3s ease;
-        }
-        
-        .dark {
-            background-color: #1a202c;
-            color: #f7fafc;
         }
         
         .glass-card {
@@ -38,29 +30,24 @@
             transition: all 0.3s ease;
         }
         
-        .dark .glass-card {
-            background: rgba(26, 32, 44, 0.9);
-            border: 1px solid rgba(74, 85, 104, 0.3);
-        }
-        
         .status-badge {
             @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
         }
         
-        .status-new { @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100; }
-        .status-pending { @apply bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100; }
-        .status-in-progress { @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100; }
-        .status-completed { @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100; }
-        .status-cancelled { @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100; }
+        .status-new { @apply bg-blue-100 text-blue-800; }
+        .status-pending { @apply bg-orange-100 text-orange-800; }
+        .status-in-progress { @apply bg-yellow-100 text-yellow-800; }
+        .status-completed { @apply bg-green-100 text-green-800; }
+        .status-cancelled { @apply bg-gray-100 text-gray-800; }
         
         .priority-badge {
             @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
         }
         
-        .priority-low { @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100; }
-        .priority-medium { @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100; }
-        .priority-high { @apply bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100; }
-        .priority-critical { @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100; }
+        .priority-low { @apply bg-gray-100 text-gray-800; }
+        .priority-medium { @apply bg-blue-100 text-blue-800; }
+        .priority-high { @apply bg-orange-100 text-orange-800; }
+        .priority-critical { @apply bg-red-100 text-red-800; }
         
         .animate-fade-in {
             animation: fadeIn 0.5s ease-in-out;
@@ -181,18 +168,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
-        
-        .dark ::-webkit-scrollbar-track {
-            background: #2d3748;
-        }
-        
-        .dark ::-webkit-scrollbar-thumb {
-            background: #4a5568;
-        }
-        
-        .dark ::-webkit-scrollbar-thumb:hover {
-            background: #718096;
-        }
 
         /* Loading spinner */
         .loading-spinner {
@@ -211,8 +186,8 @@
         }
     </style>
 </head>
-<body class="min-h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-    <!-- Header Section -->
+<body class="min-h-full bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- ส่วนหัวเว็บ -->
     <header class="bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -223,12 +198,12 @@
                                 <i class="fas fa-arrow-left mr-2"></i>
                                 กลับ
                             </button>
-                            <button id="themeToggle" class="p-2 rounded-full hover:bg-white/20 transition-colors">
-                                <i class="fas fa-moon dark:hidden"></i>
-                                <i class="fas fa-sun hidden dark:inline"></i>
+                        </div>
+                        <div class="md:hidden">
+                            <button id="mobileMenuButton" class="p-2 rounded-md hover:bg-white/20">
+                                <i class="fas fa-bars"></i>
                             </button>
                         </div>
-                 
                     </div>
                     <div class="mt-4">
                         <h1 class="text-3xl font-bold">ระบบติดตามงานแจ้งซ่อม</h1>
@@ -237,7 +212,7 @@
                 </div>
                 <div class="mt-4 md:mt-0 flex items-center space-x-4">
                     <div id="userProfile" class="hidden items-center space-x-2 bg-white/10 rounded-full pl-2 pr-4 py-1">
-                        <img id="userAvatar" class="w-8 h-8 rounded-full" src="" alt="User Avatar">
+                        <img id="userAvatar" class="w-8 h-8 rounded-full" src="" alt="รูปโปรไฟล์">
                         <span id="userName" class="font-medium"></span>
                     </div>
                 </div>
@@ -245,10 +220,10 @@
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- ส่วนเนื้อหาหลัก -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Job Type Tabs -->
-        <div class="flex overflow-x-auto scrollbar-hide mb-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <!-- แท็บประเภทงาน -->
+        <div class="flex overflow-x-auto scrollbar-hide mb-6 bg-white rounded-lg shadow">
             <button class="job-type-tab active px-6 py-3 font-medium text-sm whitespace-nowrap" data-type="IT">
                 <i class="fas fa-desktop mr-2"></i> งานซ่อม IT
             </button>
@@ -257,129 +232,129 @@
             </button>
         </div>
 
-        <!-- Loading Indicator -->
+        <!-- ตัวบ่งชี้การโหลด -->
         <div id="loadingIndicator" class="glass-card flex flex-col items-center justify-center py-12 hidden">
             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-            <p class="text-gray-700 dark:text-gray-300 font-medium">กำลังโหลดข้อมูล...</p>
+            <p class="text-gray-700 font-medium">กำลังโหลดข้อมูล...</p>
         </div>
 
-        <!-- Main Content Area -->
+        <!-- พื้นที่เนื้อหาหลัก -->
         <div id="mainContent" class="hidden">
-            <!-- Dashboard Section -->
+            <!-- ส่วนแดชบอร์ด -->
             <section id="dashboardSection" class="glass-card p-6 mb-8 animate-fade-in">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+                    <h2 class="text-xl font-bold text-gray-900 flex items-center">
                         <i class="fas fa-chart-pie mr-3 text-blue-500"></i>
                         ภาพรวมงานซ่อม
                     </h2>
-                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-2 md:mt-0">
+                    <div class="text-sm text-gray-500 mt-2 md:mt-0">
                         อัปเดตล่าสุด: <span id="lastUpdatedTime" class="font-semibold">กำลังโหลด...</span>
                     </div>
                 </div>
 
-                <!-- Stats Cards -->
+                <!-- การ์ดสถิติ -->
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-                    <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="all">
-                        <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1" id="totalJobsCount">0</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-300">ทั้งหมด</div>
+                    <div class="stat-card bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="all">
+                        <div class="text-3xl font-bold text-blue-600 mb-1" id="totalJobsCount">0</div>
+                        <div class="text-sm text-gray-600">ทั้งหมด</div>
                     </div>
-                    <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="new">
-                        <div class="text-3xl font-bold text-blue-500 dark:text-blue-300 mb-1" id="newJobsCount">0</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-300">แจ้งซ่อมใหม่</div>
+                    <div class="stat-card bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="new">
+                        <div class="text-3xl font-bold text-blue-500 mb-1" id="newJobsCount">0</div>
+                        <div class="text-sm text-gray-600">แจ้งซ่อมใหม่</div>
                     </div>
-                    <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="pending">
-                        <div class="text-3xl font-bold text-orange-500 dark:text-orange-300 mb-1" id="pendingJobsCount">0</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-300">รอดำเนินการ</div>
+                    <div class="stat-card bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="pending">
+                        <div class="text-3xl font-bold text-orange-500 mb-1" id="pendingJobsCount">0</div>
+                        <div class="text-sm text-gray-600">รอดำเนินการ</div>
                     </div>
-                    <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="in-progress">
-                        <div class="text-3xl font-bold text-yellow-500 dark:text-yellow-300 mb-1" id="inProgressJobsCount">0</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-300">กำลังดำเนินการ</div>
+                    <div class="stat-card bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="in-progress">
+                        <div class="text-3xl font-bold text-yellow-500 mb-1" id="inProgressJobsCount">0</div>
+                        <div class="text-sm text-gray-600">กำลังดำเนินการ</div>
                     </div>
-                    <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="completed">
-                        <div class="text-3xl font-bold text-green-500 dark:text-green-300 mb-1" id="completedJobsCount">0</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-300">เสร็จสิ้น</div>
+                    <div class="stat-card bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow" data-status="completed">
+                        <div class="text-3xl font-bold text-green-500 mb-1" id="completedJobsCount">0</div>
+                        <div class="text-sm text-gray-600">เสร็จสิ้น</div>
                     </div>
                 </div>
 
-                <!-- Status Tabs
-                <div class="flex overflow-x-auto scrollbar-hide border-b border-gray-200 dark:border-gray-700">
-                    <button class="status-tab active px-4 py-2 font-medium text-sm whitespace-nowrap border-b-2 border-blue-500 text-blue-600 dark:text-blue-400" data-status="all">
+                <!-- แท็บสถานะ -->
+                <div class="flex overflow-x-auto scrollbar-hide border-b border-gray-200">
+                    <button class="status-tab active px-4 py-2 font-medium text-sm whitespace-nowrap border-b-2 border-blue-500 text-blue-600" data-status="all">
                         ทั้งหมด
                     </button>
-                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" data-status="new">
+                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 hover:text-gray-700" data-status="new">
                         แจ้งซ่อมใหม่
                     </button>
-                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" data-status="pending">
+                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 hover:text-gray-700" data-status="pending">
                         รอดำเนินการ
                     </button>
-                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" data-status="in-progress">
+                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 hover:text-gray-700" data-status="in-progress">
                         กำลังดำเนินการ
                     </button>
-                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" data-status="completed">
+                    <button class="status-tab px-4 py-2 font-medium text-sm whitespace-nowrap text-gray-500 hover:text-gray-700" data-status="completed">
                         เสร็จสิ้น
                     </button>
-                </div> -->
+                </div>
             </section>
 
-            <!-- Job List and Details Section -->
+            <!-- ส่วนรายการงานและรายละเอียด -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Job List Column -->
+                <!-- คอลัมน์รายการงาน -->
                 <div class="lg:col-span-2 space-y-4">
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                    <div class="bg-white rounded-lg shadow p-4">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                            <h2 class="text-lg font-semibold text-gray-900">
                                 รายการงานซ่อม (<span id="jobCount">0</span>)
                                 <span class="text-sm font-normal ml-2" id="currentJobType">(IT)</span>
                             </h2>
-                            <button id="refreshBtn" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <button id="refreshBtn" class="text-blue-600 hover:text-blue-800 transition-colors p-2 rounded-full hover:bg-gray-100">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>
                     </div>
                     
-                    <!-- Search Box -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                    <!-- ช่องค้นหา -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
                         <div class="relative">
                             <input type="text" id="jobSearch" placeholder="ค้นหาจากเลขที่งาน, รายละเอียด..." 
-                                   class="w-full px-4 py-3 border-0 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                   class="w-full px-4 py-3 border-0 focus:ring-2 focus:ring-blue-500 bg-white text-gray-900">
                             <div class="absolute right-3 top-3 text-gray-400">
                                 <i class="fas fa-search"></i>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Jobs Container -->
+                    <!-- ตู้แสดงรายการงาน -->
                     <div id="jobsContainer" class="space-y-3"></div>
                     
-                    <!-- No Jobs Found -->
+                    <!-- ไม่พบงานซ่อม -->
                     <div id="noJobsFound" class="glass-card hidden">
                         <div class="text-center p-8">
                             <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-600 dark:text-gray-300 font-medium">ไม่พบงานซ่อมในสถานะนี้</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">ลองเปลี่ยนสถานะหรือประเภทงานดูนะคะ</p>
+                            <p class="text-gray-600 font-medium">ไม่พบงานซ่อมในสถานะนี้</p>
+                            <p class="text-sm text-gray-500 mt-1">ลองเปลี่ยนสถานะหรือประเภทงานดูนะคะ</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Job Details Column -->
+                <!-- คอลัมน์รายละเอียดงาน -->
                 <div class="lg:sticky lg:top-8 h-fit space-y-4">
-                    <div id="detailHeader" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                            <span id="detailJobType" class="text-blue-600 dark:text-blue-400"></span> 
+                    <div id="detailHeader" class="hidden bg-white rounded-lg shadow p-4">
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            <span id="detailJobType" class="text-blue-600">IT</span> - 
                             <span id="detailJobId" class="font-mono"></span>
                         </h3>
                     </div>
                     
-                    <!-- Empty State -->
+                    <!-- สถานะว่างเปล่า -->
                     <div id="emptyDetails" class="glass-card">
                         <div class="text-center p-8">
                             <i class="fas fa-info-circle text-4xl text-blue-400 mb-4"></i>
-                            <p class="text-gray-600 dark:text-gray-300 font-medium">เลือกงานจากรายการด้านซ้าย</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">รายละเอียดงานจะแสดงที่นี่</p>
+                            <p class="text-gray-600 font-medium">เลือกงานจากรายการด้านซ้าย</p>
+                            <p class="text-sm text-gray-500 mt-1">รายละเอียดงานจะแสดงที่นี่</p>
                         </div>
                     </div>
                     
-                    <!-- Job Details Container -->
+                    <!-- ตู้แสดงรายละเอียดงาน -->
                     <div id="jobDetailsContainer" class="glass-card hidden animate-fade-in"></div>
                 </div>
             </div>
@@ -443,20 +418,12 @@
             const jobSearch = document.getElementById('jobSearch');
             const refreshBtn = document.getElementById('refreshBtn');
             const backBtn = document.getElementById('backBtn');
-            const themeToggle = document.getElementById('themeToggle');
             const userProfile = document.getElementById('userProfile');
             const userAvatar = document.getElementById('userAvatar');
             const userName = document.getElementById('userName');
             const statCards = document.querySelectorAll('.stat-card');
             const statusTabs = document.querySelectorAll('.status-tab');
             const jobTypeTabs = document.querySelectorAll('.job-type-tab');
-
-            // ตรวจสอบโหมดสี
-            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
 
             /**
              * เริ่มต้น LIFF แอปพลิเคชัน
@@ -500,8 +467,8 @@
                         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
                             <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
                         </div>
-                        <h3 class="mt-3 text-lg font-medium text-gray-900 dark:text-white">${title}</h3>
-                        <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        <h3 class="mt-3 text-lg font-medium text-gray-900">${title}</h3>
+                        <div class="mt-2 text-sm text-gray-500">
                             ${message || 'กรุณาลองใหม่อีกครั้ง'}
                         </div>
                         <div class="mt-5">
@@ -625,7 +592,6 @@
             function filterJobsByType(type) {
                 currentJobType = type;
                 document.getElementById('currentJobType').textContent = `(${type})`;
-                document.body.classList.toggle('show-en', type === 'EN');
                 
                 jobTypeTabs.forEach(tab => {
                     tab.classList.toggle('active', tab.dataset.type === type);
@@ -644,9 +610,7 @@
                 statusTabs.forEach(tab => {
                     tab.classList.toggle('border-blue-500', tab.dataset.status === status);
                     tab.classList.toggle('text-blue-600', tab.dataset.status === status);
-                    tab.classList.toggle('dark:text-blue-400', tab.dataset.status === status);
                     tab.classList.toggle('text-gray-500', tab.dataset.status !== status);
-                    tab.classList.toggle('dark:text-gray-400', tab.dataset.status !== status);
                 });
                 
                 let jobs = [...repairJobs[currentJobType]];
@@ -702,7 +666,7 @@
                 
                 filteredJobs.forEach((job, index) => {
                     const jobCard = document.createElement('div');
-                    jobCard.className = `bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md ${selectedJobId === job.jobId ? 'ring-2 ring-blue-500' : ''}`;
+                    jobCard.className = `bg-white rounded-lg shadow overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md ${selectedJobId === job.jobId ? 'ring-2 ring-blue-500' : ''}`;
                     jobCard.id = `job-${job.jobId}`;
                     jobCard.onclick = () => selectJob(job.jobId);
                     
@@ -716,8 +680,8 @@
                         <div class="p-4">
                             <div class="flex items-start justify-between">
                                 <div class="flex-1 min-w-0">
-                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">${job.jobId || 'N/A'}</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 truncate">${problemInfo}</p>
+                                    <h3 class="text-lg font-semibold text-gray-900 truncate">${job.jobId || 'N/A'}</h3>
+                                    <p class="text-sm text-gray-600 mt-1 truncate">${problemInfo}</p>
                                 </div>
                                 <div class="ml-4 flex flex-col items-end">
                                     <span class="${statusInfo.class} mb-1">
@@ -732,11 +696,10 @@
                                 </div>
                             </div>
                             
-                            <div class="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                            <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
                                 <div class="flex items-center">
                                     <i class="fas fa-user-circle mr-2"></i>
-                                    <span>${job.fullName || 'ไม่ระบุชื่อ'}</span> -
-                                    (<span>${job.department || 'ไม่ระบุแผนก'}</span>)
+                                    <span>${job.fullName || 'ไม่ระบุชื่อ'}</span>
                                 </div>
                                 <div class="flex items-center">
                                     <i class="fas fa-calendar-alt mr-2"></i>
@@ -786,14 +749,14 @@
                         ${createStatusSummaryHtml(job)}
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">ผู้แจ้งซ่อม</p>
-                                <p class="font-medium text-gray-900 dark:text-white">${job.fullName || 'ไม่ระบุ'}</p>
-                                <p class="text-sm text-gray-600 dark:text-gray-300">${job.department || 'ไม่ระบุแผนก'}</p>
+                            <div class="bg-white p-4 rounded-lg shadow">
+                                <p class="text-sm text-gray-500 mb-2">ผู้แจ้งซ่อม</p>
+                                <p class="font-medium text-gray-900">${job.fullName || 'ไม่ระบุ'}</p>
+                                <p class="text-sm text-gray-600">${job.department || 'ไม่ระบุแผนก'}</p>
                             </div>
-                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">วันที่แจ้งซ่อม</p>
-                                <p class="font-medium text-gray-900 dark:text-white">${formatThaiDate(job.timestamp)}</p>
+                            <div class="bg-white p-4 rounded-lg shadow">
+                                <p class="text-sm text-gray-500 mb-2">วันที่แจ้งซ่อม</p>
+                                <p class="font-medium text-gray-900">${formatThaiDate(job.timestamp)}</p>
                             </div>
                         </div>
                         
@@ -804,9 +767,9 @@
                         ${createProgressNotesHtml(job)}
                         
                         ${job.additionalNotes ? `
-                            <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                                <h4 class="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">หมายเหตุเพิ่มเติม</h4>
-                                <p class="text-sm text-yellow-700 dark:text-yellow-300">${job.additionalNotes}</p>
+                            <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                                <h4 class="font-semibold text-yellow-800 mb-2">หมายเหตุเพิ่มเติม</h4>
+                                <p class="text-sm text-yellow-700">${job.additionalNotes}</p>
                             </div>
                         ` : ''}
                     </div>
@@ -822,19 +785,19 @@
                 
                 return `
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">สถานะงาน</p>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <p class="text-sm text-gray-500 mb-1">สถานะงาน</p>
                             <div class="flex items-center">
-                                <i class="${statusInfo.icon} mr-2 text-${statusInfo.color}-500 dark:text-${statusInfo.color}-400"></i>
-                                <span class="font-medium text-gray-900 dark:text-white">${statusInfo.text}</span>
+                                <i class="${statusInfo.icon} mr-2 text-${statusInfo.color}-500"></i>
+                                <span class="font-medium text-gray-900">${statusInfo.text}</span>
                             </div>
                         </div>
                         ${priorityInfo ? `
-                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">ความเร่งด่วน</p>
+                            <div class="bg-white p-4 rounded-lg shadow">
+                                <p class="text-sm text-gray-500 mb-1">ความเร่งด่วน</p>
                                 <div class="flex items-center">
-                                    <i class="fas fa-exclamation-circle mr-2 text-${priorityInfo.color}-500 dark:text-${priorityInfo.color}-400"></i>
-                                    <span class="font-medium text-gray-900 dark:text-white">${priorityInfo.text}</span>
+                                    <i class="fas fa-exclamation-circle mr-2 text-${priorityInfo.color}-500"></i>
+                                    <span class="font-medium text-gray-900">${priorityInfo.text}</span>
                                 </div>
                             </div>
                         ` : ''}
@@ -848,95 +811,105 @@
             function createTypeSpecificHtml(job) {
                 if (currentJobType === 'IT') {
                     return `
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ข้อมูลปัญหา</h4>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">ข้อมูลปัญหา</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">ประเภทปัญหา</p>
-                                    <p class="text-gray-900 dark:text-white">${job.problemType || 'ไม่ระบุ'}</p>
+                                    <p class="text-sm text-gray-500">ประเภทปัญหา</p>
+                                    <p class="text-gray-900">${job.problemType || 'ไม่ระบุ'}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">อุปกรณ์</p>
-                                    <p class="text-gray-900 dark:text-white">${job.device || 'ไม่ระบุ'}</p>
+                                    <p class="text-sm text-gray-500">อุปกรณ์</p>
+                                    <p class="text-gray-900">${job.device || 'ไม่ระบุ'}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">ความเร่งด่วน</p>
-                                    <p class="text-gray-900 dark:text-white">${job.urgency || 'ไม่ระบุ'}</p>
+                                    <p class="text-sm text-gray-500">ความเร่งด่วน</p>
+                                    <p class="text-gray-900">${job.urgency || 'ไม่ระบุ'}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">สำนักงาน</p>
-                                    <p class="text-gray-900 dark:text-white">${job.office || 'ไม่ระบุ'}</p>
+                                    <p class="text-sm text-gray-500">สำนักงาน</p>
+                                    <p class="text-gray-900">${job.office || 'ไม่ระบุ'}</p>
                                 </div>
                             </div>
                             <div class="mt-4">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">รายละเอียดปัญหา</p>
-                                <p class="text-gray-900 dark:text-white mt-1">${job.problemDetails || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
+                                <p class="text-sm text-gray-500">รายละเอียดปัญหา</p>
+                                <p class="text-gray-900 mt-1">${job.problemDetails || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
                             </div>
                         </div>
                     `;
                 } else {
                     return `
                         <div class="space-y-6">
-                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ข้อมูลเครื่องจักร</h4>
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4">ข้อมูลเครื่องจักร</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">ชื่อเครื่องจักร</p>
-                                        <p class="text-gray-900 dark:text-white">${job.machineName || 'ไม่ระบุ'}</p>
+                                        <p class="text-sm text-gray-500">ชื่อเครื่องจักร</p>
+                                        <p class="text-gray-900">${job.machineName || 'ไม่ระบุ'}</p>
                                     </div>
-
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">ประเภทงาน</p>
-                                        <p class="text-gray-900 dark:text-white">${job.jobType || 'ไม่ระบุ'}</p>
+                                        <p class="text-sm text-gray-500">รหัสเครื่องจักร</p>
+                                        <p class="text-gray-900">${job.machineCode || 'ไม่ระบุ'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">สถานที่ตั้ง</p>
+                                        <p class="text-gray-900">${job.machineLocation || 'ไม่ระบุ'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">ประเภทงาน</p>
+                                        <p class="text-gray-900">${job.jobType || 'ไม่ระบุ'}</p>
                                     </div>
                                 </div>
                                 <div class="mt-4">
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">รายละเอียดปัญหา</p>
-                                    <p class="text-gray-900 dark:text-white mt-1">${job.problemDescription || 'ไม่มีรายละเอียด'}</p>
+                                    <p class="text-sm text-gray-500">รายละเอียดปัญหา</p>
+                                    <p class="text-gray-900 mt-1">${job.problemDescription || 'ไม่มีรายละเอียด'}</p>
                                 </div>
                             </div>
                             
-                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow en-specific">
-                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">การซ่อมบำรุง</h4>
+                            <div class="bg-white p-6 rounded-lg shadow en-specific">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4">การซ่อมบำรุง</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">ผู้ตรวจพบปัญหา</p>
-                                        <p class="text-gray-900 dark:text-white">${job.fullName || 'ไม่ระบุ'}</p>
+                                        <p class="text-sm text-gray-500">ผู้ตรวจพบปัญหา</p>
+                                        <p class="text-gray-900">${job.reportedBy || 'ไม่ระบุ'}</p>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">วันที่พบปัญหา</p>
-                                        <p class="text-gray-900 dark:text-white">${formatDate(job.timestamp) || 'ไม่ระบุ'}</p>
+                                        <p class="text-sm text-gray-500">วันที่พบปัญหา</p>
+                                        <p class="text-gray-900">${formatDate(job.problemDate) || 'ไม่ระบุ'}</p>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">สาเหตุ</p>
-                                        <p class="text-gray-900 dark:text-white">${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</p>
+                                        <p class="text-sm text-gray-500">สาเหตุ</p>
+                                        <p class="text-gray-900">${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</p>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">การดำเนินการ</p>
-                                        <p class="text-gray-900 dark:text-white">${job.maintenanceAction || 'ไม่ระบุ'}</p>
+                                        <p class="text-sm text-gray-500">การดำเนินการ</p>
+                                        <p class="text-gray-900">${job.maintenanceAction || 'ไม่ระบุ'}</p>
                                     </div>
                                 </div>
                                 <div class="mt-4">
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">รายละเอียดการซ่อม</p>
-                                    <p class="text-gray-900 dark:text-white mt-1">${job.maintenanceDescription || 'ไม่มีข้อมูล'}</p>
+                                    <p class="text-sm text-gray-500">รายละเอียดการซ่อม</p>
+                                    <p class="text-gray-900 mt-1">${job.maintenanceDescription || 'ไม่มีข้อมูล'}</p>
                                 </div>
                             </div>
                             
-                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow en-specific">
-                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">อะไหล่และวัสดุ</h4>
+                            <div class="bg-white p-6 rounded-lg shadow en-specific">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4">อะไหล่และวัสดุ</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">อะไหล่ที่ใช้</p>
-                                        <p class="text-gray-900 dark:text-white">${job.sparePartsUsed || 'ไม่มี'}</p>
+                                        <p class="text-sm text-gray-500">อะไหล่ที่ใช้</p>
+                                        <p class="text-gray-900">${job.sparePartsUsed || 'ไม่มี'}</p>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">จำนวน</p>
-                                        <p class="text-gray-900 dark:text-white">${job.quantity || '0'} ${job.unit || 'ชิ้น'}</p>
+                                        <p class="text-sm text-gray-500">จำนวน</p>
+                                        <p class="text-gray-900">${job.quantity || '0'} ${job.unit || 'ชิ้น'}</p>
                                     </div>
-                                
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">ค่าใช้จ่าย</p>
-                                        <p class="text-gray-900 dark:text-white">${job.cost ? '฿' + job.cost : 'ไม่ระบุ'}</p>
+                                        <p class="text-sm text-gray-500">หมายเลขอะไหล่</p>
+                                        <p class="text-gray-900">${job.partNumber || 'ไม่ระบุ'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">ค่าใช้จ่าย</p>
+                                        <p class="text-gray-900">${job.cost ? '฿' + job.cost : 'ไม่ระบุ'}</p>
                                     </div>
                                 </div>
                             </div>
@@ -948,114 +921,109 @@
             /**
              * สร้าง HTML สำหรับไฟล์แนบ
              */
-          function createFileAttachmentsHtml(job) {
-    let fileUrls = [];
-
-    // **** สำคัญ: คุณต้องมั่นใจว่า 'currentJobType' ถูกกำหนดค่าไว้ก่อนเรียกใช้ฟังก์ชันนี้ ****
-    // เช่น:
-    // let currentJobType = 'IT'; // หรือ 'EN' ขึ้นอยู่กับประเภทงานปัจจุบัน
-    // หรือถ้ามาจาก object job โดยตรง:
-    // const currentJobType = job.type; // ถ้า job มี property ชื่อ 'type'
-    // ถ้าไม่มีการกำหนด 'currentJobType' โปรดระบุค่าเริ่มต้นหรือให้มั่นใจว่ามันถูกส่งมา
-    // ตัวอย่าง: ถ้าต้องการให้เป็น 'EN' โดย default ให้เพิ่มบรรทัดนี้:
-    // const currentJobType = window.currentJobType || 'EN'; // สำหรับการใช้งานในเบราว์เซอร์
-
-    if (currentJobType === 'IT') {
-        fileUrls = [...(job.imageUrls || []), ...(job.driveUrls || [])];
-    } else {
-        fileUrls = job.imageUrls || [];
-    }
-
-    // กรอง URL ที่ไม่ถูกต้องออกและเอาค่าซ้ำออก
-    const validUrls = fileUrls
-        .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
-        .filter((url, index, self) => self.indexOf(url) === index); // ลบ URL ซ้ำ
-
-    if (validUrls.length === 0) {
-        return `
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ</h4>
-                <div class="text-center py-4 text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-paperclip text-3xl mb-2"></i>
-                    <p>ไม่มีไฟล์แนบ</p>
-                </div>
-            </div>
-        `;
-    }
-
-    // แยก URL รูปภาพออกมาต่างหากสำหรับแกลเลอรีภาพขยาย
-    const imageUrls = validUrls.filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i));
-
-    return `
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ไฟล์แนบประกอบ (${validUrls.length})</h4>
-            
-            <div class="mb-4">
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    ${validUrls.map((url, index) => {
-                        const isImage = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) !== null;
-                        const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
-                        const fileExtension = fileName.split('.').pop().toLowerCase();
+            function createFileAttachmentsHtml(job) {
+                // ดึง URL ของไฟล์แนบทั้งหมด
+                let fileUrls = [];
+                
+                if (currentJobType === 'IT') {
+                    // สำหรับงาน IT: รวมทั้ง imageUrls และ driveUrls
+                    fileUrls = [...(job.imageUrls || []), ...(job.driveUrls || [])];
+                } else {
+                    // สำหรับงาน EN: รวมรูปภาพจากทุกคอลัมน์
+                    fileUrls = job.imageUrls || [];
+                }
+                
+                // กรอง URL ที่ไม่ถูกต้องออก
+                const validUrls = fileUrls
+                    .filter(url => url && (url.startsWith('http://') || url.startsWith('https://')))
+                    .filter((url, index, self) => self.indexOf(url) === index); // เอาค่าซ้ำออก
+                
+                if (validUrls.length === 0) {
+                    return `
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">ไฟล์แนบประกอบ</h4>
+                            <div class="text-center py-4 text-gray-500">
+                                <i class="fas fa-paperclip text-3xl mb-2"></i>
+                                <p>ไม่มีไฟล์แนบ</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // แยก URL รูปภาพออกมา
+                const imageUrls = validUrls.filter(url => url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i));
+                
+                return `
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">ไฟล์แนบประกอบ (${validUrls.length})</h4>
                         
-                        // กำหนด class ไอคอนสำหรับไฟล์ที่ไม่ใช่รูปภาพ
-                        let iconClass = 'fas fa-file file-icon-default';
-                        if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
-                        else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
-                        else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
-                        else if (['ppt', 'pptx'].includes(fileExtension)) iconClass = 'fas fa-file-powerpoint ppt-icon';
-                        else if (['zip', 'rar', '7z'].includes(fileExtension)) iconClass = 'fas fa-file-archive zip-icon';
-                        else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) iconClass = 'fas fa-file-video video-icon';
-                        else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) iconClass = 'fas fa-file-audio audio-icon';
+                        <div class="mb-4">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                ${validUrls.map((url, index) => {
+                                    const isImage = url.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) !== null;
+                                    const fileName = url.split('/').pop() || `ไฟล์ ${index + 1}`;
+                                    const fileExtension = fileName.split('.').pop().toLowerCase();
+                                    
+                                    let iconClass = 'fas fa-file file-icon-default';
+                                    if (isImage) iconClass = 'fas fa-image img-icon';
+                                    else if (fileExtension === 'pdf') iconClass = 'fas fa-file-pdf pdf-icon';
+                                    else if (['doc', 'docx'].includes(fileExtension)) iconClass = 'fas fa-file-word doc-icon';
+                                    else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) iconClass = 'fas fa-file-excel xls-icon';
+                                    else if (['ppt', 'pptx'].includes(fileExtension)) iconClass = 'fas fa-file-powerpoint ppt-icon';
+                                    else if (['zip', 'rar', '7z'].includes(fileExtension)) iconClass = 'fas fa-file-archive zip-icon';
+                                    else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) iconClass = 'fas fa-file-video video-icon';
+                                    else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) iconClass = 'fas fa-file-audio audio-icon';
+                                    
+                                    return `
+                                        <a href="${url}" target="_blank" 
+                                           class="group block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 relative"
+                                           title="${fileName}">
+                                            <div class="relative pt-[100%] bg-gray-100">
+                                                ${isImage ? `
+                                                    <img src="${url}" alt="ไฟล์แนบ" 
+                                                        class="absolute top-0 left-0 w-full h-full object-cover"
+                                                        onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                                                ` : `
+                                                    <div class="absolute inset-0 flex items-center justify-center">
+                                                        <i class="${iconClass} file-icon"></i>
+                                                    </div>
+                                                `}
+                                            </div>
+                                            <div class="p-2 bg-white">
+                                                <p class="text-xs text-gray-600 truncate">${fileName}</p>
+                                            </div>
+                                            ${isImage ? `
+                                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                                    <i class="fas fa-expand text-white text-xl"></i>
+                                                </div>
+                                            ` : ''}
+                                        </a>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
                         
-                        return `
-                            <a href="${url}" target="_blank" 
-                               class="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 relative"
-                               title="${fileName}">
-                                <div class="relative pt-[100%] bg-gray-100 dark:bg-gray-700">
-                                    ${isImage ? `
-                                        <img src="${url}" alt="ไฟล์แนบ" 
-                                            class="absolute top-0 left-0 w-full h-full object-cover"
-                                            onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                                    ` : `
-                                        <div class="absolute inset-0 flex items-center justify-center">
-                                            <i class="${iconClass} file-icon text-4xl text-gray-500 dark:text-gray-400"></i>
+                        ${imageUrls.length > 0 ? `
+                            <div class="mt-6">
+                                <h5 class="text-md font-semibold text-gray-800 mb-3">รูปภาพทั้งหมด</h5>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    ${imageUrls.map((url, index) => `
+                                        <div class="relative group cursor-pointer" onclick="openLightbox(imageUrls, ${index})">
+                                            <img src="${url}" alt="รูปภาพประกอบงานซ่อม" 
+                                                class="w-full h-48 object-cover rounded-lg shadow"
+                                                onerror="this.onerror=null;this.src='https://via.placeholder.com/400?text=Image+Not+Found'">
+                                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                                <i class="fas fa-expand text-white text-xl"></i>
+                                            </div>
                                         </div>
-                                    `}
-                                </div>
-                                <div class="p-2 bg-white dark:bg-gray-800">
-                                    <p class="text-xs text-gray-600 dark:text-gray-300 truncate">${fileName}</p>
-                                </div>
-                                ${isImage ? `
-                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                        <i class="fas fa-expand text-white text-xl"></i>
-                                    </div>
-                                ` : ''}
-                            </a>
-                        `;
-                    }).join('')}
-                </div>
-            </div>
-            
-            ${imageUrls.length > 0 ? `
-                <div class="mt-6">
-                    <h5 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3">รูปภาพทั้งหมด (ภาพขยาย)</h5>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        ${imageUrls.map((url, index) => `
-                            <div class="relative group cursor-pointer" onclick="openLightbox(imageUrls, ${index})">
-                                <img src="${url}" alt="รูปภาพประกอบงานซ่อม" 
-                                    class="w-full h-48 object-cover rounded-lg shadow"
-                                    onerror="this.onerror=null;this.src='https://via.placeholder.com/400?text=Image+Not+Found'">
-                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                    <i class="fas fa-expand text-white text-xl"></i>
+                                    `).join('')}
                                 </div>
                             </div>
-                        `).join('')}
+                        ` : ''}
                     </div>
-                </div>
-            ` : ''}
-        </div>
-    `;
-}
+                `;
+            }
+            
             /**
              * สร้าง HTML สำหรับบันทึกความคืบหน้า
              */
@@ -1068,9 +1036,9 @@
                 
                 if (!notes || notes.length === 0) {
                     return `
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">บันทึกความคืบหน้า</h4>
-                            <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">บันทึกความคืบหน้า</h4>
+                            <div class="text-center py-4 text-gray-500">
                                 <i class="fas fa-info-circle text-3xl mb-2"></i>
                                 <p>ยังไม่มีบันทึกความคืบหน้า</p>
                             </div>
@@ -1081,18 +1049,18 @@
                 const notesArray = typeof notes === 'string' ? notes.split('\n').filter(n => n.trim().length > 0) : notes;
                 
                 return `
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">บันทึกความคืบหน้า (${notesArray.length})</h4>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">บันทึกความคืบหน้า (${notesArray.length})</h4>
                         <div class="space-y-3">
                             ${notesArray.map((note, index) => `
-                                <div class="flex items-start space-x-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
-                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                                        <span class="text-blue-600 dark:text-blue-300 font-medium text-sm">${index + 1}</span>
+                                <div class="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <span class="text-blue-600 font-medium text-sm">${index + 1}</span>
                                     </div>
                                     <div class="min-w-0 flex-1">
-                                        <p class="text-sm text-gray-800 dark:text-gray-200">${note}</p>
+                                        <p class="text-sm text-gray-800">${note}</p>
                                         ${job.noteDates && job.noteDates[index] ? `
-                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                            <p class="mt-1 text-xs text-gray-500">
                                                 <i class="far fa-clock mr-1"></i>
                                                 ${formatDateTime(job.noteDates[index])}
                                             </p>
@@ -1337,19 +1305,6 @@
                 }
             }
             
-            /**
-             * สลับโหมดสี
-             */
-            function toggleDarkMode() {
-                if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
-                } else {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
-                }
-            }
-            
             // ตั้งค่า Event Listeners
             statCards.forEach(card => {
                 card.addEventListener('click', function() {
@@ -1375,7 +1330,6 @@
             });
             
             backBtn.addEventListener('click', goBack);
-            themeToggle.addEventListener('click', toggleDarkMode);
             
             // เปิด Lightbox จาก global scope
             window.openLightbox = openLightbox;
