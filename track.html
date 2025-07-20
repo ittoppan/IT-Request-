@@ -945,60 +945,24 @@
                 }
             }
             
-      function createFileAttachmentsHtml(job) {
+            /**
+             * สร้าง HTML สำหรับไฟล์แนบ
+             */
+          function createFileAttachmentsHtml(job) {
     let fileUrls = [];
 
-    // **** สำคัญ: currentJobType ต้องถูกกำหนดค่าไว้ก่อนเรียกใช้ฟังก์ชันนี้ ****
-    // ตัวอย่าง: ถ้า currentJobType เป็น Global variable, หรือถูกส่งมาพร้อม job
-    // เช่น: const currentJobType = job.type; // ถ้า job มี property ชื่อ 'type'
-    // หากไม่มีการกำหนด 'currentJobType' คุณอาจต้องกำหนดค่าเริ่มต้นให้มัน
-    // เช่น: const currentJobType = window.currentJobType || 'EN'; // สำหรับการใช้งานในเบราว์เซอร์
-
-    // ฟังก์ชันย่อยสำหรับแปลงลิงก์ Google Drive
-    function _getDirectDriveImageUrl(driveUrl) {
-        if (!driveUrl) return null;
-
-        // ข้ามลิงก์รูปโปรไฟล์ Google ทันที
-        if (driveUrl.includes('googleusercontent.com/profile/picture')) {
-            // console.warn(`Skipping Google Profile Picture URL: ${driveUrl}`); // สามารถเปิด console.warn ได้ถ้าต้องการ log
-            return null;
-        }
-
-        let fileId = null;
-        // พยายามดึง FILE_ID จากรูปแบบ URL ต่างๆ ของ Google Drive
-        const viewUrlMatch = driveUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)\/view/);
-        if (viewUrlMatch && viewUrlMatch[1]) {
-            fileId = viewUrlMatch[1];
-        } else {
-            const idMatch = driveUrl.match(/id=([a-zA-Z0-9_-]+)/);
-            if (idMatch && idMatch[1]) {
-                fileId = idMatch[1];
-            } else {
-                const shortUrlMatch = driveUrl.match(/drive.google.com\/(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]+)/);
-                if (shortUrlMatch && shortUrlMatch[1]) {
-                    fileId = shortUrlMatch[1];
-                }
-            }
-        }
-
-        if (fileId) {
-            return `https://drive.google.com/uc?export=view&id=${fileId}`;
-        }
-
-        // console.warn(`Could not extract file ID from Drive URL: ${driveUrl}`); // สามารถเปิด console.warn ได้ถ้าต้องการ log
-        return null; // ไม่สามารถดึง ID ได้
-    }
+    // **** สำคัญ: คุณต้องมั่นใจว่า 'currentJobType' ถูกกำหนดค่าไว้ก่อนเรียกใช้ฟังก์ชันนี้ ****
+    // เช่น:
+    // let currentJobType = 'IT'; // หรือ 'EN' ขึ้นอยู่กับประเภทงานปัจจุบัน
+    // หรือถ้ามาจาก object job โดยตรง:
+    // const currentJobType = job.type; // ถ้า job มี property ชื่อ 'type'
+    // ถ้าไม่มีการกำหนด 'currentJobType' โปรดระบุค่าเริ่มต้นหรือให้มั่นใจว่ามันถูกส่งมา
+    // ตัวอย่าง: ถ้าต้องการให้เป็น 'EN' โดย default ให้เพิ่มบรรทัดนี้:
+    // const currentJobType = window.currentJobType || 'EN'; // สำหรับการใช้งานในเบราว์เซอร์
 
     if (currentJobType === 'IT') {
-        // สำหรับงาน IT: รวมทั้ง imageUrls และ driveUrls
-        // ประมวลผล driveUrls ด้วยฟังก์ชัน _getDirectDriveImageUrl
-        const processedDriveUrls = (job.driveUrls || [])
-            .map(url => _getDirectDriveImageUrl(url))
-            .filter(url => url !== null); // กรองเอาเฉพาะลิงก์ที่แปลงได้สำเร็จ
-
-        fileUrls = [...(job.imageUrls || []), ...processedDriveUrls];
+        fileUrls = [...(job.imageUrls || []), ...(job.driveUrls || [])];
     } else {
-        // สำหรับงาน EN: รวมรูปภาพจากทุกคอลัมน์
         fileUrls = job.imageUrls || [];
     }
 
@@ -1092,7 +1056,6 @@
         </div>
     `;
 }
-       
             /**
              * สร้าง HTML สำหรับบันทึกความคืบหน้า
              */
@@ -1423,6 +1386,7 @@
             window.onload = function() {
                 initializeLiff();
                 setupSearch();
+            };
         });
     </script>
 </body>
