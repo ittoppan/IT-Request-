@@ -255,7 +255,7 @@
                 <div class="mt-4 md:mt-0 flex items-center space-x-4">
                     <div id="userProfile" class="hidden items-center space-x-2 bg-white/10 rounded-full pl-2 pr-4 py-1">
                         <img id="userAvatar" class="w-8 h-8 rounded-full" src="" alt="รูปโปรไฟล์">
-                        <span id="userName" class="font-medium"></span>
+                        <span id="fullName" class="font-medium"></span>
                     </div>
                 </div>
             </div>
@@ -1180,42 +1180,59 @@
 function convertGoogleDate(dateString) {
     if (!dateString) return new Date(NaN);
 
-    // ถ้าเป็น timestamp
+    // ถ้าเป็น timestamp (ตัวเลข)
     if (typeof dateString === 'number') {
         return new Date(dateString);
     }
 
     // ถ้าเป็น string ที่มีรูปแบบวันที่
     if (typeof dateString === 'string') {
-        // รูปแบบ yyyy-mm-dd
-        const isoFormat = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
-        if (isoFormat) {
+        // รูปแบบ yyyy-mm-dd (สำหรับวันที่เท่านั้น)
+        // เพิ่ม $ เพื่อให้แน่ใจว่าตรงทั้งสตริง
+        const isoDateFormat = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (isoDateFormat) {
             // ใช้ Date.UTC เพื่อหลีกเลี่ยงปัญหาเขตเวลาสำหรับสตริงเฉพาะวันที่
             return new Date(Date.UTC(
-                parseInt(isoFormat[1]),
-                parseInt(isoFormat[2]) - 1,
-                parseInt(isoFormat[3])
+                parseInt(isoDateFormat[1]),
+                parseInt(isoDateFormat[2]) - 1,
+                parseInt(isoDateFormat[3])
             ));
         }
 
-        // รูปแบบ dd/mm/yyyy
-        const slashFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
-        if (slashFormat) {
+        // --- เพิ่มส่วนนี้: รูปแบบ dd/mm/yyyy HH:mm:ss (สำหรับวันที่และเวลา) ---
+        const dateTimeSlashFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})\s(\d{2}):(\d{2}):(\d{2})$/);
+        if (dateTimeSlashFormat) {
+            // ดึงส่วนประกอบ: [ทั้งข้อความ, วัน, เดือน, ปี, ชั่วโมง, นาที, วินาที]
             return new Date(
-                parseInt(slashFormat[3]),
-                parseInt(slashFormat[2]) - 1,
-                parseInt(slashFormat[1])
+                parseInt(dateTimeSlashFormat[3]), // ปี
+                parseInt(dateTimeSlashFormat[2]) - 1, // เดือน (JavaScript เริ่มจาก 0)
+                parseInt(dateTimeSlashFormat[1]), // วัน
+                parseInt(dateTimeSlashFormat[4]), // ชั่วโมง
+                parseInt(dateTimeSlashFormat[5]), // นาที
+                parseInt(dateTimeSlashFormat[6])  // วินาที
+            );
+        }
+        // --- สิ้นสุดการเพิ่ม ---
+
+        // รูปแบบ dd/mm/yyyy (สำหรับวันที่เท่านั้น)
+        // เพิ่ม $ เพื่อให้แน่ใจว่าตรงทั้งสตริง และย้ายมาอยู่หลังรูปแบบที่มีเวลา
+        const slashDateFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if (slashDateFormat) {
+            return new Date(
+                parseInt(slashDateFormat[3]),
+                parseInt(slashDateFormat[2]) - 1,
+                parseInt(slashDateFormat[1])
             );
         }
 
-        // ลองแปลงเป็น Date object ตรงๆ
+        // ลองแปลงเป็น Date object ตรงๆ (เป็นตัวเลือกสุดท้าย หากไม่ตรงกับรูปแบบที่ระบุไว้)
         const parsedDate = new Date(dateString);
         if (!isNaN(parsedDate.getTime())) {
             return parsedDate;
         }
     }
 
-    return new Date(NaN);
+    return new Date(NaN); // คืนค่า Invalid Date ถ้าไม่สามารถแยกวิเคราะห์ได้
 }
             
             /**
