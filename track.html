@@ -437,6 +437,9 @@
             let userId = '';
             let userDisplayName = '';
             let userPictureUrl = '';
+
+           
+
             
             // ข้อมูลงานซ่อม
             let repairJobs = { IT: [], EN: [] };
@@ -462,7 +465,7 @@
             const backBtn = document.getElementById('backBtn');
             const userProfile = document.getElementById('userProfile');
             const userAvatar = document.getElementById('userAvatar');
-            const userName = document.getElementById('userName');
+            const fullNameSpan = document.getElementById('fullName');
             const statCards = document.querySelectorAll('.stat-card');
             const statusTabs = document.querySelectorAll('.status-tab');
             const jobTypeTabs = document.querySelectorAll('.job-type-tab');
@@ -494,11 +497,50 @@
                     
                     await loadRepairJobs();
                     
-                } catch (error) {
-                    console.error('LIFF initialization failed:', error);
-                    showError('เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF', error.message);
+               // หลังจากโหลดงานซ่อมเสร็จแล้ว ให้อัพเดตชื่อด้วยชื่อจริงจากชีท
+                let realFullName = userDisplayName; // ตั้งต้นด้วยชื่อ LINE
+
+                if (repairJobs.IT.length > 0 && repairJobs.IT[0].fullName) {
+                    realFullName = repairJobs.IT[0].fullName;
+                } else if (repairJobs.EN.length > 0 && repairJobs.EN[0].fullName) {
+                    realFullName = repairJobs.EN[0].fullName;
                 }
+
+                userName.textContent = realFullName; // อัพเดตชื่อใน UI
+                console.log("ชื่อที่แสดงใน UI:", realFullName);
+
+                // ... โค้ดอื่นๆ ที่เกี่ยวข้องกับการแสดงงานซ่อม เช่น displayRepairJobs(repairJobs.IT, repairJobs.EN);
+
+
+            } catch (error) {
+                console.error('LIFF initialization failed:', error);
+                showError('เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF', error.message);
+            } finally {
+                // *** สำคัญ: ซ่อน loading และแสดง main content เสมอ ***
+                loadingIndicator.classList.add('hidden');
+                mainContent.classList.remove('hidden');
             }
+        }
+
+        // === จุดเริ่มต้นการทำงานของ JavaScript: เมื่อ DOM โหลดเสร็จสมบูรณ์ ===
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log("DOM fully loaded and parsed. Initializing LIFF...");
+            await initializeLiff();
+        });
+
+        // เพิ่มฟังก์ชัน showError (ถ้ายังไม่มี)
+        function showError(title, message) {
+            console.error(title, message);
+            alert(`${title}\n${message}`); // ตัวอย่างการแสดง alert ง่ายๆ
+        }
+
+        // เพิ่มฟังก์ชัน toArray (ถ้ายังไม่มี)
+        function toArray(input) {
+            if (!input) return [];
+            if (Array.isArray(input)) return input;
+            if (typeof input === 'string') return input.split(',').map(s => s.trim()).filter(Boolean);
+            return [];
+        }
             
             /**
              * แสดงข้อความผิดพลาด
@@ -1180,18 +1222,13 @@
 function convertGoogleDate(dateString) {
     if (!dateString) return new Date(NaN);
 
-    // ถ้าเป็น timestamp (ตัวเลข)
     if (typeof dateString === 'number') {
         return new Date(dateString);
     }
 
-    // ถ้าเป็น string ที่มีรูปแบบวันที่
     if (typeof dateString === 'string') {
-        // รูปแบบ yyyy-mm-dd (สำหรับวันที่เท่านั้น)
-        // เพิ่ม $ เพื่อให้แน่ใจว่าตรงทั้งสตริง
         const isoDateFormat = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
         if (isoDateFormat) {
-            // ใช้ Date.UTC เพื่อหลีกเลี่ยงปัญหาเขตเวลาสำหรับสตริงเฉพาะวันที่
             return new Date(Date.UTC(
                 parseInt(isoDateFormat[1]),
                 parseInt(isoDateFormat[2]) - 1,
@@ -1199,23 +1236,20 @@ function convertGoogleDate(dateString) {
             ));
         }
 
-        // --- เพิ่มส่วนนี้: รูปแบบ dd/mm/yyyy HH:mm:ss (สำหรับวันที่และเวลา) ---
+        // *** ตรวจสอบว่ามีส่วนนี้อยู่และถูกต้องในโค้ดของคุณ ***
         const dateTimeSlashFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})\s(\d{2}):(\d{2}):(\d{2})$/);
         if (dateTimeSlashFormat) {
-            // ดึงส่วนประกอบ: [ทั้งข้อความ, วัน, เดือน, ปี, ชั่วโมง, นาที, วินาที]
             return new Date(
-                parseInt(dateTimeSlashFormat[3]), // ปี
-                parseInt(dateTimeSlashFormat[2]) - 1, // เดือน (JavaScript เริ่มจาก 0)
-                parseInt(dateTimeSlashFormat[1]), // วัน
-                parseInt(dateTimeSlashFormat[4]), // ชั่วโมง
-                parseInt(dateTimeSlashFormat[5]), // นาที
-                parseInt(dateTimeSlashFormat[6])  // วินาที
+                parseInt(dateTimeSlashFormat[3]),
+                parseInt(dateTimeSlashFormat[2]) - 1,
+                parseInt(dateTimeSlashFormat[1]),
+                parseInt(dateTimeSlashFormat[4]),
+                parseInt(dateTimeSlashFormat[5]),
+                parseInt(dateTimeSlashFormat[6])
             );
         }
-        // --- สิ้นสุดการเพิ่ม ---
+        // *************************************************
 
-        // รูปแบบ dd/mm/yyyy (สำหรับวันที่เท่านั้น)
-        // เพิ่ม $ เพื่อให้แน่ใจว่าตรงทั้งสตริง และย้ายมาอยู่หลังรูปแบบที่มีเวลา
         const slashDateFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
         if (slashDateFormat) {
             return new Date(
@@ -1225,14 +1259,12 @@ function convertGoogleDate(dateString) {
             );
         }
 
-        // ลองแปลงเป็น Date object ตรงๆ (เป็นตัวเลือกสุดท้าย หากไม่ตรงกับรูปแบบที่ระบุไว้)
         const parsedDate = new Date(dateString);
         if (!isNaN(parsedDate.getTime())) {
             return parsedDate;
         }
     }
-
-    return new Date(NaN); // คืนค่า Invalid Date ถ้าไม่สามารถแยกวิเคราะห์ได้
+    return new Date(NaN);
 }
             
             /**
