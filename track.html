@@ -536,55 +536,60 @@
              * โหลดข้อมูลงานซ่อม
              */
             async function loadRepairJobs() {
-                try {
-                    if (!userId) {
-                        throw new Error('ไม่พบข้อมูลผู้ใช้');
-                    }
-                    
-                    loadingIndicator.classList.remove('hidden');
-                    mainContent.classList.add('hidden');
-                    
-                    const timestamp = new Date().getTime();
-                    const [itResponse, enResponse] = await Promise.all([
-                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT&t=${timestamp}`),
-                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN&t=${timestamp}`)
-                    ]);
-                    
-                    if (!itResponse.ok || !enResponse.ok) {
-                        throw new Error(`การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา: ${itResponse.status}`);
-                    }
-                    
-                    const [itData, enData] = await Promise.all([
-                        itResponse.json(),
-                        enResponse.json()
-                    ]);
-                    
-                    if (itData.status === 'error' || enData.status === 'error') {
-                        throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
-                    }
-                    
-                    // Process IT jobs
-                    repairJobs.IT = (itData.data || []).map(job => {
-                        return {
-                            ...job,
-                            // แปลงข้อมูลรูปภาพให้เป็น array
-                            imageUrls: job.imageViewerUrls ? job.imageViewerUrls.split(',').map(url => url.trim()) : [],
-                            driveUrls: job.googleDriveUrls ? job.googleDriveUrls.split(',').map(url => url.trim()) : []
-                        };
-                    });
-                    
-                    // Process EN jobs
-                    repairJobs.EN = (enData.data || []).map(job => {
-                        return {
-                            ...job,
-                            // รวมรูปภาพจากทุกคอลัมน์ที่อาจมีรูปภาพ
-                            imageUrls: [
-                                job.photo1,
-                                job.photo2,
-                                job.photo3
-                            ].filter(url => url && url.trim() !== '')
-                        };
-                    });
+  function toArray(input) {
+    if (!input) return [];
+    if (Array.isArray(input)) return input;
+    if (typeof input === 'string') return input.split(',').map(s => s.trim()).filter(Boolean);
+    return [];
+  }
+
+  try {
+    if (!userId) {
+      throw new Error('ไม่พบข้อมูลผู้ใช้');
+    }
+    
+    loadingIndicator.classList.remove('hidden');
+    mainContent.classList.add('hidden');
+    
+    const timestamp = new Date().getTime();
+    const [itResponse, enResponse] = await Promise.all([
+      fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT&t=${timestamp}`),
+      fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN&t=${timestamp}`)
+    ]);
+    
+    if (!itResponse.ok || !enResponse.ok) {
+      throw new Error(`การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา: ${itResponse.status}`);
+    }
+    
+    const [itData, enData] = await Promise.all([
+      itResponse.json(),
+      enResponse.json()
+    ]);
+    
+    if (itData.status === 'error' || enData.status === 'error') {
+      throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
+    }
+    
+    // Process IT jobs
+    repairJobs.IT = (itData.data || []).map(job => {
+      return {
+        ...job,
+        imageUrls: toArray(job.imageViewerUrls),
+        driveUrls: toArray(job.googleDriveUrls)
+      };
+    });
+    
+    // Process EN jobs
+    repairJobs.EN = (enData.data || []).map(job => {
+      return {
+        ...job,
+        imageUrls: [
+          job.photo1,
+          job.photo2,
+          job.photo3
+        ].filter(url => url && url.trim() !== '')
+      };
+    });
                     
                     updateDashboardStats();
                     filterJobsByType(currentJobType);
