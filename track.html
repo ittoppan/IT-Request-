@@ -437,6 +437,7 @@
             let userId = '';
             let userDisplayName = '';
             let userPictureUrl = '';
+            let fullNameSpan;
 
            
 
@@ -473,54 +474,56 @@
             /**
              * เริ่มต้น LIFF แอปพลิเคชัน
              */
-            async function initializeLiff() {
-                try {
-                    await liff.init({ liffId });
-                    
-                    if (!liff.isLoggedIn()) {
-                        liff.login();
-                        return;
-                    }
-                    
-                    const profile = await liff.getProfile();
-                    userId = profile.userId;
-                    userDisplayName = profile.displayName;
-                    userPictureUrl = profile.pictureUrl || '';
-                    
-                    // แสดงข้อมูลผู้ใช้
-                    if (userPictureUrl) {
-                        userAvatar.src = userPictureUrl;
-                        userAvatar.alt = userDisplayName;
-                    }
-                    userName.textContent = userDisplayName;
-                    userProfile.classList.remove('hidden');
-                    
-                    await loadRepairJobs();
-                    
-               // หลังจากโหลดงานซ่อมเสร็จแล้ว ให้อัพเดตชื่อด้วยชื่อจริงจากชีท
-                let realFullName = userDisplayName; // ตั้งต้นด้วยชื่อ LINE
+           async function initializeLiff() {
+    try {
+        await liff.init({ liffId });
 
-                if (repairJobs.IT.length > 0 && repairJobs.IT[0].fullName) {
-                    realFullName = repairJobs.IT[0].fullName;
-                } else if (repairJobs.EN.length > 0 && repairJobs.EN[0].fullName) {
-                    realFullName = repairJobs.EN[0].fullName;
-                }
-
-                userName.textContent = realFullName; // อัพเดตชื่อใน UI
-                console.log("ชื่อที่แสดงใน UI:", realFullName);
-
-                // ... โค้ดอื่นๆ ที่เกี่ยวข้องกับการแสดงงานซ่อม เช่น displayRepairJobs(repairJobs.IT, repairJobs.EN);
-
-
-            } catch (error) {
-                console.error('LIFF initialization failed:', error);
-                showError('เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF', error.message);
-            } finally {
-                // *** สำคัญ: ซ่อน loading และแสดง main content เสมอ ***
-                loadingIndicator.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-            }
+        if (!liff.isLoggedIn()) {
+            liff.login();
+            return;
         }
+
+        const profile = await liff.getProfile();
+        userId = profile.userId;
+        userDisplayName = profile.displayName;
+        userPictureUrl = profile.pictureUrl || '';
+
+        // แสดงข้อมูลผู้ใช้
+        if (userPictureUrl) {
+            userAvatar.src = userPictureUrl;
+            userAvatar.alt = userDisplayName;
+        }
+        fullNameSpan.textContent = userDisplayName; // <<< แก้ไขจุดที่ 1: เปลี่ยน userName เป็น fullNameSpan
+        userProfile.classList.remove('hidden');
+
+        await loadRepairJobs();
+
+        // หลังจากโหลดงานซ่อมเสร็จแล้ว ให้อัพเดตชื่อด้วยชื่อจริงจากชีท
+        let realFullName = userDisplayName; // ตั้งต้นด้วยชื่อ LINE
+
+        if (repairJobs.IT.length > 0 && repairJobs.IT[0].fullName) {
+            realFullName = repairJobs.IT[0].fullName;
+        } else if (repairJobs.EN.length > 0 && repairJobs.EN[0].fullName) {
+            realFullName = repairJobs.EN[0].fullName;
+        }
+
+        fullNameSpan.textContent = realFullName; // <<< แก้ไขจุดที่ 2: เปลี่ยน userName เป็น fullNameSpan
+        console.log("ชื่อที่แสดงใน UI:", realFullName);
+
+    } catch (error) {
+        console.error('LIFF initialization failed:', error);
+        // ตรวจสอบให้แน่ใจว่าฟังก์ชัน showError ถูกกำหนดและสามารถเข้าถึงได้
+        showError('เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF', error.message);
+    } finally {
+        // ตรวจสอบให้แน่ใจว่า loadingIndicator และ mainContent เป็น Element ที่ระบุถูกต้อง
+        if (loadingIndicator && mainContent) {
+            loadingIndicator.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+        } else {
+            console.warn("ไม่พบ Element ตัวบ่งชี้การโหลด หรือเนื้อหาหลัก");
+        }
+    }
+}
 
         // === จุดเริ่มต้นการทำงานของ JavaScript: เมื่อ DOM โหลดเสร็จสมบูรณ์ ===
         document.addEventListener('DOMContentLoaded', async () => {
