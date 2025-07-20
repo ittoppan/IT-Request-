@@ -1127,88 +1127,96 @@
             /**
              * จัดรูปแบบวันที่ภาษาไทย
              */
-            function formatThaiDate(dateString) {
-                if (!dateString) return 'ไม่ระบุ';
-                
-                const date = convertGoogleDate(dateString);
-                if (isNaN(date.getTime())) return 'ไม่ระบุ';
-                
-                const thaiMonths = [
-                    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน',
-                    'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
-                    'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-                ];
-                
-                const day = date.getDate();
-                const month = thaiMonths[date.getMonth()];
-                const year = date.getFullYear() + 543;
-                const hours = date.getHours().toString().padStart(2, '0');
-                const minutes = date.getMinutes().toString().padStart(2, '0');
-                
-                return `${day} ${month} ${year} ${hours}:${minutes} น.`;
-            }
+           function formatThaiDate(dateString) {
+    if (!dateString) return 'ไม่ระบุ';
+
+    const date = convertGoogleDate(dateString);
+    if (isNaN(date.getTime())) return 'ไม่ระบุ';
+
+    const thaiMonths = [
+        'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน',
+        'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
+        'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+
+    const day = date.getDate();
+    const month = thaiMonths[date.getMonth()];
+    const year = date.getFullYear() + 543; // แปลงเป็นปีพุทธศักราช
+
+    // ดึงชั่วโมงและนาทีจริงจากข้อมูล และจัดรูปแบบให้มี 2 หลัก
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    // คืนค่าเป็น วัน เดือน ปี ชั่วโมง:นาที น.
+    return `${day} ${month} ${year} ${hours}:${minutes} น.`;
+}
             
             /**
              * จัดรูปแบบวันที่และเวลา
              */
-            function formatDateTime(dateTimeString) {
-                if (!dateTimeString) return 'ไม่ระบุ';
-                
-                const date = convertGoogleDate(dateTimeString);
-                if (isNaN(date.getTime())) return 'ไม่ระบุ';
-                
-                return date.toLocaleString('th-TH', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                });
-            }
+           function formatDateTime(dateTimeString) {
+    if (!dateTimeString) return 'ไม่ระบุ';
+
+    const date = convertGoogleDate(dateTimeString);
+    if (isNaN(date.getTime())) return 'ไม่ระบุ';
+
+    return date.toLocaleString('th-TH', {
+        year: 'numeric',
+        month: 'short', // หรือ 'long' หากต้องการชื่อเดือนเต็ม
+        day: 'numeric',
+        hour: '2-digit',   // แสดงชั่วโมงแบบ 2 หลัก
+        minute: '2-digit', // แสดงนาทีแบบ 2 หลัก
+        hour12: false      // ใช้รูปแบบ 24 ชั่วโมง
+        // ไม่ได้ระบุ 'second' จึงจะไม่แสดงวินาที
+    });
+}
             
             /**
              * แปลงรูปแบบวันที่จาก Google Sheets
              */
-            function convertGoogleDate(dateString) {
-                if (!dateString) return new Date(NaN);
-                
-                // ถ้าเป็น timestamp
-                if (typeof dateString === 'number') {
-                    return new Date(dateString);
-                }
-                
-                // ถ้าเป็น string ที่มีรูปแบบวันที่
-                if (typeof dateString === 'string') {
-                    // รูปแบบ yyyy-mm-dd
-                    const isoFormat = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
-                    if (isoFormat) {
-                        return new Date(Date.UTC(
-                            parseInt(isoFormat[1]),
-                            parseInt(isoFormat[2]) - 1,
-                            parseInt(isoFormat[3])
-                        ));
-                    }
-                    
-                    // รูปแบบ dd/mm/yyyy
-                    const slashFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
-                    if (slashFormat) {
-                        return new Date(
-                            parseInt(slashFormat[3]),
-                            parseInt(slashFormat[2]) - 1,
-                            parseInt(slashFormat[1])
-                        );
-                    }
-                    
-                    // ลองแปลงเป็น Date object ตรงๆ
-                    const parsedDate = new Date(dateString);
-                    if (!isNaN(parsedDate.getTime())) {
-                        return parsedDate;
-                    }
-                }
-                
-                return new Date(NaN);
-            }
+           /**
+ * แปลงรูปแบบวันที่จาก Google Sheets
+ */
+function convertGoogleDate(dateString) {
+    if (!dateString) return new Date(NaN);
+
+    // ถ้าเป็น timestamp
+    if (typeof dateString === 'number') {
+        return new Date(dateString);
+    }
+
+    // ถ้าเป็น string ที่มีรูปแบบวันที่
+    if (typeof dateString === 'string') {
+        // รูปแบบ yyyy-mm-dd
+        const isoFormat = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (isoFormat) {
+            // ใช้ Date.UTC เพื่อหลีกเลี่ยงปัญหาเขตเวลาสำหรับสตริงเฉพาะวันที่
+            return new Date(Date.UTC(
+                parseInt(isoFormat[1]),
+                parseInt(isoFormat[2]) - 1,
+                parseInt(isoFormat[3])
+            ));
+        }
+
+        // รูปแบบ dd/mm/yyyy
+        const slashFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+        if (slashFormat) {
+            return new Date(
+                parseInt(slashFormat[3]),
+                parseInt(slashFormat[2]) - 1,
+                parseInt(slashFormat[1])
+            );
+        }
+
+        // ลองแปลงเป็น Date object ตรงๆ
+        const parsedDate = new Date(dateString);
+        if (!isNaN(parsedDate.getTime())) {
+            return parsedDate;
+        }
+    }
+
+    return new Date(NaN);
+}
             
             /**
              * เปิด Lightbox สำหรับดูรูปภาพ
