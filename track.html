@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Lightbox2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet" />
+
+<!-- Lightbox2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+
     <style>
         :root {
             --primary-color: #2563eb;
@@ -963,20 +969,25 @@
              * สร้าง HTML สำหรับแกลเลอรี่รูปภาพ
              */
             function createImageGalleryHtml(job) {
-    let imageUrls = [];
+    let imageObjects = [];
 
     if (currentJobType === 'IT') {
-        imageUrls = [
-            ...(job.imageViewerUrls || []),
-            ...(job.googleDriveUrls || [])
-        ];
+        const urls = typeof job.imageViewerUrls === 'string'
+            ? job.imageViewerUrls.split(',').map(url => url.trim())
+            : (job.imageViewerUrls || []);
+        imageObjects = urls.map((url, index) => ({
+            url,
+            caption: `รูปที่ ${index + 1}` // หรือกำหนดชื่ออื่น เช่น “ภาพประกอบงานซ่อม”
+        }));
     } else {
-        imageUrls = [
-            job.photo1, job.photo2, job.photo3
-        ].filter(Boolean); // ตัด null/undefined ออก
+        // สำหรับ EN: ใส่ชื่อเฉพาะแต่ละภาพ
+        imageObjects = [
+            { url: job.photo2, caption: 'รูปก่อนซ่อม' },
+            { url: job.photo3, caption: 'รูปหลังซ่อม' }
+        ].filter(obj => obj.url);
     }
 
-    if (imageUrls.length === 0) {
+    if (imageObjects.length === 0) {
         return `
             <div class="bg-white p-6 rounded-lg shadow">
                 <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ</h4>
@@ -990,22 +1001,20 @@
 
     return `
         <div class="bg-white p-6 rounded-lg shadow">
-            <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ (${imageUrls.length})</h4>
-            <div class="gallery-grid">
-                ${imageUrls.map((url, index) => {
-                    const fileName = decodeURIComponent(url.split('/').pop().split('?')[0]);
-                    return `
-                        <div class="gallery-item" onclick="openLightbox(${JSON.stringify(imageUrls)}, ${index})">
-                            <img src="${url}" alt="รูปภาพประกอบงานซ่อม" 
-                                onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                            <div class="image-overlay">${fileName}</div>
-                        </div>
-                    `;
-                }).join('')}
+            <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ (${imageObjects.length})</h4>
+            <div class="gallery-grid grid grid-cols-2 md:grid-cols-3 gap-4">
+                ${imageObjects.map((img, index) => `
+                    <a href="${img.url}" data-lightbox="repair-gallery" data-title="${img.caption}">
+                        <img src="${img.url}" alt="${img.caption}" class="rounded shadow-md w-full h-auto object-cover"
+                            onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                    </a>
+                `).join('')}
             </div>
         </div>
     `;
 }
+
+
 
             
             /**
