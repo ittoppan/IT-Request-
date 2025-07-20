@@ -837,14 +837,7 @@
                                         <p class="text-sm text-gray-500">ชื่อเครื่องจักร</p>
                                         <p class="text-gray-900">${job.machineName || 'ไม่ระบุ'}</p>
                                     </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500">รหัสเครื่องจักร</p>
-                                        <p class="text-gray-900">${job.machineCode || 'ไม่ระบุ'}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500">สถานที่ตั้ง</p>
-                                        <p class="text-gray-900">${job.machineLocation || 'ไม่ระบุ'}</p>
-                                    </div>
+                             
                                     <div>
                                         <p class="text-sm text-gray-500">ประเภทงาน</p>
                                         <p class="text-gray-900">${job.jobType || 'ไม่ระบุ'}</p>
@@ -861,20 +854,17 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <p class="text-sm text-gray-500">ผู้ตรวจพบปัญหา</p>
-                                        <p class="text-gray-900">${job.reportedBy || 'ไม่ระบุ'}</p>
+                                        <p class="text-gray-900">${job.fullName || 'ไม่ระบุ'}</p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-500">วันที่พบปัญหา</p>
-                                        <p class="text-gray-900">${formatDate(job.problemDate) || 'ไม่ระบุ'}</p>
+                                        <p class="text-gray-900">${formatDate(job.timestamp) || 'ไม่ระบุ'}</p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-500">สาเหตุ</p>
                                         <p class="text-gray-900">${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</p>
                                     </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500">การดำเนินการ</p>
-                                        <p class="text-gray-900">${job.maintenanceAction || 'ไม่ระบุ'}</p>
-                                    </div>
+                                    
                                 </div>
                                 <div class="mt-4">
                                     <p class="text-sm text-gray-500">รายละเอียดการซ่อม</p>
@@ -893,10 +883,7 @@
                                         <p class="text-sm text-gray-500">จำนวน</p>
                                         <p class="text-gray-900">${job.quantity || '0'} ${job.unit || 'ชิ้น'}</p>
                                     </div>
-                                    <div>
-                                        <p class="text-sm text-gray-500">หมายเลขอะไหล่</p>
-                                        <p class="text-gray-900">${job.partNumber || 'ไม่ระบุ'}</p>
-                                    </div>
+                                    
                                     <div>
                                         <p class="text-sm text-gray-500">ค่าใช้จ่าย</p>
                                         <p class="text-gray-900">${job.cost ? '฿' + job.cost : 'ไม่ระบุ'}</p>
