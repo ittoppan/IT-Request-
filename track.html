@@ -174,12 +174,12 @@
                         <p class="mt-2 opacity-90">ตรวจสอบสถานะงานซ่อมได้อย่างรวดเร็วและมีประสิทธิภาพ</p>
                     </div>
                 </div>
-                <div class="mt-4 md:mt-0 flex items-center space-x-4">
-                    <div id="userProfile" class="hidden items-center space-x-2 bg-white/10 rounded-full pl-2 pr-4 py-1">
-                        <img id="userAvatar" class="w-8 h-8 rounded-full" src="" alt="รูปโปรไฟล์">
-                        <span id="fullName" class="font-medium"></span>
-                    </div>
-                </div>
+                <div class="mt-4 md:mt-0 flex items-center justify-end"> {/* เพิ่ม justify-end เพื่อจัดให้ไปทางขวาในบางกรณี หรือปรับตามความต้องการ */}
+    <div id="userProfile" class="hidden flex items-center space-x-2 bg-blue-600 text-white rounded-full pl-2 pr-4 py-1 shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer">
+        <img id="userAvatar" class="w-10 h-10 rounded-full border-2 border-white object-cover" src="" alt="รูปโปรไฟล์"> {/* เพิ่มขนาด w-10 h-10 และขอบสีขาว */}
+        <span id="fullName" class="font-semibold text-lg tracking-wide"></span> {/* เพิ่ม font-semibold, text-lg, tracking-wide */}
+    </div>
+</div>
             </div>
         </div>
     </header>
