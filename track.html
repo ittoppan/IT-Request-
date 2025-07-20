@@ -977,10 +977,9 @@
             : (job.imageViewerUrls || []);
         imageObjects = urls.map((url, index) => ({
             url,
-            caption: `รูปที่ ${index + 1}` // หรือกำหนดชื่ออื่น เช่น “ภาพประกอบงานซ่อม”
+            caption: `รูปที่ ${index + 1}`
         }));
     } else {
-        // สำหรับ EN: ใส่ชื่อเฉพาะแต่ละภาพ
         imageObjects = [
             { url: job.photo2, caption: 'รูปก่อนซ่อม' },
             { url: job.photo3, caption: 'รูปหลังซ่อม' }
@@ -1003,17 +1002,17 @@
         <div class="bg-white p-6 rounded-lg shadow">
             <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ (${imageObjects.length})</h4>
             <div class="gallery-grid grid grid-cols-2 md:grid-cols-3 gap-4">
-                ${imageObjects.map((img, index) => `
-                    <a href="${img.url}" data-lightbox="repair-gallery" data-title="${img.caption}">
+                ${imageObjects.map(img => `
+                    <div class="cursor-pointer" onclick="openModal('${img.url}')">
                         <img src="${img.url}" alt="${img.caption}" class="rounded shadow-md w-full h-auto object-cover"
                             onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                    </a>
+                        <div class="text-center mt-2 text-sm text-gray-700">${img.caption}</div>
+                    </div>
                 `).join('')}
             </div>
         </div>
     `;
 }
-
 
 
             
@@ -1335,6 +1334,35 @@
                 setupSearch();
             };
         });
+        
+function openModal(imageUrl) {
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  modalImage.src = imageUrl;
+  modal.classList.remove('hidden');
+}
+
+function closeModal() {
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  modalImage.src = '';
+  modal.classList.add('hidden');
+}
+
     </script>
+<!-- Modal -->
+<div id="imageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
+  <div class="relative max-w-3xl w-full">
+    <img id="modalImage" src="" alt="รูปภาพขยาย" class="w-full h-auto rounded-lg shadow-lg">
+    <button onclick="closeModal()"
+      class="absolute top-2 right-2 bg-white rounded-full p-2 hover:bg-gray-200 focus:outline-none">
+      <svg class="h-6 w-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+</div>
+
 </body>
 </html>
