@@ -518,13 +518,11 @@
                 ...job,
                 fullName: job.full_name || job.fullName || job.details?.fullName || userDisplayName,
                 ...job.details,
-                imageUrls: [
-                    job.photo2,
-                    job.photo3
-                ].filter(url => url && url.trim() !== ''),
-                driveUrls: toArray(job.photo1)
+                imageUrls: toArray(job.images?.viewerUrls || job.imageViewerUrls),
+                driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
             };
         });
+        
         
         console.log("ตัวอย่างข้อมูลงาน IT:", repairJobs.IT[0]);
         console.log("ตัวอย่างข้อมูลงาน EN:", repairJobs.EN[0]);
