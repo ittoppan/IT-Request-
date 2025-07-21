@@ -14,128 +14,213 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 
     <style>
-        :root{
-  --primary:#2563eb;
-  --primary-dark:#1e40af;
-  --secondary:#f59e0b;
-  --surface:#ffffff;
-  --surface-2:#f8fafc;
-  --text:#111827;
-  --text-2:#6b7280;
-  --border:#e5e7eb;
-  --success:#10b981;
-  --warning:#f59e0b;
-  --error:#ef4444;
-  --radius:0.75rem;
-  --shadow:0 4px 6px -1px rgba(0,0,0,.05),0 2px 4px -2px rgba(0,0,0,.05);
-  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);
-  --font:'Kanit',sans-serif;
-}
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary-color: #f59e0b;
+        }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.6;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .status-badge {
+            @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+        }
+        
+        .status-new { @apply bg-blue-100 text-blue-800; }
+        .status-pending { @apply bg-orange-100 text-orange-800; }
+        .status-in-progress { @apply bg-yellow-100 text-yellow-800; }
+        .status-completed { @apply bg-green-100 text-green-800; }
+        .status-cancelled { @apply bg-gray-100 text-gray-800; }
+        
+        .priority-badge {
+            @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+        }
+        
+        .priority-low { @apply bg-gray-100 text-gray-800; }
+        .priority-medium { @apply bg-blue-100 text-blue-800; }
+        .priority-high { @apply bg-orange-100 text-orange-800; }
+        .priority-critical { @apply bg-red-100 text-red-800; }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:var(--font);
-  background:linear-gradient(135deg,#f3f4f6 0%,#e5e7eb 100%);
-  color:var(--text);
-  line-height:1.6;
-}
+        /* Loading spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 0.25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-rotate 0.75s linear infinite;
+        }
+        
+        @keyframes spinner-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-/* Header ------------------------------------------------- */
-header{
-  background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 100%);
-  box-shadow:var(--shadow-lg);
-}
-header h1{font-size:2.25rem;font-weight:700;letter-spacing:.02em}
-header p{opacity:.9}
+        /* Gallery styles */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            aspect-ratio: 1;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.03);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        
+        .gallery-item .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gallery-item:hover .image-overlay {
+            opacity: 1;
+        }
 
-/* Cards -------------------------------------------------- */
-.glass-card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  transition:transform .2s,box-shadow .2s;
-}
-.glass-card:hover{
-  transform:translateY(-2px);
-  box-shadow:var(--shadow-lg);
-}
-
-/* Tabs --------------------------------------------------- */
-.job-type-tab{
-  color:var(--text-2);
-  transition:all .3s;
-}
-.job-type-tab.active{
-  color:var(--primary);
-  border-bottom:2px solid var(--primary);
-  font-weight:600;
-}
-
-/* Status Badges ----------------------------------------- */
-.status-badge{display:inline-flex;align-items:center;padding:.375rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:600}
-.status-new{background:#dbeafe;color:var(--primary)}
-.status-pending{background:#fef3c7;color:var(--warning)}
-.status-in-progress{background:#fef3c7;color:var(--warning)}
-.status-completed{background:#d1fae5;color:var(--success)}
-.status-cancelled{background:#f3f4f6;color:var(--text-2)}
-
-/* Priority Badges --------------------------------------- */
-.priority-low{background:#f3f4f6;color:var(--text-2)}
-.priority-medium{background:#dbeafe;color:var(--primary)}
-.priority-high{background:#fef3c7;color:var(--warning)}
-.priority-critical{background:#fee2e2;color:var(--error)}
-
-/* Buttons ------------------------------------------------ */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;
-  padding:.5rem 1rem;border-radius:var(--radius);font-weight:500;
-  transition:all .2s;cursor:pointer;border:none;
-}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{background:var(--primary-dark)}
-.btn-secondary{background:var(--surface);color:var(--primary);border:1px solid var(--border)}
-.btn-secondary:hover{background:var(--surface-2)}
-
-/* Tables ------------------------------------------------- */
-.responsive-table{width:100%;border-collapse:collapse}
-.responsive-table th,.responsive-table td{padding:.75rem;text-align:left;border-bottom:1px solid var(--border)}
-.responsive-table th{font-weight:600;color:var(--text-2);width:35%}
-
-/* Gallery ------------------------------------------------ */
-.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.75rem}
-.gallery-item{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:1}
-.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
-.gallery-item:hover img{transform:scale(1.08)}
-
-/* Loading Spinner --------------------------------------- */
-.loading-spinner{
-  width:2.5rem;height:2.5rem;border:4px solid #e5e7eb;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* Scrollbar --------------------------------------------- */
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:var(--surface-2)}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--text-2)}
+        /* Job card styles */
+        .job-card {
+            transition: all 0.2s ease;
+        }
+        
+        .job-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Detail section styles */
+        .detail-section {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .detail-section h4 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Responsive table */
+        .responsive-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .responsive-table th, 
+        .responsive-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .responsive-table th {
+            font-weight: 500;
+            color: #666;
+            width: 30%;
+        }
     </style>
 </head>
 <body class="min-h-full bg-gradient-to-br from-gray-50 to-gray-100">
     <!-- ส่วนหัวเว็บ -->
-    <header class="bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-xl">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
-    <div>
-      <h1 class="text-3xl font-bold tracking-tight">ระบบติดตามงานแจ้งซ่อม</h1>
-      <p class="text-blue-100 mt-1">Real-time Service Tracking & Monitoring</p>
-    </div>
-    <div id="userProfile" class="hidden flex items-center space-x-3 bg-white/10 backdrop-blur-sm rounded-full px-3 py-2">
-      <img id="userAvatar" class="w-10 h-10 rounded-full border-2 border-white" src="" alt="">
-      <span id="fullName" class="font-semibold text-sm hidden sm:inline"></span>
-    </div>
-  </div>
-</header>
+    <header class="bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button id="backBtn" class="flex items-center px-3 py-2 border border-white/30 rounded-lg hover:bg-white/20 transition-all">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                กลับ
+                            </button>
+                        </div>
+                        <div class="md:hidden">
+                            <button id="mobileMenuButton" class="p-2 rounded-md hover:bg-white/20">
+                                <i class="fas fa-bars"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <h1 class="text-3xl font-bold">ระบบติดตามงานแจ้งซ่อม</h1>
+                        <p class="mt-2 opacity-90">ตรวจสอบสถานะงานซ่อมได้อย่างรวดเร็วและมีประสิทธิภาพ</p>
+                    </div>
+                </div>
+                <div class="mt-4 md:mt-0 flex items-center justify-end"> 
+                    <div id="userProfile" class="hidden flex items-center space-x-2 bg-blue-600 text-white rounded-full pl-2 pr-4 py-1 shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer">
+                        <img id="userAvatar" class="w-10 h-10 rounded-full border-2 border-white object-cover" src="" alt="รูปโปรไฟล์"> 
+                        <span id="fullName" class="font-semibold text-lg tracking-wide"></span> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
 
     <!-- ส่วนเนื้อหาหลัก -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -591,17 +676,38 @@ header p{opacity:.9}
         
        jobCard.innerHTML = `
           
-   <div class="glass-card p-5 flex items-center justify-between hover:shadow-md">
-  <div>
-    <h3 class="text-lg font-semibold text-gray-900">${job.jobId}</h3>
-    <p class="text-sm text-gray-600 mt-1">${problemInfo}</p>
-    <p class="text-xs text-gray-500 mt-1">แจ้งโดย ${displayName} • ${formatDate(job.timestamp)}</p>
-  </div>
-  <div class="flex flex-col items-end space-y-1">
-    <span class="${statusInfo.class}">${statusInfo.text}</span>
-    ${priorityInfo ? `<span class="${priorityInfo.class}">${priorityInfo.text}</span>` : ''}
-  </div>
-</div>
+    <div class="p-5">
+        <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-semibold text-gray-900 truncate">${job.jobId || 'N/A'}</h3>
+                <p class="text-sm text-gray-600 mt-1 truncate">${problemInfo}</p>
+            </div>
+            <div class="ml-4 flex flex-col items-end">
+                <span class="${statusInfo.class} mb-2 flex items-center">
+                    <i class="${statusInfo.icon} mr-1.5 text-${statusInfo.color}-500  "></i>
+                    <span class="font-medium" text-gray-900> ${statusInfo.text}</span>
+                </span>
+                ${priorityInfo ? `
+                    <span class="${priorityInfo.class} flex items-center">
+                         <i class="${priorityInfo.icon}fas  mr-2 text-${priorityInfo.color}-500"></i>
+                                    <span class="font-medium text-gray-900">${priorityInfo.text}</span>
+
+                    </span>
+                ` : ''}
+            </div>
+        </div>
+        
+        <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+            <div class="flex items-center">
+                <i class="fas fa-user-circle mr-2"></i>
+                <span>${displayName}</span>
+            </div>
+            <div class="flex items-center">
+                <i class="fas fa-calendar-alt mr-2"></i>
+                <span>${formatDate(job.timestamp)}</span>
+            </div>
+        </div>
+    </div>
 `;
         
         jobsContainer.appendChild(jobCard);
