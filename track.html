@@ -934,14 +934,14 @@
 
                 if (currentJobType === 'IT') {
                     // สำหรับงาน IT
-                    const urls = toArray(job.imageUrls || job.imageViewerUrls);
+                    const urls = toArray(job.images.beforeRepairUrls || job.images.afterRepairUrls);
                     imageObjects = urls.map((url, index) => ({
                         url,
                         caption: `รูปประกอบ ${index + 1}`
                     }));
                 } else {
                     // สำหรับงาน EN
-                    const urls = toArray(job.imageUrls || job.imageViewerUrls);
+                    const urls = toArray(job.images.beforeRepairUrls || job.images.afterRepairUrls);
                     imageObjects = urls.map((url, index) => ({
                         url,
                         caption: `รูปประกอบ ${index + 1}`
