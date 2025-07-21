@@ -474,73 +474,78 @@
              * โหลดข้อมูลงานซ่อม
              */
             async function loadRepairJobs() {
-                try {
-                    if (!userId) {
-                        throw new Error('ไม่พบข้อมูลผู้ใช้');
-                    }
-                    
-                    loadingIndicator.classList.remove('hidden');
-                    mainContent.classList.add('hidden');
-                    
-                    const timestamp = new Date().getTime();
-                    const [itResponse, enResponse] = await Promise.all([
-                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT&t=${timestamp}`),
-                        fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN&t=${timestamp}`)
-                    ]);
-                    
-                    if (!itResponse.ok || !enResponse.ok) {
-                        throw new Error(`การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา: ${itResponse.status}`);
-                    }
-                    
-                    const [itData, enData] = await Promise.all([
-                        itResponse.json(),
-                        enResponse.json()
-                    ]);
-                    
-                    if (itData.status === 'error' || enData.status === 'error') {
-                        throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
-                    }
-                    
-                    // Process IT jobs
-                    repairJobs.IT = (itData.data?.jobs || []).map(job => {
-                        return {
-                            ...job,
-                            ...job.details, // รวมข้อมูลจาก details เข้ามาใน object หลัก
-                            imageUrls: toArray(job.images?.viewerUrls || job.imageViewerUrls),
-                            driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
-                        };
-                    });
-                    
-                    // Process EN jobs
-                    repairJobs.EN = (enData.data?.jobs || []).map(job => {
-                        return {
-                            ...job,
-                            ...job.details, // รวมข้อมูลจาก details เข้ามาใน object หลัก
-                            imageUrls: [
-                                job.photo2,
-                                job.photo3
-                            ].filter(url => url && url.trim() !== ''),
-                            driveUrls: toArray(job.photo1)
-                        };
-                    });
-                    
-                    updateDashboardStats();
-                    filterJobsByType(currentJobType);
-                    
-                    loadingIndicator.classList.add('hidden');
-                    mainContent.classList.remove('hidden');
-                    
-                    document.getElementById('lastUpdatedTime').textContent = new Date().toLocaleString('th-TH', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
-                    
-                } catch (error) {
-                    console.error('Error loading repair jobs:', error);
-                    showError('โหลดข้อมูลงานซ่อมไม่สำเร็จ', error.message || 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
-                }
-            }
+    try {
+        if (!userId) {
+            throw new Error('ไม่พบข้อมูลผู้ใช้');
+        }
+        
+        loadingIndicator.classList.remove('hidden');
+        mainContent.classList.add('hidden');
+        
+        const timestamp = new Date().getTime();
+        const [itResponse, enResponse] = await Promise.all([
+            fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=IT&t=${timestamp}`),
+            fetch(`${scriptUrl}?action=getRepairJobs&userId=${encodeURIComponent(userId)}&formType=EN&t=${timestamp}`)
+        ]);
+        
+        if (!itResponse.ok || !enResponse.ok) {
+            throw new Error(`การเชื่อมต่อกับเซิร์ฟเวอร์มีปัญหา: ${itResponse.status}`);
+        }
+        
+        const [itData, enData] = await Promise.all([
+            itResponse.json(),
+            enResponse.json()
+        ]);
+        
+        if (itData.status === 'error' || enData.status === 'error') {
+            throw new Error(itData.message || enData.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
+        }
+        
+        // Process IT jobs - แก้ไขส่วนนี้เพื่อให้แน่ใจว่าได้ชื่อผู้แจ้ง
+        repairJobs.IT = (itData.data?.jobs || []).map(job => {
+            return {
+                ...job,
+                fullName: job.full_name || job.fullName || job.details?.fullName || userDisplayName,
+                ...job.details,
+                imageUrls: toArray(job.images?.viewerUrls || job.imageViewerUrls),
+                driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
+            };
+        });
+        
+        // Process EN jobs
+        repairJobs.EN = (enData.data?.jobs || []).map(job => {
+            return {
+                ...job,
+                fullName: job.full_name || job.fullName || job.details?.fullName || userDisplayName,
+                ...job.details,
+                imageUrls: [
+                    job.photo2,
+                    job.photo3
+                ].filter(url => url && url.trim() !== ''),
+                driveUrls: toArray(job.photo1)
+            };
+        });
+        
+        console.log("ตัวอย่างข้อมูลงาน IT:", repairJobs.IT[0]);
+        console.log("ตัวอย่างข้อมูลงาน EN:", repairJobs.EN[0]);
+        
+        updateDashboardStats();
+        filterJobsByType(currentJobType);
+        
+        loadingIndicator.classList.add('hidden');
+        mainContent.classList.remove('hidden');
+        
+        document.getElementById('lastUpdatedTime').textContent = new Date().toLocaleString('th-TH', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        
+    } catch (error) {
+        console.error('Error loading repair jobs:', error);
+        showError('โหลดข้อมูลงานซ่อมไม่สำเร็จ', error.message || 'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
+    }
+}
             
             /**
              * แปลงข้อมูลเป็นอาร์เรย์
@@ -638,64 +643,70 @@
              * แสดงรายการงานซ่อม
              */
             function renderJobList() {
-                jobsContainer.innerHTML = '';
-                document.getElementById('jobCount').textContent = filteredJobs.length;
+    jobsContainer.innerHTML = '';
+    document.getElementById('jobCount').textContent = filteredJobs.length;
+    
+    if (filteredJobs.length === 0) {
+        checkNoJobsFound();
+        return;
+    }
+    
+    filteredJobs.forEach((job, index) => {
+        const jobCard = document.createElement('div');
+        jobCard.className = `bg-white rounded-lg shadow overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md job-card ${
+            selectedJobId === job.jobId ? 'ring-2 ring-blue-500' : ''
+        }`;
+        jobCard.id = `job-${job.jobId}`;
+        jobCard.onclick = () => selectJob(job.jobId);
+        
+        const statusInfo = getStatusInfo(job.status);
+        const priorityInfo = getPriorityInfo(job.urgency);
+        const problemInfo = currentJobType === 'IT' 
+            ? job.problemType || 'ไม่ระบุประเภทปัญหา'
+            : job.machineName ? `${job.machineName} (${job.jobType || 'ไม่ระบุ'})` : job.jobType || 'ไม่ระบุประเภทงาน';
+        
+        // ตรวจสอบว่ามีชื่อผู้แจ้งหรือไม่
+        const displayName = job.fullName || 
+                          job.lineDisplayName || 
+                          job.details?.fullName || 
+                          'ไม่ระบุชื่อ';
+        
+        jobCard.innerHTML = `
+            <div class="p-4">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-semibold text-gray-900 truncate">${job.jobId || 'N/A'}</h3>
+                        <p class="text-sm text-gray-600 mt-1 truncate">${problemInfo}</p>
+                    </div>
+                    <div class="ml-4 flex flex-col items-end">
+                        <span class="${statusInfo.class} mb-1">
+                            <i class="${statusInfo.icon} mr-1"></i>
+                            ${statusInfo.text}
+                        </span>
+                        ${priorityInfo ? `
+                            <span class="${priorityInfo.class}">
+                                ${priorityInfo.text}
+                            </span>
+                        ` : ''}
+                    </div>
+                </div>
                 
-                if (filteredJobs.length === 0) {
-                    checkNoJobsFound();
-                    return;
-                }
-                
-                filteredJobs.forEach((job, index) => {
-                    const jobCard = document.createElement('div');
-                    jobCard.className = `bg-white rounded-lg shadow overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md job-card ${
-                        selectedJobId === job.jobId ? 'ring-2 ring-blue-500' : ''
-                    }`;
-                    jobCard.id = `job-${job.jobId}`;
-                    jobCard.onclick = () => selectJob(job.jobId);
-                    
-                    const statusInfo = getStatusInfo(job.status);
-                    const priorityInfo = getPriorityInfo(job.urgency);
-                    const problemInfo = currentJobType === 'IT' 
-                        ? job.problemType || 'ไม่ระบุประเภทปัญหา'
-                        : job.machineName ? `${job.machineName} (${job.jobType || 'ไม่ระบุ'})` : job.jobType || 'ไม่ระบุประเภทงาน';
-                    
-                    jobCard.innerHTML = `
-                        <div class="p-4">
-                            <div class="flex items-start justify-between">
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="text-lg font-semibold text-gray-900 truncate">${job.jobId || 'N/A'}</h3>
-                                    <p class="text-sm text-gray-600 mt-1 truncate">${problemInfo}</p>
-                                </div>
-                                <div class="ml-4 flex flex-col items-end">
-                                    <span class="${statusInfo.class} mb-1">
-                                        <i class="${statusInfo.icon} mr-1"></i>
-                                        ${statusInfo.text}
-                                    </span>
-                                    ${priorityInfo ? `
-                                        <span class="${priorityInfo.class}">
-                                            ${priorityInfo.text}
-                                        </span>
-                                    ` : ''}
-                                </div>
-                            </div>
-                            
-                            <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-                                <div class="flex items-center">
-                                    <i class="fas fa-user-circle mr-2"></i>
-                                    <span>${job.fullName || 'ไม่ระบุชื่อ'}</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="fas fa-calendar-alt mr-2"></i>
-                                    <span>${formatDate(job.timestamp)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    jobsContainer.appendChild(jobCard);
-                });
-            }
+                <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+                    <div class="flex items-center">
+                        <i class="fas fa-user-circle mr-2"></i>
+                        <span>${displayName}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        <span>${formatDate(job.timestamp)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        jobsContainer.appendChild(jobCard);
+    });
+}
             
             /**
              * เลือกงานเพื่อดูรายละเอียด
