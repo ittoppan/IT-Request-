@@ -938,10 +938,11 @@
                     }));
                 } else {
                     // สำหรับงาน EN
-                    imageObjects = [
-                        { url: job.photo2, caption: 'รูปก่อนซ่อม' },
-                        { url: job.photo3, caption: 'รูปหลังซ่อม' }
-                    ].filter(obj => obj.url && obj.url.trim() !== '');
+                    const urls = toArray(job.imageUrls || job.imageViewerUrls);
+                    imageObjects = urls.map((url, index) => ({
+                        url,
+                        caption: `รูปประกอบ ${index + 1}`
+                    }));
                 }
 
                 if (imageObjects.length === 0) {
