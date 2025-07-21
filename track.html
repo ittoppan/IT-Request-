@@ -779,7 +779,7 @@
              * สร้าง HTML สำหรับสรุปสถานะงาน
              */
             function createStatusSummaryHtml(job) {
-                const statusInfo = getStatusInfo(job.status);
+                const statusInfo = getStatusInfo(job.status || job.jobStatus);
                 const priorityInfo = getPriorityInfo(job.urgency || job.priority);
                 
                 return `
