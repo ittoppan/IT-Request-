@@ -1244,20 +1244,19 @@
                     return new Date(dateString);
                 }
 
-               if (typeof dateString === 'string') {
-    // Format: dd/MM/yyyy HH:mm
-    const dateTimeSlashFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})\s(\d{2}):(\d{2})$/);
-    if (dateTimeSlashFormat) {
-        return new Date(
-            parseInt(dateTimeSlashFormat[3]), // yyyy
-            parseInt(dateTimeSlashFormat[2]) - 1, // MM (month is 0-indexed)
-            parseInt(dateTimeSlashFormat[1]), // dd
-            parseInt(dateTimeSlashFormat[4]), // HH
-            parseInt(dateTimeSlashFormat[5])  // mm
-            // Seconds will default to 0
-        );
-    }
-}
+                if (typeof dateString === 'string') {
+                    // Format: dd/MM/yyyy HH:mm:ss
+                    const dateTimeSlashFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})\s(\d{2}):(\d{2}):(\d{2})$/);
+                    if (dateTimeSlashFormat) {
+                        return new Date(
+                            parseInt(dateTimeSlashFormat[3]),
+                            parseInt(dateTimeSlashFormat[2]) - 1,
+                            parseInt(dateTimeSlashFormat[1]),
+                            parseInt(dateTimeSlashFormat[4]),
+                            parseInt(dateTimeSlashFormat[5]),
+                            parseInt(dateTimeSlashFormat[6])
+                        );
+                    }
 
                     // Format: dd/MM/yyyy
                     const slashDateFormat = dateString.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
