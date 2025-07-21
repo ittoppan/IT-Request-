@@ -810,7 +810,7 @@
                 if (currentJobType === 'IT') {
                     return `
                         <div class="detail-section">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-4">ข้อมูลปัญหา</h4>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-6">ข้อมูลปัญหา</h4>
                             <table class="responsive-table">
                                 <tr>
                                     <th>ประเภทปัญหา</th>
@@ -887,10 +887,7 @@
                                         <th>สาเหตุ</th>
                                         <td>${job.rootCause || 'ยังไม่ทราบสาเหตุ'}</td>
                                     </tr>
-                                    <tr>
-                                        <th>การดำเนินการ</th>
-                                        <td>${job.maintenanceAction || 'ไม่ระบุ'}</td>
-                                    </tr>
+                                    
                                 </table>
                                 <div class="mt-4">
                                     <p class="text-sm text-gray-500">รายละเอียดการซ่อม</p>
