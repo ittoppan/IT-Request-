@@ -982,27 +982,7 @@ driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
         </div>
     `;
 }
-    // สร้างชื่อแกลเลอรีสำหรับ Lightbox เพื่อให้แต่ละแกลเลอรีไม่ซ้ำกัน
-    const lightboxGalleryName = `job-gallery-${job.jobId || 'unknown'}`;
-
-    // สร้าง HTML สำหรับแกลเลอรีรูปภาพ
-    return `
-        <div class="detail-section">
-            <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ (${imageObjects.length})</h4>
-            <div class="gallery-grid">
-                ${imageObjects.map(img => `
-                    <div class="gallery-item">
-                        <a href="${img.url}" data-lightbox="${lightboxGalleryName}" data-title="${img.caption}" class="block w-full h-full">
-                            <img src="${img.url}" alt="${img.caption}" class="rounded shadow-md w-full h-auto object-cover" loading="lazy"
-                                onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
-                            <div class="text-center mt-2 text-sm text-gray-700">${img.caption}</div>
-                        </a>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-}
+   
             
             /**
              * สร้าง HTML สำหรับบันทึกความคืบหน้า
