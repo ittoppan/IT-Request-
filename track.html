@@ -931,20 +931,24 @@ driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
             /**
              * สร้าง HTML สำหรับแกลเลอรี่รูปภาพ
              */
-            function createImageGalleryHtml(job) {
+           function createImageGalleryHtml(job) {
     let imageObjects = [];
 
-    // ดึง URL รูปภาพ ไม่ว่าจะเป็นงาน IT หรืองาน EN
-    // ตรวจสอบก่อนว่ามี beforeRepairUrls หรือไม่ ถ้าไม่มีจะใช้ afterRepairUrls
-    const urls = toArray(job.images.beforeRepairUrls || job.images.afterRepairUrls);
-
-    // แปลง URL ให้เป็นรูปแบบออบเจกต์ที่มี url และ caption
-    imageObjects = urls.map((url, index) => ({
+    // ดึง URL รูปภาพจาก beforeRepairUrls
+    const beforeUrls = toArray(job.images.beforeRepairUrls);
+    imageObjects = imageObjects.concat(beforeUrls.map((url, index) => ({
         url,
-        caption: `รูปประกอบ ${index + 1}` // คำบรรยายรูปภาพอัตโนมัติ
-    }));
+        caption: `รูปก่อนซ่อม ${index + 1}` // คำบรรยายสำหรับรูปก่อนซ่อม
+    })));
 
-    // ถ้าไม่มีรูปภาพ จะคืนค่า HTML แจ้งว่าไม่มีรูปภาพ
+    // ดึง URL รูปภาพจาก afterRepairUrls
+    const afterUrls = toArray(job.images.afterRepairUrls);
+    imageObjects = imageObjects.concat(afterUrls.map((url, index) => ({
+        url,
+        caption: `รูปหลังซ่อม ${index + 1}` // คำบรรยายสำหรับรูปหลังซ่อม
+    })));
+
+    // ถ้าไม่มีรูปภาพเลย จะคืนค่า HTML แจ้งว่าไม่มีรูปภาพ
     if (imageObjects.length === 0) {
         return `
             <div class="detail-section">
@@ -957,6 +961,27 @@ driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
         `;
     }
 
+    // สร้างชื่อแกลเลอรีสำหรับ Lightbox เพื่อให้แต่ละแกลเลอรีไม่ซ้ำกัน
+    const lightboxGalleryName = `job-gallery-${job.jobId || 'unknown'}`;
+
+    // สร้าง HTML สำหรับแกลเลอรีรูปภาพ
+    return `
+        <div class="detail-section">
+            <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ (${imageObjects.length})</h4>
+            <div class="gallery-grid">
+                ${imageObjects.map(img => `
+                    <div class="gallery-item">
+                        <a href="${img.url}" data-lightbox="${lightboxGalleryName}" data-title="${img.caption}" class="block w-full h-full">
+                            <img src="${img.url}" alt="${img.caption}" class="rounded shadow-md w-full h-auto object-cover" loading="lazy"
+                                onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
+                            <div class="text-center mt-2 text-sm text-gray-700">${img.caption}</div>
+                        </a>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
     // สร้างชื่อแกลเลอรีสำหรับ Lightbox เพื่อให้แต่ละแกลเลอรีไม่ซ้ำกัน
     const lightboxGalleryName = `job-gallery-${job.jobId || 'unknown'}`;
 
