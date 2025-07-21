@@ -681,13 +681,13 @@
             </div>
             <div class="ml-4 flex flex-col items-end">
                 <span class="${statusInfo.class} mb-2 flex items-center">
-                    <i class="${statusInfo.icon} mr-1.5"></i>
-                    <span class="font-medium">${statusInfo.text}</span>
+                    <i class="${statusInfo.icon} mr-1.5 text-${statusInfo.color}-500  "></i>
+                    <span class="font-medium" text-gray-900> ${statusInfo.text}</span>
                 </span>
                 ${priorityInfo ? `
                     <span class="${priorityInfo.class} flex items-center">
                         <i class="fas fa-exclamation-circle mr-1.5"></i>
-                        <span class="font-medium">${priorityInfo.text}</span>
+                        <span class="font-medium" text-gray-900>${priorityInfo.text}</span>
                     </span>
                 ` : ''}
             </div>
