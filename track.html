@@ -681,10 +681,12 @@
                     <div class="ml-4 flex flex-col items-end">
                         <span class="${statusInfo.class} mb-1">
                             <i class="${statusInfo.icon} mr-1"></i>
+                            ${statusInfo.color}
                             ${statusInfo.text}
                         </span>
                         ${priorityInfo ? `
                             <span class="${priorityInfo.class}">
+                                ${priorityInfo.color}
                                 ${priorityInfo.text}
                             </span>
                         ` : ''}
@@ -736,7 +738,7 @@
                 detailHeader.classList.remove('hidden');
                 jobDetailsContainer.classList.remove('hidden');
                 
-                document.getElementById('detailJobType').textContent = currentJobType === 'IT' ? 'งานซ่อม IT' : 'งานซ่อมเครื่องจักร';
+                document.getElementById('detailJobType').textContent = currentJobType === 'IT' ? 'เลขงานแจ้งซ่อม' : 'เลขงานซ่อม';
                 document.getElementById('detailJobId').textContent = job.jobId || 'N/A';
                 
                 jobDetailsContainer.innerHTML = `
@@ -980,7 +982,7 @@
              * สร้าง HTML สำหรับบันทึกความคืบหน้า
              */
             function createProgressNotesHtml(job) {
-                let notes = job.notes || job.maintenanceNote || job.progressNotes || '';
+                let notes = job.notes || job.maintenanceNote ||  '';
                 
                 if (currentJobType === 'EN' && job.historyNotes) {
                     notes = job.historyNotes;
@@ -989,10 +991,10 @@
                 if (!notes || notes.length === 0) {
                     return `
                         <div class="detail-section">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-4">บันทึกความคืบหน้า</h4>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">รายละเอียดวิธีแก้ไขปัญหา </h4>
                             <div class="text-center py-4 text-gray-500">
                                 <i class="fas fa-info-circle text-3xl mb-2"></i>
-                                <p>ยังไม่มีบันทึกความคืบหน้า</p>
+                                <p>ยังไม่มีบันทึกรายละเอียดวิธีแก้ไขปัญหา</p>
                             </div>
                         </div>
                     `;
@@ -1002,7 +1004,7 @@
                 
                 return `
                     <div class="detail-section">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">บันทึกความคืบหน้า (${notesArray.length})</h4>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">รายละเอียดวิธีแก้ไขปัญหา (${notesArray.length})</h4>
                         <div class="space-y-3">
                             ${notesArray.map((note, index) => `
                                 <div class="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
@@ -1050,6 +1052,10 @@
                                     <th>วันที่เสร็จ</th>
                                     <td>${formatDate(job.end) || 'ยังไม่เสร็จ'}</td>
                                 </tr>
+                                 <tr>
+                                    <th>เวลาที่ใช้</th>
+                                    <td>${job.time || 'ไม่ระบุ'}</td>
+                                </tr>
                             </table>
                         </div>
                     `;
@@ -1063,8 +1069,8 @@
                                     <td>${job.responsible || 'ยังไม่ระบุ'}</td>
                                 </tr>
                                 <tr>
-                                    <th>ผู้ตรวจสอบ</th>
-                                    <td>${job.checkedBy || 'ยังไม่ตรวจสอบ'}</td>
+                                    <th>ผู้ตรวจรับ</th>
+                                    <td>${job.fullName || 'ยังไม่ตรวจสอบ'}</td>
                                 </tr>
                                 <tr>
                                     <th>วันที่เริ่ม</th>
