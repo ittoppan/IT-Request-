@@ -672,39 +672,39 @@
                           'ไม่ระบุชื่อ';
         
        jobCard.innerHTML = `
-            <div class="p-4">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1 min-w-0">
-                        <h3 class="text-lg font-semibold text-gray-900 truncate">${job.jobId || 'N/A'}</h3>
-                        <p class="text-sm text-gray-600 mt-2 truncate">${problemInfo}</p>
-                    </div>
-                    <div class="ml-5 flex flex-col items-end">
-                        <span class="${statusInfo.class} mb-2">
-                            <i class="${statusInfo.icon} mr-2 text-${statusInfo.color}-500"></i>
-                             <span class="font-medium text-gray-900">${statusInfo.text}</span>
-                        </span>
-                        ${priorityInfo ? `
-                            <span class="${priorityInfo.class}">
-                                <i class="fas fa-exclamation-circle mr-2 text-${priorityInfo.color}-500"></i>
-                                <span class="font-medium text-gray-900"> ${priorityInfo.text}</span>
-                                </div>
-                            </span>
-                        ` : ''}
-                    </div>
-                </div>
-                
-                <div class="mt-5 flex items-center justify-between text-sm text-gray-500">
-                    <div class="flex items-center">
-                        <i class="fas fa-user-circle mr-2"></i>
-                        <span>${displayName}</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-calendar-alt mr-2"></i>
-                        <span>${formatDate(job.timestamp)}</span>
-                    </div>
-                </div>
+          
+    <div class="p-4">
+        <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-semibold text-gray-900 truncate">${job.jobId || 'N/A'}</h3>
+                <p class="text-sm text-gray-600 mt-1 truncate">${problemInfo}</p>
             </div>
-        `;
+            <div class="ml-4 flex flex-col items-end">
+                <span class="${statusInfo.class} mb-2 flex items-center">
+                    <i class="${statusInfo.icon} mr-1.5"></i>
+                    <span class="font-medium">${statusInfo.text}</span>
+                </span>
+                ${priorityInfo ? `
+                    <span class="${priorityInfo.class} flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1.5"></i>
+                        <span class="font-medium">${priorityInfo.text}</span>
+                    </span>
+                ` : ''}
+            </div>
+        </div>
+        
+        <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+            <div class="flex items-center">
+                <i class="fas fa-user-circle mr-2"></i>
+                <span>${displayName}</span>
+            </div>
+            <div class="flex items-center">
+                <i class="fas fa-calendar-alt mr-2"></i>
+                <span>${formatDate(job.timestamp)}</span>
+            </div>
+        </div>
+    </div>
+`;
         
         jobsContainer.appendChild(jobCard);
     });
