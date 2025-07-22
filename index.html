@@ -691,7 +691,12 @@
                 await Swal.fire({
                     title: 'ส่งแบบฟอร์มสำเร็จ!',
                     // ตรวจสอบว่า data.jobId มีค่าหรือไม่ ก่อนแสดงผล
-                    text: 'รหัสงานของคุณคือ ' + (data.jobId || 'ไม่ระบุ'),
+                    <div class="flex justify-center mt-4 space-x-2">
+                <button id="openTrackingModal" class="btn-secondary px-6 py-2 rounded-full mb-6 inline-flex items-center animate-pulse">
+                    <i class="fas fa-search mr-2"></i>
+                    ติดตามงานซ่อม
+                </button>
+</div>
                     icon: 'success'
                 });
                 resetFormAndFiles(this); // รีเซ็ตฟอร์มและ Input ไฟล์
