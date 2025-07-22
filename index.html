@@ -434,27 +434,8 @@
 <div class="space-y-4">
     <label class="block text-sm font-medium text-gray-700 mb-1">แนบไฟล์ประกอบ (ถ้ามี)</label>
     
-    <!-- เพิ่มปุ่มถ่ายรูป -->
-    <div class="flex space-x-4 mb-4">
-        <button 
-            type="button" 
-            id="takePhotoBtn"
-            class="btn-primary flex-1 py-3 text-sm font-medium rounded-lg"
-        >
-            <i class="fas fa-camera mr-2"></i>ถ่ายรูป
-        </button>
-       
-    </div>
     
-    <!-- เพิ่ม input สำหรับ camera -->
-    <input 
-        type="file" 
-        id="cameraInput"
-        accept="image/*" 
-        capture="environment" 
-        class="hidden"
-        onchange="handleCameraUpload(event)"
-    />
+    
     
     <div
         class="file-upload-zone"
@@ -477,6 +458,11 @@
             accept="image/*,.pdf"
             multiple
             onchange="handleFileUpload(event)"
+           id="cameraInput"
+           accept="image/*" 
+           capture="environment" 
+       
+        
         />
     </div>
 
