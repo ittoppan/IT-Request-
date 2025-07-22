@@ -938,24 +938,24 @@ driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
     const beforeUrls = toArray(job.images.beforeRepairUrls);
     imageObjects = imageObjects.concat(beforeUrls.map((url, index) => ({
         url,
-        caption: `รูปก่อนซ่อม ${index }` // คำบรรยายสำหรับรูปก่อนซ่อม
+        caption: `รูปภาพก่อนซ่อม ${index }` // คำบรรยายสำหรับรูปก่อนซ่อม
     })));
 
     // ดึง URL รูปภาพจาก afterRepairUrls
     const afterUrls = toArray(job.images.afterRepairUrls);
     imageObjects = imageObjects.concat(afterUrls.map((url, index) => ({
         url,
-        caption: `รูปหลังซ่อม ${index }` // คำบรรยายสำหรับรูปหลังซ่อม
+        caption: `รูปภาพหลังซ่อม ${index }` // คำบรรยายสำหรับรูปหลังซ่อม
     })));
 
     // ถ้าไม่มีรูปภาพเลย จะคืนค่า HTML แจ้งว่าไม่มีรูปภาพ
     if (imageObjects.length === 0) {
         return `
             <div class="detail-section">
-                <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพประกอบ</h4>
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">รูปภาพงานแจ้งซ่อม</h4>
                 <div class="text-center py-4 text-gray-500">
                     <i class="fas fa-image text-3xl mb-2"></i>
-                    <p>ไม่มีรูปภาพประกอบ</p>
+                    <p>ไม่มีรูปภาพงานแจ้งซ่อม</p>
                 </div>
             </div>
         `;
