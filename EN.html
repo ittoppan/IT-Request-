@@ -424,7 +424,7 @@
                 คลิกเพื่ออัพโหลดไฟล์
             </p>
             <p class="text-sm text-gray-500">
-                รองรับ PNG, JPG, PDF (สูงสุด 5MB ต่อไฟล์)
+                รองรับ PNG, JPG,  (สูงสุด 5MB ต่อไฟล์)
             </p>
         </div>
         <input
@@ -438,11 +438,22 @@
            id="cameraInput"
            accept="image/*" 
            capture="environment" 
-       
-        
         />
     </div>
     <div id="fileList" class="flex flex-wrap gap-4 mt-4"></div>
+  <!-- Submit Button -->
+                <div class="pt-6 animate-slide-up" style="animation-delay: 0.4s;">
+                    <button
+                        type="submit"
+                        class="btn-primary w-full py-4 text-lg font-medium rounded-lg"
+                    >
+                        <i class="fas fa-paper-plane mr-2"></i>ส่งแบบฟอร์มแจ้งซ่อม
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
     <script>
         const liffId = '2007374280-MpkD0bN8';
