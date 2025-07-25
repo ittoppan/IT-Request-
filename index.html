@@ -855,7 +855,7 @@ function handleCameraUpload(event) {
     fileInfo.className = 'text-sm mt-2 text-center';
     fileInfo.innerHTML = `
         <p class="font-medium truncate">${newFile.name}</p>
-        <p class="text-gray-500">${(newFile.size / 1024 / 1024).toFixed(2)} MB</p>
+        <p class="text-gray-500">${(newFile.size / 1024 / 1024).toFixed(5)} MB</p>
     `;
     
     const wrapper = document.createElement('div');
