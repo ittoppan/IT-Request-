@@ -454,16 +454,14 @@
             </p>
         </div>
         <input
-            id="fileInput"
-            type="file"
-            name="fileUpload"
-            class="hidden"
-            accept="image/*,.pdf"
-            multiple
-            onchange="handleFileUpload(event)"
-           id="cameraInput"
-           accept="image/*" 
-           capture="environment" 
+    id="fileInput"
+    type="file"
+    name="fileUpload"
+    class="hidden"
+    accept="image/*,.pdf"
+    multiple
+    onchange="handleFileUpload(event)"
+    capture="environment" />
        
         
         />
@@ -511,37 +509,61 @@
 
     /**
      * จัดการการอัปโหลดไฟล์ แสดงตัวอย่าง และเพิ่มไฟล์ลงในอาร์เรย์
+     * พร้อมทั้งบีบอัดรูปภาพหากจำเป็น
      * @param {Event} event - อ็อบเจกต์ Event จากการเลือกไฟล์
      */
-    function handleFileUpload(event) {
+    async function handleFileUpload(event) { // Make it async
         const files = event.target.files;
         const fileList = document.getElementById('fileList');
 
         if (!files || files.length === 0) return;
 
-        // ล้างไฟล์เก่าทั้งหมดและรีเซ็ตอาร์เรย์
-        fileList.innerHTML = '';
-        uploadedFiles = [];
+        fileList.innerHTML = ''; // ล้างไฟล์เก่าทั้งหมด
+        uploadedFiles = []; // รีเซ็ตอาร์เรย์ไฟล์
 
-        Array.from(files).forEach((file, index) => {
-            // ตรวจสอบขนาดไฟล์ (สูงสุด 5MB)
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            const originalName = file.name; // เก็บชื่อไฟล์เดิม
+
+            // ตรวจสอบว่าเป็นไฟล์รูปภาพและลองบีบอัดหากมีขนาดใหญ่
+            if (file.type.startsWith('image/')) {
+                try {
+                    Swal.fire({
+                        title: 'กำลังประมวลผลรูปภาพ...',
+                        text: 'อาจใช้เวลาสักครู่',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+                    file = await compressImage(file); // ทำการบีบอัด
+                    Swal.close();
+                } catch (error) {
+                    Swal.fire({
+                        title: 'ข้อผิดพลาดในการประมวลผลรูปภาพ',
+                        text: 'ไม่สามารถบีบอัดรูปภาพได้ กรุณาลองใหม่อีกครั้ง',
+                        icon: 'error'
+                    });
+                    Swal.close();
+                    continue; // ข้ามไฟล์นี้ไป
+                }
+            }
+
+            // ตรวจสอบขนาดไฟล์หลังจากการบีบอัด (หรือสำหรับไฟล์ที่ไม่ใช่รูปภาพ)
             const MAX_FILE_SIZE_MB = 5;
             if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
                 Swal.fire({
                     title: 'ไฟล์ใหญ่เกินไป',
-                    text: `ไฟล์ ${file.name} มีขนาดเกิน ${MAX_FILE_SIZE_MB}MB`,
+                    text: `ไฟล์ "${originalName}" มีขนาดเกิน ${MAX_FILE_SIZE_MB}MB หลังจากการประมวลผล`,
                     icon: 'warning'
                 });
-                return;
+                continue; // ข้ามไฟล์นี้ไป
             }
 
-            // เพิ่มไฟล์ลงในอาร์เรย์
             uploadedFiles.push(file);
 
             // สร้าง container สำหรับแสดงผลไฟล์
             const fileContainer = document.createElement('div');
-            fileContainer.className = 'thumbnail-container'; // ใช้ class สำหรับ CSS
-            fileContainer.dataset.index = index; // เก็บ index เพื่อใช้อ้างอิงในการลบ
+            fileContainer.className = 'thumbnail-container';
+            fileContainer.dataset.index = uploadedFiles.length - 1; // เก็บ index เพื่อใช้อ้างอิงในการลบ
 
             if (file.type.startsWith('image/')) {
                 // ถ้าเป็นไฟล์รูปภาพ ให้แสดงตัวอย่าง
@@ -549,7 +571,7 @@
                 reader.onload = function(e) {
                     fileContainer.innerHTML = `
                         <img src="${e.target.result}" alt="Preview">
-                        <div class="thumbnail-remove" onclick="removeFile(${index})">
+                        <div class="thumbnail-remove" onclick="removeFile(${uploadedFiles.length - 1})">
                             <i class="fas fa-times text-red-500"></i>
                         </div>
                     `;
@@ -560,7 +582,7 @@
                 fileContainer.innerHTML = `
                     <div class="w-full h-full bg-gray-100 flex items-center justify-center">
                         <i class="fas fa-file-pdf text-red-500 text-3xl"></i>
-                        <div class="thumbnail-remove" onclick="removeFile(${index})">
+                        <div class="thumbnail-remove" onclick="removeFile(${uploadedFiles.length - 1})">
                             <i class="fas fa-times text-red-500"></i>
                         </div>
                     </div>
@@ -571,7 +593,7 @@
             const fileInfo = document.createElement('div');
             fileInfo.className = 'text-sm mt-2 text-center';
             fileInfo.innerHTML = `
-                <p class="font-medium truncate">${file.name}</p>
+                <p class="font-medium truncate">${originalName}</p>
                 <p class="text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
             `;
 
@@ -581,6 +603,72 @@
             wrapper.appendChild(fileInfo);
 
             fileList.appendChild(wrapper);
+        }
+
+        // อัพเดท files property ของ input file เพื่อให้สะท้อนการเปลี่ยนแปลง
+        const dataTransfer = new DataTransfer();
+        uploadedFiles.forEach(file => {
+            dataTransfer.items.add(file);
+        });
+        document.getElementById('fileInput').files = dataTransfer.files;
+    }
+
+    /**
+     * บีบอัดรูปภาพโดยการปรับขนาดและคุณภาพ
+     * @param {File} file - อ็อบเจกต์ File ของรูปภาพที่จะบีบอัด
+     * @returns {Promise<File>} Promise ที่ Resolve ด้วยอ็อบเจกต์ File ที่ถูกบีบอัดแล้ว
+     */
+    function compressImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    const maxWidth = 1920; // กำหนดความกว้างสูงสุดของรูปภาพ
+                    const maxHeight = 1920; // กำหนดความสูงสูงสุดของรูปภาพ
+                    let width = img.width;
+                    let height = img.height;
+
+                    // คำนวณขนาดใหม่เพื่อปรับให้พอดีกับความกว้าง/ความสูงสูงสุด โดยรักษาสัดส่วน
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // ดึงข้อมูลรูปภาพเป็น Blob และแปลงกลับเป็น File
+                    canvas.toBlob((blob) => {
+                        if (blob) {
+                            // สร้าง File object ใหม่ด้วยชื่อไฟล์เดิม
+                            const compressedFile = new File([blob], file.name, {
+                                type: 'image/jpeg', // บังคับเป็น JPEG เพื่อการบีบอัดที่ดีขึ้น
+                                lastModified: Date.now()
+                            });
+                            resolve(compressedFile);
+                        } else {
+                            reject(new Error('Failed to compress image: Blob is null'));
+                        }
+                    }, 'image/jpeg', 0.8); // 0.8 คือคุณภาพ (80%)
+                };
+                img.onerror = (error) => reject(error); // จัดการข้อผิดพลาดในการโหลดรูปภาพ
+                img.src = event.target.result;
+            };
+            reader.onerror = (error) => reject(error); // จัดการข้อผิดพลาดในการอ่านไฟล์
+            reader.readAsDataURL(file);
         });
     }
 
@@ -589,28 +677,16 @@
      * @param {number} index - Index ของไฟล์ที่จะลบ
      */
     function removeFile(index) {
-        // ลบไฟล์ออกจากอาร์เรย์
         uploadedFiles.splice(index, 1);
 
-        // อัพเดทการแสดงผลโดยการสร้างรายการใหม่ทั้งหมด
-        // (มีประสิทธิภาพน้อยกว่าการลบ Element โดยตรง แต่ช่วยให้การจัดการ Index ง่ายขึ้น)
         const fileList = document.getElementById('fileList');
-        const fileInput = document.getElementById('fileInput');
-
         fileList.innerHTML = ''; // ล้างทั้งหมด
 
-        // สร้าง DataTransfer object เพื่ออัพเดทไฟล์ที่เลือกใน input (เพื่อให้สามารถส่งซ้ำได้ถ้าจำเป็น)
-        const dataTransfer = new DataTransfer();
-        uploadedFiles.forEach(file => {
-            dataTransfer.items.add(file);
-        });
-        fileInput.files = dataTransfer.files;
-
-        // แสดงผลไฟล์ที่เหลือ
+        // Re-render ไฟล์ที่เหลือทั้งหมด
         uploadedFiles.forEach((file, newIndex) => {
             const fileContainer = document.createElement('div');
             fileContainer.className = 'thumbnail-container';
-            
+
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -632,21 +708,28 @@
                     </div>
                 `;
             }
-            
+
             const fileInfo = document.createElement('div');
             fileInfo.className = 'text-sm mt-2 text-center';
             fileInfo.innerHTML = `
                 <p class="font-medium truncate">${file.name}</p>
                 <p class="text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
             `;
-            
+
             const wrapper = document.createElement('div');
             wrapper.className = 'flex flex-col items-center';
             wrapper.appendChild(fileContainer);
             wrapper.appendChild(fileInfo);
-            
+
             fileList.appendChild(wrapper);
         });
+
+        // อัพเดท files property ของ input file เพื่อให้สะท้อนการเปลี่ยนแปลง
+        const dataTransfer = new DataTransfer();
+        uploadedFiles.forEach(file => {
+            dataTransfer.items.add(file);
+        });
+        document.getElementById('fileInput').files = dataTransfer.files;
     }
 
     /**
@@ -718,7 +801,7 @@
                 await Swal.fire({
                     title: 'ส่งแบบฟอร์มแจ้งซ่อมสำเร็จ!',
                     // ตรวจสอบว่า data.jobId มีค่าหรือไม่ ก่อนแสดงผล
-                  
+                    html: data.jobId ? `รหัสงานของคุณคือ: <strong>${data.jobId}</strong>` : '', // เพิ่มการแสดง jobId
                     icon: 'success'
                 });
                 resetFormAndFiles(this); // รีเซ็ตฟอร์มและ Input ไฟล์
@@ -750,7 +833,8 @@
             console.warn("คำเตือน: ไม่พบ Element 'fileList' สำหรับการล้างข้อมูล");
         }
         uploadedFiles = []; // ล้างอาร์เรย์ไฟล์ที่อัปโหลด
-        initializeLiff(); // รีเซ็ต LIFF หากจำเป็น
+        // ไม่ต้อง initializeLiff ซ้ำ หากไม่จำเป็น เพราะ LIFF ควรจะ init แค่ครั้งเดียว
+        // initializeLiff(); 
     }
 
     /**
@@ -817,57 +901,18 @@
                 window.open(targetUrl, '_blank'); // เปิดหน้าใหม่ในแท็บใหม่
             });
         }
-    });
-// ฟังก์ชันเปิดกล้อง
-document.getElementById('takePhotoBtn').addEventListener('click', function() {
-    document.getElementById('cameraInput').click();
-});
 
-// ฟังก์ชันจัดการรูปจากกล้อง
-function handleCameraUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    // สร้างชื่อไฟล์ใหม่ด้วย timestamp
-    const timestamp = new Date().getTime();
-    const newFile = new File([file], `photo_${timestamp}.jpg`, { type: file.type });
-    
-    // เพิ่มไฟล์ลงในอาร์เรย์
-    uploadedFiles.push(newFile);
-    
-    // แสดงตัวอย่างรูปภาพ
-    const fileList = document.getElementById('fileList');
-    const fileContainer = document.createElement('div');
-    fileContainer.className = 'thumbnail-container';
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        fileContainer.innerHTML = `
-            <img src="${e.target.result}" alt="Preview">
-            <div class="thumbnail-remove" onclick="removeFile(${uploadedFiles.length - 1})">
-                <i class="fas fa-times text-red-500"></i>
-            </div>
-        `;
-    };
-    reader.readAsDataURL(file);
-    
-    const fileInfo = document.createElement('div');
-    fileInfo.className = 'text-sm mt-2 text-center';
-    fileInfo.innerHTML = `
-        <p class="font-medium truncate">${newFile.name}</p>
-        <p class="text-gray-500">${(newFile.size / 1024 / 1024).toFixed(5)} MB</p>
-    `;
-    
-    const wrapper = document.createElement('div');
-    wrapper.className = 'flex flex-col items-center';
-    wrapper.appendChild(fileContainer);
-    wrapper.appendChild(fileInfo);
-    
-    fileList.appendChild(wrapper);
-    
-    // รีเซ็ต input เพื่อให้สามารถถ่ายรูปใหม่ได้
-    event.target.value = '';
-}
+        // Listener สำหรับปุ่ม "ถ่ายรูป/เลือกไฟล์" เพื่อเรียก input file
+        document.getElementById('takePhotoBtn').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+    });
+
+    // เนื่องจาก handleCameraUpload มีการทำงานคล้ายกับ handleFileUpload และเราได้รวม capture="environment"
+    // เข้ากับ fileInput แล้ว เราสามารถลบ handleCameraUpload ออกได้ และให้ handleFileUpload จัดการแทน
+    // ดังนั้น, โค้ด handleCameraUpload เดิมจึงไม่จำเป็นต้องใช้แล้ว
+    // หากต้องการใช้ชื่อไฟล์ที่ไม่ซ้ำ เช่น photo_timestamp.jpg สามารถปรับใน handleFileUpload ได้
+    // แต่สำหรับความเรียบง่ายและการบีบอัด ผมได้เลือกให้ใช้ชื่อไฟล์เดิม
 </script>
 </body>
 </html>
