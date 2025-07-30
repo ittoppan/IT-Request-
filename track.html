@@ -358,6 +358,7 @@
             let selectedJobId = null;
             let currentStatusFilter = 'all';
             let currentJobType = 'IT';
+            let currentSortOrder = 'timestamp_desc'; // เพิ่มตัวแปรนี้เพื่อเก็บสถานะการจัดเรียง
 
             // องค์ประกอบ DOM
             const loadingIndicator = document.getElementById('loadingIndicator');
@@ -376,7 +377,13 @@
             const statCards = document.querySelectorAll('.stat-card');
             const statusTabs = document.querySelectorAll('.status-tab');
             const jobTypeTabs = document.querySelectorAll('.job-type-tab');
+            const sortOrderSelect = document.getElementById('sortOrder'); // เพิ่มตัวแปรนี้
 
+// Event Listener สำหรับการจัดเรียง
+sortOrderSelect.addEventListener('change', (event) => {
+    currentSortOrder = event.target.value;
+    renderJobList(); // เรียก renderJobList ใหม่เมื่อมีการเปลี่ยนการจัดเรียง
+});
             /**
              * เริ่มต้น LIFF แอปพลิเคชัน
              */
