@@ -9,7 +9,8 @@
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+    // <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.0/dist/browser-image-compression.js"></script>
+<style>
         body {
             font-family: 'Kanit', sans-serif;
             background-color: #f8fafc;
@@ -530,51 +531,97 @@
     </div>
 
     <script>
-        const liffId = '2007374280-GEYwyNdl';
-        const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
+       <script>
+    const liffId = '2007374280-GEYwyNdl';
+    const googleAppsScriptUrl = 'https://script.google.com/macros/s/AKfycbzBBa2ZL8RMTw0UuNH89U8xYXF5xYRB-ek-ufJGem162kGOb7Fr2XqUfmalWp3q9nXQWA/exec';
 
-        // เก็บข้อมูลไฟล์ที่อัพโหลด
-        let uploadedFiles = [];
+    // เก็บข้อมูลไฟล์ที่อัพโหลด
+    let uploadedFiles = [];
 
-        /**
-         * ตั้งค่าประเภทปัญหาที่เลือกและเน้นการแสดงผล
-         * @param {string} type - ประเภทของปัญหาที่เลือก
-         */
-        function setProblemType(type) {
-            document.getElementById('problemType').value = type;
-            // Highlight selected type
-            const allTypes = document.querySelectorAll('[onclick^="setProblemType"]');
-            allTypes.forEach(el => {
-                if (el.getAttribute('onclick').includes(`'${type}'`)) {
-                    el.classList.add('problem-type-selected');
-                } else {
-                    el.classList.remove('problem-type-selected');
-                }
+    /**
+     * ตั้งค่าประเภทปัญหาที่เลือกและเน้นการแสดงผล
+     * @param {string} type - ประเภทของปัญหาที่เลือก
+     */
+    function setProblemType(type) {
+        document.getElementById('problemType').value = type;
+        const allTypes = document.querySelectorAll('[onclick^="setProblemType"]');
+        allTypes.forEach(el => {
+            if (el.getAttribute('onclick').includes(`'${type}'`)) {
+                el.classList.add('problem-type-selected');
+            } else {
+                el.classList.remove('problem-type-selected');
+            }
+        });
+    }
+
+    /**
+     * ฟังก์ชันบีบอัดรูปภาพ
+     * @param {File} file - ไฟล์รูปภาพที่ต้องการบีบอัด
+     * @returns {Promise<File>} - ไฟล์รูปภาพที่บีบอัดแล้ว
+     */
+    async function compressImage(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const scale = Math.min(1, 1920 / img.width); // ตั้งค่าความกว้างสูงสุดเป็น 1920px
+                    canvas.width = img.width * scale;
+                    canvas.height = img.height * scale;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob((blob) => {
+                        const compressedFile = new File([blob], file.name, {
+                            type: file.type,
+                            lastModified: Date.now()
+                        });
+                        resolve(compressedFile);
+                    }, file.type, 0.7); // กำหนดคุณภาพรูปภาพเป็น 0.7 (70%)
+                };
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    /**
+     * จัดการการอัปโหลดไฟล์ แสดงตัวอย่าง และเพิ่มไฟล์ลงในอาร์เรย์
+     * @param {Event} event - อ็อบเจกต์ Event จากการเลือกไฟล์
+     */
+    async function handleFileUpload(event) {
+        const files = event.target.files;
+        const fileList = document.getElementById('fileList');
+        const MAX_FILE_COUNT = 5;
+
+        if (!files || files.length === 0) return;
+        
+        if (uploadedFiles.length + files.length > MAX_FILE_COUNT) {
+            Swal.fire({
+                title: 'อัปโหลดได้สูงสุด 5 ไฟล์',
+                text: 'กรุณาเลือกไฟล์ใหม่หรือลบไฟล์เดิมบางส่วน',
+                icon: 'warning'
             });
+            return;
         }
 
-        /**
-         * จัดการการอัปโหลดไฟล์ แสดงตัวอย่าง และเพิ่มไฟล์ลงในอาร์เรย์
-         * @param {Event} event - อ็อบเจกต์ Event จากการเลือกไฟล์
-         */
-        function handleFileUpload(event) {
-            const files = event.target.files;
-            const fileList = document.getElementById('fileList');
-
-            if (!files || files.length === 0) return;
-
-            // ตรวจสอบจำนวนไฟล์ที่อัพโหลด (ไม่เกิน 5 ไฟล์)
-            if (uploadedFiles.length + files.length > 5) {
-                Swal.fire({
-                    title: 'อัพโหลดได้สูงสุด 5 ไฟล์',
-                    text: 'กรุณาเลือกไฟล์ใหม่หรือลบไฟล์เดิมบางส่วน',
-                    icon: 'warning'
-                });
-                return;
-            }
-
-            Array.from(files).forEach((file, index) => {
-                // ตรวจสอบขนาดไฟล์ (สูงสุด 5MB)
+        const processingPromises = Array.from(files).map(async (file) => {
+            if (file.type.startsWith('image/')) {
+                // บีบอัดรูปภาพก่อนการแสดงผล
+                const compressedFile = await compressImage(file);
+                // ตรวจสอบขนาดไฟล์หลังบีบอัดอีกครั้ง
+                const MAX_FILE_SIZE_MB = 4.8;
+                if (compressedFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+                    Swal.fire({
+                        title: 'ไฟล์ใหญ่เกินไป',
+                        text: `ไฟล์ ${file.name} มีขนาดเกิน ${MAX_FILE_SIZE_MB}MB แม้จะบีบอัดแล้ว`,
+                        icon: 'warning'
+                    });
+                    return null;
+                }
+                return compressedFile;
+            } else {
+                // ไฟล์ที่ไม่ใช่รูปภาพ (เช่น PDF)
                 const MAX_FILE_SIZE_MB = 4.8;
                 if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
                     Swal.fire({
@@ -582,465 +629,282 @@
                         text: `ไฟล์ ${file.name} มีขนาดเกิน ${MAX_FILE_SIZE_MB}MB`,
                         icon: 'warning'
                     });
-                    return;
+                    return null;
                 }
-
-                // เพิ่มไฟล์ลงในอาร์เรย์
-                uploadedFiles.push(file);
-
-                // สร้าง container สำหรับแสดงผลไฟล์
-                const fileContainer = document.createElement('div');
-                fileContainer.className = 'thumbnail-container';
-                fileContainer.dataset.index = uploadedFiles.length - 1;
-
-                if (file.type.startsWith('image/')) {
-                    // ถ้าเป็นไฟล์รูปภาพ ให้แสดงตัวอย่าง
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        fileContainer.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview">
-                            <div class="thumbnail-remove" onclick="removeFile(${uploadedFiles.length - 1})">
-                                <i class="fas fa-times text-red-500"></i>
-                            </div>
-                        `;
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    // ถ้าเป็นไฟล์อื่น (เช่น PDF) แสดงไอคอน
-                    fileContainer.innerHTML = `
-                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
-                            <i class="fas fa-file-pdf text-red-500 text-3xl"></i>
-                            <div class="thumbnail-remove" onclick="removeFile(${uploadedFiles.length - 1})">
-                                <i class="fas fa-times text-red-500"></i>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                // เพิ่มชื่อไฟล์และขนาด
-                const fileInfo = document.createElement('div');
-                fileInfo.className = 'text-sm mt-2 text-center';
-                fileInfo.innerHTML = `
-                    <p class="font-medium truncate">${file.name}</p>
-                    <p class="text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                `;
-
-                const wrapper = document.createElement('div');
-                wrapper.className = 'flex flex-col items-center';
-                wrapper.appendChild(fileContainer);
-                wrapper.appendChild(fileInfo);
-
-                fileList.appendChild(wrapper);
-            });
-        }
-
-async function compressImage(file) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = img.width * 0.8; // ลดขนาด 20%
-                canvas.height = img.height * 0.8;
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                canvas.toBlob((blob) => {
-                    resolve(new File([blob], file.name, { type: 'image/jpeg' }));
-                }, 'image/jpeg', 0.7); // คุณภาพ 70%
-            };
-        };
-        reader.readAsDataURL(file);
-    });
-}
-
-// ใน handleFileUpload():
-if (file.type.startsWith('image/')) {
-    file = await compressImage(file);
-}
-
-
-
-
-
-
-
-        /**
-         * จัดการการถ่ายภาพจากกล้อง
-         * @param {Event} event - อ็อบเจกต์ Event จากการถ่ายภาพ
-         */
-        function handleCameraUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // ตรวจสอบจำนวนไฟล์ที่อัพโหลด (ไม่เกิน 5 ไฟล์)
-            if (uploadedFiles.length >= 5) {
-                Swal.fire({
-                    title: 'อัพโหลดได้สูงสุด 5 ไฟล์',
-                    text: 'กรุณาลบไฟล์เดิมบางส่วนก่อนถ่ายภาพใหม่',
-                    icon: 'warning'
-                });
-                event.target.value = ''; // รีเซ็ต input
-                return;
+                return file;
             }
+        });
 
-            // สร้างชื่อไฟล์ใหม่ด้วย timestamp
-            const timestamp = new Date().getTime();
-            const newFile = new File([file], `photo_${timestamp}.jpg`, { type: file.type });
-            
-            // เพิ่มไฟล์ลงในอาร์เรย์
-            uploadedFiles.push(newFile);
-            
-            // แสดงตัวอย่างรูปภาพ
-            const fileList = document.getElementById('fileList');
+        const processedFiles = (await Promise.all(processingPromises)).filter(f => f !== null);
+
+        processedFiles.forEach((file) => {
+            const index = uploadedFiles.length;
+            uploadedFiles.push(file);
+
             const fileContainer = document.createElement('div');
             fileContainer.className = 'thumbnail-container';
-            fileContainer.dataset.index = uploadedFiles.length - 1;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
+            fileContainer.dataset.index = index;
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    fileContainer.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <div class="thumbnail-remove" onclick="removeFile(${index})">
+                            <i class="fas fa-times text-red-500"></i>
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            } else {
                 fileContainer.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview">
-                    <div class="thumbnail-remove" onclick="removeFile(${uploadedFiles.length - 1})">
+                    <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <i class="fas fa-file-pdf text-red-500 text-3xl"></i>
+                    </div>
+                    <div class="thumbnail-remove" onclick="removeFile(${index})">
                         <i class="fas fa-times text-red-500"></i>
                     </div>
                 `;
-            };
-            reader.readAsDataURL(file);
-            
+            }
+
             const fileInfo = document.createElement('div');
             fileInfo.className = 'text-sm mt-2 text-center';
             fileInfo.innerHTML = `
-                <p class="font-medium truncate">${newFile.name}</p>
-                <p class="text-gray-500">${(newFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                <p class="font-medium truncate">${file.name}</p>
+                <p class="text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
             `;
-            
+
             const wrapper = document.createElement('div');
             wrapper.className = 'flex flex-col items-center';
             wrapper.appendChild(fileContainer);
             wrapper.appendChild(fileInfo);
-            
+
             fileList.appendChild(wrapper);
-            
-            // รีเซ็ต input เพื่อให้สามารถถ่ายรูปใหม่ได้
-            event.target.value = '';
+        });
+    }
+
+    /**
+     * จัดการการถ่ายภาพจากกล้อง
+     * @param {Event} event - อ็อบเจกต์ Event จากการถ่ายภาพ
+     */
+    async function handleCameraUpload(event) {
+        const files = event.target.files;
+        if (files && files[0]) {
+            await handleFileUpload({ target: { files: [files[0]] } });
         }
+    }
 
-        /**
-         * ลบไฟล์ออกจากรายการที่อัปโหลดและอัปเดตการแสดงผล
-         * @param {number} index - Index ของไฟล์ที่จะลบ
-         */
-        function removeFile(index) {
-            // ลบไฟล์ออกจากอาร์เรย์
-            uploadedFiles.splice(index, 1);
+    /**
+     * ลบไฟล์ที่เลือกออกจากรายการ
+     * @param {number} index - ตำแหน่งของไฟล์ในอาร์เรย์
+     */
+    function removeFile(index) {
+        uploadedFiles.splice(index, 1);
+        const fileList = document.getElementById('fileList');
+        fileList.innerHTML = ''; // ล้างรายการทั้งหมดแล้วสร้างใหม่
+        uploadedFiles.forEach((file, newIndex) => {
+            const event = { target: { files: [file] } };
+            // เรียกฟังก์ชันเดิมเพื่อสร้าง thumbnail ใหม่ โดยไม่ต้องบีบอัดซ้ำ
+            // เราจะสร้างฟังก์ชันแสดงผลแยกต่างหากเพื่อให้โค้ดดูสะอาดขึ้น
+            // แต่สำหรับตอนนี้ใช้วิธีนี้ไปก่อน
+        });
+        // วิธีที่ดีกว่า: สร้างฟังก์ชัน renderFileList ใหม่
+        renderFileList();
+    }
 
-            // อัพเดทการแสดงผลโดยการสร้างรายการใหม่ทั้งหมด
-            const fileList = document.getElementById('fileList');
-            const fileInput = document.getElementById('fileInput');
+    function renderFileList() {
+        const fileList = document.getElementById('fileList');
+        fileList.innerHTML = '';
+        uploadedFiles.forEach((file, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex flex-col items-center';
 
-            fileList.innerHTML = ''; // ล้างทั้งหมด
+            const fileContainer = document.createElement('div');
+            fileContainer.className = 'thumbnail-container';
+            fileContainer.dataset.index = index;
 
-            // สร้าง DataTransfer object เพื่ออัพเดทไฟล์ที่เลือกใน input (เพื่อให้สามารถส่งซ้ำได้ถ้าจำเป็น)
-            const dataTransfer = new DataTransfer();
-            uploadedFiles.forEach(file => {
-                dataTransfer.items.add(file);
-            });
-            fileInput.files = dataTransfer.files;
-
-            // แสดงผลไฟล์ที่เหลือ
-            uploadedFiles.forEach((file, newIndex) => {
-                const fileContainer = document.createElement('div');
-                fileContainer.className = 'thumbnail-container';
-                fileContainer.dataset.index = newIndex;
-                
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        fileContainer.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview">
-                            <div class="thumbnail-remove" onclick="removeFile(${newIndex})">
-                                <i class="fas fa-times text-red-500"></i>
-                            </div>
-                        `;
-                    };
-                    reader.readAsDataURL(file);
-                } else {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
                     fileContainer.innerHTML = `
-                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
-                            <i class="fas fa-file-pdf text-red-500 text-3xl"></i>
-                            <div class="thumbnail-remove" onclick="removeFile(${newIndex})">
-                                <i class="fas fa-times text-red-500"></i>
-                            </div>
+                        <img src="${e.target.result}" alt="Preview">
+                        <div class="thumbnail-remove" onclick="removeFile(${index})">
+                            <i class="fas fa-times text-red-500"></i>
                         </div>
                     `;
-                }
-                
-                const fileInfo = document.createElement('div');
-                fileInfo.className = 'text-sm mt-2 text-center';
-                fileInfo.innerHTML = `
-                    <p class="font-medium truncate">${file.name}</p>
-                    <p class="text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                `;
-                
-                const wrapper = document.createElement('div');
-                wrapper.className = 'flex flex-col items-center';
-                wrapper.appendChild(fileContainer);
-                wrapper.appendChild(fileInfo);
-                
-                fileList.appendChild(wrapper);
-            });
-        }
-
-        /**
-         * แปลงอ็อบเจกต์ File เป็น Base64 String
-         * @param {File} file - อ็อบเจกต์ File ที่จะแปลง
-         * @returns {Promise<string>} Promise ที่ Resolve ด้วย Base64 String
-         */
-        function convertFileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.onerror = (error) => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
-
-        /**
-         * อัพเดทข้อมูลโปรไฟล์ผู้ใช้จาก LINE
-         * @param {Object} profile - ข้อมูลโปรไฟล์จาก LINE
-         */
-        function updateUserProfile(profile) {
-            document.getElementById('lineUserId').value = profile.userId;
-            document.getElementById('lineDisplayName').value = profile.displayName;
-            
-            if (profile.pictureUrl) {
-                document.getElementById('linePictureUrl').value = profile.pictureUrl;
-                document.getElementById('profilePicture').src = profile.pictureUrl;
-            }
-            
-            
-        }
-
-        /**
-         * ตรวจสอบความถูกต้องของฟอร์มก่อนส่ง
-         * @returns {boolean} คืนค่า true ถ้าฟอร์มถูกต้อง
-         */
-        function validateForm() {
-            const form = document.getElementById('repairForm');
-            const requiredFields = form.querySelectorAll('[required]');
-            let isValid = true;
-
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    field.classList.add('border-red-500');
-                    isValid = false;
-                } else {
-                    field.classList.remove('border-red-500');
-                }
-            });
-
-            // ตรวจสอบประเภทปัญหา
-            if (!document.getElementById('problemType').value) {
-                Swal.fire({
-                    title: 'กรุณาเลือกประเภทปัญหา',
-                    icon: 'warning'
-                });
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        /**
-         * จัดการการส่งฟอร์มแจ้งซ่อม
-         * @param {Event} e - อ็อบเจกต์ Event การส่งฟอร์ม
-         */
-        async function handleFormSubmission(e) {
-            e.preventDefault();
-
-            // ตรวจสอบความถูกต้องของฟอร์ม
-            if (!validateForm()) {
-                await Swal.fire({
-                    title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
-                    text: 'ข้อมูลที่จำเป็นต้องกรอกมีเครื่องหมาย *',
-                    icon: 'warning'
-                });
-                return;
-            }
-
-            // ตรวจสอบการเข้าสู่ระบบ LIFF
-            if (typeof liff === 'undefined' || !liff?.isLoggedIn?.()) {
-                await Swal.fire({ title: 'กรุณาเข้าสู่ระบบ', icon: 'warning' });
-                return;
-            }
-
-            // แสดงตัวหมุนโหลด (Loading Spinner)
-            Swal.fire({
-                title: 'กำลังส่งข้อมูล...',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            const formData = new FormData(this);
-
-            try {
-                // ประมวลผลไฟล์ (ถ้ามี)
-                if (uploadedFiles.length > 0) {
-                    const fileBase64Array = await Promise.all(uploadedFiles.map(file => convertFileToBase64(file)));
-                    const filenames = uploadedFiles.map(file => file.name);
-                    const mimetypes = uploadedFiles.map(file => file.type);
-
-                    formData.append('files', JSON.stringify(fileBase64Array));
-                    formData.append('filenames', JSON.stringify(filenames));
-                    formData.append('mimetypes', JSON.stringify(mimetypes));
-                }
-
-                // ส่งข้อมูลไปยัง Google Apps Script
-                const response = await fetch(googleAppsScriptUrl, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                // จัดการ Response
-                if (!response.ok) {
-                    throw new Error(`HTTP error! สถานะ: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log('ข้อมูลที่ได้รับจาก Google Apps Script:', data);
-
-                Swal.close();
-
-                if (data.status === 'success') {
-                    await Swal.fire({
-                        title: 'ส่งแบบฟอร์มแจ้งซ่อมสำเร็จ!',
-                        html: data.jobId ? `เลขที่รายการ: <strong>${data.jobId}</strong>` : '',
-                        icon: 'success',
-                        confirmButtonText: 'ตกลง'
-                    });
-                    
-                    // รีเซ็ตฟอร์มหลังส่งสำเร็จ
-                    resetFormAndFiles(this);
-                } else {
-                    throw new Error(data.message || 'เกิดข้อผิดพลาดในการส่งแบบฟอร์ม');
-                }
-            } catch (error) {
-                Swal.close();
-                await Swal.fire({
-                    title: 'เกิดข้อผิดพลาด!',
-                    text: `ไม่สามารถส่งข้อมูลได้: ${error.message}`,
-                    icon: 'error'
-                });
-                console.error('ข้อผิดพลาดในการส่งฟอร์ม:', error);
-            }
-        }
-
-        /**
-         * รีเซ็ตฟอร์มและล้างรายการไฟล์ที่อัปโหลด
-         * @param {HTMLFormElement} formElement - ฟอร์มที่จะรีเซ็ต
-         */
-        function resetFormAndFiles(formElement) {
-            formElement.reset();
-            document.getElementById('fileList').innerHTML = '';
-            uploadedFiles = [];
-            
-            // รีเซ็ตการเลือกประเภทปัญหา
-            const allTypes = document.querySelectorAll('[onclick^="setProblemType"]');
-            allTypes.forEach(el => el.classList.remove('problem-type-selected'));
-            document.getElementById('problemType').value = '';
-        }
-
-        /**
-         * เริ่มต้น LIFF และดึงข้อมูลโปรไฟล์ผู้ใช้
-         */
-        async function initializeLiff() {
-            try {
-                const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-                const isAndroid = /Android/i.test(navigator.userAgent);
-                
-                // ตั้งค่า config เฉพาะสำหรับแต่ละแพลตฟอร์ม
-                const liffConfig = {
-                    liffId: liffId,
-                    withLoginOnExternalBrowser: isIOS,
-                    redirectUri: window.location.href
                 };
+                reader.readAsDataURL(file);
+            } else {
+                fileContainer.innerHTML = `
+                    <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <i class="fas fa-file-pdf text-red-500 text-3xl"></i>
+                    </div>
+                    <div class="thumbnail-remove" onclick="removeFile(${index})">
+                        <i class="fas fa-times text-red-500"></i>
+                    </div>
+                `;
+            }
 
-                await liff.init(liffConfig);
+            const fileInfo = document.createElement('div');
+            fileInfo.className = 'text-sm mt-2 text-center';
+            fileInfo.innerHTML = `
+                <p class="font-medium truncate">${file.name}</p>
+                <p class="text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+            `;
+            
+            wrapper.appendChild(fileContainer);
+            wrapper.appendChild(fileInfo);
+            fileList.appendChild(wrapper);
+        });
+    }
 
-                if (!liff.isLoggedIn()) {
-                    if (isAndroid) {
-                        liff.login();
-                    } else if (isIOS) {
-                        liff.login({ redirectUri: window.location.href });
-                    }
-                    return;
-                }
-
-                // ดึงข้อมูลโปรไฟล์ผู้ใช้
+    /**
+     * ดึงข้อมูลผู้ใช้ LINE และตั้งค่าลงในฟอร์ม
+     */
+    async function getUserProfile() {
+        try {
+            await liff.init({ liffId: liffId });
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            } else {
                 const profile = await liff.getProfile();
-                updateUserProfile(profile);
+                document.getElementById('lineUserId').value = profile.userId;
+                document.getElementById('lineDisplayName').value = profile.displayName;
+                document.getElementById('profilePicture').src = profile.pictureUrl;
 
-            } catch (error) {
-                console.error('LIFF Init Error:', error);
-                showPlatformSpecificError(error);
-            }
-        }
+                // ตรวจสอบชนิดของอุปกรณ์
+                const device = liff.getOS();
+                document.getElementById('device').value = device;
 
-        /**
-         * แสดงข้อความผิดพลาดตามแพลตฟอร์ม
-         * @param {Error} error - อ็อบเจกต์ Error
-         */
-        function showPlatformSpecificError(error) {
-            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-            const isAndroid = /Android/i.test(navigator.userAgent);
-            
-            let errorMessage = 'เกิดข้อผิดพลาดในการเริ่มต้นแอปพลิเคชัน';
-            
-            if (isIOS) {
-                errorMessage += '\nกรุณาลองเปิดใน Safari หรืออัปเดตแอพ LINE';
-            } else if (isAndroid) {
-                errorMessage += '\nกรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตหรืออัปเดตแอพ LINE';
+                // อัพเดทชื่อผู้ใช้ในฟอร์ม
+                document.getElementById('fullName').value = profile.displayName;
             }
-            
+        } catch (error) {
+            console.error("LIFF initialization failed", error);
             Swal.fire({
-                title: 'ข้อผิดพลาด',
-                text: errorMessage,
-                icon: 'error',
-                confirmButtonText: 'ตกลง'
+                title: 'เกิดข้อผิดพลาด',
+                text: 'ไม่สามารถเชื่อมต่อ LINE ได้ กรุณาลองใหม่อีกครั้ง',
+                icon: 'error'
             });
         }
+    }
 
-        // รวม Event Listeners ใน DOMContentLoaded เดียว
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeLiff();
+    /**
+     * จัดการการส่งฟอร์ม
+     * @param {Event} event - อ็อบเจกต์ Event จากการส่งฟอร์ม
+     */
+    document.getElementById('repairForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        // ตรวจสอบความถูกต้องของข้อมูล
+        if (!validateForm()) {
+            return;
+        }
 
-            const repairForm = document.getElementById('repairForm');
-            if (repairForm) {
-                repairForm.addEventListener('submit', handleFormSubmission);
-            } else {
-                console.error("Error: 'repairForm' element not found.");
-            }
-
-            // ดึงค่า device_id จาก URL (ถ้ามี)
-            const params = new URLSearchParams(window.location.search);
-            const device = params.get("device");
-            if (device) {
-                const deviceElement = document.getElementById("device");
-                if (deviceElement) {
-                    deviceElement.value = device;
-                }
-            }
-
-            // Listener สำหรับปุ่มติดตามงาน
-            const trackingButton = document.getElementById('openTrackingModal');
-            if (trackingButton) {
-                trackingButton.addEventListener('click', function() {
-                    const targetUrl = 'https://liff.line.me/2007374280-GR1Q3YxJ';
-                    window.open(targetUrl, '_blank');
-                });
+        Swal.fire({
+            title: 'กำลังส่งข้อมูล...',
+            text: 'กรุณารอสักครู่',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
             }
         });
+
+        const formData = new FormData(this);
+        formData.delete('fileUpload'); // ลบ fileInput เก่าออก
+        
+        // เพิ่มไฟล์ที่ถูกบีบอัดลงใน FormData
+        uploadedFiles.forEach(file => {
+            formData.append('fileUpload', file, file.name);
+        });
+
+        try {
+            const response = await fetch(googleAppsScriptUrl, {
+                method: 'POST',
+                body: formData,
+                redirect: 'follow'
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                Swal.fire({
+                    title: 'ส่งแบบฟอร์มสำเร็จ!',
+                    text: 'จะแจ้งสถานะให้ทราบอีกครั้ง',
+                    icon: 'success'
+                }).then(() => {
+                    liff.closeWindow();
+                });
+            } else {
+                throw new Error(result.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'เกิดข้อผิดพลาด',
+                text: `ไม่สามารถส่งแบบฟอร์มได้: ${error.message}`,
+                icon: 'error'
+            });
+        }
+    });
+
+    /**
+     * ตรวจสอบความถูกต้องของฟอร์ม
+     */
+    function validateForm() {
+        const form = document.getElementById('repairForm');
+        if (!form.checkValidity()) {
+            Swal.fire({
+                title: 'ข้อมูลไม่ครบถ้วน',
+                text: 'กรุณากรอกข้อมูลในช่องที่มีเครื่องหมาย * ให้ครบถ้วน',
+                icon: 'warning'
+            });
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * โมดอลติดตามงานซ่อม (ใช้ได้เฉพาะบน LINE)
+     */
+    document.getElementById('openTrackingModal').addEventListener('click', () => {
+        if (!liff.isInClient()) {
+            Swal.fire({
+                title: 'คุณไม่ได้อยู่ใน LINE',
+                text: 'ฟีเจอร์นี้ใช้ได้เฉพาะใน LINE เท่านั้น',
+                icon: 'info'
+            });
+            return;
+        }
+        
+        liff.sendMessages([
+            {
+                type: 'text',
+                text: 'ติดตามงานซ่อม'
+            }
+        ]).then(() => {
+            console.log("Message sent to LINE chat.");
+            liff.closeWindow();
+        }).catch((err) => {
+            console.error("Error sending message:", err);
+            Swal.fire({
+                title: 'เกิดข้อผิดพลาด',
+                text: 'ไม่สามารถส่งข้อความติดตามงานได้',
+                icon: 'error'
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        getUserProfile();
+        // เรียกใช้ฟังก์ชันนี้ในกรณีที่มีไฟล์ที่ค้างอยู่จากการ refresh หน้า
+        renderFileList(); 
+    });
+</script>
     </script>
 </body>
 </html>
