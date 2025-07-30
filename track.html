@@ -358,7 +358,6 @@
             let selectedJobId = null;
             let currentStatusFilter = 'all';
             let currentJobType = 'IT';
-            let currentSortOrder = 'timestamp_desc'; // เพิ่มตัวแปรนี้เพื่อเก็บสถานะการจัดเรียง
 
             // องค์ประกอบ DOM
             const loadingIndicator = document.getElementById('loadingIndicator');
@@ -377,13 +376,7 @@
             const statCards = document.querySelectorAll('.stat-card');
             const statusTabs = document.querySelectorAll('.status-tab');
             const jobTypeTabs = document.querySelectorAll('.job-type-tab');
-            const sortOrderSelect = document.getElementById('sortOrder'); // เพิ่มตัวแปรนี้
 
-// Event Listener สำหรับการจัดเรียง
-sortOrderSelect.addEventListener('change', (event) => {
-    currentSortOrder = event.target.value;
-    renderJobList(); // เรียก renderJobList ใหม่เมื่อมีการเปลี่ยนการจัดเรียง
-});
             /**
              * เริ่มต้น LIFF แอปพลิเคชัน
              */
@@ -651,137 +644,76 @@ driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
                 jobsContainer.classList.toggle('hidden', !hasJobs);
             }
             
-
-
-
-/**
- * จัดเรียงรายการงานซ่อมตามเงื่อนไขที่กำหนด
- */
-function sortJobs(jobs, sortBy) {
-    const sorted = [...jobs]; // สร้างสำเนาเพื่อไม่ให้กระทบกับอาร์เรย์ต้นฉบับ
-
-    sorted.sort((a, b) => {
-        switch (sortBy) {
-            case 'timestamp_desc': // วันที่ล่าสุด (มากไปน้อย)
-                return new Date(b.timestamp) - new Date(a.timestamp);
-            case 'timestamp_asc': // วันที่เก่าที่สุด (น้อยไปมาก)
-                return new Date(a.timestamp) - new Date(b.timestamp);
-            case 'status': // เรียงตามสถานะ
-                // กำหนดลำดับของสถานะเพื่อการจัดเรียงที่เหมาะสม
-                const statusOrder = {
-                    'แจ้งซ่อมใหม่': 1,
-                    'รอดำเนินการ': 2,
-                    'กำลังดำเนินการ': 3,
-                    'เสร็จสิ้น': 4,
-                    'ยกเลิก': 5 // เพิ่มสถานะยกเลิกถ้ามี
-                };
-                const statusA = statusOrder[a.status] || 99; // ใช้ 99 สำหรับสถานะที่ไม่รู้จัก
-                const statusB = statusOrder[b.status] || 99;
-                return statusA - statusB;
-            case 'urgency_desc': // ความเร่งด่วน (มากไปน้อย)
-                const urgencyOrderDesc = {
-                    'วิกฤต': 1,
-                    'สูง': 2,
-                    'ปานกลาง': 3,
-                    'ต่ำ': 4
-                };
-                const urgencyADesc = urgencyOrderDesc[a.urgency] || 99;
-                const urgencyBDesc = urgencyOrderDesc[b.urgency] || 99;
-                return urgencyADesc - urgencyBDesc;
-            case 'urgency_asc': // ความเร่งด่วน (น้อยไปมาก)
-                const urgencyOrderAsc = {
-                    'ต่ำ': 1,
-                    'ปานกลาง': 2,
-                    'สูง': 3,
-                    'ด่วนมาก': 4
-                };
-                const urgencyAAsc = urgencyOrderAsc[a.urgency] || 99;
-                const urgencyBAsc = urgencyOrderAsc[b.urgency] || 99;
-                return urgencyAAsc - urgencyBAsc;
-            default:
-                return 0; // ไม่มีการจัดเรียง
-        }
-    });
-    return sorted;
-}
             /**
              * แสดงรายการงานซ่อม
              */
             function renderJobList() {
     jobsContainer.innerHTML = '';
     document.getElementById('jobCount').textContent = filteredJobs.length;
-
+    
     if (filteredJobs.length === 0) {
         checkNoJobsFound();
         return;
     }
-
-    // ⭐ เพิ่มส่วนนี้: จัดเรียง filteredJobs ก่อนการแสดงผล
-    const sortedJobs = sortJobs(filteredJobs, currentSortOrder);
-
-    // ⭐ เปลี่ยนจาก filteredJobs เป็น sortedJobs ใน loop
-    sortedJobs.forEach((job, index) => {
+    
+    filteredJobs.forEach((job, index) => {
         const jobCard = document.createElement('div');
         jobCard.className = `bg-white rounded-lg shadow overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md job-card ${
             selectedJobId === job.jobId ? 'ring-2 ring-blue-500' : ''
         }`;
         jobCard.id = `job-${job.jobId}`;
         jobCard.onclick = () => selectJob(job.jobId);
-
+        
         const statusInfo = getStatusInfo(job.status);
         const priorityInfo = getPriorityInfo(job.urgency);
-        const problemInfo = currentJobType === 'IT'
+        const problemInfo = currentJobType === 'IT' 
             ? job.problemType || 'ไม่ระบุประเภทปัญหา'
             : job.machineName ? `${job.machineName} (${job.jobType || 'ไม่ระบุ'})` : job.jobType || 'ไม่ระบุประเภทงาน';
-
-        const displayName = job.fullName ||
-                            job.lineDisplayName ||
-                            job.details?.fullName ||
-                            'ไม่ระบุชื่อ';
-
-        jobCard.innerHTML = `
-            <div class="p-5">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1 min-w-0">
-                        <h3 class="text-lg font-semibold text-gray-900 truncate">${job.jobId || 'N/A'}</h3>
-                        <p class="text-sm text-gray-600 mt-1 truncate">${problemInfo}</p>
-                    </div>
-                    <div class="ml-4 flex flex-col items-end">
-                        <span class="${statusInfo.class} mb-2 flex items-center">
-                            <i class="${statusInfo.icon} mr-1.5 text-${statusInfo.color}-500"></i>
-                            <span class="font-medium"> ${statusInfo.text}</span>
-                        </span>
-                        ${priorityInfo ? `
-                            <span class="${priorityInfo.class} flex items-center">
-                                <i class="${priorityInfo.icon} mr-2 text-${priorityInfo.color}-500"></i>
-                                <span class="font-medium">${priorityInfo.text}</span>
-                            </span>
-                        ` : ''}
-                    </div>
-                </div>
-
-                <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-                    <div class="flex items-center">
-                        <i class="fas fa-user-circle mr-2"></i>
-                        <span>${displayName}</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-calendar-alt mr-2"></i>
-                        <span>${formatDate(job.timestamp)}</span>
-                    </div>
-                </div>
+        
+        // ตรวจสอบว่ามีชื่อผู้แจ้งหรือไม่
+        const displayName = job.fullName || 
+                          job.lineDisplayName || 
+                          job.details?.fullName || 
+                          'ไม่ระบุชื่อ';
+        
+       jobCard.innerHTML = `
+          
+    <div class="p-5">
+        <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-semibold text-gray-900 truncate">${job.jobId || 'N/A'}</h3>
+                <p class="text-sm text-gray-600 mt-1 truncate">${problemInfo}</p>
             </div>
-        `;
+            <div class="ml-4 flex flex-col items-end">
+                <span class="${statusInfo.class} mb-2 flex items-center">
+                    <i class="${statusInfo.icon} mr-1.5 text-${statusInfo.color}-500  "></i>
+                    <span class="font-medium" text-gray-900> ${statusInfo.text}</span>
+                </span>
+                ${priorityInfo ? `
+                    <span class="${priorityInfo.class} flex items-center">
+                         <i class="${priorityInfo.icon}fas  mr-2 text-${priorityInfo.color}-500"></i>
+                                    <span class="font-medium text-gray-900">${priorityInfo.text}</span>
 
+                    </span>
+                ` : ''}
+            </div>
+        </div>
+        
+        <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+            <div class="flex items-center">
+                <i class="fas fa-user-circle mr-2"></i>
+                <span>${displayName}</span>
+            </div>
+            <div class="flex items-center">
+                <i class="fas fa-calendar-alt mr-2"></i>
+                <span>${formatDate(job.timestamp)}</span>
+            </div>
+        </div>
+    </div>
+`;
+        
         jobsContainer.appendChild(jobCard);
     });
-    // ⭐ หากมีงานที่เคยถูกเลือกอยู่ ให้เน้นการ์ดนั้นอีกครั้งหลังจัดเรียงใหม่
-    if (selectedJobId) {
-        const previouslySelectedCard = document.getElementById(`job-${selectedJobId}`);
-        if (previouslySelectedCard) {
-            previouslySelectedCard.classList.add('ring-2', 'ring-blue-500');
-        }
-    }
 }
             
             /**
