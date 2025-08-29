@@ -1,9 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แบบฟอร์มแจ้งซ่อม MAINTENANCE JOB REQUEST</title>
+    <title>แบบฟอร์มแจ้งซ่อม (MAINTENANCE JOB REQUEST)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -12,80 +13,164 @@
     <style>
         body {
             font-family: 'Kanit', sans-serif;
-            background-color: #f8fafc;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .bg-gradient-primary {
-            background: linear-gradient(135deg, #183263 0%, #0099ff 100%);
+            background: linear-gradient(135deg, #633818 0%, #ff6f00 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bg-gradient-primary::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #183263 0%, #0099ff 100%);
-            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #633818 0%, #ff6f00 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(25deg);
+            transition: all 0.6s;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px -4px rgba(0, 0, 0, 0.2);
         }
 
-         /* เพิ่มในส่วน style */
+        .btn-primary:hover::after {
+            left: 120%;
+        }
+
         .btn-secondary {
             background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
             color: white;
-            transition: all 0.3s ease;
-            border: none; /* Remove default border if any */
-            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-secondary::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(25deg);
+            transition: all 0.6s;
         }
 
         .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px -4px rgba(0, 0, 0, 0.2);
         }
 
+        .btn-secondary:hover::after {
+            left: 120%;
+        }
 
         .form-input {
-            border: 1px solid #e2e8f0;
+            border: 1px solid #d1d5db;
             border-radius: 0.5rem;
             padding: 0.75rem 1rem;
             width: 100%;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            background-color: #f9fafb;
         }
 
         .form-input:focus {
             outline: none;
             border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background-color: #ffffff;
+        }
+
+        select.form-input {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
         }
 
         .file-upload-zone {
-            border: 2px dashed #e2e8f0;
+            border: 2px dashed #d1d5db;
             border-radius: 0.75rem;
             padding: 2rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 0.5rem; /* Add some space above */
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload-zone::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 70%);
+            transform: translateX(-100%);
         }
 
         .file-upload-zone:hover {
             border-color: #3b82f6;
-            background-color: #f8fafc;
+            background-color: #f0f9ff;
+        }
+
+        .file-upload-zone:hover::before {
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
         }
 
         .animate-fade-in {
-            animation: fadeIn 0.5s ease-out;
+            animation: fadeIn 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
         }
 
         .animate-slide-up {
-            animation: slideUp 0.5s ease-out;
+            animation: slideUp 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
         }
 
         .animate-float {
@@ -93,14 +178,14 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -110,28 +195,46 @@
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-15px); }
         }
 
         .section-header {
             display: flex;
             align-items: center;
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-weight: 600;
             color: #1e293b;
             margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+            position: relative;
+        }
+
+        .section-header::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, #633818, #ff6f00);
+            border-radius: 1px;
         }
 
         .thumbnail-container {
             position: relative;
-            width: 120px; /* Adjusted size */
-            height: 120px; /* Adjusted size */
-            border-radius: 0.5rem;
+            width: 120px;
+            height: 120px;
+            border-radius: 0.75rem;
             overflow: hidden;
             margin-right: 1rem;
             margin-bottom: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .thumbnail-container:hover {
+            transform: scale(1.05);
         }
 
         .thumbnail-container img {
@@ -142,29 +245,84 @@
 
         .thumbnail-remove {
             position: absolute;
-            top: 0.25rem;
-            right: 0.25rem;
-            background-color: rgba(255, 255, 255, 0.8);
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 50%;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 2rem;
+            height: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .thumbnail-container:hover .thumbnail-remove {
             opacity: 1;
         }
+
+        .job-type-option, .job-desc-option {
+            transition: all 0.2s ease;
+            border: 2px solid #e5e7eb;
+        }
+
+        .job-type-option:hover, .job-desc-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .job-type-option.selected, .job-desc-option.selected {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+        }
+
+        .urgency-option {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .urgency-option:hover {
+            background-color: #f9fafb;
+        }
+
+        .urgency-option.selected {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .profile-badge {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-badge::after {
+            content: "LINE";
+            position: absolute;
+            bottom: -8px;
+            right: -8px;
+            background: #06c755;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 md:p-8 bg-gray-50">
-    <div class="glass-card w-full max-w-4xl rounded-2xl overflow-hidden shadow-xl animate-fade-in">
+<body class="min-h-screen flex items-center justify-center p-4 md:p-6">
+    <div class="glass-card w-full max-w-4xl rounded-2xl overflow-hidden animate-fade-in">
         <!-- Header -->
-        <div class="bg-gradient-primary text-white p-8 relative overflow-hidden">
+        <div class="bg-gradient-primary text-white p-8 relative">
             <div class="absolute inset-0 opacity-10">
                 <div class="absolute top-4 right-4 w-32 h-32 bg-white rounded-full blur-3xl animate-float"></div>
                 <div class="absolute bottom-4 left-4 w-24 h-24 bg-white rounded-full blur-2xl animate-float" style="animation-delay: 1s;"></div>
@@ -172,19 +330,21 @@
 
             <div class="relative z-10 text-center">
                 <div class="flex justify-center mb-6">
-                    <div class="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center shadow-lg">
-                        <img id="profilePicture" src="https://via.placeholder.com/96/CCCCCC/FFFFFF?text=PROFILE" alt="รูปโปรไฟล์" class="w-20 h-20 rounded-full object-cover">
+                    <div class="profile-badge">
+                        <div class="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center shadow-lg">
+                            <img id="profilePicture" src="https://via.placeholder.com/96/CCCCCC/FFFFFF?text=PROFILE" alt="รูปโปรไฟล์" class="w-20 h-20 rounded-full object-cover">
+                        </div>
                     </div>
                 </div>
 
                 <h1 class="text-3xl md:text-4xl font-bold mb-3">
                     แบบฟอร์มแจ้งซ่อม MAINTENANCE JOB REQUEST 👨🏻‍🔧
                 </h1>
-                <p class="text-sm opacity-90">
-
+                <p class="text-sm opacity-90 mb-6">
+                    กรุณากรอกข้อมูลให้ครบถ้วนเพื่อความรวดเร็วในการดำเนินการ
                 </p>
-                <div class="flex justify-center mt-4 space-x-2">
-                    <button id="openTrackingModal" class="btn-secondary px-6 py-2 rounded-full mb-6 inline-flex items-center animate-pulse">
+                <div class="flex justify-center">
+                    <button id="openTrackingModal" class="btn-secondary px-6 py-2 rounded-full inline-flex items-center animate-pulse">
                         <i class="fas fa-search mr-2"></i>
                         ติดตามงานซ่อม
                     </button>
@@ -193,7 +353,7 @@
         </div>
 
         <!-- Form -->
-        <div class="p-8">
+        <div class="p-6 md:p-8">
             <form id="repairForm" class="space-y-8">
                 <input type="hidden" name="formType" value="EN" />
                 <input type="hidden" id="lineUserId" name="lineUserId">
@@ -239,17 +399,19 @@
                                 >
                                     <option value="" disabled selected>เลือกแผนก</option>
                                     <option value="HR&GA">HR&GA</option>
-                                    <option value="Safety">Safety</option>
+                                    <option value="SAFETY">SAFETY</option>
                                     <option value="IT">IT</option>
-                                    <option value="Printing & Color match">Printing & Color match</option>
-                                    <option value="Dry Laminate">Dry Laminate</option>
-                                    <option value="Rewinder & Slitter">Rewinder & Slitter</option>
-                                    <option value="Bag Making">Bag Making</option>
-                                    <option value="Packing">Packing</option>
+                                    <option value="PRINTING & COLOR MATCH">PRINTING & COLOR MATCH</option>
+                                    <option value="DRY LAMINATE">DRY LAMINATE</option>
+                                    <option value="REWINDER & SLITTER">REWINDER & SLITTER</option>
+                                    <option value="BAG MAKING">BAG MAKING</option>
+                                    <option value="PLANNING">PLANNING</option>
+                                    <option value="PACKING">PACKING</option>
                                     <option value="QC & QA">QC & QA</option>
-                                    <option value="Warehouse">Warehouse</option>
-                                    <option value="Engineering">Engineering</option>
-
+                                    <option value="WAREHOUSE">WAREHOUSE</option>
+                                    <option value="ENGINEERING">ENGINEERING</option>
+                                    <option value="DV">DV</option>
+                                    <option value="OTHER">OTHER</option>
                                 </select>
                                 <i class="fas fa-building absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                             </div>
@@ -308,42 +470,66 @@
                 </div>
 
                 <!-- รายละเอียดปัญหา -->
-                <div class="space-y-6 animate-slide-up" style="animation-delay: 0.2s;">
+                <div class="space-y-6 animate-slide-up" style="animation-delay: 0.1s;">
                     <div class="section-header">
                         <i class="fas fa-exclamation-circle mr-3 text-yellow-500"></i>
                         <span>รายละเอียดปัญหา</span>
                     </div>
 
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทงาน *</label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div class="p-4 border-2 border-border rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg" onclick="setjobType('เครื่องจักร')">
-                                <div class="flex items-center space-x-3">
-                                    <i class="fas fa-desktop text-blue-500"></i>
-                                    <span class="text-sm">เครื่องจักร (Machinery)</span>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทงาน (Job Type) *</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="job-type-option p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 border-gray-200" onclick="setjobType('เครื่องจักร')">
+                                <div class="flex flex-col items-center space-y-2">
+                                    <i class="fas fa-tools text-2xl text-blue-500"></i>
+                                    <span class="text-sm font-medium text-center">เครื่องจักร<br>(Machinery)</span>
                                 </div>
                             </div>
-                            <div class="p-4 border-2 border-border rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg" onclick="setjobType('อุปกรณ์สนับสนุน')">
-                                <div class="flex items-center space-x-3">
-                                    <i class="fas fa-cog text-blue-500"></i>
-                                    <span class="text-sm">อุปกรณ์สนับสนุน (Equipment Support)</span>
+                            <div class="job-type-option p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 border-gray-200" onclick="setjobType('อุปกรณ์สนับสนุน')">
+                                <div class="flex flex-col items-center space-y-2">
+                                    <i class="fas fa-cog text-2xl text-blue-500"></i>
+                                    <span class="text-sm font-medium text-center">อุปกรณ์สนับสนุน<br>(Equipment Support)</span>
                                 </div>
                             </div>
-                            <div class="p-4 border-2 border-border rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg" onclick="setjobType('โครงสร้างพื้นฐาน')">
-                                <div class="flex items-center space-x-3">
-                                    <i class="fas fa-wifi text-blue-500"></i>
-                                    <span class="text-sm">โครงสร้างพื้นฐาน (Facilities)</span>
+                            <div class="job-type-option p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 border-gray-200" onclick="setjobType('โครงสร้างพื้นฐาน')">
+                                <div class="flex flex-col items-center space-y-2">
+                                    <i class="fas fa-wifi text-2xl text-blue-500"></i>
+                                    <span class="text-sm font-medium text-center">โครงสร้างพื้นฐาน<br>(Facilities)</span>
                                 </div>
                             </div>
-                            <div class="p-4 border-2 border-border rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg" onclick="setjobType('อื่นๆ')">
-                                <div class="flex items-center space-x-3">
-                                    <i class="fas fa-envelope text-blue-500"></i>
-                                    <span class="text-sm">อื่นๆ (Other)</span>
+                            <div class="job-type-option p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 border-gray-200" onclick="setjobType('อื่นๆ')">
+                                <div class="flex flex-col items-center space-y-2">
+                                    <i class="fas fa-ellipsis-h text-2xl text-blue-500"></i>
+                                    <span class="text-sm font-medium text-center">อื่นๆ<br>(Other)</span>
                                 </div>
                             </div>
-
                         </div>
                         <input type="hidden" id="jobType" name="jobType" required>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ลักษณะงาน (Job Description) *</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="job-desc-option p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 border-gray-200" onclick="setjobDescription('ซ่อมบำรุง')">
+                                <div class="flex flex-col items-center space-y-2">
+                                    <i class="fas fa-wrench text-2xl text-green-500"></i>
+                                    <span class="text-sm font-medium text-center">ซ่อมบำรุง<br>(Maintenance)</span>
+                                </div>
+                            </div>
+                            <div class="job-desc-option p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 border-gray-200" onclick="setjobDescription('ปรับปรุง/ ดัดแปลง')">
+                                <div class="flex flex-col items-center space-y-2">
+                                    <i class="fas fa-sync-alt text-2xl text-yellow-500"></i>
+                                    <span class="text-sm font-medium text-center">ปรับปรุง/ ดัดแปลง<br>(Modify)</span>
+                                </div>
+                            </div>
+                            <div class="job-desc-option p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 border-gray-200" onclick="setjobDescription('สร้าง/ จัดทำใหม่')">
+                                <div class="flex flex-col items-center space-y-2">
+                                    <i class="fas fa-plus-circle text-2xl text-purple-500"></i>
+                                    <span class="text-sm font-medium text-center">สร้าง/ จัดทำใหม่<br>(Build)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="jobDescription" name="jobDescription" required>
                     </div>
 
                     <div class="space-y-2">
@@ -356,65 +542,71 @@
                             rows="4"
                             required
                             placeholder="อธิบายปัญหาที่พบให้ละเอียดที่สุด เช่น อาการที่พบ ข้อความแจ้งเตือน เวลาเกิดปัญหา"
-                            class="form-input min-h-[120px] resize-none"
+                            class="form-input"
                         ></textarea>
                     </div>
 
-                     <div class="space-y-4">
+                    <div class="space-y-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">ระดับความเร่งด่วน *</label>
                         <div class="space-y-3">
-                            <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                                <input type="radio" id="urgency-low" name="urgency" value="ต่ำ" class="form-radio text-green-500" checked>
-                                <div class="flex-1 cursor-pointer" onclick="document.getElementById('urgency-low').click()">
+                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectUrgency('urgency-low')">
+                                <input type="radio" id="urgency-low" name="urgency" value="ต่ำ" class="form-radio text-green-500 mr-3" checked>
+                                <div class="flex-1">
                                     <div class="flex items-center space-x-2">
                                         <i class="fas fa-clock text-green-500"></i>
-                                        <label for="urgency-low" class="font-medium text-green-500 cursor-pointer">ต่ำ</label>
+                                        <label for="urgency-low" class="font-medium text-green-600 cursor-pointer">ต่ำ</label>
                                     </div>
-                                    <p class="text-sm text-gray-500 ml-6">ไม่เร่งด่วน สามารถรอได้</p>
+                                    <p class="text-sm text-gray-600 mt-1">ไม่เร่งด่วน สามารถรอได้</p>
                                 </div>
                             </div>
-                            <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                                <input type="radio" id="urgency-medium" name="urgency" value="ปานกลาง" class="form-radio text-blue-500">
-                                <div class="flex-1 cursor-pointer" onclick="document.getElementById('urgency-medium').click()">
+                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectUrgency('urgency-medium')">
+                                <input type="radio" id="urgency-medium" name="urgency" value="ปานกลาง" class="form-radio text-blue-500 mr-3">
+                                <div class="flex-1">
                                     <div class="flex items-center space-x-2">
-                                        <i class="fas fa-clock text-blue-500"></i>
-                                        <label for="urgency-medium" class="font-medium text-blue-500 cursor-pointer">ปานกลาง</label>
+                                        <i class="fas fa-hourglass-half text-blue-500"></i>
+                                        <label for="urgency-medium" class="font-medium text-blue-600 cursor-pointer">ปานกลาง</label>
                                     </div>
-                                    <p class="text-sm text-gray-500 ml-6">ต้องการการแก้ไขในระยะเวลาอันควร</p>
+                                    <p class="text-sm text-gray-600 mt-1">ต้องการการแก้ไขในระยะเวลาอันควร</p>
                                 </div>
                             </div>
-                            <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                                <input type="radio" id="urgency-high" name="urgency" value="สูง" class="form-radio text-yellow-500">
-                                <div class="flex-1 cursor-pointer" onclick="document.getElementById('urgency-high').click()">
+                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectUrgency('urgency-high')">
+                                <input type="radio" id="urgency-high" name="urgency" value="สูง" class="form-radio text-yellow-500 mr-3">
+                                <div class="flex-1">
                                     <div class="flex items-center space-x-2">
                                         <i class="fas fa-exclamation-triangle text-yellow-500"></i>
-                                        <label for="urgency-high" class="font-medium text-yellow-500 cursor-pointer">สูง</label>
+                                        <label for="urgency-high" class="font-medium text-yellow-600 cursor-pointer">สูง</label>
                                     </div>
-                                    <p class="text-sm text-gray-500 ml-6">ส่งผลกระทบต่อการทำงาน</p>
+                                    <p class="text-sm text-gray-600 mt-1">ส่งผลกระทบต่อการทำงาน</p>
                                 </div>
                             </div>
-                            <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                                <input type="radio" id="urgency-critical" name="urgency" value="ด่วนมาก" class="form-radio text-red-500">
-                                <div class="flex-1 cursor-pointer" onclick="document.getElementById('urgency-critical').click()">
+                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectUrgency('urgency-critical')">
+                                <input type="radio" id="urgency-critical" name="urgency" value="ด่วนมาก" class="form-radio text-red-500 mr-3">
+                                <div class="flex-1">
                                     <div class="flex items-center space-x-2">
                                         <i class="fas fa-bolt text-red-500"></i>
-                                        <label for="urgency-critical" class="font-medium text-red-500 cursor-pointer">ด่วนมาก</label>
+                                        <label for="urgency-critical" class="font-medium text-red-600 cursor-pointer">ด่วนมาก</label>
                                     </div>
-                                    <p class="text-sm text-gray-500 ml-6">หยุดการทำงานทั้งหมด</p>
+                                    <p class="text-sm text-gray-600 mt-1">หยุดการทำงานทั้งหมด</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                   <!-- File Upload -->
-                    <div class="space-y-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">แนบไฟล์ประกอบ (ถ้ามี)</label>
+                </div>
 
+                <!-- File Upload -->
+                <div class="space-y-4 animate-slide-up" style="animation-delay: 0.2s;">
+                    <div class="section-header">
+                        <i class="fas fa-paperclip mr-3 text-purple-500"></i>
+                        <span>แนบไฟล์ประกอบ (ถ้ามี)</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- File Upload Zone -->
                         <div class="file-upload-zone" onclick="document.getElementById('fileInput').click()">
-                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-4"></i>
+                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
                             <div class="text-center">
-                                <p class="text-lg font-medium text-gray-800 mb-2">เลือกไฟล์</p>
-                                <p class="text-sm text-gray-500">PNG, JPG, PDF (สูงสุด 5MB ต่อไฟล์)</p>
+                                <p class="text-lg font-medium text-gray-800 mb-1">เลือกไฟล์</p>
+                                <p class="text-xs text-gray-500">PNG, JPG, PDF (สูงสุด 5MB ต่อไฟล์)</p>
                             </div>
                             <input
                                 id="fileInput"
@@ -427,11 +619,12 @@
                             />
                         </div>
 
-                        <!-- Camera Capture Button -->
-                        <div class="mt-4 text-center">
-                            <button type="button" id="takePhotoBtn" class="btn-secondary px-6 py-2 rounded-full inline-flex items-center">
+                        <!-- Camera Capture -->
+                        <div class="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                            <button type="button" id="takePhotoBtn" class="btn-secondary px-5 py-3 rounded-full inline-flex items-center mb-3">
                                 <i class="fas fa-camera mr-2"></i>ถ่ายภาพ
                             </button>
+                            <p class="text-xs text-gray-500 text-center">ถ่ายภาพเพื่อแสดงปัญหาอย่างชัดเจน</p>
                             <input
                                 id="cameraInput"
                                 type="file"
@@ -441,20 +634,20 @@
                                 onchange="handleCameraUpload(event)"
                             />
                         </div>
-
-                        <!-- File List Display -->
-                        <div id="fileList" class="flex flex-wrap gap-4 mt-4"></div>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div class="pt-6 animate-slide-up" style="animation-delay: 0.4s;">
-                        <button
-                            type="submit"
-                            class="btn-primary w-full py-4 text-lg font-medium rounded-lg"
-                        >
-                            <i class="fas fa-paper-plane mr-2"></i>ส่งแบบฟอร์มแจ้งซ่อม
-                        </button>
-                    </div>
+                    <!-- File List Display -->
+                    <div id="fileList" class="flex flex-wrap gap-4 mt-4"></div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-6 animate-slide-up" style="animation-delay: 0.3s;">
+                    <button
+                        type="submit"
+                        class="btn-primary w-full py-4 text-lg font-medium rounded-lg"
+                    >
+                        <i class="fas fa-paper-plane mr-2"></i>ส่งแบบฟอร์มแจ้งซ่อม
+                    </button>
                 </div>
             </form>
         </div>
@@ -470,22 +663,41 @@
         function setjobType(type) {
             document.getElementById('jobType').value = type;
             // Highlight selected type
-            const allTypes = document.querySelectorAll('[onclick^="setjobType"]');
+            const allTypes = document.querySelectorAll('.job-type-option');
             allTypes.forEach(el => {
                 if (el.getAttribute('onclick').includes(`'${type}'`)) {
-                    el.classList.add('border-blue-500', 'bg-blue-50', 'shadow-lg');
-                    el.classList.remove('border-border'); // Remove default border class when selected
+                    el.classList.add('selected', 'border-blue-500', 'bg-blue-50');
                 } else {
-                    el.classList.remove('border-blue-500', 'bg-blue-50', 'shadow-lg');
-                    el.classList.add('border-border'); // Add back default border class
+                    el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
                 }
             });
         }
 
+        function setjobDescription(type) {
+            document.getElementById('jobDescription').value = type;
+            // Highlight selected description
+            const allDescs = document.querySelectorAll('.job-desc-option');
+            allDescs.forEach(el => {
+                if (el.getAttribute('onclick').includes(`'${type}'`)) {
+                    el.classList.add('selected', 'border-blue-500', 'bg-blue-50');
+                } else {
+                    el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
+                }
+            });
+        }
+
+        function selectUrgency(id) {
+            document.getElementById(id).checked = true;
+            // Highlight selected urgency
+            const allUrgencies = document.querySelectorAll('.urgency-option');
+            allUrgencies.forEach(el => {
+                el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
+            });
+            event.currentTarget.classList.add('selected', 'border-blue-500', 'bg-blue-50');
+        }
+
         function handleFileUpload(event) {
             const files = event.target.files;
-            const fileList = document.getElementById('fileList');
-
             if (!files || files.length === 0) return;
 
             // Process each selected file
@@ -494,30 +706,30 @@
                     Swal.fire({
                         title: 'ไฟล์ใหญ่เกินไป',
                         text: `ไฟล์ ${file.name} มีขนาดเกิน 5MB`,
-                        icon: 'warning'
+                        icon: 'warning',
+                        confirmButtonText: 'ตกลง'
                     });
                     return;
                 }
 
-                // Check for duplicates (basic check by name and size)
+                // Check for duplicates
                 const isDuplicate = uploadedFiles.some(f => f.name === file.name && f.size === file.size);
                 if (isDuplicate) {
                     Swal.fire({
                         title: 'ไฟล์ซ้ำ',
                         text: `ไฟล์ ${file.name} ถูกเลือกแล้ว`,
-                        icon: 'info'
+                        icon: 'info',
+                        confirmButtonText: 'ตกลง'
                     });
                     return;
                 }
 
                 // Add file to the array
                 uploadedFiles.push(file);
-
-                // Create and display thumbnail/preview
                 displayFilePreview(file, uploadedFiles.length - 1);
             });
 
-            // Reset input to allow selecting the same file again later
+            // Reset input
             event.target.value = '';
         }
 
@@ -538,47 +750,44 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            // สร้างชื่อไฟล์ใหม่ด้วย timestamp
+            // สร้างชื่อไฟล์ใหม่
             const timestamp = new Date().getTime();
             const extension = file.name.split('.').pop();
             const newFileName = `photo_${timestamp}.${extension}`;
             const newFile = new File([file], newFileName, { type: file.type });
 
-            // Check for duplicates (unlikely with timestamp, but good practice)
+            // Check for duplicates
             const isDuplicate = uploadedFiles.some(f => f.name === newFile.name && f.size === newFile.size);
             if (isDuplicate) {
-                 Swal.fire({
+                Swal.fire({
                     title: 'ไฟล์ซ้ำ',
                     text: `ไฟล์ ${newFile.name} ถูกเพิ่มแล้ว`,
-                    icon: 'info'
+                    icon: 'info',
+                    confirmButtonText: 'ตกลง'
                 });
-                event.target.value = ''; // Reset input
+                event.target.value = '';
                 return;
             }
 
             // เพิ่มไฟล์ลงในอาร์เรย์
             uploadedFiles.push(newFile);
-
-            // แสดงตัวอย่างรูปภาพ
             displayFilePreview(newFile, uploadedFiles.length - 1);
 
-            // รีเซ็ต input เพื่อให้สามารถถ่ายรูปใหม่ได้
+            // รีเซ็ต input
             event.target.value = '';
         }
 
         function displayFilePreview(file, index) {
-             const fileList = document.getElementById('fileList');
+            const fileList = document.getElementById('fileList');
 
-            // สร้าง container สำหรับแสดงผลไฟล์
             const wrapper = document.createElement('div');
             wrapper.className = 'flex flex-col items-center';
-            wrapper.dataset.index = index; // Store index for removal
+            wrapper.dataset.index = index;
 
             const fileContainer = document.createElement('div');
             fileContainer.className = 'thumbnail-container';
 
             if (file.type.startsWith('image/')) {
-                // ถ้าเป็นไฟล์รูปภาพ ให้แสดงตัวอย่าง
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     fileContainer.innerHTML = `
@@ -590,7 +799,6 @@
                 };
                 reader.readAsDataURL(file);
             } else {
-                // ถ้าเป็นไฟล์อื่น (เช่น PDF) แสดงไอคอน
                 fileContainer.innerHTML = `
                     <div class="w-full h-full bg-gray-100 flex items-center justify-center">
                         <i class="fas fa-file-pdf text-red-500 text-3xl"></i>
@@ -601,11 +809,10 @@
                 `;
             }
 
-            // เพิ่มชื่อไฟล์และขนาด
             const fileInfo = document.createElement('div');
-            fileInfo.className = 'text-sm mt-2 text-center';
+            fileInfo.className = 'text-xs mt-2 text-center max-w-[120px]';
             fileInfo.innerHTML = `
-                <p class="font-medium truncate max-w-[120px]">${file.name}</p>
+                <p class="font-medium truncate">${file.name}</p>
                 <p class="text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
             `;
 
@@ -614,20 +821,14 @@
             fileList.appendChild(wrapper);
         }
 
-
         function removeFile(index) {
-            // ลบไฟล์ออกจากอาร์เรย์
             uploadedFiles.splice(index, 1);
-
-            // อัพเดทการแสดงผล
             updateFileListDisplay();
         }
 
         function updateFileListDisplay() {
             const fileList = document.getElementById('fileList');
-            fileList.innerHTML = ''; // Clear current display
-
-            // Re-display all remaining files with updated indices
+            fileList.innerHTML = '';
             uploadedFiles.forEach((file, newIndex) => {
                 displayFilePreview(file, newIndex);
             });
@@ -657,7 +858,8 @@
                 Swal.fire({
                     title: 'เกิดข้อผิดพลาด',
                     text: `ไม่สามารถเริ่มต้น LIFF ได้: ${error.message}`,
-                    icon: 'error'
+                    icon: 'error',
+                    confirmButtonText: 'ตกลง'
                 });
             }
         }
@@ -666,7 +868,12 @@
             e.preventDefault();
 
             if (typeof liff === 'undefined' || !liff.isLoggedIn()) {
-                Swal.fire({ title: 'กรุณาเข้าสู่ระบบ', icon: 'warning' });
+                Swal.fire({ 
+                    title: 'กรุณาเข้าสู่ระบบ', 
+                    text: 'กรุณาเข้าสู่ระบบ LINE ก่อนส่งแบบฟอร์ม',
+                    icon: 'warning',
+                    confirmButtonText: 'ตกลง'
+                });
                 return;
             }
 
@@ -708,20 +915,28 @@
                     Swal.fire({
                         title: 'แจ้งซ่อมสำเร็จ!',
                         text: 'รหัสงานของคุณคือ ' + data.jobId,
-                        icon: 'success'
+                        icon: 'success',
+                        confirmButtonText: 'ตกลง'
                     });
                     this.reset();
                     document.getElementById('fileList').innerHTML = '';
                     uploadedFiles = [];
-                    // Reset job type selection styling
-                     const allTypes = document.querySelectorAll('[onclick^="setjobType"]');
-                     allTypes.forEach(el => {
-                        el.classList.remove('border-blue-500', 'bg-blue-50', 'shadow-lg');
-                        el.classList.add('border-border');
-                     });
-                     document.getElementById('jobType').value = ''; // Clear hidden input
+                    
+                    // Reset selections
+                    document.querySelectorAll('.job-type-option, .job-desc-option').forEach(el => {
+                        el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
+                    });
+                    document.getElementById('jobType').value = '';
+                    document.getElementById('jobDescription').value = '';
+                    
+                    // Reset urgency selection
+                    document.querySelectorAll('.urgency-option').forEach(el => {
+                        el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
+                    });
+                    document.getElementById('urgency-low').checked = true;
+                    document.querySelector('.urgency-option[for="urgency-low"]').classList.add('selected', 'border-blue-500', 'bg-blue-50');
 
-                    initializeLiff(); // Re-initialize LIFF to potentially get updated profile
+                    initializeLiff();
                 } else {
                     throw new Error(data.message || 'เกิดข้อผิดพลาดในการส่งแบบฟอร์ม');
                 }
@@ -730,7 +945,8 @@
                 Swal.fire({
                     title: 'เกิดข้อผิดพลาด!',
                     text: error.message,
-                    icon: 'error'
+                    icon: 'error',
+                    confirmButtonText: 'ตกลง'
                 });
             }
         });
@@ -748,14 +964,8 @@
 
             if (trackingButton) {
                 trackingButton.addEventListener('click', function() {
-                    // กำหนด URL ที่คุณต้องการให้ปุ่มนี้ลิงก์ไป
-                    const targetUrl = 'https://liff.line.me/2007374280-GR1Q3YxJ'; // **เปลี่ยน URL นี้**
-
-                    // เปิดหน้าใหม่ในแท็บใหม่ (แนะนำสำหรับลิงก์ออกนอก)
+                    const targetUrl = 'https://liff.line.me/2007374280-GR1Q3YxJ';
                     window.open(targetUrl, '_blank');
-
-                    // หรือถ้าต้องการเปิดในแท็บเดิม:
-                    // window.location.href = targetUrl;
                 });
             }
         });
@@ -763,7 +973,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initializeLiff();
         });
-
     </script>
 </body>
 </html>
+```
