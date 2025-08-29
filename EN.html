@@ -279,17 +279,17 @@
             box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
         }
 
-        .urgency-option {
+        .machine-status-option {
             border: 1px solid #e5e7eb;
             border-radius: 0.5rem;
             transition: all 0.2s ease;
         }
 
-        .urgency-option:hover {
+        .machine-status-option:hover {
             background-color: #f9fafb;
         }
 
-        .urgency-option.selected {
+        .machine-status-option.selected {
             border-color: #3b82f6;
             background-color: #eff6ff;
         }
@@ -476,7 +476,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1"> Ⓐ ประเภทงาน (Job Type)*</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ⓐ ประเภทงาน (Job Type) *</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div class="job-type-option p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 border-gray-200" onclick="setjobType('เครื่องจักร')">
                                 <div class="flex flex-col items-center space-y-2">
@@ -507,8 +507,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Ⓑ ลักษณะงาน (Job Description)*
-</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ⓑ ลักษณะงาน (Job Description)*</label>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="job-desc-option p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 border-gray-200" onclick="setjobDescription('ซ่อมบำรุง')">
                                 <div class="flex flex-col items-center space-y-2">
@@ -532,42 +531,40 @@
                         <input type="hidden" id="jobDescription" name="jobDescription" required>
                     </div>
 
-                    
-
                     <div class="space-y-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Ⓒ สถานะเครื่องจักร (Machine Status)
- *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ⓒ สถานะเครื่องจักร (Machine Status)*</label>
                         <div class="space-y-3">
-                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectmachineStatus('urgency-low')">
-                                <input type="radio" id="urgency-low" name="machineStatus" value="สูง" class="form-radio text-green-500 mr-3" checked>
+                            <div class="machine-status-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectmachineStatus('status-normal')">
+                                <input type="radio" id="status-normal" name="machineStatus" value="ปกติ (Normal)" class="form-radio text-green-500 mr-3" checked>
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-2">
-                                        <i class="fas fa-clock text-green-500"></i>
-                                        <label for="urgency-low" class="font-medium text-green-600 cursor-pointer">หยุดทำงาน (Break Down)
-</label>
+                                        <i class="fas fa-check-circle text-green-500"></i>
+                                        <label for="status-normal" class="font-medium text-green-600 cursor-pointer"> ปกติ (Normal)</label>
                                     </div>
-                                    
                                 </div>
                             </div>
-                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectmachineStatus('urgency-medium')">
-                                <input type="radio" id="urgency-medium" name="machineStatus" value="ปานกลาง" class="form-radio text-blue-500 mr-3">
+                            <div class="machine-status-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectmachineStatus('status-delayed')">
+                                <input type="radio" id="status-delayed" name="machineStatus" value="ยังทำงานได้รอการซ่อม (Still working, wait for maintenance)" class="form-radio text-blue-500 mr-3">
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-2">
                                         <i class="fas fa-hourglass-half text-blue-500"></i>
-                                        <label for="urgency-medium" class="font-medium text-blue-600 cursor-pointer">  ยังทำงานได้รอการซ่อม (Still working, wait for maintenance)
-</label>
+                                        <label for="status-delayed" class="font-medium text-blue-600 cursor-pointer"> ยังทำงานได้รอการซ่อม (Still working, wait for maintenance)</label>
                                     </div>
-                                  
                                 </div>
                             </div>
-                            
-                            
+                            <div class="machine-status-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectmachineStatus('status-down')">
+                                <input type="radio" id="status-down" name="machineStatus" value="หยุดทำงาน (Down)" class="form-radio text-red-500 mr-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-exclamation-triangle text-red-500"></i>
+                                        <label for="status-down" class="font-medium text-red-600 cursor-pointer"> หยุดทำงาน (Down)</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-
-<div class="space-y-2">
+                    <div class="space-y-2">
                         <label for="problemDescription" class="block text-sm font-medium text-gray-700 mb-1">
                             ※ รายละเอียดของปัญหา (Problem Description)*
                         </label>
@@ -580,6 +577,8 @@
                             class="form-input"
                         ></textarea>
                     </div>
+
+                </div>
 
                 <!-- File Upload -->
                 <div class="space-y-4 animate-slide-up" style="animation-delay: 0.2s;">
@@ -676,9 +675,9 @@
 
         function selectmachineStatus(id) {
             document.getElementById(id).checked = true;
-            // Highlight selected machineStatus
-            const allUrgencies = document.querySelectorAll('.machineStatus-option');
-            allUrgencies.forEach(el => {
+            // Highlight selected status
+            const allStatuses = document.querySelectorAll('.machine-status-option');
+            allStatuses.forEach(el => {
                 el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
             });
             event.currentTarget.classList.add('selected', 'border-blue-500', 'bg-blue-50');
@@ -856,8 +855,8 @@
             e.preventDefault();
 
             if (typeof liff === 'undefined' || !liff.isLoggedIn()) {
-                Swal.fire({ 
-                    title: 'กรุณาเข้าสู่ระบบ', 
+                Swal.fire({
+                    title: 'กรุณาเข้าสู่ระบบ',
                     text: 'กรุณาเข้าสู่ระบบ LINE ก่อนส่งแบบฟอร์ม',
                     icon: 'warning',
                     confirmButtonText: 'ตกลง'
@@ -909,20 +908,20 @@
                     this.reset();
                     document.getElementById('fileList').innerHTML = '';
                     uploadedFiles = [];
-                    
+
                     // Reset selections
                     document.querySelectorAll('.job-type-option, .job-desc-option').forEach(el => {
                         el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
                     });
                     document.getElementById('jobType').value = '';
                     document.getElementById('jobDescription').value = '';
-                    
-                    // Reset machineStatus selection
-                    document.querySelectorAll('.urgency-option').forEach(el => {
+
+                    // Reset machine status selection
+                    document.querySelectorAll('.machine-status-option').forEach(el => {
                         el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
                     });
-                    document.getElementById('urgency-low').checked = true;
-                    document.querySelector('.urgency-option[for="urgency-low"]').classList.add('selected', 'border-blue-500', 'bg-blue-50');
+                    document.getElementById('status-normal').checked = true;
+                    document.querySelector('.machine-status-option[for="status-normal"]').classList.add('selected', 'border-blue-500', 'bg-blue-50');
 
                     initializeLiff();
                 } else {
@@ -964,4 +963,3 @@
     </script>
 </body>
 </html>
-
