@@ -476,7 +476,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทงาน (Job Type) *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1"> Ⓐ ประเภทงาน (Job Type)*</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div class="job-type-option p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 border-gray-200" onclick="setjobType('เครื่องจักร')">
                                 <div class="flex flex-col items-center space-y-2">
@@ -507,7 +507,8 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ลักษณะงาน (Job Description) *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ⓑ ลักษณะงาน (Job Description)*
+</label>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="job-desc-option p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 border-gray-200" onclick="setjobDescription('ซ่อมบำรุง')">
                                 <div class="flex flex-col items-center space-y-2">
@@ -531,7 +532,42 @@
                         <input type="hidden" id="jobDescription" name="jobDescription" required>
                     </div>
 
-                    <div class="space-y-2">
+                    
+
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ⓒ สถานะเครื่องจักร (Machine Status)
+ *</label>
+                        <div class="space-y-3">
+                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectmachineStatus('urgency-low')">
+                                <input type="radio" id="urgency-low" name="machineStatus" value="สูง" class="form-radio text-green-500 mr-3" checked>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-clock text-green-500"></i>
+                                        <label for="urgency-low" class="font-medium text-green-600 cursor-pointer">หยุดทำงาน (Break Down)
+</label>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectmachineStatus('urgency-medium')">
+                                <input type="radio" id="urgency-medium" name="machineStatus" value="ปานกลาง" class="form-radio text-blue-500 mr-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-hourglass-half text-blue-500"></i>
+                                        <label for="urgency-medium" class="font-medium text-blue-600 cursor-pointer">  ยังทำงานได้รอการซ่อม (Still working, wait for maintenance)
+</label>
+                                    </div>
+                                  
+                                </div>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+
+
+<div class="space-y-2">
                         <label for="problemDescription" class="block text-sm font-medium text-gray-700 mb-1">
                             ※ รายละเอียดของปัญหา (Problem Description)*
                         </label>
@@ -544,53 +580,6 @@
                             class="form-input"
                         ></textarea>
                     </div>
-
-                    <div class="space-y-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ระดับความเร่งด่วน *</label>
-                        <div class="space-y-3">
-                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectUrgency('urgency-low')">
-                                <input type="radio" id="urgency-low" name="urgency" value="ต่ำ" class="form-radio text-green-500 mr-3" checked>
-                                <div class="flex-1">
-                                    <div class="flex items-center space-x-2">
-                                        <i class="fas fa-clock text-green-500"></i>
-                                        <label for="urgency-low" class="font-medium text-green-600 cursor-pointer">ต่ำ</label>
-                                    </div>
-                                    <p class="text-sm text-gray-600 mt-1">ไม่เร่งด่วน สามารถรอได้</p>
-                                </div>
-                            </div>
-                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectUrgency('urgency-medium')">
-                                <input type="radio" id="urgency-medium" name="urgency" value="ปานกลาง" class="form-radio text-blue-500 mr-3">
-                                <div class="flex-1">
-                                    <div class="flex items-center space-x-2">
-                                        <i class="fas fa-hourglass-half text-blue-500"></i>
-                                        <label for="urgency-medium" class="font-medium text-blue-600 cursor-pointer">ปานกลาง</label>
-                                    </div>
-                                    <p class="text-sm text-gray-600 mt-1">ต้องการการแก้ไขในระยะเวลาอันควร</p>
-                                </div>
-                            </div>
-                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectUrgency('urgency-high')">
-                                <input type="radio" id="urgency-high" name="urgency" value="สูง" class="form-radio text-yellow-500 mr-3">
-                                <div class="flex-1">
-                                    <div class="flex items-center space-x-2">
-                                        <i class="fas fa-exclamation-triangle text-yellow-500"></i>
-                                        <label for="urgency-high" class="font-medium text-yellow-600 cursor-pointer">สูง</label>
-                                    </div>
-                                    <p class="text-sm text-gray-600 mt-1">ส่งผลกระทบต่อการทำงาน</p>
-                                </div>
-                            </div>
-                            <div class="urgency-option flex items-center p-4 rounded-lg cursor-pointer" onclick="selectUrgency('urgency-critical')">
-                                <input type="radio" id="urgency-critical" name="urgency" value="ด่วนมาก" class="form-radio text-red-500 mr-3">
-                                <div class="flex-1">
-                                    <div class="flex items-center space-x-2">
-                                        <i class="fas fa-bolt text-red-500"></i>
-                                        <label for="urgency-critical" class="font-medium text-red-600 cursor-pointer">ด่วนมาก</label>
-                                    </div>
-                                    <p class="text-sm text-gray-600 mt-1">หยุดการทำงานทั้งหมด</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- File Upload -->
                 <div class="space-y-4 animate-slide-up" style="animation-delay: 0.2s;">
@@ -685,10 +674,10 @@
             });
         }
 
-        function selectUrgency(id) {
+        function selectmachineStatus(id) {
             document.getElementById(id).checked = true;
-            // Highlight selected urgency
-            const allUrgencies = document.querySelectorAll('.urgency-option');
+            // Highlight selected machineStatus
+            const allUrgencies = document.querySelectorAll('.machineStatus-option');
             allUrgencies.forEach(el => {
                 el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
             });
@@ -928,7 +917,7 @@
                     document.getElementById('jobType').value = '';
                     document.getElementById('jobDescription').value = '';
                     
-                    // Reset urgency selection
+                    // Reset machineStatus selection
                     document.querySelectorAll('.urgency-option').forEach(el => {
                         el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
                     });
@@ -975,3 +964,4 @@
     </script>
 </body>
 </html>
+
