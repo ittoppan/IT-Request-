@@ -117,7 +117,7 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
             background-color: #ffffff;
         }
-
+status-delayed
         select.form-input {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
             background-position: right 0.5rem center;
@@ -957,7 +957,7 @@
                         el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
                     });
                     document.getElementById('status-delayed').checked = true;
-                    document.querySelector('.machine-status-option[for="status-normal"]').classList.add('selected', 'border-blue-500', 'bg-blue-50');
+                    document.querySelector('.machine-status-option[for="status-delayed"]').classList.add('selected', 'border-blue-500', 'bg-blue-50');
 
                     initializeLiff();
                 } else {
@@ -1001,6 +1001,7 @@ if (machineName) {
     </script>
 </body>
 </html>
+
 
 
 
