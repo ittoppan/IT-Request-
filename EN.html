@@ -956,7 +956,7 @@
                     document.querySelectorAll('.machine-status-option').forEach(el => {
                         el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
                     });
-                    document.getElementById('status-normal').checked = true;
+                    document.getElementById('status-delayed').checked = true;
                     document.querySelector('.machine-status-option[for="status-normal"]').classList.add('selected', 'border-blue-500', 'bg-blue-50');
 
                     initializeLiff();
@@ -1001,6 +1001,7 @@ if (machineName) {
     </script>
 </body>
 </html>
+
 
 
 
