@@ -358,7 +358,7 @@ status-delayed
                 <input type="hidden" id="lineUserId" name="lineUserId">
                 <input type="hidden" id="lineDisplayName" name="lineDisplayName">
                 <input type="hidden" id="linePictureUrl" name="linePictureUrl">
-                <input type="hidden" id="machineName" name="machineName">
+               
 
                 <!-- ข้อมูลผู้แจ้ง -->
                 <div class="space-y-6 animate-slide-up">
@@ -974,13 +974,24 @@ status-delayed
             }
         });
 
-        //device_id
+         // device_id from URL
         const params = new URLSearchParams(window.location.search);
-        const machineName = params.get("machineName");     
-if (machineName) {
-    const select = document.getElementById("machineName");
-    select.value = machineName;
-}
+        const machineName = params.get("machineName");
+        if (machineName) {
+            const select = document.getElementById("machineName");
+            if (select) {
+                const optionExists = Array.from(select.options).some(option => option.value === machineName);
+                if (optionExists) {
+                    select.value = machineName;
+                } else {
+                    const newOption = document.createElement("option");
+                    newOption.value = machineName;
+                    newOption.text = machineName + " (จาก Barcode)";
+                    newOption.selected = true;
+                    select.appendChild(newOption);
+                }
+            }
+        }
 
 
         // Tracking Button Functionality
@@ -998,9 +1009,13 @@ if (machineName) {
         document.addEventListener('DOMContentLoaded', () => {
             initializeLiff();
         });
+
+
+        
     </script>
 </body>
 </html>
+
 
 
 
