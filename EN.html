@@ -976,10 +976,12 @@
 
         //device_id
         const params = new URLSearchParams(window.location.search);
-        const machineName = params.get("machineName");
-        if (machineName) {
-            document.getElementById("machineName").value = machineName;
-        }
+        const machineName = params.get("machineName");     
+if (machineName) {
+    const select = document.getElementById("machineName");
+    select.value = machineName;
+}
+
 
         // Tracking Button Functionality
         document.addEventListener('DOMContentLoaded', function() {
@@ -999,6 +1001,7 @@
     </script>
 </body>
 </html>
+
 
 
 
