@@ -470,7 +470,7 @@ status-delayed
 
 
 <div class="space-y-2">
-                            <label for="department" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="machinename" class="block text-sm font-medium text-gray-700 mb-1">
                                ชื่อเครื่องจักร (Machine Name)
 
                             </label>
@@ -956,8 +956,16 @@ status-delayed
                     document.querySelectorAll('.machine-status-option').forEach(el => {
                         el.classList.remove('selected', 'border-blue-500', 'bg-blue-50');
                     });
-                    document.getElementById('status-delayed').checked = true;
-                    document.querySelector('.machine-status-option[for="status-delayed"]').classList.add('selected', 'border-blue-500', 'bg-blue-50');
+                    document.getElementById('status-delayed').checked = true; 
+                    const statusDelayedInput = document.getElementById('status-delayed');
+                    if (statusDelayedInput) {
+                    const container = statusDelayedInput.closest('.machine-status-option');
+                    if (container) {
+                    container.classList.add('selected', 'border-blue-500', 'bg-blue-50');
+                      }
+                    }
+
+                   
 
                     initializeLiff();
                 } else {
@@ -975,25 +983,27 @@ status-delayed
         });
 
          // device_id from URL
-        document.addEventListener('DOMContentLoaded', () => {
-          const params = new URLSearchParams(window.location.search);
-          const machineName = params.get("machineName");
-          if (machineName) {
-            const select = document.getElementById("machineName");
-            if (select) {
-              const optionExists = Array.from(select.options).some(option => option.value === machineName);
-              if (optionExists) {
-                select.value = machineName;
-              } else {
-                const newOption = document.createElement("option");
-                newOption.value = machineName;
-                newOption.text = machineName + " (จาก Barcode)";
-                newOption.selected = true;
-                select.appendChild(newOption);
-              }
-            }
-          }
-        });
+       
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const machineName = params.get("machineName");
+    if (machineName) {
+      const select = document.getElementById("machineName");
+      if (select) {
+        const optionExists = Array.from(select.options).some(option => option.value === machineName);
+        if (optionExists) {
+          select.value = machineName;
+        } else {
+          const newOption = document.createElement("option");
+          newOption.value = machineName;
+          newOption.text = machineName + " (จาก Barcode)";
+          newOption.selected = true;
+          select.appendChild(newOption);
+        }
+      }
+    }
+  });
+
 
 
         // Tracking Button Functionality
@@ -1017,6 +1027,7 @@ status-delayed
     </script>
 </body>
 </html>
+
 
 
 
