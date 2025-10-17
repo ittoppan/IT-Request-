@@ -975,23 +975,25 @@ status-delayed
         });
 
          // device_id from URL
-        const params = new URLSearchParams(window.location.search);
-        const machineName = params.get("machineName");
-        if (machineName) {
+        document.addEventListener('DOMContentLoaded', () => {
+          const params = new URLSearchParams(window.location.search);
+          const machineName = params.get("machineName");
+          if (machineName) {
             const select = document.getElementById("machineName");
             if (select) {
-                const optionExists = Array.from(select.options).some(option => option.value === machineName);
-                if (optionExists) {
-                    select.value = machineName;
-                } else {
-                    const newOption = document.createElement("option");
-                    newOption.value = machineName;
-                    newOption.text = machineName + " (จาก Barcode)";
-                    newOption.selected = true;
-                    select.appendChild(newOption);
-                }
+              const optionExists = Array.from(select.options).some(option => option.value === machineName);
+              if (optionExists) {
+                select.value = machineName;
+              } else {
+                const newOption = document.createElement("option");
+                newOption.value = machineName;
+                newOption.text = machineName + " (จาก Barcode)";
+                newOption.selected = true;
+                select.appendChild(newOption);
+              }
             }
-        }
+          }
+        });
 
 
         // Tracking Button Functionality
@@ -1015,6 +1017,7 @@ status-delayed
     </script>
 </body>
 </html>
+
 
 
 
