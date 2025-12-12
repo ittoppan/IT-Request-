@@ -470,6 +470,13 @@ status-delayed
 
 
 <div class="space-y-2">
+
+<!-- เพิ่ม CSS และ JS ของ Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    
                             <label for="machinename" class="block text-sm font-medium text-gray-700 mb-1">
                                ชื่อเครื่องจักร (Machine Name)
 
@@ -479,7 +486,8 @@ status-delayed
                                     id="machineName"
                                     name="machineName"
                                     required
-                                    class="form-input pl-12 appearance-none bg-white"
+                                     class="form-input w-full select2"
+                                     data-placeholder="เลือกหรือพิมพ์ชื่อเครื่องจักร"
                                 >
                                     <option value="" disabled selected>เลือกเครื่องจักร</option>
                                     <option value="A-PT-01">A-PT-01</option>
@@ -509,7 +517,53 @@ status-delayed
                                 <i class="fas fa-building absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                             </div>
                         </div>
+<script>
+$(document).ready(function() {
+    $('#machineName').select2({
+        placeholder: "เลือกหรือพิมพ์ชื่อเครื่องจักร",
+        allowClear: true,
+        tags: true, // อนุญาตให้เพิ่มรายการใหม่
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            
+            if (term === '') {
+                return null;
+            }
+            
+            // ตรวจสอบว่ามีอยู่ในรายการแล้วหรือไม่
+            var exists = $('#machineName option').filter(function() {
+                return $(this).text().toLowerCase() === term.toLowerCase();
+            }).length > 0;
+            
+            if (exists) {
+                return null;
+            }
+            
+            return {
+                id: term,
+                text: term + ' (ใหม่)',
+                newTag: true
+            };
+        },
+        templateResult: function (data) {
+            var $result = $("<span></span>");
+            
+            $result.text(data.text);
+            
+            if (data.newTag) {
+                $result.append(" <span class='text-green-600 text-xs'>[เพิ่มใหม่]</span>");
+            }
+            
+            return $result;
+        }
+    });
+});
 
+// ฟังก์ชันสำหรับดึงค่าที่เลือก
+function getSelectedMachine() {
+    return $('#machineName').val();
+}
+</script>
                 <!-- รายละเอียดปัญหา -->
                 <div class="space-y-6 animate-slide-up" style="animation-delay: 0.1s;">
                     <div class="section-header">
@@ -1027,6 +1081,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 </body>
 </html>
+
 
 
 
