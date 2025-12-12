@@ -468,102 +468,65 @@ status-delayed
                     </div>
                 </div>
 
-
-<div class="space-y-2">
-
-<!-- เพิ่ม CSS และ JS ของ Select2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+<div class="space-y-2">
+
+
 
     
-                            <label for="machinename" class="block text-sm font-medium text-gray-700 mb-1">
-                               ชื่อเครื่องจักร (Machine Name)
-
-                            </label>
-                            <div class="relative">
-                                <select
-                                    id="machineName"
-                                    name="machineName"
-                                    required
-                                     class="form-input w-full select2"
-                                     data-placeholder="เลือกหรือพิมพ์ชื่อเครื่องจักร"
-                                >
-                                    <option value="" ></option>
-                                    <option value="A-PT-01">A-PT-01</option>
-                                    <option value="A-PT-02">A-PT-02</option>
-                                    <option value="A-DL-01">A-DL-01</option>
-                                    <option value="A-DL-02">A-DL-02</option>
-                                    <option value="A-DL-03">A-DL-03</option>
-                                    <option value="A-RW-01">A-RW-01</option>
-                                    <option value="A-RW-02">A-RW-02</option>
-                                    <option value="A-RW-03">A-RW-03</option>
-                                    <option value="A-RW-04">A-RW-04</option>
- <option value="A-RW-05">A-RW-05</option>
- <option value="A-RW-06">A-RW-06</option>
- <option value="A-RW-07">A-RW-07</option>
- <option value="A-RW-08">A-RW-08</option>
- <option value="A-ST-01">A-ST-01</option>
- <option value="A-ST-02">A-ST-02</option>
- <option value="A-ST-03">A-ST-03</option>
- <option value="A-BM-01">A-BM-01</option>
- <option value="A-BM-02">A-BM-02</option>
- <option value="A-BM-03">A-BM-03</option>
- <option value="A-BM-04">A-BM-04</option>
- <option value="A-BM-05">A-BM-05</option>
-<option value="A-BM-06">A-BM-06</option>
-
-                                </select>
-                                <i class="fas fa-building absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                            </div>
-                        </div>
-<script>
-$(document).ready(function() {
-    $('#machineName').select2({
-        placeholder: "เลือกหรือพิมพ์ชื่อเครื่องจักร",
-        allowClear: true,
-        tags: true, // อนุญาตให้เพิ่มรายการใหม่
-        createTag: function (params) {
-            var term = $.trim(params.term);
-            
-            if (term === '') {
-                return null;
-            }
-            
-            // ตรวจสอบว่ามีอยู่ในรายการแล้วหรือไม่
-            var exists = $('#machineName option').filter(function() {
-                return $(this).text().toLowerCase() === term.toLowerCase();
-            }).length > 0;
-            
-            if (exists) {
-                return null;
-            }
-            
-            return {
-                id: term,
-                text: term + ' (ใหม่)',
-                newTag: true
-            };
-        },
-        templateResult: function (data) {
-            var $result = $("<span></span>");
-            
-            $result.text(data.text);
-            
-            if (data.newTag) {
-                $result.append(" <span class='text-green-600 text-xs'>[เพิ่มใหม่]</span>");
-            }
-            
-            return $result;
-        }
-    });
-});
-
-// ฟังก์ชันสำหรับดึงค่าที่เลือก
-function getSelectedMachine() {
-    return $('#machineName').val();
-}
-</script>
+                         
+    <label for="machineName" class="block text-sm font-medium text-gray-700 mb-1">
+        ชื่อเครื่องจักร (Machine Name)
+    </label>
+    
+    <div class="relative">
+        <!-- ใช้ input แทน select -->
+        <input
+            type="text"
+            id="machineName"
+            name="machineName"
+            required
+            class="form-input pl-12 w-full"
+            placeholder="พิมพ์หรือเลือกเครื่องจักร"
+            list="machineOptions"
+            autocomplete="off"
+        />
+        
+        <!-- Datalist สำหรับ dropdown -->
+        <datalist id="machineOptions">
+            <option value="A-PT-01">A-PT-01</option>
+            <option value="A-PT-02">A-PT-02</option>
+            <option value="A-DL-01">A-DL-01</option>
+            <option value="A-DL-02">A-DL-02</option>
+            <option value="A-DL-03">A-DL-03</option>
+            <option value="A-RW-01">A-RW-01</option>
+            <option value="A-RW-02">A-RW-02</option>
+            <option value="A-RW-03">A-RW-03</option>
+            <option value="A-RW-04">A-RW-04</option>
+            <option value="A-RW-05">A-RW-05</option>
+            <option value="A-RW-06">A-RW-06</option>
+            <option value="A-RW-07">A-RW-07</option>
+            <option value="A-RW-08">A-RW-08</option>
+            <option value="A-ST-01">A-ST-01</option>
+            <option value="A-ST-02">A-ST-02</option>
+            <option value="A-ST-03">A-ST-03</option>
+            <option value="A-BM-01">A-BM-01</option>
+            <option value="A-BM-02">A-BM-02</option>
+            <option value="A-BM-03">A-BM-03</option>
+            <option value="A-BM-04">A-BM-04</option>
+            <option value="A-BM-05">A-BM-05</option>
+            <option value="A-BM-06">A-BM-06</option>
+        </datalist>
+        
+        <i class="fas fa-building absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+    </div>
+    
+    <p class="text-xs text-gray-500 mt-1">
+        พิมพ์ชื่อเครื่องจักรหรือเลือกจากรายการที่ปรากฏ
+    </p>
+</div>
                 <!-- รายละเอียดปัญหา -->
                 <div class="space-y-6 animate-slide-up" style="animation-delay: 0.1s;">
                     <div class="section-header">
@@ -1081,6 +1044,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 </body>
 </html>
+
 
 
 
