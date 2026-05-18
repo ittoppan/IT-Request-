@@ -15,7 +15,8 @@
     .card { background: var(--card-bg); border-radius: 18px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; border: none; }
     .btn-back { display: inline-block; margin-bottom: 5px; text-decoration: none; color: rgba(255,255,255,0.9); font-size: 0.85rem; }
     label { font-weight: 600; font-size: 0.95rem; display: block; margin-bottom: 8px; color: #555; }
-    input[type="text"], select, textarea { width: 100%; padding: 14px; margin: 5px 0 15px; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Prompt', sans-serif; font-size: 16px; background-color: #f9f9f9; transition: border 0.3s; }
+    /* เพิ่มการรองรับ CSS ของ input number */
+    input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 14px; margin: 5px 0 15px; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Prompt', sans-serif; font-size: 16px; background-color: #f9f9f9; transition: border 0.3s; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background-color: #fff; }
     textarea:required { border-left: 4px solid var(--danger); background-color: #fff5f5; }
     .check-item { background: #fff; padding: 15px 0; border-bottom: 1px solid #eee; margin-bottom: 10px; }
@@ -82,7 +83,6 @@
 
     const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
 
-    // อัปเดตโครงสร้าง S1, S6 และเพิ่ม S7 เข้ามา
     const dataStructure = {
       s1: { title: "1. สถานที่ทำงาน", qs: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "วอเตอร์"] },
       s2: { title: "2. ท่าทางการทำงาน", qs: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์", "การยกของอย่างถูกต้องและปลอดภัย"] },
@@ -107,17 +107,35 @@
         let remarkName = `section${sNum}_remark${i}`;
         imgB64[qKey] = []; 
 
-        htmlStr += `<div class="check-item"><small>${i+1}. ${q}</small><div class="options">
-          <input type="radio" name="section${sNum}_q${i}" id="s${sNum}y${i}" value="ดี" required 
-            onchange="document.getElementsByName('${remarkName}')[0].required = false; document.getElementsByName('${remarkName}')[0].placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...';">
-          <label for="s${sNum}y${i}"><i class="fas fa-check-circle"></i> ปกติ</label>
-          
-          <input type="radio" name="section${sNum}_q${i}" id="s${sNum}n${i}" value="ไม่ดี" 
-            onchange="document.getElementsByName('${remarkName}')[0].required = true; document.getElementsByName('${remarkName}')[0].placeholder = '* กรุณาระบุรายละเอียด (บังคับ)';">
-          <label for="s${sNum}n${i}"><i class="fas fa-exclamation-triangle"></i> ไม่ปกติ</label>
-        </div>
-        <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..."></textarea>
+        // ตรวจสอบ: ถ้าเป็นข้อ "วอเตอร์" ให้แสดงเป็นช่องกรอกตัวเลข
+        if (s === 's1' && q === 'วอเตอร์') {
+           htmlStr += `<div class="check-item"><small>${i+1}. ${q}</small>
+            <div style="margin: 10px 0; display:flex; align-items:center;">
+              <input type="number" step="any" name="water_val" id="water_val" placeholder="ระบุตัวเลข" style="width:130px; margin:0; padding:10px;" required 
+                oninput="evalWater(this.value, '${sNum}', ${i}, '${remarkName}')">
+              <span style="margin-left: 10px; font-weight:600; color:#555;">%</span>
+              <span id="water_badge" style="padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-left: 15px; display:none;"></span>
+            </div>
+            <!-- สร้าง input แบบซ่อน เพื่อส่งค่า ดี/ไม่ดี กลับไปให้ระบบประมวลผลตามโครงสร้างเดิม -->
+            <input type="hidden" name="section${sNum}_q${i}" id="hidden_s${sNum}q${i}" value="">
+            <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..."></textarea>
+           `;
+        } else {
+           // โครงสร้างข้ออื่นๆ (Radio button ปกติ)
+           htmlStr += `<div class="check-item"><small>${i+1}. ${q}</small><div class="options">
+             <input type="radio" name="section${sNum}_q${i}" id="s${sNum}y${i}" value="ดี" required 
+               onchange="document.getElementsByName('${remarkName}')[0].required = false; document.getElementsByName('${remarkName}')[0].placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...';">
+             <label for="s${sNum}y${i}"><i class="fas fa-check-circle"></i> ปกติ</label>
+             
+             <input type="radio" name="section${sNum}_q${i}" id="s${sNum}n${i}" value="ไม่ดี" 
+               onchange="document.getElementsByName('${remarkName}')[0].required = true; document.getElementsByName('${remarkName}')[0].placeholder = '* กรุณาระบุรายละเอียด (บังคับ)';">
+             <label for="s${sNum}n${i}"><i class="fas fa-exclamation-triangle"></i> ไม่ปกติ</label>
+           </div>
+           <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..."></textarea>`;
+        }
         
+        // ชุดกล้องและคอมเมนต์ใต้รูปที่ใช้ร่วมกัน
+        htmlStr += `
         <div class="camera-box">
           <div id="preview-container_${qKey}" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:5px;"></div>
           <div id="camera-placeholder_${qKey}" style="text-align:center; cursor:pointer; padding:15px; border:2px dashed #d1d8e0; border-radius:10px; background:#fff;" onclick="document.getElementById('fileInput_${qKey}').click()">
@@ -132,6 +150,39 @@
       itemsDiv.appendChild(card);
     }
     
+    // ฟังก์ชันคำนวณและประเมินค่า "วอเตอร์" แบบเรียลไทม์
+    function evalWater(val, sNum, i, remarkName) {
+      const hiddenInput = document.getElementById(`hidden_s${sNum}q${i}`);
+      const badge = document.getElementById('water_badge');
+      const remark = document.getElementsByName(remarkName)[0];
+      
+      badge.style.display = 'inline-block';
+      if(val === "") {
+         hiddenInput.value = "";
+         badge.style.display = 'none';
+         remark.required = false;
+         remark.placeholder = "เพิ่มเติมความเห็น (ถ้ามี)...";
+         return;
+      }
+      
+      let num = parseFloat(val);
+      if(num < 50) {
+         hiddenInput.value = "ไม่ดี";
+         badge.style.background = "#ffebee";
+         badge.style.color = "var(--danger)";
+         badge.innerHTML = "✘ ไม่ปกติ";
+         remark.required = true;
+         remark.placeholder = "* กรุณาระบุรายละเอียด (ต่ำกว่า 50%)";
+      } else {
+         hiddenInput.value = "ดี";
+         badge.style.background = "#e8f5e9";
+         badge.style.color = "var(--success)";
+         badge.innerHTML = "✔ ปกติ";
+         remark.required = false;
+         remark.placeholder = "เพิ่มเติมความเห็น (ถ้ามี)...";
+      }
+    }
+
     function pv(input, qKey) {
       if (input.files && input.files[0]) {
         if(imgB64[qKey].length >= 3) {
@@ -154,7 +205,6 @@
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
             
-            // ดันรูปพร้อมเตรียมช่องคอมเมนต์ภาพ
             imgB64[qKey].push({
               b64: canvas.toDataURL("image/jpeg", 0.7),
               caption: ""
