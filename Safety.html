@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <!-- ซ่อน CSS ที่ยาวเกินไปไว้ ให้ใช้ CSS ตัวเดิมของคุณได้เลยครับ -->
   <style>
     :root { --primary: #f39c12; --primary-dark: #e67e22; --bg: #f0f2f5; --card-bg: #ffffff; --text: #2c3e50; }
     body { font-family: 'Prompt', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--text); -webkit-tap-highlight-color: transparent; }
@@ -20,7 +19,7 @@
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background-color: #fff; }
     .check-item { background: #fff; padding: 15px 0; border-bottom: 1px solid #eee; margin-bottom: 10px; }
     .check-item:last-child { border-bottom: none; }
-    .check-item small { font-size: 0.95rem; color: var(--text); font-weight: 400; line-height: 1.4; display: block; margin-bottom: 12px; }
+    .check-item small { font-size: 1rem; color: var(--text); font-weight: 600; line-height: 1.4; display: block; margin-bottom: 12px; }
     .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0; }
     .options label { cursor: pointer; padding: 12px; border-radius: 10px; background: #f0f0f0; text-align: center; font-weight: 600; font-size: 0.9rem; margin-bottom: 0; transition: all 0.2s; border: 2px solid transparent; color: #777; }
     input[type="radio"] { display: none; }
@@ -28,7 +27,7 @@
     input[value="ไม่ดี"]:checked + label { background: #ffebee; color: #c62828; border-color: #c62828; }
     .btn-submit { width: 100%; background: linear-gradient(to right, #f39c12, #e67e22); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3); margin-top: 10px; }
     .btn-submit:active { transform: scale(0.98); }
-    .camera-box { border: 2px dashed #d1d8e0; background: #fafafa; padding: 20px; border-radius: 15px; color: #7f8c8d; transition: all 0.3s; position: relative; }
+    .camera-box { border: 2px dashed #d1d8e0; background: #fafafa; padding: 12px; border-radius: 12px; color: #7f8c8d; transition: all 0.3s; position: relative; margin-top: 8px; }
     .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
   </style>
 </head>
@@ -37,10 +36,10 @@
   <div id="loading" class="loading-overlay">
     <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i>
     <p style="margin-top:15px; font-weight: 600;">กำลังบันทึกข้อมูล...</p>
+    <small style="color:#777; margin-top:5px;">(หากมีรูปภาพเยอะ อาจใช้เวลาสักครู่)</small>
   </div>
 
   <div class="header">
-    <!-- เปลี่ยนการเชื่อมโยงหน้าจอไปใช้ไฟล์ HTML ธรรมดา -->
     <a href="Dash.html" class="btn-back"><i class="fas fa-chevron-left"></i> กลับหน้าหลัก</a>
     <h2>SAFETY PATROL</h2>
   </div>
@@ -70,7 +69,6 @@
   </div>
 
   <script>
-    // URL Web App ตัวใหม่ของคุณ
     const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
 
     const dataStructure = {
@@ -82,7 +80,7 @@
       s6: { title: "6. อื่นๆ", qs: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน"] }
     };
 
-    let imgB64 = { s1: "", s2: "", s3: "", s4: "", s5: "", s6: "" };
+    let imgB64 = {}; // เปลี่ยนเป็นรับค่าแบบ Dynamic ตามรายข้อ
     const itemsDiv = document.getElementById('items');
     
     for(let s in dataStructure) {
@@ -92,30 +90,33 @@
       let htmlStr = `<h4 style="color:var(--primary-dark); margin: 0 0 15px 0; border-left: 4px solid var(--primary); padding-left: 10px;">${dataStructure[s].title}</h4>`;
       
       dataStructure[s].qs.forEach((q, i) => {
-        htmlStr += `<div class="check-item"><small>${q}</small><div class="options">
+        let qKey = `${s}_q${i}`; // สร้าง Key เฉพาะสำหรับแต่ละข้อ เช่น s1_q0, s1_q1
+        imgB64[qKey] = ""; // เตรียมพื้นที่เก็บรูป
+
+        htmlStr += `<div class="check-item"><small>${i+1}. ${q}</small><div class="options">
           <input type="radio" name="section${sNum}_q${i}" id="s${sNum}y${i}" value="ดี" required><label for="s${sNum}y${i}"><i class="fas fa-check-circle"></i> ปกติ</label>
           <input type="radio" name="section${sNum}_q${i}" id="s${sNum}n${i}" value="ไม่ดี"><label for="s${sNum}n${i}"><i class="fas fa-exclamation-triangle"></i> ไม่ปกติ</label>
-        </div><textarea name="section${sNum}_remark${i}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..."></textarea></div>`;
-      });
-
-      htmlStr += `
-        <div class="camera-box" style="text-align:center; cursor:pointer; margin-top:15px;" onclick="document.getElementById('fileInput_${s}').click()">
-          <div id="camera-placeholder_${s}">
-            <i class="fas fa-camera-retro fa-2x" style="color: var(--primary); margin-bottom: 8px;"></i>
-            <p style="margin: 0; font-size: 1rem; font-weight: 600; color: #34495e;">ถ่ายภาพประกอบ (สถานที่ ${sNum})</p>
+        </div><textarea name="section${sNum}_remark${i}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..."></textarea>
+        
+        <!-- แทรกปุ่มถ่ายรูปรายข้อ -->
+        <div class="camera-box" style="text-align:center; cursor:pointer;" onclick="document.getElementById('fileInput_${qKey}').click()">
+          <div id="camera-placeholder_${qKey}">
+            <i class="fas fa-camera" style="color: var(--primary); margin-bottom: 5px; font-size:1.2rem;"></i>
+            <span style="font-size: 0.85rem; font-weight: 600; color: #7f8c8d; margin-left:5px;">แนบภาพประกอบข้อนี้</span>
           </div>
-          <input type="file" id="fileInput_${s}" accept="image/*" capture="environment" style="display:none" onchange="pv(this, '${s}')">
-          <div id="preview-container_${s}" style="display:none; position:relative; margin-top:10px;">
-             <img id="preview_${s}" style="width:100%; border-radius:10px; border: 2px solid #ddd; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-             <div style="position:absolute; top:-10px; right:-10px; background:#e74c3c; color:white; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border: 2px solid white;" onclick="event.stopPropagation(); removeImg('${s}');"><i class="fas fa-times"></i></div>
+          <input type="file" id="fileInput_${qKey}" accept="image/*" capture="environment" style="display:none" onchange="pv(this, '${qKey}')">
+          <div id="preview-container_${qKey}" style="display:none; position:relative; margin-top:10px;">
+             <img id="preview_${qKey}" style="width:100%; border-radius:8px; border: 2px solid #ddd;">
+             <div style="position:absolute; top:-10px; right:-10px; background:#e74c3c; color:white; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border: 2px solid white;" onclick="event.stopPropagation(); removeImg('${qKey}');"><i class="fas fa-times"></i></div>
           </div>
         </div>
-      `;
+        </div>`;
+      });
       card.innerHTML = htmlStr;
       itemsDiv.appendChild(card);
     }
     
-    function pv(input, section) {
+    function pv(input, qKey) {
       if (input.files && input.files[0]) {
         document.getElementById('loading').style.display = 'flex';
         const reader = new FileReader();
@@ -130,11 +131,12 @@
             canvas.width = width; canvas.height = height;
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
-            imgB64[section] = canvas.toDataURL("image/jpeg", 0.7);
             
-            document.getElementById('preview_' + section).src = imgB64[section];
-            document.getElementById('preview-container_' + section).style.display = 'block';
-            document.getElementById('camera-placeholder_' + section).style.display = 'none';
+            imgB64[qKey] = canvas.toDataURL("image/jpeg", 0.7);
+            
+            document.getElementById('preview_' + qKey).src = imgB64[qKey];
+            document.getElementById('preview-container_' + qKey).style.display = 'block';
+            document.getElementById('camera-placeholder_' + qKey).style.display = 'none';
             document.getElementById('loading').style.display = 'none';
           };
           img.src = e.target.result;
@@ -143,11 +145,11 @@
       }
     }
 
-    function removeImg(section) {
-      imgB64[section] = "";
-      document.getElementById('fileInput_' + section).value = "";
-      document.getElementById('preview-container_' + section).style.display = 'none';
-      document.getElementById('camera-placeholder_' + section).style.display = 'block';
+    function removeImg(qKey) {
+      imgB64[qKey] = "";
+      document.getElementById('fileInput_' + qKey).value = "";
+      document.getElementById('preview-container_' + qKey).style.display = 'none';
+      document.getElementById('camera-placeholder_' + qKey).style.display = 'block';
     }
 
     document.getElementById('f').onsubmit = function(e) {
@@ -170,10 +172,9 @@
         s1_res: ck('s1'), s2_res: ck('s2'), s3_res: ck('s3'), s4_res: ck('s4'), s5_res: ck('s5'), s6_res: ck('s6')
       };
 
-      // ใช้ Fetch ส่งข้อมูลผ่าน Webhook ของ API
       fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" }, // ใช้ text/plain เลี่ยงปัญหา CORS 
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
         body: JSON.stringify(payload)
       })
       .then(response => response.json())
@@ -181,7 +182,7 @@
         document.getElementById('loading').style.display = 'none';
         if(res.status === 'success') {
            Swal.fire({ title: 'ส่งรายงานสำเร็จ', text: res.message, icon: 'success' })
-          .then(() => { window.location.href = "Dash.html"; }); // กลับหน้า Dashboard
+          .then(() => { window.location.href = "Dash.html"; }); 
         } else {
            Swal.fire('เกิดข้อผิดพลาด', res.message, 'error');
         }
