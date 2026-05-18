@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    /* ใช้ CSS ตัวเดิมทั้งหมดได้เลยครับ */
     :root { --primary: #f39c12; --dark: #2c3e50; --success: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; --light-orange: #fff5e6; }
     body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding: 0; }
     .nav { background: linear-gradient(90deg, #ff8c00, var(--primary)); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -18,31 +17,33 @@
     .table-box { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
     table { width: 100%; border-collapse: collapse; }
     th { background: #fff8f0; color: #e67e22; padding: 15px; text-align: left; }
-    td { padding: 15px; border-bottom: 1px solid #eee; }
+    td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; }
     .badge { padding: 4px 12px; border-radius: 50px; color: white; font-size: 0.75rem; }
     .detail-row { display: none; background: var(--light-orange); }
     .inner-detail { padding: 20px; background: white; border: 1px solid #f9e3b4; margin: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.1); }
     .section-group { margin-bottom: 15px; border-radius: 10px; overflow: hidden; border: 1px solid #ffe8cc; }
     .section-head { background: var(--primary); color: white; padding: 12px 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;}
-    .sub-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #fff3e0; padding: 10px 15px; background: #fffdfa; }
+    .sub-item { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #fff3e0; padding: 12px 15px; background: #fffdfa; }
     .sub-item-text { flex: 1; color: #5a4a3a; font-size: 0.95rem; }
-    .status-pill { min-width: 90px; padding: 5px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-align: center; }
+    .status-pill { min-width: 90px; padding: 5px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-align: center; margin-left: 15px; }
     .status-good { background: #e8f5e9; color: var(--success); }
     .status-bad { background: #ffebee; color: var(--danger); }
     .remark-box { font-size: 0.85rem; color: #d35400; margin-top: 5px; padding: 5px 10px; background: #fff9f0; border-left: 3px solid var(--primary); }
-    .btn-photo { background: rgba(255,255,255,0.25); color: white; padding: 4px 10px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; transition: background 0.3s; }
-    .btn-photo:hover { background: rgba(255,255,255,0.4); }
     .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-    .btn-view { background: #f4f6f7; border: 1px solid #d5dbdb; padding: 6px 12px; border-radius: 6px; cursor: pointer; color: var(--dark); font-family: 'Prompt'; transition: 0.2s; }
+    .btn-view { background: #f4f6f7; border: 1px solid #d5dbdb; padding: 6px 12px; border-radius: 6px; cursor: pointer; color: var(--dark); font-family: 'Prompt'; transition: 0.2s; white-space: nowrap; }
     .btn-view:hover { background: #e5e8e8; }
+    /* เพิ่มสไตล์สำหรับรูปภาพพรีวิว */
+    .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; transition: transform 0.2s; margin-right: 5px; margin-bottom: 5px; }
+    .img-preview:hover { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    .img-preview-large { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; transition: transform 0.2s; margin-right: 8px; margin-top: 10px; }
+    .img-preview-large:hover { transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
   </style>
 </head>
 <body>
   <div id="loader" class="loader"><i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i></div>
   <nav class="nav">
     <div><h2 style="margin:0;">SAFETY DASHBOARD</h2></div>
-    <!-- ลิงก์ตรงไปหน้า index.html ของ GitHub -->
-    <a href="https://itrequests.netlify.app/safety" class="btn-main"><i class="fas fa-plus"></i> ตรวจสอบพื้นที่</a>
+    <a href="Safety.html" class="btn-main"><i class="fas fa-plus"></i> ตรวจสอบพื้นที่</a>
   </nav>
 
   <div class="container">
@@ -75,11 +76,20 @@
     let fullData = [];
     document.getElementById('dateFilter').valueAsDate = new Date();
 
+    // ฟังก์ชันแปลง URL จาก Google Drive ให้เป็นลิงก์สำหรับดึงรูปมาโชว์บนเว็บ
+    function getDriveThumbnailUrl(url) {
+      if(!url) return "";
+      let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if(match && match[1]) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+      }
+      return url; 
+    }
+
     function loadData() {
       document.getElementById('loader').style.display = 'flex';
       let dateVal = document.getElementById('dateFilter').value;
 
-      // ดึงข้อมูลผ่าน Fetch API โดยส่ง Parameter เป็นแบบ GET URL
       fetch(API_URL + "?action=getDashboardData&date=" + dateVal)
       .then(response => response.json())
       .then(data => {
@@ -105,12 +115,25 @@
       tbody.innerHTML = '';
 
       filtered.forEach(d => {
+        
+        // --- จัดการแสดงรูปขนาดย่อ (Thumbnail) ในตารางหลัก ---
         let photoDisplay = '-';
+        let allPhotos = [];
+        
         if (typeof d.photo === 'object' && d.photo !== null) {
-          let photoCount = Object.values(d.photo).filter(url => url !== "ไม่มีรูปถ่าย" && url !== "").length;
-          if(photoCount > 0) { photoDisplay = `<span style="color:var(--primary); font-size:0.9rem; font-weight:600;"><i class="fas fa-images"></i> ${photoCount} รูป</span>`; }
+          allPhotos = Object.values(d.photo).filter(url => url !== "ไม่มีรูปถ่าย" && url.trim() !== "");
         } else if (typeof d.photo === 'string' && d.photo !== "ไม่มีรูปถ่าย" && d.photo.trim() !== "") {
-          photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image fa-lg"></i></a>`;
+          allPhotos.push(d.photo);
+        }
+
+        if(allPhotos.length > 0) {
+          photoDisplay = `<div style="display:flex; flex-wrap:wrap; max-width:180px;">`;
+          allPhotos.forEach(url => {
+             let thumbUrl = getDriveThumbnailUrl(url);
+             // แสดงรูปเล็กๆ กดเพื่อเปิดดูภาพเต็มได้
+             photoDisplay += `<a href="${url}" target="_blank"><img src="${thumbUrl}" class="img-preview"></a>`;
+          });
+          photoDisplay += `</div>`;
         }
 
         const tr = document.createElement('tr');
@@ -120,11 +143,10 @@
           <td><button class="btn-view" onclick="toggleDetail(${d.id})"><i class="fas fa-chevron-down" id="icon-${d.id}"></i> ดูผลตรวจ</button></td>`;
         tbody.appendChild(tr);
 
+        // --- ส่วนสร้างหน้าต่างรายละเอียดเมื่อกดปุ่ม ---
         const detailTr = document.createElement('tr');
         detailTr.id = `detail-${d.id}`;
         detailTr.className = 'detail-row';
-        
-      // ... (โค้ดก่อนหน้านี้เหมือนเดิม) ...
         
         let detailHtml = `<div class="inner-detail"><h4 style="margin:0 0 15px 0; color:var(--dark); border-bottom:3px solid var(--primary); padding-bottom:8px;">รายละเอียดผลการตรวจสอบรายหัวข้อ</h4>`;
         
@@ -133,31 +155,37 @@
           const sNum = secKey.replace('s', '');
 
           detailHtml += `<div class="section-group"><div class="section-head"><span>${section.title}</span></div>`;
-         section.questions.forEach((qText, idx) => {
+          
+          section.questions.forEach((qText, idx) => {
             const res = d.fullChecklist[`section${sNum}_q${idx}`];
             const remark = d.fullChecklist[`section${sNum}_remark${idx}`];
             const isBad = res === "ไม่ดี";
             
-            // เช็คว่าข้อนี้มีการแนบรูปมาหรือไม่ (รองรับทั้งระบบเก่าและระบบ 3 รูป)
-            const qPhotoKey = `${secKey}_q${idx}`; // เช่น s1_q0
-            let qPhotoBtn = "";
+            const qPhotoKey = `${secKey}_q${idx}`; 
+            let qPhotoPreviews = ""; // สำหรับเก็บ <img> tag
             
             if(typeof d.photo === 'object' && d.photo !== null) {
-               // 1. ตรวจสอบของเก่า (ที่มีรูปเดียว)
+               // ตรวจสอบภาพระบบเดิม (1 รูป)
                if(d.photo[qPhotoKey] && d.photo[qPhotoKey] !== "") {
-                  qPhotoBtn += `<a href="${d.photo[qPhotoKey]}" target="_blank" style="margin-left:8px; color:var(--primary); font-size:0.85rem; text-decoration:none;"><i class="fas fa-image"></i> เปิดดูรูป</a>`;
+                  let thumbUrl = getDriveThumbnailUrl(d.photo[qPhotoKey]);
+                  qPhotoPreviews += `<a href="${d.photo[qPhotoKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large"></a>`;
                }
-               // 2. ตรวจสอบของใหม่ (ที่มีได้สูงสุด 3 รูป)
+               // ตรวจสอบภาพระบบใหม่ (รองรับ 3 รูป)
                for(let p = 0; p < 3; p++) {
-                  let pKey = `${qPhotoKey}_${p}`; // เช่น s1_q0_0
+                  let pKey = `${qPhotoKey}_${p}`;
                   if(d.photo[pKey] && d.photo[pKey] !== "") {
-                     qPhotoBtn += `<a href="${d.photo[pKey]}" target="_blank" style="margin-left:8px; color:var(--primary); font-size:0.85rem; text-decoration:none; background:#fff3e0; padding:2px 6px; border-radius:4px;"><i class="fas fa-image"></i> รูป ${p+1}</a>`;
+                     let thumbUrl = getDriveThumbnailUrl(d.photo[pKey]);
+                     qPhotoPreviews += `<a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large"></a>`;
                   }
                }
             }
             
             detailHtml += `<div class="sub-item">
-                <div class="sub-item-text">- ${qText} ${qPhotoBtn} ${remark ? `<div class="remark-box"><b>หมายเหตุ:</b> ${remark}</div>` : ''}</div>
+                <div class="sub-item-text">
+                  - ${qText} 
+                  ${remark ? `<div class="remark-box"><b>หมายเหตุ:</b> ${remark}</div>` : ''}
+                  ${qPhotoPreviews !== "" ? `<div style="display:flex; flex-wrap:wrap; margin-top:5px;">${qPhotoPreviews}</div>` : ''}
+                </div>
                 <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}</div>
               </div>`;
           });
@@ -168,8 +196,6 @@
         tbody.appendChild(detailTr);
       });
     }
-
-    // ... (ส่วนที่เหลือคงเดิม) ...
 
     function toggleDetail(id) {
       const row = document.getElementById('detail-' + id);
