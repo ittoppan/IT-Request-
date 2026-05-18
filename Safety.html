@@ -104,7 +104,7 @@
             <i class="fas fa-camera" style="color: var(--primary); margin-bottom: 5px; font-size:1.2rem;"></i>
             <span style="font-size: 0.85rem; font-weight: 600; color: #7f8c8d; margin-left:5px;">แนบภาพประกอบข้อนี้</span>
           </div>
-          <input type="file" id="fileInput_${qKey}" accept="image/*" capture="environment" style="display:none" onchange="pv(this, '${qKey}')">
+        <input type="file" id="fileInput_${qKey}" accept="image/*" style="display:none" onchange="pv(this, '${qKey}')">
           <div id="preview-container_${qKey}" style="display:none; position:relative; margin-top:10px;">
              <img id="preview_${qKey}" style="width:100%; border-radius:8px; border: 2px solid #ddd;">
              <div style="position:absolute; top:-10px; right:-10px; background:#e74c3c; color:white; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border: 2px solid white;" onclick="event.stopPropagation(); removeImg('${qKey}');"><i class="fas fa-times"></i></div>
