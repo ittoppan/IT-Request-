@@ -54,7 +54,7 @@
         <input type="text" name="inspector" placeholder="ระบุชื่อ-นามสกุล" required>
         
         <label><i class="fas fa-map-marker-alt"></i> พื้นที่สำรวจ</label>
-        <select name="area" required>
+     <select name="area" onchange="toggleWaterMistByArea(this.value)" required>
           <option value="">-- เลือกแผนก --</option>
           <option value="แผนก Print">1. แผนก Print</option>
           <option value="แผนก Laminate">2. แผนก Laminate</option>
@@ -109,14 +109,16 @@
       card.className = 'card';
       let htmlStr = `<h4 style="color:var(--primary-dark); margin: 0 0 15px 0; border-left: 4px solid var(--primary); padding-left: 10px;">${dataStructure[s].title}</h4>`;
       
-      dataStructure[s].qs.forEach((q, i) => {
+     dataStructure[s].qs.forEach((q, i) => {
         let qKey = `${s}_q${i}`; 
         let remarkName = `section${sNum}_remark${i}`;
-        let itemDivId = `item_${sNum}_${i}`; // ID สำหรับเปลี่ยนสีพื้นหลัง
+        let itemDivId = `item_${sNum}_${i}`; 
         imgB64[qKey] = []; 
 
-        if (s === 's1' && q === 'วอเตอร์') {
-           htmlStr += `<div class="check-item" id="${itemDivId}" style="padding:15px;"><small>${i+1}. ${q}</small>
+        // ตรวจสอบว่าเป็นข้อ "Water Mist" หรือไม่
+        if (s === 's1' && q === 'Water Mist') {
+           // ใส่สไตล์ display:none ไว้เป็นค่าเริ่มต้น (ซ่อนไว้ก่อน) และเพิ่ม class="water-mist-block" เพื่อให้ควบคุมง่าย
+           htmlStr += `<div class="check-item water-mist-block" id="${itemDivId}" style="padding:15px; display:none;"><small>${i+1}. ${q}</small>
             <div style="margin: 10px 0; display:flex; align-items:center;">
               <input type="number" step="any" name="water_val" id="water_val" placeholder="ระบุตัวเลข" style="width:130px; margin:0; padding:10px;" 
                 oninput="evalWater(this.value, '${sNum}', ${i}, '${remarkName}'); clearError('${itemDivId}');">
@@ -127,7 +129,7 @@
             <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..." oninput="clearError('${itemDivId}')"></textarea>
            `;
         } else {
-           // ปลดเอา required ของ HTML ออก เพื่อให้ JS เราเป็นตัวจัดการเช็คเอง
+           // ข้ออื่นๆ โค้ดเดิมปกติ...
            htmlStr += `<div class="check-item" id="${itemDivId}" style="padding:15px;"><small>${i+1}. ${q}</small><div class="options">
              <input type="radio" name="section${sNum}_q${i}" id="s${sNum}y${i}" value="ดี" 
                onchange="document.getElementsByName('${remarkName}')[0].required = false; document.getElementsByName('${remarkName}')[0].placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...'; clearError('${itemDivId}');">
@@ -154,7 +156,27 @@
       card.innerHTML = htmlStr;
       itemsDiv.appendChild(card);
     }
-    
+
+
+    // ฟังก์ชันเปิด-ปิดการแสดงผลข้อ Water Mist ตามแผนกที่เลือก
+    function toggleWaterMistByArea(selectedArea) {
+      const waterBlock = document.querySelector('.water-mist-block');
+      const waterInput = document.getElementById('water_val');
+      const hiddenInput = document.getElementById('hidden_s1q4'); // s1 ข้อ 5 (index คือ 4)
+      
+      if (!waterBlock) return;
+
+      if (selectedArea === "แผนก Print" || selectedArea === "แผนก Laminate") {
+        waterBlock.style.display = 'block'; // แสดงผล
+      } else {
+        // ซ่อนฟิลด์ และเคลียร์ค่าทิ้งอัตโนมัติหากเปลี่ยนไปแผนกอื่น เพื่อไม่ให้เกิด Error ข้อมูลค้าง
+        waterBlock.style.display = 'none'; 
+        if(waterInput) waterInput.value = "";
+        if(hiddenInput) hiddenInput.value = "";
+        const badge = document.getElementById('water_badge');
+        if(badge) badge.style.display = 'none';
+      }
+    }
     function evalWater(val, sNum, i, remarkName) {
       const hiddenInput = document.getElementById(`hidden_s${sNum}q${i}`);
       const badge = document.getElementById('water_badge');
@@ -271,22 +293,26 @@
           let itemDiv = document.getElementById(itemDivId);
           let remarkElem = document.getElementsByName(`section${sNum}_remark${i}`)[0];
 
-          // 1. ตรวจสอบข้อพิเศษ (วอเตอร์)
-          if(s === 's1' && dataStructure[s].qs[i] === 'วอเตอร์') {
-              let waterVal = fd.get('water_val');
-              if(!isOptional && (!waterVal || waterVal.trim() === "")) {
-                  isValid = false;
-                  itemDiv.style.backgroundColor = '#ffebee'; // เปลี่ยนพื้นหลังเป็นสีแดง
-                  if(!firstErrorElement) firstErrorElement = itemDiv;
-              } else if (waterVal !== "" && parseFloat(waterVal) < 50) {
-                  let remark = fd.get(`section${sNum}_remark${i}`);
-                  if(!remark || remark.trim() === "") {
+         // 1. ตรวจสอบข้อพิเศษ (Water Mist)
+          if(s === 's1' && dataStructure[s].qs[i] === 'Water Mist') {
+              let currentArea = fd.get('area');
+              // บังคับตรวจเฉพาะ แผนก Print และ แผนก Laminate เท่านั้น
+              if(currentArea === "แผนก Print" || currentArea === "แผนก Laminate") {
+                  let waterVal = fd.get('water_val');
+                  if(!waterVal || waterVal.trim() === "") {
                       isValid = false;
-                      itemDiv.style.backgroundColor = '#ffebee';
-                      if(!firstErrorElement) firstErrorElement = remarkElem;
+                      itemDiv.style.backgroundColor = '#ffebee'; 
+                      if(!firstErrorElement) firstErrorElement = document.getElementById('water_val');
+                  } else if (waterVal !== "" && parseFloat(waterVal) < 50) {
+                      let remark = fd.get(`section${sNum}_remark${i}`);
+                      if(!remark || remark.trim() === "") {
+                          isValid = false;
+                          itemDiv.style.backgroundColor = '#ffebee';
+                          if(!firstErrorElement) firstErrorElement = remarkElem;
+                      }
                   }
               }
-              continue; // ตรวจวอเตอร์เสร็จ ข้ามไปข้อถัดไป
+              continue; // ข้ามฟังก์ชันตรวจวิทยุปกติสำหรับข้อนี้
           }
 
           // 2. ตรวจสอบ Radio Button ปกติ
