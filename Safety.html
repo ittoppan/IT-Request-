@@ -82,16 +82,17 @@
 
     const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
 
+    // อัปเดตโครงสร้าง S1, S6 และเพิ่ม S7 เข้ามา
     const dataStructure = {
-      s1: { title: "1. สถานที่ทำงาน", qs: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่"] },
+      s1: { title: "1. สถานที่ทำงาน", qs: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "วอเตอร์"] },
       s2: { title: "2. ท่าทางการทำงาน", qs: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์", "การยกของอย่างถูกต้องและปลอดภัย"] },
       s3: { title: "3. เครื่องจักร", qs: ["สวมใส่อุปกรณ์ป้องกันอันตราย (PPE)", "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย"] },
       s4: { title: "4. สารเคมี", qs: ["ไม่มีสารเคมีหกรั่วไหล", "ภาชนะปิดสนิท/มีฉลากชัดเจน", "มีอุปกรณ์ Spill Kit พร้อมใช้"] },
       s5: { title: "5. ไฟฟ้า", qs: ["อุปกรณ์ไฟฟ้า/ปลั๊กไฟไม่ชำรุด", "ไม่มีการต่อพ่วงไฟฟ้าชั่วคราว", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย"] },
-      s6: { title: "6. อื่นๆ", qs: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน"] }
+      s6: { title: "6. อุปกรณ์ฉุกเฉิน", qs: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน"] },
+      s7: { title: "7. อื่นๆ", qs: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
 
-    // เปลี่ยนระบบเก็บรูปให้เป็น Array เพื่อรองรับการเก็บ 3 รูปต่อข้อ
     let imgB64 = {}; 
     const itemsDiv = document.getElementById('items');
     
@@ -104,8 +105,7 @@
       dataStructure[s].qs.forEach((q, i) => {
         let qKey = `${s}_q${i}`; 
         let remarkName = `section${sNum}_remark${i}`;
-        
-        imgB64[qKey] = []; // เตรียม Array เก็บรูป
+        imgB64[qKey] = []; 
 
         htmlStr += `<div class="check-item"><small>${i+1}. ${q}</small><div class="options">
           <input type="radio" name="section${sNum}_q${i}" id="s${sNum}y${i}" value="ดี" required 
@@ -113,7 +113,7 @@
           <label for="s${sNum}y${i}"><i class="fas fa-check-circle"></i> ปกติ</label>
           
           <input type="radio" name="section${sNum}_q${i}" id="s${sNum}n${i}" value="ไม่ดี" 
-            onchange="document.getElementsByName('${remarkName}')[0].required = true; document.getElementsByName('${remarkName}')[0].placeholder = '* กรุณาระบุหมายเหตุความผิดปกติ (บังคับ)';">
+            onchange="document.getElementsByName('${remarkName}')[0].required = true; document.getElementsByName('${remarkName}')[0].placeholder = '* กรุณาระบุรายละเอียด (บังคับ)';">
           <label for="s${sNum}n${i}"><i class="fas fa-exclamation-triangle"></i> ไม่ปกติ</label>
         </div>
         <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..."></textarea>
@@ -124,7 +124,7 @@
             <i class="fas fa-camera" style="color: var(--primary); font-size:1.2rem;"></i>
             <span style="font-size: 0.85rem; font-weight: 600; color: #7f8c8d; margin-left:5px;">เพิ่มภาพประกอบ (สูงสุด 3 รูป)</span>
           </div>
-         <input type="file" id="fileInput_${qKey}" accept="image/*" capture="environment" style="display:none" onchange="pv(this, '${qKey}')">
+          <input type="file" id="fileInput_${qKey}" accept="image/*" capture="environment" style="display:none" onchange="pv(this, '${qKey}')">
         </div>
         </div>`;
       });
@@ -132,12 +132,11 @@
       itemsDiv.appendChild(card);
     }
     
-  function pv(input, qKey) {
+    function pv(input, qKey) {
       if (input.files && input.files[0]) {
-        // เช็คว่ารูปเกินโควต้า 3 รูปหรือไม่
         if(imgB64[qKey].length >= 3) {
             Swal.fire('จำกัดจำนวน', 'ถ่ายภาพได้สูงสุด 3 รูปต่อข้อเท่านั้น', 'warning');
-            input.value = ""; // เคลียร์ค่าทิ้ง
+            input.value = ""; 
             return;
         }
 
@@ -155,12 +154,13 @@
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
             
-            // นำรูปล่าสุดที่เพิ่งถ่ายดันเข้า Array
-            imgB64[qKey].push(canvas.toDataURL("image/jpeg", 0.7));
+            // ดันรูปพร้อมเตรียมช่องคอมเมนต์ภาพ
+            imgB64[qKey].push({
+              b64: canvas.toDataURL("image/jpeg", 0.7),
+              caption: ""
+            });
             
-            // แสดงภาพและเช็คว่าครบ 3 รูปหรือยัง
-            renderPhotos(qKey);
-            
+            renderPhotos(qKey); 
             document.getElementById('loading').style.display = 'none';
           };
           img.src = e.target.result;
@@ -174,28 +174,34 @@
       renderPhotos(qKey);
     }
 
+    function updateCaption(qKey, index, value) {
+      imgB64[qKey][index].caption = value;
+    }
+
     function renderPhotos(qKey) {
       const container = document.getElementById(`preview-container_${qKey}`);
       const placeholder = document.getElementById(`camera-placeholder_${qKey}`);
       
       container.innerHTML = "";
-      imgB64[qKey].forEach((b64, index) => {
+      imgB64[qKey].forEach((imgObj, index) => {
+        let safeCaption = imgObj.caption.replace(/"/g, '&quot;');
         container.innerHTML += `
-         <div style="position:relative; width: 30%; aspect-ratio: 1/1;">
-             <img src="${b64}" style="width:100%; height:100%; object-fit:cover; border-radius:8px; border: 2px solid #ddd;">
-             <div style="position:absolute; top:-8px; right:-8px; background:#e74c3c; color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border: 2px solid white; font-size:12px;" onclick="event.stopPropagation(); removeImg('${qKey}', ${index});"><i class="fas fa-times"></i></div>
+         <div style="position:relative; width: 31%; display:flex; flex-direction:column; gap:6px;">
+             <div style="position:relative; aspect-ratio: 1/1;">
+               <img src="${imgObj.b64}" style="width:100%; height:100%; object-fit:cover; border-radius:8px; border: 2px solid #ddd;">
+               <div style="position:absolute; top:-8px; right:-8px; background:#e74c3c; color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border: 2px solid white; font-size:12px;" onclick="event.stopPropagation(); removeImg('${qKey}', ${index});"><i class="fas fa-times"></i></div>
+             </div>
+             <input type="text" value="${safeCaption}" placeholder="คอมเมนต์ภาพ.." style="padding:4px; font-size:0.75rem; border-radius:4px; border:1px solid #ccc; width:100%; box-sizing:border-box; margin:0;" onchange="updateCaption('${qKey}', ${index}, this.value)">
          </div>
         `;
       });
 
-      // ซ่อนปุ่มเพิ่มภาพ ถ้าครบ 3 รูป
       if(imgB64[qKey].length >= 3) {
           placeholder.style.display = 'none';
       } else {
           placeholder.style.display = 'block';
       }
-      
-      document.getElementById(`fileInput_${qKey}`).value = ""; // รีเซ็ต input
+      document.getElementById(`fileInput_${qKey}`).value = ""; 
     }
 
     document.getElementById('f').onsubmit = function(e) {
@@ -236,20 +242,21 @@
         return st;
       };
 
-      // --- แปลงรูปภาพทั้งหมดให้เป็นรูปแบบที่หลังบ้านรับได้ ---
+      let fdDetails = Object.fromEntries(fd);
       let flatImages = {};
+      
       for(let key in imgB64) {
-          imgB64[key].forEach((b64, idx) => {
-              // จะได้ชื่อคีย์เช่น s1_q0_0, s1_q0_1
-              flatImages[`${key}_${idx}`] = b64;
+          imgB64[key].forEach((imgObj, idx) => {
+              flatImages[`${key}_${idx}`] = imgObj.b64;
+              fdDetails[`caption_${key}_${idx}`] = imgObj.caption;
           });
       }
 
       const payload = {
         inspector: fd.get('inspector'), area: fd.get('area'), 
-        images: flatImages, // ส่งชุดรูปภาพ
-        details: Object.fromEntries(fd),
-        s1_res: ck('s1'), s2_res: ck('s2'), s3_res: ck('s3'), s4_res: ck('s4'), s5_res: ck('s5'), s6_res: ck('s6')
+        images: flatImages, 
+        details: fdDetails,
+        s1_res: ck('s1'), s2_res: ck('s2'), s3_res: ck('s3'), s4_res: ck('s4'), s5_res: ck('s5'), s6_res: ck('s6'), s7_res: ck('s7')
       };
 
       fetch(API_URL, {
