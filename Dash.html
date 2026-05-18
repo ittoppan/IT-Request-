@@ -33,9 +33,7 @@
     .btn-view { background: #f4f6f7; border: 1px solid #d5dbdb; padding: 6px 12px; border-radius: 6px; cursor: pointer; color: var(--dark); font-family: 'Prompt'; transition: 0.2s; white-space: nowrap; }
     .btn-view:hover { background: #e5e8e8; }
     
-    /* สไตล์รูปภาพ */
-    .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; transition: transform 0.2s; margin-right: 5px; margin-bottom: 5px; background-color: #f9f9f9; }
-    .img-preview:hover { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    /* คงสไตล์พรีวิวรูปภาพขนาดใหญ่ไว้ในหน้าส่องรายละเอียด */
     .img-preview-large { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; transition: transform 0.2s; margin:0; background-color: #f9f9f9; }
     .img-preview-large:hover { transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
   </style>
@@ -56,7 +54,7 @@
     </div>
     <div class="table-box">
       <table>
-        <thead><tr><th>เวลา</th><th>พื้นที่</th><th>ผู้ตรวจ</th><th>สถานะรวม</th><th>รายละเอียด</th></tr></thead>
+        <thead><tr><th>เวลา</th><th>พื้นที่</th><th>ผู้ตรวจ</th><th>สถานะรวม</th><th>รูปถ่าย</th><th>รายละเอียด</th></tr></thead>
         <tbody id="tableBody"></tbody>
       </table>
     </div>
@@ -78,12 +76,10 @@
     let fullData = [];
     document.getElementById('dateFilter').valueAsDate = new Date();
 
-    // --- อัปเดตสูตรดึงรูปภาพของ Google Drive ใหม่ ---
     function getDriveThumbnailUrl(url) {
       if(!url) return "";
       let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
       if(match && match[1]) {
-        // ใช้ API Thumbnail หรือ lh3 ที่ Google อนุญาตให้โชว์บนเว็บไซต์ได้
         return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w500`;
       }
       return url; 
@@ -118,23 +114,16 @@
       tbody.innerHTML = '';
 
       filtered.forEach(d => {
-        let photoDisplay = '-';
-        let allPhotos = [];
         
+        // --- ปรับปรุงให้หน้าตารางหลักแสดงผลเป็น "ข้อความจำนวนรูป" เพื่อความสะอาดตา ---
+        let photoDisplay = '-';
         if (typeof d.photo === 'object' && d.photo !== null) {
-          allPhotos = Object.values(d.photo).filter(url => url !== "ไม่มีรูปถ่าย" && url.trim() !== "");
+          let photoCount = Object.values(d.photo).filter(url => url !== "ไม่มีรูปถ่าย" && url.trim() !== "").length;
+          if(photoCount > 0) {
+            photoDisplay = `<span style="color:var(--primary); font-size:0.95rem; font-weight:600;"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
+          }
         } else if (typeof d.photo === 'string' && d.photo !== "ไม่มีรูปถ่าย" && d.photo.trim() !== "") {
-          allPhotos.push(d.photo);
-        }
-
-        if(allPhotos.length > 0) {
-          photoDisplay = `<div style="display:flex; flex-wrap:wrap; max-width:180px;">`;
-          allPhotos.forEach(url => {
-             let thumbUrl = getDriveThumbnailUrl(url);
-             // ใส่ onerror ป้องกันกรณีรูปดึงมาไม่ได้ ให้โชว์โลโก้ภาพเสียแทนหน้าจอแตกๆ
-             photoDisplay += `<a href="${url}" target="_blank"><img src="${thumbUrl}" class="img-preview" onerror="this.src='https://placehold.co/50x50/eeeeee/999999?text=IMG'"></a>`;
-          });
-          photoDisplay += `</div>`;
+          photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image fa-lg"></i></a>`;
         }
 
         const tr = document.createElement('tr');
@@ -161,7 +150,6 @@
             const remark = d.fullChecklist[`section${sNum}_remark${idx}`];
             const isBad = res === "ไม่ดี";
             
-            // โชว์ตัวเลข % สำหรับวอเตอร์
             let displayQText = qText;
             if(secKey === 's1' && qText === 'วอเตอร์') {
                 let waterVal = d.fullChecklist['water_val'];
