@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root { --primary: #27ae60; --dark: #2c3e50; --bg: #f4f7f6; --danger: #e74c3c; }
+    body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--dark); }
+    .header { background: linear-gradient(135deg, #2ecc71, var(--primary)); color: white; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header h2 { margin: 0; font-size: 1.4rem; }
+    .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+    .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    .job-badge { background: #fef9e7; color: #d35400; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 1rem; display: inline-block; margin-bottom: 10px; }
+    label { font-weight: 600; font-size: 0.95rem; display: block; margin-bottom: 8px; color: #555; margin-top: 15px;}
+    input[type="text"], textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Prompt'; font-size: 16px; background: #f9f9f9; }
+    input:focus, textarea:focus { outline: none; border-color: var(--primary); background: #fff; }
+    .img-before { width: 100%; max-height: 300px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; margin-top: 10px; }
+    .camera-box { background: #fafafa; padding: 15px; border-radius: 12px; border: 2px dashed #d1d8e0; text-align: center; cursor: pointer; margin-top: 10px; }
+    .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 10px; font-weight: 600; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
+    .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
+  </style>
+</head>
+<body>
+
+  <div id="loading" class="loader"><i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i><p style="margin-top:15px; font-weight: 600;" id="loadText">กำลังดึงข้อมูลงาน...</p></div>
+
+  <div class="header">
+    <h2>อัปเดตผลการแก้ไขปัญหา</h2>
+  </div>
+
+  <div class="container" id="contentArea" style="display:none;">
+    <div class="card" style="border-left: 4px solid #e74c3c;">
+      <div class="job-badge" id="displayJobId">MT-XXXXXX</div>
+      <p style="margin: 5px 0;"><b>พื้นที่:</b> <span id="displayArea"></span></p>
+      <p style="margin: 5px 0;"><b>ปัญหาที่พบ:</b> <span id="displayProblem" style="color:#c0392b;"></span></p>
+      <p style="margin: 5px 0; font-size: 0.9rem; color:#7f8c8d;"><b>หมายเหตุผู้ตรวจ:</b> <span id="displayRemark"></span></p>
+      <div id="beforeImgContainer"></div>
+    </div>
+
+    <form id="resolveForm">
+      <div class="card">
+        <h3 style="margin-top:0; color:var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px;">แบบฟอร์มการแก้ไข (Corrective Action)</h3>
+        
+        <label>1. ชื่อผู้รับผิดชอบ (PIC)</label>
+        <input type="text" id="picName" placeholder="ระบุชื่อพนักงานที่ดำเนินการซ่อม/แก้ไข" required>
+
+        <label>2. รายละเอียดแนวทางการแก้ไข</label>
+        <textarea id="correctiveAction" rows="3" placeholder="อธิบายสิ่งที่ได้ดำเนินการแก้ไข..." required></textarea>
+
+        <label>3. อัปโหลดรูปภาพหลังแก้ไข (After)</label>
+        <div id="afterPreviewContainer" style="margin-bottom:10px;"></div>
+        <div class="camera-box" id="cameraBtn" onclick="document.getElementById('fileInput').click()">
+          <i class="fas fa-camera" style="color: var(--primary); font-size:1.5rem;"></i>
+          <p style="margin:5px 0 0 0; font-size: 0.9rem; color: #7f8c8d;">ถ่ายภาพผลงาน (บังคับ 1 รูป)</p>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none" onchange="processImage(this)" required>
+      </div>
+      
+      <button type="submit" class="btn-submit">✔️ บันทึกและปิดงาน (Close Job)</button>
+    </form>
+  </div>
+
+  <script>
+    // ⚠️ นำลิงก์ Web App URL ของ code.gs มาวางที่นี่ ⚠️
+    const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
+    
+    let currentJobId = "";
+    let base64AfterImg = "";
+
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      currentJobId = urlParams.get('jobid');
+      
+      if(!currentJobId) {
+        Swal.fire('ข้อผิดพลาด', 'ไม่พบหมายเลขงานในลิงก์', 'error');
+        document.getElementById('loading').style.display = 'none';
+        return;
+      }
+
+      fetch(API_URL + "?action=getJobDetails&jobid=" + currentJobId)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('loading').style.display = 'none';
+        if(data.status === "success") {
+           if(data.jobStatus === "Closed") {
+             Swal.fire('งานนี้ปิดไปแล้ว', 'งานนี้ได้รับการแก้ไขและปิดสถานะไปเรียบร้อยแล้ว', 'info');
+             return;
+           }
+           document.getElementById('contentArea').style.display = 'block';
+           document.getElementById('displayJobId').innerText = data.jobId;
+           document.getElementById('displayArea').innerText = data.area;
+           document.getElementById('displayProblem').innerText = data.problem;
+           document.getElementById('displayRemark').innerText = data.remark;
+           
+           if(data.picBefore) {
+             // แปลงลิงก์ Google Drive ให้แสดงผลบนเว็บได้
+             let match = data.picBefore.match(/\/d\/([a-zA-Z0-9_-]+)/);
+             if(match) {
+                let thumb = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w600`;
+                document.getElementById('beforeImgContainer').innerHTML = `<p style="margin:10px 0 5px; font-weight:bold; font-size:0.9rem;">รูปภาพก่อนแก้ไข (Before):</p><img src="${thumb}" class="img-before">`;
+             }
+           }
+        } else {
+           Swal.fire('ไม่พบข้อมูล', data.message, 'error');
+        }
+      })
+      .catch(err => {
+        document.getElementById('loading').style.display = 'none';
+        Swal.fire('การเชื่อมต่อล้มเหลว', 'โปรดลองใหม่อีกครั้ง', 'error');
+      });
+    };
+
+    function processImage(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('loadText').innerText = 'กำลังประมวลผลรูปภาพ...';
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800; 
+            let width = img.width; let height = img.height;
+            if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+            canvas.width = width; canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            base64AfterImg = canvas.toDataURL("image/jpeg", 0.7);
+            document.getElementById('afterPreviewContainer').innerHTML = `<img src="${base64AfterImg}" style="width:100%; border-radius:8px; border:2px solid var(--primary);">`;
+            document.getElementById('cameraBtn').style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    document.getElementById('resolveForm').onsubmit = function(e) {
+      e.preventDefault();
+      if(!base64AfterImg) {
+        Swal.fire('กรุณาแนบรูปภาพ', 'ต้องมีรูปภาพหลังการแก้ไข (After) เสมอ', 'warning');
+        return;
+      }
+
+      document.getElementById('loading').style.display = 'flex';
+      document.getElementById('loadText').innerText = 'กำลังบันทึกการปิดงาน...';
+
+      const payload = {
+        action: "resolve_issue",
+        jobId: currentJobId,
+        picName: document.getElementById('picName').value,
+        correctiveAction: document.getElementById('correctiveAction').value,
+        afterImage: base64AfterImg
+      };
+
+      fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        document.getElementById('loading').style.display = 'none';
+        if(res.status === 'success') {
+           Swal.fire('ยอดเยี่ยม!', 'บันทึกการแก้ไขและปิดงานสำเร็จ', 'success').then(() => {
+             window.location.href = "https://itrequests.netlify.app/safety"; // กลับไปหน้า Dashboard/Safety
+           });
+        } else {
+           Swal.fire('เกิดข้อผิดพลาด', res.message, 'error');
+        }
+      })
+      .catch(err => {
+        document.getElementById('loading').style.display = 'none';
+        Swal.fire('เกิดข้อผิดพลาด', 'ระบบเครือข่ายมีปัญหา', 'error');
+      });
+    };
+  </script>
+</body>
+</html>
