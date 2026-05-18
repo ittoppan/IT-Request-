@@ -7,51 +7,99 @@
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root { --primary: #f39c12; --dark: #2c3e50; --success: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; --light-orange: #fff5e6; }
-    body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding: 0; }
-    .nav { background: linear-gradient(90deg, #ff8c00, var(--primary)); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .container { max-width: 1100px; margin: 25px auto; padding: 0 20px; }
-    .btn-main { background: white; color: var(--primary); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: 0.3s; }
+    body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    .nav { background: linear-gradient(90deg, #ff8c00, var(--primary)); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+    .nav h2 { margin: 0; font-size: 1.3rem; letter-spacing: 0.5px; }
+    .container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
+    .btn-main { background: white; color: var(--primary); padding: 8px 15px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: 0.3s; font-size: 0.95rem; white-space: nowrap; }
+    
+    /* สถิติ Dashboard */
     .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
-    .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-bottom: 5px solid #ddd; cursor: pointer; }
+    .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-bottom: 5px solid #ddd; cursor: pointer; transition: 0.2s; }
     .stat-card.active { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .table-box { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #fff8f0; color: #e67e22; padding: 15px; text-align: left; }
-    td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; }
-    .badge { padding: 4px 12px; border-radius: 50px; color: white; font-size: 0.75rem; }
+    .stat-card small { color: #7f8c8d; font-weight: 600; }
+    
+    /* ตารางหลัก (ปรับให้เลื่อนซ้ายขวาได้บนมือถือ) */
+    .table-box { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; min-width: 750px; /* บังคับความกว้างขั้นต่ำ เพื่อให้เกิด Scroll บนมือถือ */ }
+    th { background: #fff8f0; color: #e67e22; padding: 15px; text-align: left; font-size: 0.95rem; white-space: nowrap; }
+    td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; font-size: 0.95rem; }
+    .badge { padding: 4px 12px; border-radius: 50px; color: white; font-size: 0.8rem; white-space: nowrap; }
+    
+    /* ส่วนรายละเอียด (หน้าต่างย่อย) */
     .detail-row { display: none; background: var(--light-orange); }
     .inner-detail { padding: 20px; background: white; border: 1px solid #f9e3b4; margin: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.1); }
     .section-group { margin-bottom: 15px; border-radius: 10px; overflow: hidden; border: 1px solid #ffe8cc; }
     .section-head { background: var(--primary); color: white; padding: 12px 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;}
-    .sub-item { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #fff3e0; padding: 12px 15px; background: #fffdfa; }
-    .sub-item-text { flex: 1; color: #5a4a3a; font-size: 0.95rem; }
-    .status-pill { min-width: 90px; padding: 5px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-align: center; margin-left: 15px; }
+    .sub-item { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #fff3e0; padding: 12px 15px; background: #fffdfa; gap: 10px; }
+    .sub-item-text { flex: 1; color: #5a4a3a; font-size: 0.95rem; line-height: 1.5; }
+    .status-pill { min-width: 80px; padding: 5px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-align: center; white-space: nowrap; }
     .status-good { background: #e8f5e9; color: var(--success); }
     .status-bad { background: #ffebee; color: var(--danger); }
-    .remark-box { font-size: 0.85rem; color: #d35400; margin-top: 5px; padding: 5px 10px; background: #fff9f0; border-left: 3px solid var(--primary); }
-    .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-    .btn-view { background: #f4f6f7; border: 1px solid #d5dbdb; padding: 6px 12px; border-radius: 6px; cursor: pointer; color: var(--dark); font-family: 'Prompt'; transition: 0.2s; white-space: nowrap; }
+    .remark-box { font-size: 0.85rem; color: #d35400; margin-top: 8px; padding: 8px 12px; background: #fff9f0; border-left: 3px solid var(--primary); border-radius: 4px; }
+    
+    .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+    .btn-view { background: #f4f6f7; border: 1px solid #d5dbdb; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--dark); font-family: 'Prompt'; transition: 0.2s; white-space: nowrap; font-weight: 600; }
     .btn-view:hover { background: #e5e8e8; }
     
-    /* คงสไตล์พรีวิวรูปภาพขนาดใหญ่ไว้ในหน้าส่องรายละเอียด */
-    .img-preview-large { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; transition: transform 0.2s; margin:0; background-color: #f9f9f9; }
-    .img-preview-large:hover { transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+    /* รูปภาพ */
+    .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; transition: transform 0.2s; margin-right: 5px; margin-bottom: 5px; background-color: #f9f9f9; }
+    .img-preview:hover { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    .img-preview-large { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; margin:0; background-color: #f9f9f9; }
+    
+    /* กล่องฟิลเตอร์วันที่ */
+    .date-filter-box { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    input[type="date"] { padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd; font-family: 'Prompt'; font-size: 1rem; color: var(--dark); outline: none; transition: border 0.3s; }
+    input[type="date"]:focus { border-color: var(--primary); }
+
+    /* =========================================
+       📱 MEDIA QUERIES (สำหรับมือถือ Responsive)
+       ========================================= */
+    @media (max-width: 768px) {
+      .nav h2 { font-size: 1.1rem; }
+      .btn-main { padding: 6px 12px; font-size: 0.85rem; }
+      .container { padding: 0 10px; margin: 15px auto; }
+      
+      /* ปรับ 3 กล่องสถิติให้เล็กลงแต่ยังอยู่แถวเดียวกัน */
+      .stats { gap: 10px; margin-bottom: 15px; }
+      .stat-card { padding: 12px 8px; border-radius: 10px; border-bottom: 4px solid #ddd; }
+      .stat-card.active { transform: translateY(-3px); }
+      .stat-card small { font-size: 0.7rem; letter-spacing: -0.5px; }
+      .stat-card .value { font-size: 1.5rem !important; }
+      
+      /* ปรับหน้าต่างรายละเอียดให้ซ้อนกันอ่านง่ายบนจอมือถือ */
+      .inner-detail { padding: 12px; margin: 10px 5px; }
+      .section-head { font-size: 0.95rem; padding: 10px; }
+      .sub-item { flex-direction: column; padding: 12px 10px; }
+      .status-pill { margin-left: 0; margin-top: 10px; align-self: flex-start; }
+      
+      /* ย่อรูปลงนิดหน่อยบนมือถือ */
+      .img-preview-large { width: 75px; height: 75px; }
+      
+      /* ให้ช่องเลือกวันที่เต็มจอถ้าจอเล็กมาก */
+      input[type="date"] { width: 100%; max-width: 250px; }
+    }
   </style>
 </head>
 <body>
   <div id="loader" class="loader"><i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i></div>
   <nav class="nav">
-    <div><h2 style="margin:0;">SAFETY DASHBOARD</h2></div>
+    <div><h2>SAFETY DASHBOARD</h2></div>
     <a href="https://itrequests.netlify.app/safety" class="btn-main"><i class="fas fa-plus"></i> ตรวจสอบพื้นที่</a>
   </nav>
 
   <div class="container">
-    <div style="margin-bottom:20px;"><input type="date" id="dateFilter" onchange="loadData()" style="padding:10px; border-radius:8px; border:1px solid #ddd; font-family:'Prompt';"></div>
+    <div class="date-filter-box">
+      <i class="fas fa-calendar-alt" style="color:var(--primary); font-size:1.2rem;"></i>
+      <input type="date" id="dateFilter" onchange="loadData()">
+    </div>
+    
     <div class="stats">
       <div class="stat-card" id="card-all" onclick="updateFilter('all')"><small>ทั้งหมดวันนี้</small><div class="value" id="countTotal" style="font-size:2.2rem; color:#3498db;">0</div></div>
       <div class="stat-card" id="card-good" onclick="updateFilter('good')"><small>ปกติ</small><div class="value" id="countGood" style="font-size:2.2rem; color:var(--success);">0</div></div>
       <div class="stat-card" id="card-bad" onclick="updateFilter('bad')"><small>พบปัญหา</small><div class="value" id="countBad" style="font-size:2.2rem; color:var(--danger);">0</div></div>
     </div>
+    
     <div class="table-box">
       <table>
         <thead><tr><th>เวลา</th><th>พื้นที่</th><th>ผู้ตรวจ</th><th>สถานะรวม</th><th>รูปถ่าย</th><th>รายละเอียด</th></tr></thead>
@@ -115,7 +163,6 @@
 
       filtered.forEach(d => {
         
-        // --- ปรับปรุงให้หน้าตารางหลักแสดงผลเป็น "ข้อความจำนวนรูป" เพื่อความสะอาดตา ---
         let photoDisplay = '-';
         if (typeof d.photo === 'object' && d.photo !== null) {
           let photoCount = Object.values(d.photo).filter(url => url !== "ไม่มีรูปถ่าย" && url.trim() !== "").length;
