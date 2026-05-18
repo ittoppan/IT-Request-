@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    :root { --primary: #f39c12; --primary-dark: #e67e22; --bg: #f0f2f5; --card-bg: #ffffff; --text: #2c3e50; }
+    :root { --primary: #f39c12; --primary-dark: #e67e22; --bg: #f0f2f5; --card-bg: #ffffff; --text: #2c3e50; --danger: #e74c3c; }
     body { font-family: 'Prompt', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--text); -webkit-tap-highlight-color: transparent; }
     .header { background: linear-gradient(135deg, #ff8c00, var(--primary)); color: white; padding: 20px 15px 45px 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     .header h2 { margin: 10px 0 0; font-size: 1.4rem; letter-spacing: 1px; }
@@ -17,6 +17,7 @@
     label { font-weight: 600; font-size: 0.95rem; display: block; margin-bottom: 8px; color: #555; }
     input[type="text"], select, textarea { width: 100%; padding: 14px; margin: 5px 0 15px; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Prompt', sans-serif; font-size: 16px; background-color: #f9f9f9; transition: border 0.3s; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background-color: #fff; }
+    textarea:required { border-left: 4px solid var(--danger); background-color: #fff5f5; }
     .check-item { background: #fff; padding: 15px 0; border-bottom: 1px solid #eee; margin-bottom: 10px; }
     .check-item:last-child { border-bottom: none; }
     .check-item small { font-size: 1rem; color: var(--text); font-weight: 600; line-height: 1.4; display: block; margin-bottom: 12px; }
@@ -27,7 +28,7 @@
     input[value="ไม่ดี"]:checked + label { background: #ffebee; color: #c62828; border-color: #c62828; }
     .btn-submit { width: 100%; background: linear-gradient(to right, #f39c12, #e67e22); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3); margin-top: 10px; }
     .btn-submit:active { transform: scale(0.98); }
-    .camera-box { border: 2px dashed #d1d8e0; background: #fafafa; padding: 12px; border-radius: 12px; color: #7f8c8d; transition: all 0.3s; position: relative; margin-top: 8px; }
+    .camera-box { background: #fafafa; padding: 12px; border-radius: 12px; color: #7f8c8d; transition: all 0.3s; margin-top: 8px; border: 1px solid #eee; }
     .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
   </style>
 </head>
@@ -69,6 +70,16 @@
   </div>
 
   <script>
+    if (navigator.userAgent.indexOf("Line") > -1) {
+      Swal.fire({
+        title: '⚠️ เปิดผ่านแอป LINE',
+        html: 'แอป LINE อาจบล็อกการเปิดกล้องถ่ายรูป<br><br><b>วิธีแก้:</b> ให้กดที่เมนู (จุด 3 จุด) มุมขวาบน แล้วเลือก<br><span style="color:#e74c3c; font-weight:bold;">"เปิดในเบราว์เซอร์เริ่มต้น / Safari / Chrome"</span>',
+        icon: 'warning',
+        confirmButtonText: 'เข้าใจแล้ว',
+        confirmButtonColor: '#f39c12'
+      });
+    }
+
     const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
 
     const dataStructure = {
@@ -80,7 +91,8 @@
       s6: { title: "6. อื่นๆ", qs: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน"] }
     };
 
-    let imgB64 = {}; // เปลี่ยนเป็นรับค่าแบบ Dynamic ตามรายข้อ
+    // เปลี่ยนระบบเก็บรูปให้เป็น Array เพื่อรองรับการเก็บ 3 รูปต่อข้อ
+    let imgB64 = {}; 
     const itemsDiv = document.getElementById('items');
     
     for(let s in dataStructure) {
@@ -90,25 +102,29 @@
       let htmlStr = `<h4 style="color:var(--primary-dark); margin: 0 0 15px 0; border-left: 4px solid var(--primary); padding-left: 10px;">${dataStructure[s].title}</h4>`;
       
       dataStructure[s].qs.forEach((q, i) => {
-        let qKey = `${s}_q${i}`; // สร้าง Key เฉพาะสำหรับแต่ละข้อ เช่น s1_q0, s1_q1
-        imgB64[qKey] = ""; // เตรียมพื้นที่เก็บรูป
+        let qKey = `${s}_q${i}`; 
+        let remarkName = `section${sNum}_remark${i}`;
+        
+        imgB64[qKey] = []; // เตรียม Array เก็บรูป
 
         htmlStr += `<div class="check-item"><small>${i+1}. ${q}</small><div class="options">
-          <input type="radio" name="section${sNum}_q${i}" id="s${sNum}y${i}" value="ดี" required><label for="s${sNum}y${i}"><i class="fas fa-check-circle"></i> ปกติ</label>
-          <input type="radio" name="section${sNum}_q${i}" id="s${sNum}n${i}" value="ไม่ดี"><label for="s${sNum}n${i}"><i class="fas fa-exclamation-triangle"></i> ไม่ปกติ</label>
-        </div><textarea name="section${sNum}_remark${i}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..."></textarea>
+          <input type="radio" name="section${sNum}_q${i}" id="s${sNum}y${i}" value="ดี" required 
+            onchange="document.getElementsByName('${remarkName}')[0].required = false; document.getElementsByName('${remarkName}')[0].placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...';">
+          <label for="s${sNum}y${i}"><i class="fas fa-check-circle"></i> ปกติ</label>
+          
+          <input type="radio" name="section${sNum}_q${i}" id="s${sNum}n${i}" value="ไม่ดี" 
+            onchange="document.getElementsByName('${remarkName}')[0].required = true; document.getElementsByName('${remarkName}')[0].placeholder = '* กรุณาระบุหมายเหตุความผิดปกติ (บังคับ)';">
+          <label for="s${sNum}n${i}"><i class="fas fa-exclamation-triangle"></i> ไม่ปกติ</label>
+        </div>
+        <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..."></textarea>
         
-        <!-- แทรกปุ่มถ่ายรูปรายข้อ -->
-        <div class="camera-box" style="text-align:center; cursor:pointer;" onclick="document.getElementById('fileInput_${qKey}').click()">
-          <div id="camera-placeholder_${qKey}">
-            <i class="fas fa-camera" style="color: var(--primary); margin-bottom: 5px; font-size:1.2rem;"></i>
-            <span style="font-size: 0.85rem; font-weight: 600; color: #7f8c8d; margin-left:5px;">แนบภาพประกอบข้อนี้</span>
+        <div class="camera-box">
+          <div id="preview-container_${qKey}" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:5px;"></div>
+          <div id="camera-placeholder_${qKey}" style="text-align:center; cursor:pointer; padding:15px; border:2px dashed #d1d8e0; border-radius:10px; background:#fff;" onclick="document.getElementById('fileInput_${qKey}').click()">
+            <i class="fas fa-camera" style="color: var(--primary); font-size:1.2rem;"></i>
+            <span style="font-size: 0.85rem; font-weight: 600; color: #7f8c8d; margin-left:5px;">เพิ่มภาพประกอบ (สูงสุด 3 รูป)</span>
           </div>
-       <input type="file" id="fileInput_${qKey}" accept="image/*" capture="environment" style="display:none" onchange="pv(this, '${qKey}')">
-          <div id="preview-container_${qKey}" style="display:none; position:relative; margin-top:10px;">
-             <img id="preview_${qKey}" style="width:100%; border-radius:8px; border: 2px solid #ddd;">
-             <div style="position:absolute; top:-10px; right:-10px; background:#e74c3c; color:white; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border: 2px solid white;" onclick="event.stopPropagation(); removeImg('${qKey}');"><i class="fas fa-times"></i></div>
-          </div>
+          <input type="file" id="fileInput_${qKey}" accept="image/*" style="display:none" onchange="pv(this, '${qKey}')">
         </div>
         </div>`;
       });
@@ -118,6 +134,12 @@
     
     function pv(input, qKey) {
       if (input.files && input.files[0]) {
+        // ดักจับไม่ให้เกิน 3 รูป
+        if(imgB64[qKey].length >= 3) {
+            Swal.fire('จำกัดจำนวน', 'ถ่ายภาพได้สูงสุด 3 รูปต่อข้อเท่านั้น', 'warning');
+            return;
+        }
+
         document.getElementById('loading').style.display = 'flex';
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -132,11 +154,10 @@
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
             
-            imgB64[qKey] = canvas.toDataURL("image/jpeg", 0.7);
+            // นำรูปล่าสุดดันเข้า Array
+            imgB64[qKey].push(canvas.toDataURL("image/jpeg", 0.7));
+            renderPhotos(qKey); // เรียกฟังก์ชันแสดงภาพ
             
-            document.getElementById('preview_' + qKey).src = imgB64[qKey];
-            document.getElementById('preview-container_' + qKey).style.display = 'block';
-            document.getElementById('camera-placeholder_' + qKey).style.display = 'none';
             document.getElementById('loading').style.display = 'none';
           };
           img.src = e.target.result;
@@ -145,17 +166,63 @@
       }
     }
 
-    function removeImg(qKey) {
-      imgB64[qKey] = "";
-      document.getElementById('fileInput_' + qKey).value = "";
-      document.getElementById('preview-container_' + qKey).style.display = 'none';
-      document.getElementById('camera-placeholder_' + qKey).style.display = 'block';
+    function removeImg(qKey, index) {
+      imgB64[qKey].splice(index, 1);
+      renderPhotos(qKey);
+    }
+
+    function renderPhotos(qKey) {
+      const container = document.getElementById(`preview-container_${qKey}`);
+      const placeholder = document.getElementById(`camera-placeholder_${qKey}`);
+      
+      container.innerHTML = "";
+      imgB64[qKey].forEach((b64, index) => {
+        container.innerHTML += `
+         <div style="position:relative; width: 30%; aspect-ratio: 1/1;">
+             <img src="${b64}" style="width:100%; height:100%; object-fit:cover; border-radius:8px; border: 2px solid #ddd;">
+             <div style="position:absolute; top:-8px; right:-8px; background:#e74c3c; color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border: 2px solid white; font-size:12px;" onclick="event.stopPropagation(); removeImg('${qKey}', ${index});"><i class="fas fa-times"></i></div>
+         </div>
+        `;
+      });
+
+      // ซ่อนปุ่มเพิ่มภาพ ถ้าครบ 3 รูป
+      if(imgB64[qKey].length >= 3) {
+          placeholder.style.display = 'none';
+      } else {
+          placeholder.style.display = 'block';
+      }
+      
+      document.getElementById(`fileInput_${qKey}`).value = ""; // รีเซ็ต input
     }
 
     document.getElementById('f').onsubmit = function(e) {
       e.preventDefault();
-      document.getElementById('loading').style.display = 'flex';
       const fd = new FormData(this);
+      let isValid = true;
+      let errorMsg = "";
+
+      for(let s in dataStructure) {
+        let sNum = s.replace('s', '');
+        for(let i=0; i<dataStructure[s].qs.length; i++) {
+          let status = fd.get(`section${sNum}_q${i}`);
+          let remark = fd.get(`section${sNum}_remark${i}`);
+          
+          if(status === "ไม่ดี" && (!remark || remark.trim() === "")) {
+            isValid = false;
+            errorMsg = `กรุณาระบุหมายเหตุในหัวข้อ:<br><b style="color:var(--danger)">${dataStructure[s].qs[i]}</b>`;
+            document.getElementsByName(`section${sNum}_remark${i}`)[0].focus();
+            break; 
+          }
+        }
+        if(!isValid) break;
+      }
+
+      if(!isValid) {
+        Swal.fire({ title: 'ข้อมูลไม่ครบถ้วน', html: errorMsg, icon: 'warning', confirmButtonColor: '#e74c3c' });
+        return; 
+      }
+
+      document.getElementById('loading').style.display = 'flex';
       
       const ck = (s) => {
         let st = "ดี";
@@ -166,8 +233,18 @@
         return st;
       };
 
+      // --- แปลงรูปภาพทั้งหมดให้เป็นรูปแบบที่หลังบ้านรับได้ ---
+      let flatImages = {};
+      for(let key in imgB64) {
+          imgB64[key].forEach((b64, idx) => {
+              // จะได้ชื่อคีย์เช่น s1_q0_0, s1_q0_1
+              flatImages[`${key}_${idx}`] = b64;
+          });
+      }
+
       const payload = {
-        inspector: fd.get('inspector'), area: fd.get('area'), images: imgB64, 
+        inspector: fd.get('inspector'), area: fd.get('area'), 
+        images: flatImages, // ส่งชุดรูปภาพ
         details: Object.fromEntries(fd),
         s1_res: ck('s1'), s2_res: ck('s2'), s3_res: ck('s3'), s4_res: ck('s4'), s5_res: ck('s5'), s6_res: ck('s6')
       };
