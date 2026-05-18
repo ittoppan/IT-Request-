@@ -32,9 +32,11 @@
     .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .btn-view { background: #f4f6f7; border: 1px solid #d5dbdb; padding: 6px 12px; border-radius: 6px; cursor: pointer; color: var(--dark); font-family: 'Prompt'; transition: 0.2s; white-space: nowrap; }
     .btn-view:hover { background: #e5e8e8; }
-    .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; transition: transform 0.2s; margin-right: 5px; margin-bottom: 5px; }
+    
+    /* สไตล์รูปภาพ */
+    .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; transition: transform 0.2s; margin-right: 5px; margin-bottom: 5px; background-color: #f9f9f9; }
     .img-preview:hover { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-    .img-preview-large { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; transition: transform 0.2s; margin:0; }
+    .img-preview-large { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; transition: transform 0.2s; margin:0; background-color: #f9f9f9; }
     .img-preview-large:hover { transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
   </style>
 </head>
@@ -42,7 +44,6 @@
   <div id="loader" class="loader"><i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i></div>
   <nav class="nav">
     <div><h2 style="margin:0;">SAFETY DASHBOARD</h2></div>
-    <!-- ลิงก์ตรงไปหน้าตรวจพื้นที่ที่ Netlify ตามที่คุณกำหนด -->
     <a href="https://itrequests.netlify.app/safety" class="btn-main"><i class="fas fa-plus"></i> ตรวจสอบพื้นที่</a>
   </nav>
 
@@ -64,7 +65,6 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
 
-    // อัปเดตโครงสร้าง S1, S6 และ S7
     const checklistStructure = {
       s1: { title: "1. สถานที่ทำงาน", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "วอเตอร์"] },
       s2: { title: "2. ท่าทางการทำงาน", questions: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์", "การยกของอย่างถูกต้องและปลอดภัย"] },
@@ -78,11 +78,13 @@
     let fullData = [];
     document.getElementById('dateFilter').valueAsDate = new Date();
 
+    // --- อัปเดตสูตรดึงรูปภาพของ Google Drive ใหม่ ---
     function getDriveThumbnailUrl(url) {
       if(!url) return "";
       let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
       if(match && match[1]) {
-        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+        // ใช้ API Thumbnail หรือ lh3 ที่ Google อนุญาตให้โชว์บนเว็บไซต์ได้
+        return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w500`;
       }
       return url; 
     }
@@ -129,7 +131,8 @@
           photoDisplay = `<div style="display:flex; flex-wrap:wrap; max-width:180px;">`;
           allPhotos.forEach(url => {
              let thumbUrl = getDriveThumbnailUrl(url);
-             photoDisplay += `<a href="${url}" target="_blank"><img src="${thumbUrl}" class="img-preview"></a>`;
+             // ใส่ onerror ป้องกันกรณีรูปดึงมาไม่ได้ ให้โชว์โลโก้ภาพเสียแทนหน้าจอแตกๆ
+             photoDisplay += `<a href="${url}" target="_blank"><img src="${thumbUrl}" class="img-preview" onerror="this.src='https://placehold.co/50x50/eeeeee/999999?text=IMG'"></a>`;
           });
           photoDisplay += `</div>`;
         }
@@ -173,7 +176,7 @@
             if(typeof d.photo === 'object' && d.photo !== null) {
                if(d.photo[qPhotoKey] && d.photo[qPhotoKey] !== "") {
                   let thumbUrl = getDriveThumbnailUrl(d.photo[qPhotoKey]);
-                  qPhotoPreviews += `<div style="margin-right:10px; margin-top:10px;"><a href="${d.photo[qPhotoKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large"></a></div>`;
+                  qPhotoPreviews += `<div style="margin-right:10px; margin-top:10px;"><a href="${d.photo[qPhotoKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large" onerror="this.src='https://placehold.co/90x90/eeeeee/999999?text=IMG'"></a></div>`;
                }
                for(let p = 0; p < 3; p++) {
                   let pKey = `${qPhotoKey}_${p}`;
@@ -183,7 +186,7 @@
                      
                      qPhotoPreviews += `
                        <div style="display:flex; flex-direction:column; align-items:center; width:90px; margin-right:12px; margin-top:10px;">
-                         <a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large"></a>
+                         <a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large" onerror="this.src='https://placehold.co/90x90/eeeeee/999999?text=IMG'"></a>
                          ${imgCaption ? `<span style="font-size:0.75rem; color:#555; text-align:center; margin-top:4px; line-height:1.2; word-break:break-word;">${imgCaption}</span>` : ''}
                        </div>
                      `;
