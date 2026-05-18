@@ -124,7 +124,7 @@
             <i class="fas fa-camera" style="color: var(--primary); font-size:1.2rem;"></i>
             <span style="font-size: 0.85rem; font-weight: 600; color: #7f8c8d; margin-left:5px;">เพิ่มภาพประกอบ (สูงสุด 3 รูป)</span>
           </div>
-          <input type="file" id="fileInput_${qKey}" accept="image/*" style="display:none" onchange="pv(this, '${qKey}')">
+         <input type="file" id="fileInput_${qKey}" accept="image/*" capture="environment" style="display:none" onchange="pv(this, '${qKey}')">
         </div>
         </div>`;
       });
@@ -132,11 +132,12 @@
       itemsDiv.appendChild(card);
     }
     
-    function pv(input, qKey) {
+  function pv(input, qKey) {
       if (input.files && input.files[0]) {
-        // ดักจับไม่ให้เกิน 3 รูป
+        // เช็คว่ารูปเกินโควต้า 3 รูปหรือไม่
         if(imgB64[qKey].length >= 3) {
             Swal.fire('จำกัดจำนวน', 'ถ่ายภาพได้สูงสุด 3 รูปต่อข้อเท่านั้น', 'warning');
+            input.value = ""; // เคลียร์ค่าทิ้ง
             return;
         }
 
@@ -154,9 +155,11 @@
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
             
-            // นำรูปล่าสุดดันเข้า Array
+            // นำรูปล่าสุดที่เพิ่งถ่ายดันเข้า Array
             imgB64[qKey].push(canvas.toDataURL("image/jpeg", 0.7));
-            renderPhotos(qKey); // เรียกฟังก์ชันแสดงภาพ
+            
+            // แสดงภาพและเช็คว่าครบ 3 รูปหรือยัง
+            renderPhotos(qKey);
             
             document.getElementById('loading').style.display = 'none';
           };
