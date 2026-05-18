@@ -15,11 +15,11 @@
     .card { background: var(--card-bg); border-radius: 18px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; border: none; }
     .btn-back { display: inline-block; margin-bottom: 5px; text-decoration: none; color: rgba(255,255,255,0.9); font-size: 0.85rem; }
     label { font-weight: 600; font-size: 0.95rem; display: block; margin-bottom: 8px; color: #555; }
-    /* เพิ่มการรองรับ CSS ของ input number */
     input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 14px; margin: 5px 0 15px; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Prompt', sans-serif; font-size: 16px; background-color: #f9f9f9; transition: border 0.3s; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background-color: #fff; }
     textarea:required { border-left: 4px solid var(--danger); background-color: #fff5f5; }
-    .check-item { background: #fff; padding: 15px 0; border-bottom: 1px solid #eee; margin-bottom: 10px; }
+    /* เพิ่ม Transition ให้พื้นหลังเปลี่ยนสีแบบนุ่มนวล */
+    .check-item { background: #fff; padding: 15px; border-bottom: 1px solid #eee; margin-bottom: 10px; border-radius: 8px; transition: background-color 0.3s; }
     .check-item:last-child { border-bottom: none; }
     .check-item small { font-size: 1rem; color: var(--text); font-weight: 600; line-height: 1.4; display: block; margin-bottom: 12px; }
     .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0; }
@@ -50,6 +50,7 @@
     <form id="f">
       <div class="card">
         <label><i class="fas fa-user-edit"></i> ชื่อผู้ตรวจสอบ</label>
+        <!-- ชื่อและแผนกยังคงบังคับกรอก (required) ตามปกติ -->
         <input type="text" name="inspector" placeholder="ระบุชื่อ-นามสกุล" required>
         
         <label><i class="fas fa-map-marker-alt"></i> พื้นที่สำรวจ</label>
@@ -90,11 +91,16 @@
       s4: { title: "4. สารเคมี", qs: ["ไม่มีสารเคมีหกรั่วไหล", "ภาชนะปิดสนิท/มีฉลากชัดเจน", "มีอุปกรณ์ Spill Kit พร้อมใช้"] },
       s5: { title: "5. ไฟฟ้า", qs: ["อุปกรณ์ไฟฟ้า/ปลั๊กไฟไม่ชำรุด", "ไม่มีการต่อพ่วงไฟฟ้าชั่วคราว", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย"] },
       s6: { title: "6. อุปกรณ์ฉุกเฉิน", qs: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน"] },
-      s7: { title: "7. อื่นๆ", qs: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
+      s7: { title: "7. อื่นๆ (ไม่บังคับ)", qs: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
 
     let imgB64 = {}; 
     const itemsDiv = document.getElementById('items');
+
+    // ฟังก์ชันล้างสีแดงเมื่อผู้ใช้เริ่มกรอกข้อมูล
+    function clearError(id) {
+      document.getElementById(id).style.backgroundColor = '#fff';
+    }
     
     for(let s in dataStructure) {
       let sNum = s.replace('s', '');
@@ -105,36 +111,34 @@
       dataStructure[s].qs.forEach((q, i) => {
         let qKey = `${s}_q${i}`; 
         let remarkName = `section${sNum}_remark${i}`;
+        let itemDivId = `item_${sNum}_${i}`; // ID สำหรับเปลี่ยนสีพื้นหลัง
         imgB64[qKey] = []; 
 
-        // ตรวจสอบ: ถ้าเป็นข้อ "วอเตอร์" ให้แสดงเป็นช่องกรอกตัวเลข
         if (s === 's1' && q === 'วอเตอร์') {
-           htmlStr += `<div class="check-item"><small>${i+1}. ${q}</small>
+           htmlStr += `<div class="check-item" id="${itemDivId}" style="padding:15px;"><small>${i+1}. ${q}</small>
             <div style="margin: 10px 0; display:flex; align-items:center;">
-              <input type="number" step="any" name="water_val" id="water_val" placeholder="ระบุตัวเลข" style="width:130px; margin:0; padding:10px;" required 
-                oninput="evalWater(this.value, '${sNum}', ${i}, '${remarkName}')">
+              <input type="number" step="any" name="water_val" id="water_val" placeholder="ระบุตัวเลข" style="width:130px; margin:0; padding:10px;" 
+                oninput="evalWater(this.value, '${sNum}', ${i}, '${remarkName}'); clearError('${itemDivId}');">
               <span style="margin-left: 10px; font-weight:600; color:#555;">%</span>
               <span id="water_badge" style="padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-left: 15px; display:none;"></span>
             </div>
-            <!-- สร้าง input แบบซ่อน เพื่อส่งค่า ดี/ไม่ดี กลับไปให้ระบบประมวลผลตามโครงสร้างเดิม -->
             <input type="hidden" name="section${sNum}_q${i}" id="hidden_s${sNum}q${i}" value="">
-            <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..."></textarea>
+            <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..." oninput="clearError('${itemDivId}')"></textarea>
            `;
         } else {
-           // โครงสร้างข้ออื่นๆ (Radio button ปกติ)
-           htmlStr += `<div class="check-item"><small>${i+1}. ${q}</small><div class="options">
-             <input type="radio" name="section${sNum}_q${i}" id="s${sNum}y${i}" value="ดี" required 
-               onchange="document.getElementsByName('${remarkName}')[0].required = false; document.getElementsByName('${remarkName}')[0].placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...';">
+           // ปลดเอา required ของ HTML ออก เพื่อให้ JS เราเป็นตัวจัดการเช็คเอง
+           htmlStr += `<div class="check-item" id="${itemDivId}" style="padding:15px;"><small>${i+1}. ${q}</small><div class="options">
+             <input type="radio" name="section${sNum}_q${i}" id="s${sNum}y${i}" value="ดี" 
+               onchange="document.getElementsByName('${remarkName}')[0].required = false; document.getElementsByName('${remarkName}')[0].placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...'; clearError('${itemDivId}');">
              <label for="s${sNum}y${i}"><i class="fas fa-check-circle"></i> ปกติ</label>
              
              <input type="radio" name="section${sNum}_q${i}" id="s${sNum}n${i}" value="ไม่ดี" 
-               onchange="document.getElementsByName('${remarkName}')[0].required = true; document.getElementsByName('${remarkName}')[0].placeholder = '* กรุณาระบุรายละเอียด (บังคับ)';">
+               onchange="document.getElementsByName('${remarkName}')[0].required = true; document.getElementsByName('${remarkName}')[0].placeholder = '* กรุณาระบุรายละเอียด (บังคับ)'; clearError('${itemDivId}');">
              <label for="s${sNum}n${i}"><i class="fas fa-exclamation-triangle"></i> ไม่ปกติ</label>
            </div>
-           <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..."></textarea>`;
+           <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..." oninput="clearError('${itemDivId}')"></textarea>`;
         }
         
-        // ชุดกล้องและคอมเมนต์ใต้รูปที่ใช้ร่วมกัน
         htmlStr += `
         <div class="camera-box">
           <div id="preview-container_${qKey}" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:5px;"></div>
@@ -150,7 +154,6 @@
       itemsDiv.appendChild(card);
     }
     
-    // ฟังก์ชันคำนวณและประเมินค่า "วอเตอร์" แบบเรียลไทม์
     function evalWater(val, sNum, i, remarkName) {
       const hiddenInput = document.getElementById(`hidden_s${sNum}q${i}`);
       const badge = document.getElementById('water_badge');
@@ -205,10 +208,7 @@
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
             
-            imgB64[qKey].push({
-              b64: canvas.toDataURL("image/jpeg", 0.7),
-              caption: ""
-            });
+            imgB64[qKey].push({ b64: canvas.toDataURL("image/jpeg", 0.7), caption: "" });
             
             renderPhotos(qKey); 
             document.getElementById('loading').style.display = 'none';
@@ -246,11 +246,8 @@
         `;
       });
 
-      if(imgB64[qKey].length >= 3) {
-          placeholder.style.display = 'none';
-      } else {
-          placeholder.style.display = 'block';
-      }
+      if(imgB64[qKey].length >= 3) { placeholder.style.display = 'none'; } 
+      else { placeholder.style.display = 'block'; }
       document.getElementById(`fileInput_${qKey}`).value = ""; 
     }
 
@@ -258,26 +255,67 @@
       e.preventDefault();
       const fd = new FormData(this);
       let isValid = true;
-      let errorMsg = "";
+      let firstErrorElement = null;
 
+      // ระบบล้างสีแดงที่เคยเตือนออกก่อนเริ่มเช็คใหม่
+      document.querySelectorAll('.check-item').forEach(el => el.style.backgroundColor = '#fff');
+
+      // ตรวจสอบข้อมูลก่อนส่ง
       for(let s in dataStructure) {
         let sNum = s.replace('s', '');
+        let isOptional = (s === 's7'); // s7 เป็นหมวดไม่บังคับ
+
         for(let i=0; i<dataStructure[s].qs.length; i++) {
+          let itemDivId = `item_${sNum}_${i}`;
+          let itemDiv = document.getElementById(itemDivId);
+          let remarkElem = document.getElementsByName(`section${sNum}_remark${i}`)[0];
+
+          // 1. ตรวจสอบข้อพิเศษ (วอเตอร์)
+          if(s === 's1' && dataStructure[s].qs[i] === 'วอเตอร์') {
+              let waterVal = fd.get('water_val');
+              if(!isOptional && (!waterVal || waterVal.trim() === "")) {
+                  isValid = false;
+                  itemDiv.style.backgroundColor = '#ffebee'; // เปลี่ยนพื้นหลังเป็นสีแดง
+                  if(!firstErrorElement) firstErrorElement = itemDiv;
+              } else if (waterVal !== "" && parseFloat(waterVal) < 50) {
+                  let remark = fd.get(`section${sNum}_remark${i}`);
+                  if(!remark || remark.trim() === "") {
+                      isValid = false;
+                      itemDiv.style.backgroundColor = '#ffebee';
+                      if(!firstErrorElement) firstErrorElement = remarkElem;
+                  }
+              }
+              continue; // ตรวจวอเตอร์เสร็จ ข้ามไปข้อถัดไป
+          }
+
+          // 2. ตรวจสอบ Radio Button ปกติ
           let status = fd.get(`section${sNum}_q${i}`);
           let remark = fd.get(`section${sNum}_remark${i}`);
           
-          if(status === "ไม่ดี" && (!remark || remark.trim() === "")) {
-            isValid = false;
-            errorMsg = `กรุณาระบุหมายเหตุในหัวข้อ:<br><b style="color:var(--danger)">${dataStructure[s].qs[i]}</b>`;
-            document.getElementsByName(`section${sNum}_remark${i}`)[0].focus();
-            break; 
+          if(!isOptional && !status) { // ถ้าไม่ใช่ S7 แล้วไม่ได้เลือก (ว่าง)
+              isValid = false;
+              itemDiv.style.backgroundColor = '#ffebee'; // สีแดงเตือน
+              if(!firstErrorElement) firstErrorElement = itemDiv;
+          } else if(status === "ไม่ดี" && (!remark || remark.trim() === "")) { // ถ้าเลือกไม่ดี ต้องบังคับใส่หมายเหตุ
+              isValid = false;
+              itemDiv.style.backgroundColor = '#ffebee';
+              if(!firstErrorElement) firstErrorElement = remarkElem;
           }
         }
-        if(!isValid) break;
       }
 
+      // ถ้ายืนยันข้อมูลไม่ผ่าน ให้เด้งแจ้งเตือนและเลื่อนจอไปตรงที่ลืมกรอก
       if(!isValid) {
-        Swal.fire({ title: 'ข้อมูลไม่ครบถ้วน', html: errorMsg, icon: 'warning', confirmButtonColor: '#e74c3c' });
+        Swal.fire({ 
+          title: 'ข้อมูลไม่ครบถ้วน', 
+          text: 'กรุณาตรวจสอบและกรอกข้อมูลในหัวข้อที่ถูกเน้นด้วยพื้นหลังสีแดง', 
+          icon: 'warning', 
+          confirmButtonColor: '#e74c3c' 
+        });
+        if(firstErrorElement) {
+            firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if(firstErrorElement.tagName === 'TEXTAREA') firstErrorElement.focus();
+        }
         return; 
       }
 
@@ -286,9 +324,14 @@
       const ck = (s) => {
         let st = "ดี";
         const sNum = s.replace('s', '');
+        let hasData = false;
         for(let i=0; i<dataStructure[s].qs.length; i++) {
-          if(fd.get(`section${sNum}_q${i}`) === "ไม่ดี") { st = "ไม่ดี"; break; }
+          let val = fd.get(`section${sNum}_q${i}`);
+          if(val) hasData = true;
+          if(val === "ไม่ดี") { st = "ไม่ดี"; break; }
         }
+        // หมวด 7 ถ้าไม่ได้กรอกอะไรเลย ส่งค่า "ดี" ไปเพื่อให้ระบบประมวลผลผ่าน
+        if(s === 's7' && !hasData) return "ดี";
         return st;
       };
 
