@@ -18,7 +18,6 @@
     input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 14px; margin: 5px 0 15px; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Prompt', sans-serif; font-size: 16px; background-color: #f9f9f9; transition: border 0.3s; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background-color: #fff; }
     textarea:required { border-left: 4px solid var(--danger); background-color: #fff5f5; }
-    /* เพิ่ม Transition ให้พื้นหลังเปลี่ยนสีแบบนุ่มนวล */
     .check-item { background: #fff; padding: 15px; border-bottom: 1px solid #eee; margin-bottom: 10px; border-radius: 8px; transition: background-color 0.3s; }
     .check-item:last-child { border-bottom: none; }
     .check-item small { font-size: 1rem; color: var(--text); font-weight: 600; line-height: 1.4; display: block; margin-bottom: 12px; }
@@ -50,16 +49,15 @@
     <form id="f">
       <div class="card">
         <label><i class="fas fa-user-edit"></i> ชื่อผู้ตรวจสอบ</label>
-        <!-- ชื่อและแผนกยังคงบังคับกรอก (required) ตามปกติ -->
         <input type="text" name="inspector" placeholder="ระบุชื่อ-นามสกุล" required>
         
         <label><i class="fas fa-map-marker-alt"></i> พื้นที่สำรวจ</label>
-     <select name="area" onchange="toggleWaterMistByArea(this.value)" required>
+        <select name="area" onchange="toggleWaterMistByArea(this.value)" required>
           <option value="">-- เลือกแผนก --</option>
           <option value="แผนก Print">1. แผนก Print</option>
           <option value="แผนก Laminate">2. แผนก Laminate</option>
           <option value="แผนก Solvent">2. แผนก Solvent</option>
-          <option value="แผนก Rewinder / Slitter / Packing">3. แผนก Rewider / Slitter / Packing</option>
+          <option value="แผนก Rewinder / Slitter / Packing">3. แผนก Rewinder / Slitter / Packing</option>
           <option value="แผนก BAG MAKING">4. แผนก BAG MAKING</option>
           <option value="แผนก QA & QC">5. แผนก QA & QC</option>
           <option value="แผนก Warehouse">6. แผนก Warehouse</option>
@@ -85,8 +83,9 @@
 
     const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
 
+    // อัปเดตคีย์ข้อสุดท้ายของหมวด 1 เป็น "Water Mist" ให้ตรงระบบตรวจจับ
     const dataStructure = {
-      s1: { title: "1. สถานที่ทำงาน", qs: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "วอเตอร์"] },
+      s1: { title: "1. สถานที่ทำงาน", qs: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "Water Mist"] },
       s2: { title: "2. ท่าทางการทำงาน", qs: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์", "การยกของอย่างถูกต้องและปลอดภัย"] },
       s3: { title: "3. เครื่องจักร", qs: ["สวมใส่อุปกรณ์ป้องกันอันตราย (PPE)", "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย"] },
       s4: { title: "4. สารเคมี", qs: ["ไม่มีสารเคมีหกรั่วไหล", "ภาชนะปิดสนิท/มีฉลากชัดเจน", "มีอุปกรณ์ Spill Kit พร้อมใช้"] },
@@ -98,7 +97,6 @@
     let imgB64 = {}; 
     const itemsDiv = document.getElementById('items');
 
-    // ฟังก์ชันล้างสีแดงเมื่อผู้ใช้เริ่มกรอกข้อมูล
     function clearError(id) {
       document.getElementById(id).style.backgroundColor = '#fff';
     }
@@ -109,15 +107,13 @@
       card.className = 'card';
       let htmlStr = `<h4 style="color:var(--primary-dark); margin: 0 0 15px 0; border-left: 4px solid var(--primary); padding-left: 10px;">${dataStructure[s].title}</h4>`;
       
-     dataStructure[s].qs.forEach((q, i) => {
+      dataStructure[s].qs.forEach((q, i) => {
         let qKey = `${s}_q${i}`; 
         let remarkName = `section${sNum}_remark${i}`;
         let itemDivId = `item_${sNum}_${i}`; 
         imgB64[qKey] = []; 
 
-        // ตรวจสอบว่าเป็นข้อ "Water Mist" หรือไม่
         if (s === 's1' && q === 'Water Mist') {
-           // ใส่สไตล์ display:none ไว้เป็นค่าเริ่มต้น (ซ่อนไว้ก่อน) และเพิ่ม class="water-mist-block" เพื่อให้ควบคุมง่าย
            htmlStr += `<div class="check-item water-mist-block" id="${itemDivId}" style="padding:15px; display:none;"><small>${i+1}. ${q}</small>
             <div style="margin: 10px 0; display:flex; align-items:center;">
               <input type="number" step="any" name="water_val" id="water_val" placeholder="ระบุตัวเลข" style="width:130px; margin:0; padding:10px;" 
@@ -129,7 +125,6 @@
             <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..." oninput="clearError('${itemDivId}')"></textarea>
            `;
         } else {
-           // ข้ออื่นๆ โค้ดเดิมปกติ...
            htmlStr += `<div class="check-item" id="${itemDivId}" style="padding:15px;"><small>${i+1}. ${q}</small><div class="options">
              <input type="radio" name="section${sNum}_q${i}" id="s${sNum}y${i}" value="ดี" 
                onchange="document.getElementsByName('${remarkName}')[0].required = false; document.getElementsByName('${remarkName}')[0].placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...'; clearError('${itemDivId}');">
@@ -157,19 +152,16 @@
       itemsDiv.appendChild(card);
     }
 
-
-    // ฟังก์ชันเปิด-ปิดการแสดงผลข้อ Water Mist ตามแผนกที่เลือก
     function toggleWaterMistByArea(selectedArea) {
       const waterBlock = document.querySelector('.water-mist-block');
       const waterInput = document.getElementById('water_val');
-      const hiddenInput = document.getElementById('hidden_s1q4'); // s1 ข้อ 5 (index คือ 4)
+      const hiddenInput = document.getElementById('hidden_s1q4'); 
       
       if (!waterBlock) return;
 
       if (selectedArea === "แผนก Print" || selectedArea === "แผนก Laminate") {
-        waterBlock.style.display = 'block'; // แสดงผล
+        waterBlock.style.display = 'block'; 
       } else {
-        // ซ่อนฟิลด์ และเคลียร์ค่าทิ้งอัตโนมัติหากเปลี่ยนไปแผนกอื่น เพื่อไม่ให้เกิด Error ข้อมูลค้าง
         waterBlock.style.display = 'none'; 
         if(waterInput) waterInput.value = "";
         if(hiddenInput) hiddenInput.value = "";
@@ -177,6 +169,7 @@
         if(badge) badge.style.display = 'none';
       }
     }
+
     function evalWater(val, sNum, i, remarkName) {
       const hiddenInput = document.getElementById(`hidden_s${sNum}q${i}`);
       const badge = document.getElementById('water_badge');
@@ -247,8 +240,11 @@
       renderPhotos(qKey);
     }
 
+    // แก้ไขฟังก์ชันอัปเดตแคปชันให้ทำงานได้อย่างสมบูรณ์
     function updateCaption(qKey, index, value) {
-      imgB64[qKey][index].caption = value;
+      if(imgB64[qKey] && imgB64[qKey][index]) {
+        imgB64[qKey][index].caption = value;
+      }
     }
 
     function renderPhotos(qKey) {
@@ -280,23 +276,20 @@
       let isValid = true;
       let firstErrorElement = null;
 
-      // ระบบล้างสีแดงที่เคยเตือนออกก่อนเริ่มเช็คใหม่
       document.querySelectorAll('.check-item').forEach(el => el.style.backgroundColor = '#fff');
 
-      // ตรวจสอบข้อมูลก่อนส่ง
       for(let s in dataStructure) {
         let sNum = s.replace('s', '');
-        let isOptional = (s === 's7'); // s7 เป็นหมวดไม่บังคับ
+        let isOptional = (s === 's7');
 
         for(let i=0; i<dataStructure[s].qs.length; i++) {
           let itemDivId = `item_${sNum}_${i}`;
           let itemDiv = document.getElementById(itemDivId);
           let remarkElem = document.getElementsByName(`section${sNum}_remark${i}`)[0];
 
-         // 1. ตรวจสอบข้อพิเศษ (Water Mist)
+          // 1. ตรวจสอบข้อพิเศษ (Water Mist)
           if(s === 's1' && dataStructure[s].qs[i] === 'Water Mist') {
               let currentArea = fd.get('area');
-              // บังคับตรวจเฉพาะ แผนก Print และ แผนก Laminate เท่านั้น
               if(currentArea === "แผนก Print" || currentArea === "แผนก Laminate") {
                   let waterVal = fd.get('water_val');
                   if(!waterVal || waterVal.trim() === "") {
@@ -312,18 +305,18 @@
                       }
                   }
               }
-              continue; // ข้ามฟังก์ชันตรวจวิทยุปกติสำหรับข้อนี้
+              continue; 
           }
 
           // 2. ตรวจสอบ Radio Button ปกติ
           let status = fd.get(`section${sNum}_q${i}`);
           let remark = fd.get(`section${sNum}_remark${i}`);
           
-          if(!isOptional && !status) { // ถ้าไม่ใช่ S7 แล้วไม่ได้เลือก (ว่าง)
+          if(!isOptional && !status) { 
               isValid = false;
-              itemDiv.style.backgroundColor = '#ffebee'; // สีแดงเตือน
+              itemDiv.style.backgroundColor = '#ffebee'; 
               if(!firstErrorElement) firstErrorElement = itemDiv;
-          } else if(status === "ไม่ดี" && (!remark || remark.trim() === "")) { // ถ้าเลือกไม่ดี ต้องบังคับใส่หมายเหตุ
+          } else if(status === "ไม่ดี" && (!remark || remark.trim() === "")) { 
               isValid = false;
               itemDiv.style.backgroundColor = '#ffebee';
               if(!firstErrorElement) firstErrorElement = remarkElem;
@@ -331,7 +324,6 @@
         }
       }
 
-      // ถ้ายืนยันข้อมูลไม่ผ่าน ให้เด้งแจ้งเตือนและเลื่อนจอไปตรงที่ลืมกรอก
       if(!isValid) {
         Swal.fire({ 
           title: 'ข้อมูลไม่ครบถ้วน', 
@@ -341,7 +333,7 @@
         });
         if(firstErrorElement) {
             firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            if(firstErrorElement.tagName === 'TEXTAREA') firstErrorElement.focus();
+            if(firstErrorElement.tagName === 'TEXTAREA' || firstErrorElement.tagName === 'INPUT') firstErrorElement.focus();
         }
         return; 
       }
@@ -355,9 +347,19 @@
         for(let i=0; i<dataStructure[s].qs.length; i++) {
           let val = fd.get(`section${sNum}_q${i}`);
           if(val) hasData = true;
-          if(val === "ไม่ดี") { st = "ไม่ดี"; break; }
+          if(val === "ไม่ดี") { st = "not_good"; break; } // ป้องกันปัญหาระบบหลังบ้านรับค่าผิดเพี้ยน
         }
-        // หมวด 7 ถ้าไม่ได้กรอกอะไรเลย ส่งค่า "ดี" ไปเพื่อให้ระบบประมวลผลผ่าน
+        
+        // ตรวจสอบข้อพิเศษกรณีส่งสถานะกลุ่มหลัก
+        if(s === 's1') {
+           let currentArea = fd.get('area');
+           if(currentArea === "แผนก Print" || currentArea === "แผนก Laminate") {
+              let waterVal = fd.get('water_val');
+              if(waterVal && parseFloat(waterVal) < 50) return "ไม่ดี";
+           }
+        }
+        
+        if(st === "not_good") return "ไม่ดี";
         if(s === 's7' && !hasData) return "ดี";
         return st;
       };
