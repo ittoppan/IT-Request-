@@ -28,8 +28,10 @@
     input[value="ไม่ดี"]:checked + label { background: #ffebee; color: #c62828; border-color: #c62828; }
     .btn-submit { width: 100%; background: linear-gradient(to right, #f39c12, #e67e22); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3); margin-top: 10px; }
     .btn-submit:active { transform: scale(0.98); }
-    .camera-box { background: #fafafa; padding: 12px; border-radius: 12px; color: #7f8c8d; transition: all 0.3s; margin-top: 8px; border: 1px solid #eee; }
     .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
+    /* เพิ่มสไตล์ปุ่มกล้องแบบคู่ */
+    .btn-cam-split { flex: 1; text-align: center; cursor: pointer; padding: 12px; border: 2px dashed #d1d8e0; border-radius: 10px; background: #fff; transition: 0.2s; }
+    .btn-cam-split:active { background: #f0f0f0; }
   </style>
 </head>
 <body>
@@ -136,15 +138,27 @@
            <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..." oninput="clearError('${itemDivId}')"></textarea>`;
         }
         
+        // ==========================================
+        // อัปเดตส่วนปุ่มให้แยกเป็น 2 ปุ่ม: ถ่ายรูป กับ เลือกรูป
+        // ==========================================
         htmlStr += `
-        <div class="camera-box">
+        <div style="background: #fafafa; padding: 12px; border-radius: 12px; border: 1px solid #eee; margin-top: 8px;">
           <div id="preview-container_${qKey}" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:5px;"></div>
-          <div id="camera-placeholder_${qKey}" style="text-align:center; cursor:pointer; padding:15px; border:2px dashed #d1d8e0; border-radius:10px; background:#fff;" onclick="document.getElementById('fileInput_${qKey}').click()">
-            <i class="fas fa-camera" style="color: var(--primary); font-size:1.2rem;"></i>
-            <span style="font-size: 0.85rem; font-weight: 600; color: #7f8c8d; margin-left:5px;">เพิ่มภาพประกอบ / เลือกจากอัลบั้ม (สูงสุด 3 รูป)</span>
+          
+          <div id="camera-placeholder_${qKey}" style="display:flex; gap:10px;">
+            <div class="btn-cam-split" onclick="document.getElementById('fileInputCam_${qKey}').click()">
+              <i class="fas fa-camera" style="color: var(--primary); font-size:1.2rem;"></i>
+              <div style="font-size: 0.8rem; font-weight: 600; color: #7f8c8d; margin-top:5px;">ถ่ายรูป</div>
+            </div>
+            <div class="btn-cam-split" onclick="document.getElementById('fileInputGal_${qKey}').click()">
+              <i class="fas fa-images" style="color: var(--primary); font-size:1.2rem;"></i>
+              <div style="font-size: 0.8rem; font-weight: 600; color: #7f8c8d; margin-top:5px;">เลือกรูป</div>
+            </div>
           </div>
-          <!-- ถอนคำสั่ง capture="environment" ออกเพื่อให้เลือกรูปภาพจากมือถือได้ -->
-          <input type="file" id="fileInput_${qKey}" accept="image/*" style="display:none" onchange="pv(this, '${qKey}')">
+          
+          <!-- แยก input สองตัว: ตัวนึงบังคับกล้อง (capture) อีกตัวเปิดอัลบั้ม -->
+          <input type="file" id="fileInputCam_${qKey}" accept="image/*" capture="environment" style="display:none" onchange="pv(this, '${qKey}')">
+          <input type="file" id="fileInputGal_${qKey}" accept="image/*" style="display:none" onchange="pv(this, '${qKey}')">
         </div>
         </div>`;
       });
@@ -264,9 +278,16 @@
         `;
       });
 
-      if(imgB64[qKey].length >= 3) { placeholder.style.display = 'none'; } 
-      else { placeholder.style.display = 'block'; }
-      document.getElementById(`fileInput_${qKey}`).value = ""; 
+      // ควบคุมการแสดงผลชุดปุ่มถ่ายรูป/เลือกรูป
+      if(imgB64[qKey].length >= 3) { 
+          placeholder.style.display = 'none'; 
+      } else { 
+          placeholder.style.display = 'flex'; 
+      }
+      
+      // ล้างค่า input ทั้งสองตัวเพื่อให้กดเลือกรูปเดิมซ้ำได้เผื่อผู้ใช้ลบแล้วจะลงใหม่
+      document.getElementById(`fileInputCam_${qKey}`).value = ""; 
+      document.getElementById(`fileInputGal_${qKey}`).value = ""; 
     }
 
     document.getElementById('f').onsubmit = function(e) {
