@@ -83,7 +83,6 @@
 
     const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
 
-    // อัปเดตคีย์ข้อสุดท้ายของหมวด 1 เป็น "Water Mist" ให้ตรงระบบตรวจจับ
     const dataStructure = {
       s1: { title: "1. สถานที่ทำงาน", qs: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "Water Mist"] },
       s2: { title: "2. ท่าทางการทำงาน", qs: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์", "การยกของอย่างถูกต้องและปลอดภัย"] },
@@ -142,9 +141,10 @@
           <div id="preview-container_${qKey}" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:5px;"></div>
           <div id="camera-placeholder_${qKey}" style="text-align:center; cursor:pointer; padding:15px; border:2px dashed #d1d8e0; border-radius:10px; background:#fff;" onclick="document.getElementById('fileInput_${qKey}').click()">
             <i class="fas fa-camera" style="color: var(--primary); font-size:1.2rem;"></i>
-            <span style="font-size: 0.85rem; font-weight: 600; color: #7f8c8d; margin-left:5px;">เพิ่มภาพประกอบ (สูงสุด 3 รูป)</span>
+            <span style="font-size: 0.85rem; font-weight: 600; color: #7f8c8d; margin-left:5px;">เพิ่มภาพประกอบ / เลือกจากอัลบั้ม (สูงสุด 3 รูป)</span>
           </div>
-          <input type="file" id="fileInput_${qKey}" accept="image/*" capture="environment" style="display:none" onchange="pv(this, '${qKey}')">
+          <!-- ถอนคำสั่ง capture="environment" ออกเพื่อให้เลือกรูปภาพจากมือถือได้ -->
+          <input type="file" id="fileInput_${qKey}" accept="image/*" style="display:none" onchange="pv(this, '${qKey}')">
         </div>
         </div>`;
       });
@@ -240,7 +240,6 @@
       renderPhotos(qKey);
     }
 
-    // แก้ไขฟังก์ชันอัปเดตแคปชันให้ทำงานได้อย่างสมบูรณ์
     function updateCaption(qKey, index, value) {
       if(imgB64[qKey] && imgB64[qKey][index]) {
         imgB64[qKey][index].caption = value;
@@ -287,7 +286,6 @@
           let itemDiv = document.getElementById(itemDivId);
           let remarkElem = document.getElementsByName(`section${sNum}_remark${i}`)[0];
 
-          // 1. ตรวจสอบข้อพิเศษ (Water Mist)
           if(s === 's1' && dataStructure[s].qs[i] === 'Water Mist') {
               let currentArea = fd.get('area');
               if(currentArea === "แผนก Print" || currentArea === "แผนก Laminate") {
@@ -308,7 +306,6 @@
               continue; 
           }
 
-          // 2. ตรวจสอบ Radio Button ปกติ
           let status = fd.get(`section${sNum}_q${i}`);
           let remark = fd.get(`section${sNum}_remark${i}`);
           
@@ -347,10 +344,9 @@
         for(let i=0; i<dataStructure[s].qs.length; i++) {
           let val = fd.get(`section${sNum}_q${i}`);
           if(val) hasData = true;
-          if(val === "ไม่ดี") { st = "not_good"; break; } // ป้องกันปัญหาระบบหลังบ้านรับค่าผิดเพี้ยน
+          if(val === "ไม่ดี") { st = "not_good"; break; }
         }
         
-        // ตรวจสอบข้อพิเศษกรณีส่งสถานะกลุ่มหลัก
         if(s === 's1') {
            let currentArea = fd.get('area');
            if(currentArea === "แผนก Print" || currentArea === "แผนก Laminate") {
