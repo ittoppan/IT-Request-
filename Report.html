@@ -195,7 +195,7 @@
       });
     }
 
-    function renderTable() {
+  function renderTable() {
       const areaVal = document.getElementById('areaFilter').value;
       const statusVal = document.getElementById('statusFilter').value;
       const reportContent = document.getElementById('reportContent');
@@ -211,8 +211,11 @@
          return;
       }
 
-filteredData.forEach((item, index) => {
-        // ส่วนของการสร้างลิงก์ปุ่มกดไปหน้า Resolve (ถ้าสถานะยัง Open)
+      filteredData.forEach((item, index) => {
+        // 🎨 กำหนดสีพื้นหลังของแถว (Row) ตามสถานะที่ตรวจพบ
+        // สีแดงอ่อน (Open) = #fff5f5, สีเขียวอ่อน (Closed) = #f0fbf0
+        let rowBgColor = item.status === 'Open' ? '#fff5f5' : '#f0fbf0';
+        
         let actionButtonHtml = "";
         if (item.status === 'Open') {
            actionButtonHtml = `<a href="resolve.html?jobid=${item.jobId}" style="background-color: #e74c3c; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px; display: inline-block; box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3); transition: 0.2s;"><i class="fas fa-wrench"></i> คลิกเพื่ออัปเดตงาน</a>`;
@@ -220,22 +223,21 @@ filteredData.forEach((item, index) => {
            actionButtonHtml = '<span style="color:#aaa;">-</span>';
         }
 
+        // แทรกรหัสสีลงไปใน <tr style="...">
         let row = `
-          <tr>
+          <tr style="background-color: ${rowBgColor}; border-bottom: 2px solid #fff;">
             <td data-label="📌 ลำดับ">${index + 1}</td>
             <td data-label="📷 รูปภาพ (ก่อนแก้)">${item.picBefore ? `<img src="${getDriveThumb(item.picBefore)}" class="img-box" onclick="window.open('${item.picBefore}')">` : '<span style="color:#aaa;">-</span>'}</td>
-            
             <td data-label="🛠️ รูปภาพ (หลังแก้)">${item.picAfter ? `<img src="${getDriveThumb(item.picAfter)}" class="img-box" onclick="window.open('${item.picAfter}')">` : actionButtonHtml}</td>
-            
             <td data-label="📍 พื้นที่ (Area)"><b>${item.area}</b></td>
             <td data-label="🏷️ JOB NO." style="color:#2980b9;"><b>${item.jobId}</b></td>
-            <td data-label="⚠️ รายละเอียดปัญหา" style="text-align:left;">${item.problem}</td> 
+            <td data-label="⚠️ รายละเอียดปัญหา" style="text-align:left;">${item.remark}</td> 
             <td data-label="✅ แนวทางการแก้ไข" style="text-align:left;">${item.correctiveAction || '<span style="color:#aaa;">-</span>'}</td>
             <td data-label="👤 ผู้รับผิดชอบ">${item.picName || '<span style="color:#aaa;">-</span>'}</td>
             <td data-label="📅 วันที่พบ">${item.dateFound}</td>
             <td data-label="⏳ วันครบกำหนด" style="color:#e74c3c; font-weight:bold;">${item.dueDate}</td>
             <td data-label="🏁 วันที่ซ่อมเสร็จ">${item.finishDate !== "-" ? `<span class="status-closed"><i class="fas fa-check"></i> ${item.finishDate}</span>` : '<span style="color:#aaa;">-</span>'}</td>
-            <td data-label="📝 หมายเหตุ" style="text-align:left;">${item.remark}</td>
+            <td data-label="📝 หมายเหตุ" style="text-align:left;">${item.problem}</td>
           </tr>
         `;
         reportContent.innerHTML += row;
