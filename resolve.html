@@ -169,7 +169,7 @@
         document.getElementById('loading').style.display = 'none';
         if(res.status === 'success') {
            Swal.fire('ยอดเยี่ยม!', 'บันทึกการแก้ไขและปิดงานสำเร็จ', 'success').then(() => {
-             window.location.href = "https://itrequests.netlify.app/safety"; // กลับไปหน้า Dashboard/Safety
+             window.location.href = "https://itrequests.netlify.app/report"; // กลับไปหน้า Dashboard/Safety
            });
         } else {
            Swal.fire('เกิดข้อผิดพลาด', res.message, 'error');
