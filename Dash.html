@@ -83,12 +83,6 @@
 
   <div class="container">
     
-    <div class="card-action-summary" style="background:white; border-radius:12px; padding:20px; margin-bottom:25px; border-left: 5px solid #e74c3c; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-      <h3 style="margin-top:0; color:#e74c3c; font-size:1.1rem;"><i class="fas fa-tools"></i> งานซ่อมที่ยังรอดำเนินการ (Pending Action)</h3>
-      <div id="pendingJobsList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px; margin-top:15px;">
-         </div>
-    </div>
-
     <div class="date-filter-box">
       <i class="fas fa-calendar-alt" style="color:var(--primary); font-size:1.2rem;"></i>
       <input type="date" id="dateFilter" onchange="loadData()">
@@ -132,39 +126,6 @@
         return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w500`;
       }
       return url; 
-    }
-
-    // ==========================================
-    // 1. ฟังก์ชันโหลดกล่อง Pending Jobs (งานค้าง)
-    // ==========================================
-    function loadPendingJobs() {
-      fetch(API_URL + "?action=getReport")
-      .then(res => res.json())
-      .then(data => {
-        const pendingBox = document.getElementById('pendingJobsList');
-        // กรองเอาเฉพาะงานที่ยัง Open (ค้างอยู่)
-        const pendingData = data.filter(d => d.status === 'Open');
-        
-        if(pendingData.length === 0) {
-           pendingBox.innerHTML = '<p style="color:#7f8c8d; font-weight:bold; margin:0;"><i class="fas fa-check-circle" style="color:var(--success);"></i> สุดยอด! ไม่มีรายการค้างแก้ไขในระบบ</p>';
-           return;
-        }
-        
-        pendingBox.innerHTML = '';
-        pendingData.forEach(job => {
-           pendingBox.innerHTML += `
-             <div style="border:1px solid #fbdcce; padding:15px; border-radius:8px; background:#fffcfb; position:relative;">
-                <div style="font-weight:bold; color:#c0392b; font-size:1.1rem; border-bottom:1px solid #fbdcce; padding-bottom:5px; margin-bottom:10px;">${job.jobId}</div>
-                <div style="font-size:0.85rem; color:#7f8c8d; margin-bottom:5px;"><b>พื้นที่:</b> ${job.area}</div>
-                <div style="font-size:0.9rem; color:#333; line-height:1.4;">${job.problem}</div>
-                <div style="margin-top:15px; text-align:right;">
-                  <a href="https://itrequests.netlify.app/resolve.html?jobid=${job.jobId}" target="_blank" style="display:inline-block; font-size:0.85rem; background:#e74c3c; color:white; padding:6px 12px; border-radius:6px; text-decoration:none; font-weight:600;"><i class="fas fa-wrench"></i> เข้าไปอัปเดตงาน</a>
-                </div>
-             </div>
-           `;
-        });
-      })
-      .catch(err => console.error("Error loading pending jobs", err));
     }
 
     // ==========================================
@@ -291,11 +252,8 @@
       icon.className = isVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
     }
 
-    // เมื่อโหลดหน้าเว็บ ให้ดึงข้อมูลทั้งสองส่วน (Pending Jobs และ Data วันนี้)
-    window.onload = function() {
-       loadPendingJobs();
-       loadData();
-    };
+    // โหลดตารางข้อมูลเมื่อเปิดหน้าเว็บ
+    window.onload = loadData;
   </script>
 </body>
 </html>
