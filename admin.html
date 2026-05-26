@@ -11,7 +11,7 @@
     :root { --primary: #3498db; --success: #27ae60; --warning: #f39c12; --danger: #e74c3c; --bg: #f5f7fa; }
     body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding: 0; }
     
-    .sidebar { width: 220px; background: #2c3e50; color: white; height: 100vh; position: fixed; padding: 20px; }
+    .sidebar { width: 220px; background: #2c3e50; color: white; height: 100vh; position: fixed; padding: 20px; box-sizing: border-box; }
     .sidebar h3 { margin: 0 0 20px; padding-bottom: 15px; border-bottom: 1px solid #34495e; }
     .nav-item { padding: 12px 15px; cursor: pointer; border-radius: 8px; margin: 5px 0; display: flex; align-items: center; gap: 10px; }
     .nav-item:hover, .nav-item.active { background: var(--primary); }
@@ -162,7 +162,9 @@
   </div>
 
   <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
+    // ✅ API_URL - แก้เป็นของคุณที่นี่
+    const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
+    
     let configData = {};
     let currentTab = 'types';
     
@@ -197,7 +199,7 @@
     function loadConfig() {
       Swal.fire({ title: 'กำลังโหลด...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
       
-      fetch(`${API_URL}?action=getConfig`)
+      fetch(API_URL + "?action=getConfig")
         .then(res => res.json())
         .then(data => {
           Swal.close();
@@ -218,10 +220,10 @@
     function populateFilters() {
       const typeOptions = (configData.types || [])
         .filter(t => t.is_active === 'TRUE')
-        .map(t => `<option value="${t.id}">${t.name_th}</option>`)
+        .map(t => '<option value="' + t.id + '">' + t.name_th + '</option>')
         .join('');
       
-      ['filterSectionType', 'filterQType'].forEach(id => {
+      ['filterSectionType', 'filterQType'].forEach(function(id) {
         const el = document.getElementById(id);
         if (el) el.innerHTML = '<option value="">ทั้งหมด</option>' + typeOptions;
       });
@@ -229,10 +231,10 @@
     
     // === Render Functions ===
     function showTab(tab) {
-      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(function(el) { el.style.display = 'none'; });
+      document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
       
-      document.getElementById(`tab-${tab}`).style.display = 'block';
+      document.getElementById('tab-' + tab).style.display = 'block';
       event.currentTarget.classList.add('active');
       currentTab = tab;
       
@@ -259,114 +261,112 @@
     
     function renderTypes() {
       const tbody = document.getElementById('typesTable');
-      tbody.innerHTML = (configData.types || [])
-        .filter(t => t.is_active !== undefined)
-        .map(t => `
-        <tr>
-          <td><strong>${t.name_th}</strong></td>
-          <td>${t.name_en || '-'}</td>
-          <td><span class="badge ${t.is_active==='TRUE'?'badge-active':'badge-inactive'}">
-            ${t.is_active==='TRUE'?'✅ ใช้งาน':'❌ ปิด'}
-          </span></td>
-          <td>
-            <button class="btn btn-sm" onclick="editItem('Config_Types', ${t.id})">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteItem('Config_Types', ${t.id})">🗑️</button>
-          </td>
-        </tr>
-      `).join('') || '<tr><td colspan="4" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
+      const types = configData.types || [];
+      tbody.innerHTML = types.filter(function(t) { return t.is_active !== undefined; })
+        .map(function(t) {
+          return '<tr>' +
+            '<td><strong>' + t.name_th + '</strong></td>' +
+            '<td>' + (t.name_en || '-') + '</td>' +
+            '<td><span class="badge ' + (t.is_active==='TRUE'?'badge-active':'badge-inactive') + '">' +
+              (t.is_active==='TRUE'?'✅ ใช้งาน':'❌ ปิด') + '</span></td>' +
+            '<td>' +
+              '<button class="btn btn-sm" onclick="editItem(\'Config_Types\', ' + t.id + ')">✏️</button> ' +
+              '<button class="btn btn-sm btn-danger" onclick="deleteItem(\'Config_Types\', ' + t.id + ')">🗑️</button>' +
+            '</td>' +
+          '</tr>';
+        }).join('') || '<tr><td colspan="4" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
     }
     
     function renderAreas() {
       const tbody = document.getElementById('areasTable');
       const areas = configData.areas || [];
       
-      tbody.innerHTML = areas.map(a => `
-        <tr>
-          <td><strong>${a.area_name}</strong></td>
-          <td>${a.department || '-'}</td>
-          <td>${a.applicable_types ? 
-            a.applicable_types.split(',').map(id => {
-              const t = (configData.types||[]).find(x=>x.id==id);
-              return t ? `<span class="badge" style="background:#e1f5fe;color:#0277bd;margin:2px;">${t.name_th}</span>` : '';
-            }).join('') : 'ทั้งหมด'
-          }</td>
-          <td><span class="badge ${a.is_active==='TRUE'?'badge-active':'badge-inactive'}">
-            ${a.is_active==='TRUE'?'✅':'❌'}
-          </span></td>
-          <td>
-            <button class="btn btn-sm" onclick="editItem('Config_Areas', ${a.id})">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteItem('Config_Areas', ${a.id})">🗑️</button>
-          </td>
-        </tr>
-      `).join('') || '<tr><td colspan="5" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
+      tbody.innerHTML = areas.map(function(a) {
+        let typesHtml = 'ทั้งหมด';
+        if (a.applicable_types) {
+          typesHtml = a.applicable_types.split(',').map(function(id) {
+            const t = (configData.types||[]).find(function(x){ return x.id == id; });
+            return t ? '<span class="badge" style="background:#e1f5fe;color:#0277bd;margin:2px;">' + t.name_th + '</span>' : '';
+          }).join('');
+        }
+        return '<tr>' +
+          '<td><strong>' + a.area_name + '</strong></td>' +
+          '<td>' + (a.department || '-') + '</td>' +
+          '<td>' + typesHtml + '</td>' +
+          '<td><span class="badge ' + (a.is_active==='TRUE'?'badge-active':'badge-inactive') + '">' +
+            (a.is_active==='TRUE'?'✅':'❌') + '</span></td>' +
+          '<td>' +
+            '<button class="btn btn-sm" onclick="editItem(\'Config_Areas\', ' + a.id + ')">✏️</button> ' +
+            '<button class="btn btn-sm btn-danger" onclick="deleteItem(\'Config_Areas\', ' + a.id + ')">🗑️</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('') || '<tr><td colspan="5" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
     }
     
     function renderSections() {
-      const typeFilter = document.getElementById('filterSectionType')?.value;
+      const typeFilter = document.getElementById('filterSectionType') ? document.getElementById('filterSectionType').value : '';
       const tbody = document.getElementById('sectionsTable');
       
-      let sections = (configData.sections || []).filter(s => s.is_active === 'TRUE');
-      if (typeFilter) sections = sections.filter(s => s.type_id == typeFilter);
-      sections.sort((a,b) => a.order - b.order);
+      let sections = (configData.sections || []).filter(function(s) { return s.is_active === 'TRUE'; });
+      if (typeFilter) sections = sections.filter(function(s) { return s.type_id == typeFilter; });
+      sections.sort(function(a,b) { return (a.order||0) - (b.order||0); });
       
-      tbody.innerHTML = sections.map(s => {
-        const typeName = (configData.types||[]).find(t=>t.id==s.type_id)?.name_th || s.type_id;
-        return `
-        <tr>
-          <td><span class="badge" style="background:#e3f2fd;color:#1565c0;">${typeName}</span></td>
-          <td>${s.order}</td>
-          <td><strong>${s.title_th}</strong></td>
-          <td>${s.is_required==='TRUE'?'✅':'-'}</td>
-          <td>
-            <button class="btn btn-sm" onclick="editItem('Config_Sections', ${s.id})">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteItem('Config_Sections', ${s.id})">🗑️</button>
-          </td>
-        </tr>
-      `}).join('') || '<tr><td colspan="5" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
+      tbody.innerHTML = sections.map(function(s) {
+        const typeName = (configData.types||[]).find(function(t){ return t.id == s.type_id; })?.name_th || s.type_id;
+        return '<tr>' +
+          '<td><span class="badge" style="background:#e3f2fd;color:#1565c0;">' + typeName + '</span></td>' +
+          '<td>' + (s.order || '-') + '</td>' +
+          '<td><strong>' + s.title_th + '</strong></td>' +
+          '<td>' + (s.is_required==='TRUE'?'✅':'-') + '</td>' +
+          '<td>' +
+            '<button class="btn btn-sm" onclick="editItem(\'Config_Sections\', ' + s.id + ')">✏️</button> ' +
+            '<button class="btn btn-sm btn-danger" onclick="deleteItem(\'Config_Sections\', ' + s.id + ')">🗑️</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('') || '<tr><td colspan="5" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
     }
     
     function renderQuestions() {
-      const typeFilter = document.getElementById('filterQType')?.value;
-      const sectionFilter = document.getElementById('filterQSection')?.value;
+      const typeFilter = document.getElementById('filterQType') ? document.getElementById('filterQType').value : '';
+      const sectionFilter = document.getElementById('filterQSection') ? document.getElementById('filterQSection').value : '';
       const tbody = document.getElementById('questionsTable');
       
-      let questions = (configData.questions || []).filter(q => q.is_active === 'TRUE');
+      let questions = (configData.questions || []).filter(function(q) { return q.is_active === 'TRUE'; });
       
       if (typeFilter) {
         const sectionIds = (configData.sections||[])
-          .filter(s => s.type_id == typeFilter)
-          .map(s => s.id);
-        questions = questions.filter(q => sectionIds.includes(q.section_id));
+          .filter(function(s) { return s.type_id == typeFilter; })
+          .map(function(s) { return s.id; });
+        questions = questions.filter(function(q) { return sectionIds.indexOf(q.section_id) >= 0; });
       }
       if (sectionFilter) {
-        questions = questions.filter(q => q.section_id == sectionFilter);
+        questions = questions.filter(function(q) { return q.section_id == sectionFilter; });
       }
-      questions.sort((a,b) => a.order - b.order);
+      questions.sort(function(a,b) { return (a.order||0) - (b.order||0); });
       
-      tbody.innerHTML = questions.map(q => {
-        const section = (configData.sections||[]).find(s => s.id == q.section_id);
-        return `
-        <tr>
-          <td><small>${section?.title_th || '-'}</small></td>
-          <td>${q.question_th}</td>
-          <td><span class="badge" style="background:#f3e5f5;color:#7b1fa2;">${q.answer_type}</span></td>
-          <td>${q.has_duedate==='TRUE'?'✅':'-'}</td>
-          <td>
-            <button class="btn btn-sm" onclick="editItem('Config_Questions', ${q.id})">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteItem('Config_Questions', ${q.id})">🗑️</button>
-          </td>
-        </tr>
-      `).join('') || '<tr><td colspan="5" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
+      tbody.innerHTML = questions.map(function(q) {
+        const section = (configData.sections||[]).find(function(s) { return s.id == q.section_id; });
+        return '<tr>' +
+          '<td><small>' + (section?.title_th || '-') + '</small></td>' +
+          '<td>' + q.question_th + '</td>' +
+          '<td><span class="badge" style="background:#f3e5f5;color:#7b1fa2;">' + q.answer_type + '</span></td>' +
+          '<td>' + (q.has_duedate==='TRUE'?'✅':'-') + '</td>' +
+          '<td>' +
+            '<button class="btn btn-sm" onclick="editItem(\'Config_Questions\', ' + q.id + ')">✏️</button> ' +
+            '<button class="btn btn-sm btn-danger" onclick="deleteItem(\'Config_Questions\', ' + q.id + ')">🗑️</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('') || '<tr><td colspan="5" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
     }
     
     // === Modal & Form ===
-    function openModal(mode, sheetName = null, id = null) {
+    function openModal(mode, sheetName, id) {
+      sheetName = sheetName || getSheetByTab(currentTab);
       document.getElementById('modal').classList.add('show');
       document.getElementById('modalTitle').innerText = mode === 'add' ? '➕ เพิ่มใหม่' : '✏️ แก้ไข';
       document.getElementById('editId').value = id || '';
-      document.getElementById('currentSheet').value = sheetName || getSheetByTab(currentTab);
-      
-      generateFormFields(document.getElementById('currentSheet').value, id);
+      document.getElementById('currentSheet').value = sheetName;
+      generateFormFields(sheetName, id);
     }
     
     function closeModal() {
@@ -384,105 +384,118 @@
       return map[tab] || 'Config_Types';
     }
     
- function generateFormFields(sheetName, editId) {
-  const container = document.getElementById('formFields');
-  let fields = [], existingData = {};
-  
-  // Load existing data if editing
-  if (editId) {
-    const key = sheetName.replace('Config_', '').toLowerCase() + 's';
-    existingData = (configData[key] || []).find(x => x.id == editId) || {};
-  }
-  
-  if (sheetName === 'Config_Types') {
-    fields = [
-      {name:'name_th', label:'ชื่อภาษาไทย*', type:'text', required:true},
-      {name:'name_en', label:'ชื่อภาษาอังกฤษ', type:'text'},
-      {name:'description', label:'คำอธิบาย', type:'textarea'},
-      {name:'color', label:'สี (Hex)', type:'text', placeholder:'#3498db'},
-      {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-    ];
-  } else if (sheetName === 'Config_Areas') {
-    fields = [
-      {name:'area_name', label:'ชื่อพื้นที่*', type:'text', required:true},
-      {name:'department', label:'แผนก', type:'text'},
-      {name:'applicable_types', label:'ประเภทที่ใช้ได้ (คั่นด้วย ,)', type:'text', placeholder:'1,2,3'},
-      {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-    ];
-  } else if (sheetName === 'Config_Sections') {
-    fields = [
-      {name:'type_id', label:'ประเภทเช็คลิสต์*', type:'select', 
-       options:(configData.types||[]).filter(t=>t.is_active==='TRUE').map(t=>[t.id,t.name_th]), required:true},
-      {name:'order', label:'ลำดับ', type:'number'},
-      {name:'title_th', label:'หัวข้อ (ไทย)*', type:'text', required:true},
-      {name:'title_en', label:'หัวข้อ (อังกฤษ)', type:'text'},
-      {name:'is_required', label:'บังคับตอบ', type:'select', options:[['TRUE','✅ บังคับ'],['FALSE','❌ ไม่บังคับ']]},
-      {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-    ];
-  } else if (sheetName === 'Config_Questions') {
-    fields = [
-      {name:'section_id', label:'หัวข้อหลัก*', type:'select',
-       options:(configData.sections||[]).filter(s=>s.is_active==='TRUE').map(s=>[s.id,s.title_th]), required:true},
-      {name:'order', label:'ลำดับ', type:'number'},
-      {name:'question_th', label:'คำถาม (ไทย)*', type:'textarea', required:true},
-      {name:'question_en', label:'คำถาม (อังกฤษ)', type:'textarea'},
-      {name:'answer_type', label:'ประเภทคำตอบ*', type:'select',
-       options:[['radio','✅/❌'],['number','🔢 ตัวเลข'],['text','📝 สั้น']], required:true},
-      {name:'options', label:'ตัวเลือก (คั่นด้วย ,)', type:'text', placeholder:'ดี,ไม่ดี'},
-      {name:'is_required', label:'บังคับตอบ', type:'select', options:[['TRUE','✅'],['FALSE','❌']]},
-      {name:'has_remark', label:'มีช่องหมายเหตุ', type:'select', options:[['TRUE','✅ มี'],['FALSE','❌ ไม่มี']]},
-      {name:'has_duedate', label:'มี Due Date', type:'select', options:[['TRUE','✅ มี'],['FALSE','❌ ไม่มี']]},
-      {name:'has_photo', label:'บังคับแนบรูป', type:'select', options:[['TRUE','✅ บังคับ'],['FALSE','❌ ไม่บังคับ']]},
-      {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-    ];
-  }
-  
-  // ✅ สร้างฟอร์มอย่างปลอดภัย (แยกบรรทัดให้อ่านง่าย)
-  container.innerHTML = fields.map(f => {
-    const val = existingData[f.name] || '';
-    
-    if (f.type === 'select') {
-      let optionsHtml = '';
-      if (f.options && Array.isArray(f.options)) {
-        optionsHtml = f.options.map(opt => {
-          const selected = (val == opt[0]) ? 'selected' : '';
-          return `<option value="${opt[0]}" ${selected}>${opt[1]}</option>`;
-        }).join('');
+    function generateFormFields(sheetName, editId) {
+      const container = document.getElementById('formFields');
+      let fields = [];
+      let existingData = {};
+      
+      // Load existing data if editing
+      if (editId) {
+        const key = sheetName.replace('Config_', '').toLowerCase() + 's';
+        const list = configData[key] || [];
+        for (let i = 0; i < list.length; i++) {
+          if (list[i].id == editId) {
+            existingData = list[i];
+            break;
+          }
+        }
       }
-      return `
-        <div class="form-group">
-          <label>${f.label}</label>
-          <select name="${f.name}" ${f.required ? 'required' : ''}>
-            ${optionsHtml}
-          </select>
-        </div>
-      `;
-    } 
-    else if (f.type === 'textarea') {
-      return `
-        <div class="form-group">
-          <label>${f.label}</label>
-          <textarea name="${f.name}" rows="3" ${f.required ? 'required' : ''}>${val || ''}</textarea>
-        </div>
-      `;
-    } 
-    else {
-      return `
-        <div class="form-group">
-          <label>${f.label}</label>
-          <input type="${f.type}" name="${f.name}" value="${val || ''}" ${f.required ? 'required' : ''} placeholder="${f.placeholder || ''}">
-        </div>
-      `;
+      
+      if (sheetName === 'Config_Types') {
+        fields = [
+          {name:'name_th', label:'ชื่อภาษาไทย*', type:'text', required:true},
+          {name:'name_en', label:'ชื่อภาษาอังกฤษ', type:'text'},
+          {name:'description', label:'คำอธิบาย', type:'textarea'},
+          {name:'color', label:'สี (Hex)', type:'text', placeholder:'#3498db'},
+          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
+        ];
+      } else if (sheetName === 'Config_Areas') {
+        fields = [
+          {name:'area_name', label:'ชื่อพื้นที่*', type:'text', required:true},
+          {name:'department', label:'แผนก', type:'text'},
+          {name:'applicable_types', label:'ประเภทที่ใช้ได้ (คั่นด้วย ,)', type:'text', placeholder:'1,2,3'},
+          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
+        ];
+      } else if (sheetName === 'Config_Sections') {
+        fields = [
+          {name:'type_id', label:'ประเภทเช็คลิสต์*', type:'select', 
+           options:getActiveTypes(), required:true},
+          {name:'order', label:'ลำดับ', type:'number'},
+          {name:'title_th', label:'หัวข้อ (ไทย)*', type:'text', required:true},
+          {name:'title_en', label:'หัวข้อ (อังกฤษ)', type:'text'},
+          {name:'is_required', label:'บังคับตอบ', type:'select', options:[['TRUE','✅ บังคับ'],['FALSE','❌ ไม่บังคับ']]},
+          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
+        ];
+      } else if (sheetName === 'Config_Questions') {
+        fields = [
+          {name:'section_id', label:'หัวข้อหลัก*', type:'select',
+           options:getActiveSections(), required:true},
+          {name:'order', label:'ลำดับ', type:'number'},
+          {name:'question_th', label:'คำถาม (ไทย)*', type:'textarea', required:true},
+          {name:'question_en', label:'คำถาม (อังกฤษ)', type:'textarea'},
+          {name:'answer_type', label:'ประเภทคำตอบ*', type:'select',
+           options:[['radio','✅/❌'],['number','🔢 ตัวเลข'],['text','📝 สั้น']], required:true},
+          {name:'options', label:'ตัวเลือก (คั่นด้วย ,)', type:'text', placeholder:'ดี,ไม่ดี'},
+          {name:'is_required', label:'บังคับตอบ', type:'select', options:[['TRUE','✅'],['FALSE','❌']]},
+          {name:'has_remark', label:'มีช่องหมายเหตุ', type:'select', options:[['TRUE','✅ มี'],['FALSE','❌ ไม่มี']]},
+          {name:'has_duedate', label:'มี Due Date', type:'select', options:[['TRUE','✅ มี'],['FALSE','❌ ไม่มี']]},
+          {name:'has_photo', label:'บังคับแนบรูป', type:'select', options:[['TRUE','✅ บังคับ'],['FALSE','❌ ไม่บังคับ']]},
+          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
+        ];
+      }
+      
+      // สร้างฟอร์ม
+      let html = '';
+      for (let i = 0; i < fields.length; i++) {
+        const f = fields[i];
+        const val = existingData[f.name] !== undefined ? existingData[f.name] : '';
+        
+        if (f.type === 'select') {
+          let optionsHtml = '';
+          if (f.options && Array.isArray(f.options)) {
+            for (let j = 0; j < f.options.length; j++) {
+              const opt = f.options[j];
+              const selected = (val == opt[0]) ? 'selected' : '';
+              optionsHtml += '<option value="' + opt[0] + '" ' + selected + '>' + opt[1] + '</option>';
+            }
+          }
+          html += '<div class="form-group">' +
+            '<label>' + f.label + '</label>' +
+            '<select name="' + f.name + '" ' + (f.required ? 'required' : '') + '>' +
+            optionsHtml +
+            '</select></div>';
+        } else if (f.type === 'textarea') {
+          html += '<div class="form-group">' +
+            '<label>' + f.label + '</label>' +
+            '<textarea name="' + f.name + '" rows="3" ' + (f.required ? 'required' : '') + '>' + (val || '') + '</textarea></div>';
+        } else {
+          html += '<div class="form-group">' +
+            '<label>' + f.label + '</label>' +
+            '<input type="' + f.type + '" name="' + f.name + '" value="' + (val || '') + '" ' + 
+            (f.required ? 'required' : '') + ' placeholder="' + (f.placeholder || '') + '"></div>';
+        }
+      }
+      container.innerHTML = html;
     }
-  }).join('');
-}
+    
+    function getActiveTypes() {
+      return (configData.types || []).filter(function(t) { return t.is_active === 'TRUE'; })
+        .map(function(t) { return [t.id, t.name_th]; });
+    }
+    
+    function getActiveSections() {
+      return (configData.sections || []).filter(function(s) { return s.is_active === 'TRUE'; })
+        .map(function(s) { return [s.id, s.title_th]; });
+    }
     
     // === CRUD Operations ===
     document.getElementById('configForm').onsubmit = function(e) {
       e.preventDefault();
       const formData = new FormData(this);
       const data = {};
-      for (let [key, value] of formData.entries()) data[key] = value;
+      for (const pair of formData.entries()) {
+        data[pair[0]] = pair[1];
+      }
       
       const payload = {
         action: document.getElementById('editId').value ? 'update' : 'create',
@@ -492,18 +505,18 @@
         adminToken: localStorage.getItem('adminToken')
       };
       
-      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
       
       fetch(API_URL, {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: { 'Content-Type': 'text/plain' }
       })
-      .then(res => res.json())
-      .then(result => {
+      .then(function(res) { return res.json(); })
+      .then(function(result) {
         Swal.close();
         if (result.status === 'success') {
-          Swal.fire('สำเร็จ!', result.message, 'success').then(() => {
+          Swal.fire('สำเร็จ!', result.message, 'success').then(function() {
             closeModal();
             loadConfig();
           });
@@ -511,7 +524,7 @@
           Swal.fire('ผิดพลาด', result.message, 'error');
         }
       })
-      .catch(err => {
+      .catch(function(err) {
         Swal.close();
         Swal.fire('เชื่อมต่อล้มเหลว', 'โปรดตรวจสอบอินเทอร์เน็ต', 'error');
       });
@@ -538,7 +551,7 @@
         confirmButtonText: '✅ ลบเลย',
         cancelButtonText: '❌ ยกเลิก',
         confirmButtonColor: '#e74c3c'
-      }).then((result) => {
+      }).then(function(result) {
         if (result.isConfirmed) {
           fetch(API_URL, {
             method: 'POST',
@@ -550,10 +563,10 @@
             }),
             headers: { 'Content-Type': 'text/plain' }
           })
-          .then(res => res.json())
-          .then(result => {
+          .then(function(res) { return res.json(); })
+          .then(function(result) {
             if (result.status === 'success') {
-              Swal.fire('ลบสำเร็จ!', '', 'success').then(() => loadConfig());
+              Swal.fire('ลบสำเร็จ!', '', 'success').then(function() { loadConfig(); });
             } else {
               Swal.fire('ผิดพลาด', result.message, 'error');
             }
