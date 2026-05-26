@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root { 
+      --primary: #f39c12; 
+      --dark: #2c3e50; 
+      --success: #27ae60; 
+      --danger: #e74c3c; 
+      --bg: #f4f7f6; 
+      --light-orange: #fff5e6;
+      --blue: #2980b9;
+      --purple: #8e44ad;
+      --green: #27ae60;
+    }
+    * { box-sizing: border-box; }
+    body { 
+      font-family: 'Prompt', sans-serif; 
+      background: var(--bg); 
+      margin: 0; 
+      padding: 0; 
+      -webkit-tap-highlight-color: transparent; 
+    }
+    
+    /* ===== NAV ===== */
+    .nav { 
+      background: linear-gradient(90deg, #ff8c00, var(--primary)); 
+      color: white; 
+      padding: 15px 20px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+      position: sticky; 
+      top: 0; 
+      z-index: 100; 
+      flex-wrap: wrap; 
+      gap: 10px; 
+    }
+    .nav h2 { 
+      margin: 0; 
+      font-size: 1.3rem; 
+      letter-spacing: 0.5px; 
+    }
+    .nav-actions { 
+      display: flex; 
+      gap: 10px; 
+    }
+    .container { 
+      max-width: 1100px; 
+      margin: 25px auto; 
+      padding: 0 15px; 
+    }
+    .btn-main { 
+      background: white; 
+      color: var(--primary); 
+      padding: 8px 15px; 
+      border-radius: 8px; 
+      text-decoration: none; 
+      font-weight: 600; 
+      transition: 0.3s; 
+      font-size: 0.95rem; 
+      white-space: nowrap; 
+      border: 1px solid white; 
+    }
+    .btn-main:hover { 
+      background: #fff9f0; 
+      transform: translateY(-2px);
+    }
+    .btn-report { 
+      background: #3498db; 
+      color: white; 
+      padding: 8px 15px; 
+      border-radius: 8px; 
+      text-decoration: none; 
+      font-weight: 600; 
+      transition: 0.3s; 
+      font-size: 0.95rem; 
+      white-space: nowrap; 
+      border: 1px solid #3498db; 
+    }
+    .btn-report:hover { 
+      background: #2980b9; 
+      transform: translateY(-2px);
+    }
+    
+    /* ===== TYPE SELECTOR (ใหม่) ===== */
+    .type-filter-section {
+      background: white;
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .type-filter-label {
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .type-filter-label i {
+      color: var(--primary);
+    }
+    .type-selector {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .type-btn {
+      padding: 10px 6px;
+      border-radius: 12px;
+      border: 2px solid #e0e0e0;
+      background: #f8f9fa;
+      text-align: center;
+      cursor: pointer;
+      font-family: 'Prompt', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #666;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      min-height: 70px;
+    }
+    .type-btn i {
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+    .type-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-color: var(--primary);
+    }
+    .type-btn:active {
+      transform: scale(0.98);
+    }
+    .type-btn.active {
+      background: linear-gradient(145deg, #fff3e0, #ffe0b2);
+      color: #e67e22;
+      border-color: #e67e22;
+      box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+    }
+    .type-btn.active i {
+      transform: scale(1.1);
+      color: #e67e22;
+    }
+    .type-btn[data-type="5S"].active {
+      background: linear-gradient(145deg, #e8f5e9, #c8e6c9);
+      color: #27ae60;
+      border-color: #27ae60;
+      box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    }
+    .type-btn[data-type="5S"].active i {
+      color: #27ae60;
+    }
+    .type-btn[data-type="Audit"].active {
+      background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+      color: #1565c0;
+      border-color: #1565c0;
+      box-shadow: 0 4px 15px rgba(21, 101, 192, 0.3);
+    }
+    .type-btn[data-type="Audit"].active i {
+      color: #1565c0;
+    }
+    .type-btn[data-type="Accident/Fire"].active {
+      background: linear-gradient(145deg, #fce4ec, #f8bbd9);
+      color: #c62828;
+      border-color: #c62828;
+      box-shadow: 0 4px 15px rgba(198, 40, 40, 0.3);
+    }
+    .type-btn[data-type="Accident/Fire"].active i {
+      color: #c62828;
+    }
+
+    /* ===== สถิติ Dashboard ===== */
+    .stats { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 20px; 
+      margin-bottom: 25px; 
+    }
+    .stat-card { 
+      background: white; 
+      padding: 20px; 
+      border-radius: 12px; 
+      text-align: center; 
+      border-bottom: 5px solid #ddd; 
+      cursor: pointer; 
+      transition: 0.2s; 
+    }
+    .stat-card.active { 
+      transform: translateY(-5px); 
+      border-color: var(--primary); 
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+    }
+    .stat-card small { 
+      color: #7f8c8d; 
+      font-weight: 600; 
+    }
+    
+    /* ===== ตารางหลัก ===== */
+    .table-box { 
+      background: white; 
+      border-radius: 12px; 
+      overflow-x: auto; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+      -webkit-overflow-scrolling: touch; 
+    }
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      min-width: 750px; 
+    }
+    th { 
+      background: #fff8f0; 
+      color: #e67e22; 
+      padding: 15px; 
+      text-align: left; 
+      font-size: 0.95rem; 
+      white-space: nowrap; 
+    }
+    td { 
+      padding: 15px; 
+      border-bottom: 1px solid #eee; 
+      vertical-align: middle; 
+      font-size: 0.95rem; 
+    }
+    .badge { 
+      padding: 4px 12px; 
+      border-radius: 50px; 
+      color: white; 
+      font-size: 0.8rem; 
+      white-space: nowrap; 
+    }
+    
+    /* ===== ส่วนรายละเอียด ===== */
+    .detail-row { 
+      display: none; 
+      background: var(--light-orange); 
+    }
+    .inner-detail { 
+      padding: 20px; 
+      background: white; 
+      border: 1px solid #f9e3b4; 
+      margin: 15px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 10px rgba(243, 156, 18, 0.1); 
+    }
+    .section-group { 
+      margin-bottom: 15px; 
+      border-radius: 10px; 
+      overflow: hidden; 
+      border: 1px solid #ffe8cc; 
+    }
+    .section-head { 
+      background: var(--primary); 
+      color: white; 
+      padding: 12px 15px; 
+      font-weight: 600; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .sub-item { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: flex-start; 
+      border-bottom: 1px solid #fff3e0; 
+      padding: 12px 15px; 
+      background: #fffdfa; 
+      gap: 10px; 
+    }
+    .sub-item-text { 
+      flex: 1; 
+      color: #5a4a3a; 
+      font-size: 0.95rem; 
+      line-height: 1.5; 
+    }
+    .status-pill { 
+      min-width: 80px; 
+      padding: 5px 10px; 
+      border-radius: 6px; 
+      font-size: 0.85rem; 
+      font-weight: 600; 
+      text-align: center; 
+      white-space: nowrap; 
+    }
+    .status-good { 
+      background: #e8f5e9; 
+      color: var(--success); 
+    }
+    .status-bad { 
+      background: #ffebee; 
+      color: var(--danger); 
+    }
+    .remark-box { 
+      font-size: 0.85rem; 
+      color: #d35400; 
+      margin-top: 8px; 
+      padding: 8px 12px; 
+      background: #fff9f0; 
+      border-left: 3px solid var(--primary); 
+      border-radius: 4px; 
+    }
+    
+    .loader { 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background: rgba(255,255,255,0.9); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 2000; 
+      backdrop-filter: blur(5px);
+    }
+    .btn-view { 
+      background: #f4f6f7; 
+      border: 1px solid #d5dbdb; 
+      padding: 8px 12px; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      color: var(--dark); 
+      font-family: 'Prompt'; 
+      transition: 0.2s; 
+      white-space: nowrap; 
+      font-weight: 600; 
+    }
+    .btn-view:hover { 
+      background: #e5e8e8; 
+      transform: translateY(-1px);
+    }
+    
+    /* ===== รูปภาพ ===== */
+    .img-preview { 
+      width: 50px; 
+      height: 50px; 
+      object-fit: cover; 
+      border-radius: 6px; 
+      border: 1px solid #ddd; 
+      transition: transform 0.2s; 
+      margin-right: 5px; 
+      margin-bottom: 5px; 
+      background-color: #f9f9f9; 
+    }
+    .img-preview:hover { 
+      transform: scale(1.1); 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+    }
+    .img-preview-large { 
+      width: 90px; 
+      height: 90px; 
+      object-fit: cover; 
+      border-radius: 8px; 
+      border: 1px solid #ddd; 
+      margin:0; 
+      background-color: #f9f9f9; 
+    }
+    
+    .date-filter-box { 
+      margin-bottom: 20px; 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      flex-wrap: wrap;
+    }
+    input[type="date"] { 
+      padding: 10px 15px; 
+      border-radius: 8px; 
+      border: 1px solid #ddd; 
+      font-family: 'Prompt'; 
+      font-size: 1rem; 
+      color: var(--dark); 
+      outline: none; 
+      transition: border 0.3s; 
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .nav h2 { 
+        font-size: 1.1rem; 
+        width: 100%; 
+        text-align: center; 
+      }
+      .nav-actions { 
+        width: 100%; 
+        justify-content: center; 
+      }
+      .btn-main, .btn-report { 
+        padding: 6px 10px; 
+        font-size: 0.85rem; 
+      }
+      .container { 
+        padding: 0 10px; 
+        margin: 15px auto; 
+      }
+      .stats { 
+        gap: 10px; 
+        margin-bottom: 15px; 
+      }
+      .stat-card { 
+        padding: 12px 8px; 
+        border-radius: 10px; 
+        border-bottom: 4px solid #ddd; 
+      }
+      .stat-card small { 
+        font-size: 0.7rem; 
+        letter-spacing: -0.5px; 
+      }
+      .stat-card .value { 
+        font-size: 1.5rem !important; 
+      }
+      .inner-detail { 
+        padding: 12px; 
+        margin: 10px 5px; 
+      }
+      .sub-item { 
+        flex-direction: column; 
+        padding: 12px 10px; 
+      }
+      .status-pill { 
+        margin-left: 0; 
+        margin-top: 10px; 
+        align-self: flex-start; 
+      }
+      .img-preview-large { 
+        width: 75px; 
+        height: 75px; 
+      }
+      input[type="date"] { 
+        width: 100%; 
+        max-width: 250px; 
+      }
+      .type-selector { 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 6px;
+      }
+      .type-btn { 
+        font-size: 0.65rem; 
+        padding: 8px 4px; 
+        min-height: 60px;
+      }
+      .type-btn i { 
+        font-size: 1rem; 
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .type-selector { 
+        grid-template-columns: repeat(2, 1fr); 
+      }
+      .type-btn { 
+        font-size: 0.62rem; 
+        min-height: 55px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="loader" class="loader">
+    <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i>
+  </div>
+  
+  <nav class="nav">
+    <div><h2>SAFETY DASHBOARD</h2></div>
+    <div class="nav-actions">
+      <a href="Report.html" class="btn-report"><i class="fas fa-chart-line"></i> Action Plan</a>
+      <a href="https://itrequests.netlify.app/safety" class="btn-main"><i class="fas fa-plus"></i> ตรวจสอบพื้นที่</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    
+    <!-- ===== FILTER SECTION ===== -->
+    <div class="date-filter-box">
+      <i class="fas fa-calendar-alt" style="color:var(--primary); font-size:1.2rem;"></i>
+      <input type="date" id="dateFilter" onchange="loadData()">
+    </div>
+    
+    <!-- ===== TYPE SELECTOR (ใหม่) ===== -->
+    <div class="type-filter-section">
+      <div class="type-filter-label">
+        <i class="fas fa-filter"></i> กรองตามประเภทการตรวจสอบ
+      </div>
+      <div class="type-selector">
+        <div class="type-btn active" data-type="all" onclick="selectTypeFilter('all', this)">
+          <i class="fas fa-list"></i>ทั้งหมด
+        </div>
+        <div class="type-btn" data-type="จป.ว" onclick="selectTypeFilter('จป.ว', this)">
+          <i class="fas fa-hard-hat"></i>จป.ว
+        </div>
+        <div class="type-btn" data-type="คปอ." onclick="selectTypeFilter('คปอ.', this)">
+          <i class="fas fa-users-cog"></i>คปอ.
+        </div>
+        <div class="type-btn" data-type="Foreman/Mgr." onclick="selectTypeFilter('Foreman/Mgr.', this)">
+          <i class="fas fa-user-tie"></i>Foreman/Mgr.
+        </div>
+        <div class="type-btn" data-type="Audit" onclick="selectTypeFilter('Audit', this)">
+          <i class="fas fa-search"></i>Audit
+        </div>
+        <div class="type-btn" data-type="Accident/Fire" onclick="selectTypeFilter('Accident/Fire', this)">
+          <i class="fas fa-fire-extinguisher"></i>Accident/Fire
+        </div>
+        <div class="type-btn" data-type="5S" onclick="selectTypeFilter('5S', this)">
+          <i class="fas fa-broom"></i>5S
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== STATS ===== -->
+    <div class="stats">
+      <div class="stat-card" id="card-all" onclick="updateStatusFilter('all')">
+        <small>ทั้งหมดวันนี้</small>
+        <div class="value" id="countTotal" style="font-size:2.2rem; color:#3498db;">0</div>
+      </div>
+      <div class="stat-card" id="card-good" onclick="updateStatusFilter('good')">
+        <small>ปกติ</small>
+        <div class="value" id="countGood" style="font-size:2.2rem; color:var(--success);">0</div>
+      </div>
+      <div class="stat-card" id="card-bad" onclick="updateStatusFilter('bad')">
+        <small>พบปัญหา</small>
+        <div class="value" id="countBad" style="font-size:2.2rem; color:var(--danger);">0</div>
+      </div>
+    </div>
+    
+    <!-- ===== TABLE ===== -->
+    <div class="table-box">
+      <table>
+        <thead>
+          <tr>
+            <th>เวลา</th>
+            <th>ประเภท</th>
+            <th>พื้นที่</th>
+            <th>ผู้ตรวจ</th>
+            <th>สถานะรวม</th>
+            <th>รูปถ่าย</th>
+            <th>รายละเอียด</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // ⚠️ นำลิงก์ Web App URL ของคุณมาใส่ตรงนี้ ⚠️
+    const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
+
+    const checklistStructure = {
+      s1: { title: "1. สถานที่ทำงาน", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "Water Mist"] },
+      s2: { title: "2. ท่าทางการทำงาน", questions: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์", "การยกของอย่างถูกต้องและปลอดภัย"] },
+      s3: { title: "3. เครื่องจักร", questions: ["สวมใส่อุปกรณ์ป้องกันอันตราย (PPE)", "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย"] },
+      s4: { title: "4. สารเคมี", questions: ["ไม่มีสารเคมีหกรั่วไหล", "ภาชนะปิดสนิท/มีฉลากชัดเจน", "มีอุปกรณ์ Spill Kit พร้อมใช้"] },
+      s5: { title: "5. ไฟฟ้า", questions: ["อุปกรณ์ไฟฟ้า/ปลั๊กไฟไม่ชำรุด", "ไม่มีการต่อพ่วงไฟฟ้าชั่วคราว", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย"] },
+      s6: { title: "6. อุปกรณ์ฉุกเฉิน", questions: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน"] },
+      s7: { title: "7. อื่นๆ", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
+    };
+
+    let fullData = [];
+    let currentTypeFilter = 'all';
+    let currentStatusFilter = 'all';
+    
+    document.getElementById('dateFilter').valueAsDate = new Date();
+
+    function getDriveThumbnailUrl(url) {
+      if(!url) return "";
+      let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if(match && match[1]) {
+        return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w500`;
+      }
+      return url; 
+    }
+
+    // ==========================================
+    // TYPE FILTER FUNCTION
+    // ==========================================
+    function selectTypeFilter(type, el) {
+      currentTypeFilter = type;
+      
+      // Update active button
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      
+      // Re-render table with new filter
+      applyFilters();
+    }
+    
+    function updateStatusFilter(type) {
+      currentStatusFilter = type;
+      
+      // Update active stat card
+      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+      document.getElementById('card-' + type).classList.add('active');
+      
+      applyFilters();
+    }
+    
+    function applyFilters() {
+      let filtered = [...fullData];
+      
+      // Filter by type
+      if (currentTypeFilter !== 'all') {
+        filtered = filtered.filter(d => d.inspectionType === currentTypeFilter);
+      }
+      
+      // Filter by status
+      if (currentStatusFilter === 'good') {
+        filtered = filtered.filter(d => !d.hasBad);
+      } else if (currentStatusFilter === 'bad') {
+        filtered = filtered.filter(d => d.hasBad);
+      }
+      
+      renderTable(filtered);
+    }
+
+    // ==========================================
+    // LOAD DATA
+    // ==========================================
+    function loadData() {
+      document.getElementById('loader').style.display = 'flex';
+      let dateVal = document.getElementById('dateFilter').value;
+
+      fetch(API_URL + "?action=getDashboardData&date=" + dateVal)
+      .then(response => response.json())
+      .then(data => {
+        fullData = data.details || [];
+        document.getElementById('countTotal').innerText = data.total || 0;
+        document.getElementById('countGood').innerText = data.good || 0;
+        document.getElementById('countBad').innerText = data.bad || 0;
+        
+        // Reset filters to default
+        currentTypeFilter = 'all';
+        currentStatusFilter = 'all';
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('.type-btn[data-type="all"]').classList.add('active');
+        document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+        document.getElementById('card-all').classList.add('active');
+        
+        applyFilters();
+        document.getElementById('loader').style.display = 'none';
+      })
+      .catch(err => {
+        document.getElementById('loader').style.display = 'none';
+        console.error("Error loading data", err);
+      });
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      data.forEach(d => {
+        
+        let photoDisplay = '-';
+        if (typeof d.photo === 'object' && d.photo !== null) {
+          let photoCount = Object.values(d.photo).filter(url => url !== "ไม่มีรูปถ่าย" && url.trim() !== "").length;
+          if(photoCount > 0) {
+            photoDisplay = `<span style="color:var(--primary); font-size:0.95rem; font-weight:600;"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
+          }
+        } else if (typeof d.photo === 'string' && d.photo !== "ไม่มีรูปถ่าย" && d.photo.trim() !== "") {
+          photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image fa-lg"></i></a>`;
+        }
+
+        // Get type badge color
+        let typeBadgeColor = '#95a5a6';
+        if (d.inspectionType === 'จป.ว' || d.inspectionType === 'คปอ.' || d.inspectionType === 'Foreman/Mgr.') {
+          typeBadgeColor = '#f39c12';
+        } else if (d.inspectionType === 'Audit') {
+          typeBadgeColor = '#2980b9';
+        } else if (d.inspectionType === 'Accident/Fire') {
+          typeBadgeColor = '#e74c3c';
+        } else if (d.inspectionType === '5S') {
+          typeBadgeColor = '#27ae60';
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${d.timestamp}</td>
+          <td><span class="badge" style="background:${typeBadgeColor}">${d.inspectionType || '-'}</span></td>
+          <td><strong>${d.area}</strong></td>
+          <td>${d.inspector}</td>
+          <td><span class="badge" style="background:${d.hasBad? 'var(--danger)':'var(--success)'}">${d.hasBad?'พบปัญหา':'ปกติ'}</span></td>
+          <td>${photoDisplay}</td>
+          <td><button class="btn-view" onclick="toggleDetail(${d.id})"><i class="fas fa-chevron-down" id="icon-${d.id}"></i> ดูผลตรวจ</button></td>
+        `;
+        tbody.appendChild(tr);
+
+        const detailTr = document.createElement('tr');
+        detailTr.id = `detail-${d.id}`;
+        detailTr.className = 'detail-row';
+        
+        let detailHtml = `<div class="inner-detail">
+          <h4 style="margin:0 0 15px 0; color:var(--dark); border-bottom:3px solid var(--primary); padding-bottom:8px;">
+            <i class="fas fa-clipboard-list"></i> รายละเอียดผลการตรวจสอบรายหัวข้อ
+          </h4>`;
+        
+        for(let secKey in checklistStructure) {
+          const section = checklistStructure[secKey];
+          const sNum = secKey.replace('s', '');
+
+          detailHtml += `<div class="section-group">
+            <div class="section-head">
+              <span>${section.title}</span>
+            </div>`;
+          
+          section.questions.forEach((qText, idx) => {
+            const res = d.fullChecklist[`section${sNum}_q${idx}`];
+            const remark = d.fullChecklist[`section${sNum}_remark${idx}`];
+            const isBad = res === "ไม่ดี";
+            
+            let displayQText = qText;
+            if(secKey === 's1' && qText === 'Water Mist') {
+                let waterVal = d.fullChecklist['water_val'];
+                if(waterVal) {
+                    displayQText += ` <span style="color:#e67e22; font-weight:bold;">(${waterVal}%)</span>`;
+                }
+            }
+            
+            const qPhotoKey = `${secKey}_q${idx}`; 
+            let qPhotoPreviews = ""; 
+            
+            if(typeof d.photo === 'object' && d.photo !== null) {
+               if(d.photo[qPhotoKey] && d.photo[qPhotoKey] !== "") {
+                  let thumbUrl = getDriveThumbnailUrl(d.photo[qPhotoKey]);
+                  qPhotoPreviews += `<div style="margin-right:10px; margin-top:10px;"><a href="${d.photo[qPhotoKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large" onerror="this.src='https://placehold.co/90x90/eeeeee/999999?text=IMG'"></a></div>`;
+               }
+               for(let p = 0; p < 3; p++) {
+                  let pKey = `${qPhotoKey}_${p}`;
+                  if(d.photo[pKey] && d.photo[pKey] !== "") {
+                     let thumbUrl = getDriveThumbnailUrl(d.photo[pKey]);
+                     let imgCaption = d.fullChecklist[`caption_${pKey}`] || ""; 
+                     
+                     qPhotoPreviews += `
+                       <div style="display:flex; flex-direction:column; align-items:center; width:90px; margin-right:12px; margin-top:10px;">
+                         <a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large" onerror="this.src='https://placehold.co/90x90/eeeeee/999999?text=IMG'"></a>
+                         ${imgCaption ? `<span style="font-size:0.75rem; color:#555; text-align:center; margin-top:4px; line-height:1.2; word-break:break-word;">${imgCaption}</span>` : ''}
+                       </div>
+                     `;
+                  }
+               }
+            }
+            
+            detailHtml += `<div class="sub-item">
+                <div class="sub-item-text">
+                  - ${displayQText} 
+                  ${remark ? `<div class="remark-box"><b>หมายเหตุ:</b> ${remark}</div>` : ''}
+                  ${qPhotoPreviews !== "" ? `<div style="display:flex; flex-wrap:wrap;">${qPhotoPreviews}</div>` : ''}
+                </div>
+                <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">
+                  ${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}
+                </div>
+              </div>`;
+          });
+          detailHtml += `</div>`;
+        }
+        detailHtml += `</div>`;
+        detailTr.innerHTML = `<td colspan="7" style="padding:0;">${detailHtml}</td>`;
+        tbody.appendChild(detailTr);
+      });
+    }
+
+    function toggleDetail(id) {
+      const row = document.getElementById('detail-' + id);
+      const icon = document.getElementById('icon-' + id);
+      const isVisible = row.style.display === 'table-row';
+      row.style.display = isVisible ? 'none' : 'table-row';
+      icon.className = isVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+    }
+
+    // โหลดตารางข้อมูลเมื่อเปิดหน้าเว็บ
+    window.onload = loadData;
+  </script>
+</body>
+</html>
