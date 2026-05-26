@@ -1,0 +1,138 @@
+<!-- หน้าเลือกประเภทเช็คลิสต์ -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ SAFETY PATROL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Prompt', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .container { background: white; border-radius: 20px; padding: 30px; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .logo { text-align: center; margin-bottom: 30px; }
+    .logo h1 { color: #667eea; margin: 10px 0; font-size: 1.8rem; }
+    .type-grid { display: grid; gap: 15px; }
+    .type-card { 
+      background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; 
+      padding: 20px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 15px;
+    }
+    .type-card:hover { border-color: #667eea; transform: translateY(-3px); }
+    .type-card.active { border-color: #667eea; background: #f0f4ff; }
+    .type-icon { 
+      width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; 
+      font-size: 1.5rem; color: white; flex-shrink: 0;
+    }
+    .type-info h3 { margin: 0 0 5px; color: #2c3e50; }
+    .type-info p { margin: 0; color: #7f8c8d; font-size: 0.9rem; }
+    .btn-start { 
+      width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; 
+      border: none; padding: 15px; border-radius: 12px; font-size: 1.1rem; font-weight: 600; 
+      cursor: pointer; margin-top: 20px; transition: 0.3s;
+    }
+    .btn-start:disabled { opacity: 0.6; cursor: not-allowed; }
+    .area-select { margin-top: 20px; display: none; }
+    .area-select.show { display: block; }
+    .area-select select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-family: 'Prompt'; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <div style="font-size: 3rem;">🛡️</div>
+      <h1>SAFETY PATROL</h1>
+      <p style="color: #7f8c8d;">ระบบตรวจสอบความปลอดภัย</p>
+    </div>
+    
+    <h3 style="margin: 0 0 15px; color: #2c3e50;">📋 เลือกประเภทการตรวจสอบ</h3>
+    
+    <div class="type-grid" id="typeGrid">
+      <!-- Types will be loaded dynamically -->
+    </div>
+    
+    <div class="area-select" id="areaSelect">
+      <label style="font-weight: 600; color: #555; display: block; margin-bottom: 8px;">🏭 เลือกพื้นที่</label>
+      <select id="areaDropdown">
+        <option value="">-- กรุณาเลือกพื้นที่ --</option>
+      </select>
+    </div>
+    
+    <button class="btn-start" id="startBtn" disabled onclick="startInspection()">
+      🚀 เริ่มการตรวจสอบ
+    </button>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
+    let selectedType = null;
+    
+    // Load checklist types
+    fetch(API_URL + "?action=getConfig")
+      .then(res => res.json())
+      .then(data => {
+        if(data.status === 'success' && data.types) {
+          const types = data.types.filter(t => t.is_active === 'TRUE');
+          const grid = document.getElementById('typeGrid');
+          
+          grid.innerHTML = types.map(t => `
+            <div class="type-card" onclick="selectType('${t.id}', this)">
+              <div class="type-icon" style="background: ${t.color || '#667eea'}">
+                ${getTypeIcon(t.id)}
+              </div>
+              <div class="type-info">
+                <h3>${t.name_th}</h3>
+                <p>${t.description || t.name_en}</p>
+              </div>
+            </div>
+          `).join('');
+        }
+      });
+    
+    function selectType(typeId, element) {
+      document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active'));
+      element.classList.add('active');
+      selectedType = typeId;
+      loadAreasForType(typeId);
+      updateStartButton();
+    }
+    
+    function loadAreasForType(typeId) {
+      fetch(API_URL + "?action=getAreasByType&typeId=" + typeId)
+        .then(res => res.json())
+        .then(result => {
+          if(result.status === 'success') {
+            const areas = result.data;
+            const dropdown = document.getElementById('areaDropdown');
+            const areaContainer = document.getElementById('areaSelect');
+            
+            if(areas.length > 0) {
+              areaContainer.classList.add('show');
+              dropdown.innerHTML = '<option value="">-- กรุณาเลือกพื้นที่ --</option>' + 
+                areas.map(a => `<option value="${a.id}">${a.area_name}</option>`).join('');
+            } else {
+              areaContainer.classList.remove('show');
+            }
+          }
+        });
+    }
+    
+    document.getElementById('areaDropdown')?.addEventListener('change', updateStartButton);
+    
+    function updateStartButton() {
+      const btn = document.getElementById('startBtn');
+      const areaVal = document.getElementById('areaDropdown').value;
+      btn.disabled = !selectedType || (document.getElementById('areaSelect').classList.contains('show') && !areaVal);
+    }
+    
+    function startInspection() {
+      const areaId = document.getElementById('areaDropdown').value;
+      // ไปที่หน้าฟอร์มเดิม พร้อมส่งพารามิเตอร์
+      window.location.href = `check.html?type=${selectedType}&area=${areaId}`;
+    }
+    
+    function getTypeIcon(typeId) {
+      const icons = { '1':'👨‍💼', '2':'👥', '3':'👔', '4':'🔍', '5':'🚨', '6':'🧹' };
+      return icons[typeId] || '📋';
+    }
+  </script>
+</body>
+</html>
