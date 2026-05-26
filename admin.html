@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🔧 Admin - SAFETY PATROL</title>
   
-  <!-- Tailwind CSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -29,7 +28,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
-  <!-- SweetAlert2 Custom Style -->
   <style>
     .swal2-popup { font-family: 'Prompt', sans-serif !important; border-radius: 1rem !important; }
     .swal2-title { font-size: 1.25rem !important; font-weight: 600 !important; }
@@ -38,7 +36,6 @@
 </head>
 <body class="font-prompt bg-gray-100">
 
-  <!-- Auth Modal -->
   <div id="authModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
       <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">
@@ -63,7 +60,6 @@
     </div>
   </div>
 
-  <!-- Sidebar -->
   <aside class="fixed md:static top-0 left-0 w-64 md:h-screen bg-sidebar text-white z-40 transform -translate-x-full md:translate-x-0 transition-transform" id="sidebar">
     <div class="p-5">
       <h3 class="text-lg font-semibold border-b border-gray-600 pb-4 mb-4">🔧 Admin Panel</h3>
@@ -89,14 +85,11 @@
     </div>
   </aside>
 
-  <!-- Mobile Menu Toggle -->
   <button onclick="toggleSidebar()" class="md:hidden fixed bottom-4 right-4 w-14 h-14 bg-primary text-white rounded-full shadow-lg z-50 flex items-center justify-center">
     <i class="fas fa-bars text-xl"></i>
   </button>
 
-  <!-- Main Content -->
   <main class="md:ml-64 min-h-screen">
-    <!-- Header -->
     <header class="bg-white shadow-sm sticky top-0 z-30">
       <div class="px-6 py-4 flex items-center justify-between">
         <h2 id="pageTitle" class="text-lg font-semibold text-gray-800">จัดการประเภทเช็คลิสต์</h2>
@@ -106,13 +99,11 @@
       </div>
     </header>
 
-    <!-- Content Area -->
     <div class="p-6">
-      <!-- Tab: Types -->
       <div id="tab-types" class="tab-content">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="p-5 border-b border-gray-100">
-            <h4 class="font-semibold text-primary">📋 ประเภทเช็คลิสต์ (6 ประเภท)</h4>
+            <h4 class="font-semibold text-primary">📋 ประเภทเช็คลิสต์</h4>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full">
@@ -130,7 +121,6 @@
         </div>
       </div>
 
-      <!-- Tab: Areas -->
       <div id="tab-areas" class="tab-content hidden">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="p-5 border-b border-gray-100">
@@ -153,7 +143,6 @@
         </div>
       </div>
 
-      <!-- Tab: Sections -->
       <div id="tab-sections" class="tab-content hidden">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="p-5 border-b border-gray-100">
@@ -183,7 +172,6 @@
         </div>
       </div>
 
-      <!-- Tab: Questions -->
       <div id="tab-questions" class="tab-content hidden">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="p-5 border-b border-gray-100">
@@ -224,7 +212,6 @@
     </div>
   </main>
 
-  <!-- Modal Form -->
   <div id="modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
       <div class="p-6 border-b border-gray-100">
@@ -246,14 +233,13 @@
     </div>
   </div>
 
-  <!-- Loading Overlay -->
   <div id="loading" class="fixed inset-0 bg-white/90 z-50 hidden flex-col items-center justify-center">
     <i class="fas fa-circle-notch fa-spin text-4xl text-primary"></i>
     <p class="mt-4 font-semibold text-gray-700">กำลังโหลด...</p>
   </div>
 
   <script>
-    // ✅ API_URL - แก้เป็นของคุณที่นี่
+    // 🔴 วาง URL App Script ของคุณที่นี่
     var API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
     
     var configData = {};
@@ -371,7 +357,6 @@
       else if (tab === 'sections') renderSections();
       else if (tab === 'questions') renderQuestions();
       
-      // Close mobile sidebar
       var sidebar = document.getElementById('sidebar');
       if (sidebar) sidebar.classList.add('-translate-x-full');
     }
@@ -432,7 +417,7 @@
         var typesHtml = 'ทั้งหมด';
         
         if (a.applicable_types) {
-          var typeIds = a.applicable_types.split(',');
+          var typeIds = a.applicable_types.toString().split(',');
           typesHtml = '';
           for (var j = 0; j < typeIds.length; j++) {
             var t = findInArray(configData.types || [], 'id', typeIds[j]);
@@ -613,7 +598,6 @@
       var fields = [];
       var existingData = {};
       
-      // Load existing data if editing
       if (editId) {
         var key = sheetName.replace('Config_', '').toLowerCase() + 's';
         var list = configData[key] || [];
@@ -634,10 +618,11 @@
           {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
         ];
       } else if (sheetName === 'Config_Areas') {
+        // 🔧 ปรับแต่ง: ใช้ Checkbox แทนการกรอกตัวเลขธรรมดา
         fields = [
           {name:'area_name', label:'ชื่อพื้นที่*', type:'text', required:true},
           {name:'department', label:'แผนก', type:'text'},
-          {name:'applicable_types', label:'ประเภทที่ใช้ได้ (คั่นด้วย ,)', type:'text', placeholder:'1,2,3'},
+          {name:'applicable_types', label:'ประเภทที่ใช้ได้ (สามารถเลือกได้หลายข้อ)', type:'checkbox_group', options: getActiveTypes()},
           {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
         ];
       } else if (sheetName === 'Config_Sections') {
@@ -692,6 +677,20 @@
             '<textarea name="' + f.name + '" rows="3" ' + (f.required ? 'required' : '') +
               ' class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none resize-none">' + (val || '') + '</textarea>' +
           '</div>';
+        } else if (f.type === 'checkbox_group') {
+          // 🔧 เพิ่มระบบ Checkbox แบบกลุ่ม
+          var cbHtml = '<div class="flex flex-wrap gap-4 mt-2 p-3 border border-gray-200 rounded-xl bg-gray-50">';
+          var selectedVals = val ? val.toString().split(',') : [];
+          for (var j = 0; j < f.options.length; j++) {
+            var opt = f.options[j]; // [id, name]
+            var checked = selectedVals.includes(opt[0].toString()) ? 'checked' : '';
+            cbHtml += '<label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-100 hover:border-primary transition">' +
+                      '<input type="checkbox" name="' + f.name + '[]" value="' + opt[0] + '" ' + checked + ' class="w-4 h-4 text-primary rounded">' +
+                      '<span class="text-sm font-semibold text-gray-700">' + opt[1] + '</span>' +
+                      '</label>';
+          }
+          cbHtml += '</div>';
+          html += '<div><label class="block text-sm font-medium text-gray-700">' + f.label + '</label>' + cbHtml + '</div>';
         } else {
           html += '<div>' +
             '<label class="block text-sm font-medium text-gray-700 mb-2">' + f.label + '</label>' +
@@ -732,8 +731,25 @@
         e.preventDefault();
         var formData = new FormData(this);
         var data = {};
+        
+        // 🔧 ปรับปรุงการรับค่าเผื่อกรณี Checkbox มีค่า Array
         for (var pair of formData.entries()) {
-          data[pair[0]] = pair[1];
+          var name = pair[0];
+          var value = pair[1];
+          if (name.endsWith('[]')) {
+             var cleanName = name.replace('[]', '');
+             if (!data[cleanName]) data[cleanName] = [];
+             data[cleanName].push(value);
+          } else {
+             data[name] = value;
+          }
+        }
+        
+        // แปลง Array กลับเป็น String คั่นด้วย , เพื่อบันทึกลง Google Sheet
+        for (var key in data) {
+           if (Array.isArray(data[key])) {
+              data[key] = data[key].join(',');
+           }
         }
         
         var editIdEl = document.getElementById('editId');
