@@ -384,87 +384,98 @@
       return map[tab] || 'Config_Types';
     }
     
-    function generateFormFields(sheetName, editId) {
-      const container = document.getElementById('formFields');
-      let fields = [], existingData = {};
-      
-      // Load existing data if editing
-      if (editId) {
-        const key = sheetName.replace('Config_', '').toLowerCase() + (sheetName==='Config_Types'?'s':sheetName==='Config_Areas'?'s':'');
-        existingData = (configData[key] || []).find(x => x.id == editId) || {};
+ function generateFormFields(sheetName, editId) {
+  const container = document.getElementById('formFields');
+  let fields = [], existingData = {};
+  
+  // Load existing data if editing
+  if (editId) {
+    const key = sheetName.replace('Config_', '').toLowerCase() + 's';
+    existingData = (configData[key] || []).find(x => x.id == editId) || {};
+  }
+  
+  if (sheetName === 'Config_Types') {
+    fields = [
+      {name:'name_th', label:'ชื่อภาษาไทย*', type:'text', required:true},
+      {name:'name_en', label:'ชื่อภาษาอังกฤษ', type:'text'},
+      {name:'description', label:'คำอธิบาย', type:'textarea'},
+      {name:'color', label:'สี (Hex)', type:'text', placeholder:'#3498db'},
+      {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
+    ];
+  } else if (sheetName === 'Config_Areas') {
+    fields = [
+      {name:'area_name', label:'ชื่อพื้นที่*', type:'text', required:true},
+      {name:'department', label:'แผนก', type:'text'},
+      {name:'applicable_types', label:'ประเภทที่ใช้ได้ (คั่นด้วย ,)', type:'text', placeholder:'1,2,3'},
+      {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
+    ];
+  } else if (sheetName === 'Config_Sections') {
+    fields = [
+      {name:'type_id', label:'ประเภทเช็คลิสต์*', type:'select', 
+       options:(configData.types||[]).filter(t=>t.is_active==='TRUE').map(t=>[t.id,t.name_th]), required:true},
+      {name:'order', label:'ลำดับ', type:'number'},
+      {name:'title_th', label:'หัวข้อ (ไทย)*', type:'text', required:true},
+      {name:'title_en', label:'หัวข้อ (อังกฤษ)', type:'text'},
+      {name:'is_required', label:'บังคับตอบ', type:'select', options:[['TRUE','✅ บังคับ'],['FALSE','❌ ไม่บังคับ']]},
+      {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
+    ];
+  } else if (sheetName === 'Config_Questions') {
+    fields = [
+      {name:'section_id', label:'หัวข้อหลัก*', type:'select',
+       options:(configData.sections||[]).filter(s=>s.is_active==='TRUE').map(s=>[s.id,s.title_th]), required:true},
+      {name:'order', label:'ลำดับ', type:'number'},
+      {name:'question_th', label:'คำถาม (ไทย)*', type:'textarea', required:true},
+      {name:'question_en', label:'คำถาม (อังกฤษ)', type:'textarea'},
+      {name:'answer_type', label:'ประเภทคำตอบ*', type:'select',
+       options:[['radio','✅/❌'],['number','🔢 ตัวเลข'],['text','📝 สั้น']], required:true},
+      {name:'options', label:'ตัวเลือก (คั่นด้วย ,)', type:'text', placeholder:'ดี,ไม่ดี'},
+      {name:'is_required', label:'บังคับตอบ', type:'select', options:[['TRUE','✅'],['FALSE','❌']]},
+      {name:'has_remark', label:'มีช่องหมายเหตุ', type:'select', options:[['TRUE','✅ มี'],['FALSE','❌ ไม่มี']]},
+      {name:'has_duedate', label:'มี Due Date', type:'select', options:[['TRUE','✅ มี'],['FALSE','❌ ไม่มี']]},
+      {name:'has_photo', label:'บังคับแนบรูป', type:'select', options:[['TRUE','✅ บังคับ'],['FALSE','❌ ไม่บังคับ']]},
+      {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
+    ];
+  }
+  
+  // ✅ สร้างฟอร์มอย่างปลอดภัย (แยกบรรทัดให้อ่านง่าย)
+  container.innerHTML = fields.map(f => {
+    const val = existingData[f.name] || '';
+    
+    if (f.type === 'select') {
+      let optionsHtml = '';
+      if (f.options && Array.isArray(f.options)) {
+        optionsHtml = f.options.map(opt => {
+          const selected = (val == opt[0]) ? 'selected' : '';
+          return `<option value="${opt[0]}" ${selected}>${opt[1]}</option>`;
+        }).join('');
       }
-      
-      if (sheetName === 'Config_Types') {
-        fields = [
-          {name:'name_th', label:'ชื่อภาษาไทย*', type:'text', required:true},
-          {name:'name_en', label:'ชื่อภาษาอังกฤษ', type:'text'},
-          {name:'description', label:'คำอธิบาย', type:'textarea'},
-          {name:'color', label:'สี (Hex)', type:'text', placeholder:'#3498db'},
-          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-        ];
-      } else if (sheetName === 'Config_Areas') {
-        fields = [
-          {name:'area_name', label:'ชื่อพื้นที่*', type:'text', required:true},
-          {name:'department', label:'แผนก', type:'text'},
-          {name:'applicable_types', label:'ประเภทที่ใช้ได้ (คั่นด้วย ,)', type:'text', placeholder:'1,2,3'},
-          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-        ];
-      } else if (sheetName === 'Config_Sections') {
-        fields = [
-          {name:'type_id', label:'ประเภทเช็คลิสต์*', type:'select', 
-           options:(configData.types||[]).filter(t=>t.is_active==='TRUE').map(t=>[t.id,t.name_th]), required:true},
-          {name:'order', label:'ลำดับ', type:'number'},
-          {name:'title_th', label:'หัวข้อ (ไทย)*', type:'text', required:true},
-          {name:'title_en', label:'หัวข้อ (อังกฤษ)', type:'text'},
-          {name:'is_required', label:'บังคับตอบ', type:'select', options:[['TRUE','✅ บังคับ'],['FALSE','❌ ไม่บังคับ']]},
-          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-        ];
-      } else if (sheetName === 'Config_Questions') {
-        fields = [
-          {name:'section_id', label:'หัวข้อหลัก*', type:'select',
-           options:(configData.sections||[]).filter(s=>s.is_active==='TRUE').map(s=>[s.id,s.title_th]), required:true},
-          {name:'order', label:'ลำดับ', type:'number'},
-          {name:'question_th', label:'คำถาม (ไทย)*', type:'textarea', required:true},
-          {name:'question_en', label:'คำถาม (อังกฤษ)', type:'textarea'},
-          {name:'answer_type', label:'ประเภทคำตอบ*', type:'select',
-           options:[['radio','✅/❌'],['number','🔢 ตัวเลข'],['text','📝 สั้น']], required:true},
-          {name:'options', label:'ตัวเลือก (คั่นด้วย ,)', type:'text', placeholder:'ดี,ไม่ดี'},
-          {name:'is_required', label:'บังคับตอบ', type:'select', options:[['TRUE','✅'],['FALSE','❌']]},
-          {name:'has_remark', label:'มีช่องหมายเหตุ', type:'select', options:[['TRUE','✅ มี'],['FALSE','❌ ไม่มี']]},
-          {name:'has_duedate', label:'มี Due Date', type:'select', options:[['TRUE','✅ มี'],['FALSE','❌ ไม่มี']]},
-          {name:'has_photo', label:'บังคับแนบรูป', type:'select', options:[['TRUE','✅ บังคับ'],['FALSE','❌ ไม่บังคับ']]},
-          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-        ];
-      }
-      
-      container.innerHTML = fields.map(f => {
-        const val = existingData[f.name] || '';
-        if (f.type === 'select') {
-          return `
-            <div class="form-group">
-              <label>${f.label}</label>
-              <select name="${f.name}" ${f.required?'required':''}>
-                ${f.options.map(opt => `<option value="${opt[0]}" ${val==opt[0]?'selected':''}>${opt[1]}</option>`).join('')}
-              </select>
-            </div>
-          `;
-        } else if (f.type === 'textarea') {
-          return `
-            <div class="form-group">
-              <label>${f.label}</label>
-              <textarea name="${f.name}" rows="3" ${f.required?'required':''}>${val}</textarea>
-            </div>
-          `;
-        } else {
-          return `
-            <div class="form-group">
-              <label>${f.label}</label>
-              <input type="${f.type}" name="${f.name}" value="${val}" ${f.required?'required':''} placeholder="${f.placeholder||''}">
-            </div>
-          `;
-        }
-      }).join('');
+      return `
+        <div class="form-group">
+          <label>${f.label}</label>
+          <select name="${f.name}" ${f.required ? 'required' : ''}>
+            ${optionsHtml}
+          </select>
+        </div>
+      `;
+    } 
+    else if (f.type === 'textarea') {
+      return `
+        <div class="form-group">
+          <label>${f.label}</label>
+          <textarea name="${f.name}" rows="3" ${f.required ? 'required' : ''}>${val || ''}</textarea>
+        </div>
+      `;
+    } 
+    else {
+      return `
+        <div class="form-group">
+          <label>${f.label}</label>
+          <input type="${f.type}" name="${f.name}" value="${val || ''}" ${f.required ? 'required' : ''} placeholder="${f.placeholder || ''}">
+        </div>
+      `;
     }
+  }).join('');
+}
     
     // === CRUD Operations ===
     document.getElementById('configForm').onsubmit = function(e) {
