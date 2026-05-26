@@ -3,30 +3,41 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SAFETY DASHBOARD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    :root { 
-      --primary: #f39c12; 
-      --dark: #2c3e50; 
-      --success: #27ae60; 
-      --danger: #e74c3c; 
-      --bg: #f4f7f6; 
-      --light-orange: #fff5e6;
-      --blue: #2980b9;
+    :root {
+      --primary: #f39c12;
+      --primary-dark: #e67e22;
+      --dark: #2c3e50;
+      --success: #27ae60;
+      --danger: #e74c3c;
+      --info: #2980b9;
       --purple: #8e44ad;
-      --green: #27ae60;
+      --bg: #f4f7f6;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --text-muted: #7f8c8d;
+      --border: #e0e0e0;
+      --light-orange: #fff5e6;
+      --shadow: 0 4px 15px rgba(0,0,0,0.05);
+      --shadow-hover: 0 8px 25px rgba(0,0,0,0.1);
     }
+    
     * { box-sizing: border-box; }
+    
     body { 
       font-family: 'Prompt', sans-serif; 
       background: var(--bg); 
       margin: 0; 
       padding: 0; 
-      -webkit-tap-highlight-color: transparent; 
+      color: var(--text); 
+      -webkit-tap-highlight-color: transparent;
+      line-height: 1.5;
     }
     
-    /* ===== NAV ===== */
+    /* ===== Navigation ===== */
     .nav { 
       background: linear-gradient(90deg, #ff8c00, var(--primary)); 
       color: white; 
@@ -45,78 +56,123 @@
       margin: 0; 
       font-size: 1.3rem; 
       letter-spacing: 0.5px; 
+      font-weight: 700;
     }
     .nav-actions { 
       display: flex; 
       gap: 10px; 
-    }
-    .container { 
-      max-width: 1100px; 
-      margin: 25px auto; 
-      padding: 0 15px; 
+      flex-wrap: wrap;
     }
     .btn-main { 
       background: white; 
       color: var(--primary); 
-      padding: 8px 15px; 
-      border-radius: 8px; 
+      padding: 8px 16px; 
+      border-radius: 10px; 
       text-decoration: none; 
       font-weight: 600; 
-      transition: 0.3s; 
-      font-size: 0.95rem; 
+      transition: all 0.25s; 
+      font-size: 0.9rem; 
       white-space: nowrap; 
-      border: 1px solid white; 
+      border: 2px solid white;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
     .btn-main:hover { 
       background: #fff9f0; 
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .btn-report { 
-      background: #3498db; 
+      background: var(--info); 
       color: white; 
-      padding: 8px 15px; 
-      border-radius: 8px; 
+      padding: 8px 16px; 
+      border-radius: 10px; 
       text-decoration: none; 
       font-weight: 600; 
-      transition: 0.3s; 
-      font-size: 0.95rem; 
+      transition: all 0.25s; 
+      font-size: 0.9rem; 
       white-space: nowrap; 
-      border: 1px solid #3498db; 
+      border: 2px solid var(--info);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
     .btn-report:hover { 
-      background: #2980b9; 
+      background: #1f618d; 
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
     }
     
-    /* ===== TYPE SELECTOR (ใหม่) ===== */
+    /* ===== Container ===== */
+    .container { 
+      max-width: 1200px; 
+      margin: 20px auto; 
+      padding: 0 15px; 
+    }
+    
+    /* ===== Date Filter ===== */
+    .date-filter-box { 
+      margin-bottom: 20px; 
+      display: flex; 
+      align-items: center; 
+      gap: 12px;
+      background: var(--card-bg);
+      padding: 12px 18px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      flex-wrap: wrap;
+    }
+    .date-filter-box i { 
+      color: var(--primary); 
+      font-size: 1.3rem; 
+    }
+    input[type="date"] { 
+      padding: 10px 15px; 
+      border-radius: 8px; 
+      border: 1.5px solid var(--border); 
+      font-family: 'Prompt'; 
+      font-size: 14px; 
+      color: var(--text); 
+      outline: none; 
+      transition: all 0.2s;
+      background: #fafafa;
+    }
+    input[type="date"]:focus { 
+      border-color: var(--primary); 
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
+    }
+
+    /* ===== TYPE SELECTOR ===== */
     .type-filter-section {
-      background: white;
+      background: var(--card-bg);
       border-radius: 14px;
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      padding: 16px 20px;
+      margin: 0 0 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
     }
     .type-filter-label {
       font-weight: 600;
       color: var(--dark);
-      font-size: 0.9rem;
-      margin-bottom: 12px;
+      font-size: 0.95rem;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .type-filter-label i {
-      color: var(--primary);
-    }
+    .type-filter-label i { color: var(--primary); }
+    
     .type-selector {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 8px;
+      gap: 10px;
     }
     .type-btn {
-      padding: 10px 6px;
+      padding: 12px 8px;
       border-radius: 12px;
-      border: 2px solid #e0e0e0;
+      border: 2px solid var(--border);
       background: #f8f9fa;
       text-align: center;
       cursor: pointer;
@@ -128,60 +184,130 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
-      min-height: 70px;
+      gap: 6px;
+      min-height: 72px;
+      user-select: none;
     }
     .type-btn i {
       font-size: 1.2rem;
       transition: transform 0.2s;
+      color: var(--text-muted);
     }
     .type-btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
       border-color: var(--primary);
+      background: #fff9f0;
     }
-    .type-btn:active {
-      transform: scale(0.98);
-    }
+    .type-btn:hover i { color: var(--primary); transform: scale(1.1); }
+    .type-btn:active { transform: scale(0.98); }
+    
     .type-btn.active {
       background: linear-gradient(145deg, #fff3e0, #ffe0b2);
-      color: #e67e22;
-      border-color: #e67e22;
-      box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+      color: var(--primary-dark);
+      border-color: var(--primary-dark);
+      box-shadow: 0 6px 20px rgba(230, 126, 34, 0.25);
     }
-    .type-btn.active i {
-      transform: scale(1.1);
-      color: #e67e22;
-    }
+    .type-btn.active i { transform: scale(1.15); color: var(--primary-dark); }
+    
     .type-btn[data-type="5S"].active {
       background: linear-gradient(145deg, #e8f5e9, #c8e6c9);
-      color: #27ae60;
-      border-color: #27ae60;
-      box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+      color: #219a52;
+      border-color: #219a52;
+      box-shadow: 0 6px 20px rgba(39, 174, 96, 0.25);
     }
-    .type-btn[data-type="5S"].active i {
-      color: #27ae60;
-    }
+    .type-btn[data-type="5S"].active i { color: #219a52; }
+    
     .type-btn[data-type="Audit"].active {
       background: linear-gradient(145deg, #e3f2fd, #bbdefb);
       color: #1565c0;
       border-color: #1565c0;
-      box-shadow: 0 4px 15px rgba(21, 101, 192, 0.3);
+      box-shadow: 0 6px 20px rgba(21, 101, 192, 0.25);
     }
-    .type-btn[data-type="Audit"].active i {
-      color: #1565c0;
-    }
+    .type-btn[data-type="Audit"].active i { color: #1565c0; }
+    
     .type-btn[data-type="Accident/Fire"].active {
       background: linear-gradient(145deg, #fce4ec, #f8bbd9);
       color: #c62828;
       border-color: #c62828;
-      box-shadow: 0 4px 15px rgba(198, 40, 40, 0.3);
+      box-shadow: 0 6px 20px rgba(198, 40, 40, 0.25);
     }
-    .type-btn[data-type="Accident/Fire"].active i {
-      color: #c62828;
-    }
+    .type-btn[data-type="Accident/Fire"].active i { color: #c62828; }
 
-    /* ===== สถิติ Dashboard ===== */
+    /* ===== AREA SELECTOR (Dynamic Dropdown) ===== */
+    .area-selector-wrapper { position: relative; min-width: 200px; }
+    
+    .area-options {
+      display: none;
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0; right: 0;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      z-index: 100;
+      max-height: 280px;
+      overflow-y: auto;
+      padding: 6px;
+      animation: slideDown 0.2s ease;
+    }
+    .area-options.show { display: block; }
+    
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .area-option {
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.15s;
+      font-weight: 500;
+    }
+    .area-option:hover {
+      background: linear-gradient(135deg, #fff9f0, #fff3e0);
+      color: var(--primary-dark);
+      padding-left: 18px;
+    }
+    .area-option.selected {
+      background: linear-gradient(135deg, #ffe0b2, #ffd59a);
+      color: var(--primary-dark);
+      font-weight: 600;
+      border-left: 3px solid var(--primary-dark);
+    }
+    .area-option i {
+      width: 18px; text-align: center;
+      color: var(--text-muted);
+      transition: color 0.15s;
+    }
+    .area-option:hover i, .area-option.selected i { color: inherit; }
+    
+    .area-display {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 14px; background: #fafafa;
+      border-radius: 8px; border: 1.5px solid var(--border);
+      cursor: pointer; min-height: 40px;
+      font-weight: 500; font-size: 14px;
+      transition: all 0.2s;
+    }
+    .area-display:hover {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .area-display .arrow {
+      margin-left: auto; color: var(--text-muted);
+      transition: transform 0.25s; font-size: 12px;
+    }
+    .area-display.active .arrow { transform: rotate(180deg); }
+
+    /* ===== Stats Cards ===== */
     .stats { 
       display: grid; 
       grid-template-columns: repeat(3, 1fr); 
@@ -189,64 +315,108 @@
       margin-bottom: 25px; 
     }
     .stat-card { 
-      background: white; 
+      background: var(--card-bg); 
       padding: 20px; 
-      border-radius: 12px; 
+      border-radius: 14px; 
       text-align: center; 
-      border-bottom: 5px solid #ddd; 
+      border-bottom: 5px solid var(--border); 
       cursor: pointer; 
-      transition: 0.2s; 
+      transition: all 0.25s; 
+      box-shadow: var(--shadow);
+    }
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
     }
     .stat-card.active { 
       transform: translateY(-5px); 
       border-color: var(--primary); 
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+      box-shadow: 0 8px 25px rgba(230, 126, 34, 0.2); 
     }
     .stat-card small { 
-      color: #7f8c8d; 
+      color: var(--text-muted); 
       font-weight: 600; 
+      font-size: 0.85rem;
+      display: block;
+      margin-bottom: 8px;
     }
-    
-    /* ===== ตารางหลัก ===== */
+    .stat-card .value { 
+      font-size: 2rem; 
+      font-weight: 700;
+      transition: color 0.2s;
+    }
+    .stat-card#card-all .value { color: var(--info); }
+    .stat-card#card-good .value { color: var(--success); }
+    .stat-card#card-bad .value { color: var(--danger); }
+
+    /* ===== Table ===== */
     .table-box { 
-      background: white; 
-      border-radius: 12px; 
+      background: var(--card-bg); 
+      border-radius: 14px; 
       overflow-x: auto; 
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+      box-shadow: var(--shadow); 
       -webkit-overflow-scrolling: touch; 
     }
     table { 
       width: 100%; 
       border-collapse: collapse; 
-      min-width: 750px; 
+      min-width: 800px; 
     }
     th { 
-      background: #fff8f0; 
-      color: #e67e22; 
-      padding: 15px; 
+      background: linear-gradient(135deg, var(--dark), #34495e); 
+      color: white; 
+      border: 1px solid var(--dark); 
+      padding: 14px 12px; 
       text-align: left; 
-      font-size: 0.95rem; 
+      font-size: 0.9rem; 
       white-space: nowrap; 
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
     td { 
-      padding: 15px; 
-      border-bottom: 1px solid #eee; 
+      padding: 14px 12px; 
+      border-bottom: 1px solid var(--border); 
       vertical-align: middle; 
-      font-size: 0.95rem; 
+      font-size: 0.9rem; 
     }
+    tbody tr:hover { background: #fffdf9; }
+    
+    /* ===== Badges ===== */
     .badge { 
-      padding: 4px 12px; 
-      border-radius: 50px; 
+      padding: 5px 14px; 
+      border-radius: 20px; 
       color: white; 
       font-size: 0.8rem; 
       white-space: nowrap; 
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
+    .badge-good { background: linear-gradient(135deg, var(--success), #219a52); }
+    .badge-bad { background: linear-gradient(135deg, var(--danger), #c0392b); }
     
-    /* ===== ส่วนรายละเอียด ===== */
-    .detail-row { 
-      display: none; 
-      background: var(--light-orange); 
+    .type-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
     }
+    .type-badge-safety { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+    .type-badge-5s { background: linear-gradient(135deg, var(--success), #219a52); }
+    .type-badge-audit { background: linear-gradient(135deg, var(--info), #1f618d); }
+    .type-badge-acc { background: linear-gradient(135deg, var(--danger), #c0392b); }
+
+    /* ===== Detail Row ===== */
+    .detail-row { display: none; background: var(--light-orange); }
     .inner-detail { 
       padding: 20px; 
       background: white; 
@@ -255,6 +425,35 @@
       border-radius: 12px; 
       box-shadow: 0 4px 10px rgba(243, 156, 18, 0.1); 
     }
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--primary);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .detail-header h4 {
+      margin: 0;
+      color: var(--dark);
+      font-size: 1.1rem;
+    }
+    .detail-meta {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .detail-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .detail-meta i { color: var(--primary); }
+    
     .section-group { 
       margin-bottom: 15px; 
       border-radius: 10px; 
@@ -269,7 +468,10 @@
       display: flex; 
       justify-content: space-between; 
       align-items: center;
+      font-size: 0.95rem;
     }
+    .section-head i { margin-right: 8px; }
+    
     .sub-item { 
       display: flex; 
       justify-content: space-between; 
@@ -279,216 +481,287 @@
       background: #fffdfa; 
       gap: 10px; 
     }
+    .sub-item:last-child { border-bottom: none; }
     .sub-item-text { 
       flex: 1; 
       color: #5a4a3a; 
-      font-size: 0.95rem; 
+      font-size: 0.9rem; 
       line-height: 1.5; 
     }
     .status-pill { 
-      min-width: 80px; 
-      padding: 5px 10px; 
-      border-radius: 6px; 
-      font-size: 0.85rem; 
+      min-width: 85px; 
+      padding: 5px 12px; 
+      border-radius: 20px; 
+      font-size: 0.8rem; 
       font-weight: 600; 
       text-align: center; 
-      white-space: nowrap; 
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
     .status-good { 
       background: #e8f5e9; 
       color: var(--success); 
+      border: 1px solid #c8e6c9;
     }
     .status-bad { 
       background: #ffebee; 
       color: var(--danger); 
+      border: 1px solid #ffcdd2;
     }
     .remark-box { 
       font-size: 0.85rem; 
-      color: #d35400; 
+      color: #c0392b; 
       margin-top: 8px; 
       padding: 8px 12px; 
-      background: #fff9f0; 
-      border-left: 3px solid var(--primary); 
+      background: #fff5f5; 
+      border-left: 3px solid var(--danger); 
       border-radius: 4px; 
+      font-weight: 500;
     }
-    
-    .loader { 
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      width: 100%; 
-      height: 100%; 
-      background: rgba(255,255,255,0.9); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      z-index: 2000; 
-      backdrop-filter: blur(5px);
-    }
+
+    /* ===== View Button ===== */
     .btn-view { 
       background: #f4f6f7; 
-      border: 1px solid #d5dbdb; 
-      padding: 8px 12px; 
-      border-radius: 6px; 
+      border: 1.5px solid var(--border); 
+      padding: 8px 14px; 
+      border-radius: 8px; 
       cursor: pointer; 
       color: var(--dark); 
       font-family: 'Prompt'; 
-      transition: 0.2s; 
+      transition: all 0.2s; 
       white-space: nowrap; 
-      font-weight: 600; 
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
     .btn-view:hover { 
-      background: #e5e8e8; 
+      background: #e8eaec; 
+      border-color: var(--primary);
       transform: translateY(-1px);
     }
-    
-    /* ===== รูปภาพ ===== */
+    .btn-view:active { transform: scale(0.98); }
+
+    /* ===== Images ===== */
     .img-preview { 
-      width: 50px; 
-      height: 50px; 
+      width: 55px; 
+      height: 55px; 
       object-fit: cover; 
-      border-radius: 6px; 
-      border: 1px solid #ddd; 
-      transition: transform 0.2s; 
-      margin-right: 5px; 
-      margin-bottom: 5px; 
-      background-color: #f9f9f9; 
+      border-radius: 8px; 
+      border: 2px solid var(--border); 
+      transition: all 0.25s; 
+      background: #f9f9f9;
+      cursor: pointer;
     }
     .img-preview:hover { 
-      transform: scale(1.1); 
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+      transform: scale(1.15); 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+      border-color: var(--primary);
+      z-index: 5;
+      position: relative;
     }
     .img-preview-large { 
       width: 90px; 
       height: 90px; 
       object-fit: cover; 
-      border-radius: 8px; 
-      border: 1px solid #ddd; 
-      margin:0; 
-      background-color: #f9f9f9; 
+      border-radius: 10px; 
+      border: 2px solid var(--border); 
+      background: #f9f9f9;
+      cursor: pointer;
+      transition: all 0.25s;
     }
-    
-    .date-filter-box { 
-      margin-bottom: 20px; 
-      display: flex; 
+    .img-preview-large:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      border-color: var(--primary);
+    }
+    .img-placeholder {
+      width: 55px; height: 55px;
+      background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); font-size: 10px;
+      flex-direction: column; gap: 3px;
+    }
+    .img-placeholder i { font-size: 1rem; opacity: 0.5; }
+
+    /* ===== Loader ===== */
+    .loader { 
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%; 
+      background: rgba(255,255,255,0.95); 
+      display: none;
+      flex-direction: column; 
       align-items: center; 
-      gap: 10px; 
-      flex-wrap: wrap;
+      justify-content: center; 
+      z-index: 2000;
+      backdrop-filter: blur(5px);
     }
-    input[type="date"] { 
-      padding: 10px 15px; 
-      border-radius: 8px; 
-      border: 1px solid #ddd; 
-      font-family: 'Prompt'; 
-      font-size: 1rem; 
-      color: var(--dark); 
-      outline: none; 
-      transition: border 0.3s; 
+    .loader.show { display: flex; }
+    .loader i { 
+      color: var(--primary); 
+      font-size: 2.5rem;
+      animation: spin 1s linear infinite;
+    }
+    .loader p {
+      margin-top: 15px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
-    /* ===== Responsive ===== */
+    /* ===== Empty State ===== */
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.4;
+      color: var(--border);
+    }
+    .empty-state p {
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    /* ===== Mobile Responsive ===== */
     @media (max-width: 768px) {
-      .nav h2 { 
-        font-size: 1.1rem; 
-        width: 100%; 
-        text-align: center; 
-      }
-      .nav-actions { 
-        width: 100%; 
-        justify-content: center; 
-      }
-      .btn-main, .btn-report { 
-        padding: 6px 10px; 
-        font-size: 0.85rem; 
-      }
-      .container { 
-        padding: 0 10px; 
-        margin: 15px auto; 
-      }
-      .stats { 
-        gap: 10px; 
-        margin-bottom: 15px; 
-      }
-      .stat-card { 
-        padding: 12px 8px; 
-        border-radius: 10px; 
-        border-bottom: 4px solid #ddd; 
-      }
-      .stat-card small { 
-        font-size: 0.7rem; 
-        letter-spacing: -0.5px; 
-      }
-      .stat-card .value { 
-        font-size: 1.5rem !important; 
-      }
-      .inner-detail { 
-        padding: 12px; 
-        margin: 10px 5px; 
-      }
-      .sub-item { 
+      .nav { padding: 12px 15px; }
+      .nav h2 { font-size: 1.1rem; width: 100%; text-align: center; }
+      .nav-actions { width: 100%; justify-content: center; }
+      .btn-main, .btn-report { padding: 7px 12px; font-size: 0.85rem; }
+      
+      .container { padding: 0 12px; margin: 15px auto; }
+      
+      .date-filter-box { 
         flex-direction: column; 
-        padding: 12px 10px; 
+        align-items: stretch; 
+        padding: 15px;
       }
-      .status-pill { 
-        margin-left: 0; 
-        margin-top: 10px; 
-        align-self: flex-start; 
+      
+      .type-selector { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .type-btn { font-size: 0.68rem; padding: 10px 6px; min-height: 68px; }
+      .type-btn i { font-size: 1.1rem; }
+      
+      .stats { gap: 12px; margin-bottom: 20px; }
+      .stat-card { padding: 15px 10px; border-radius: 12px; border-bottom: 4px solid var(--border); }
+      .stat-card small { font-size: 0.75rem; }
+      .stat-card .value { font-size: 1.7rem !important; }
+      
+      .table-box { border-radius: 12px; }
+      
+      /* Table Card View */
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      
+      tr { 
+        margin-bottom: 15px; 
+        border: 1.5px solid var(--border); 
+        border-radius: 12px; 
+        overflow: hidden; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
+        background: #fff;
       }
-      .img-preview-large { 
-        width: 75px; 
-        height: 75px; 
+      
+      td { 
+        text-align: left !important; 
+        padding: 12px 16px; 
+        border: none; 
+        border-bottom: 1px solid #f5f5f5; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 4px;
+        position: relative;
       }
-      input[type="date"] { 
-        width: 100%; 
-        max-width: 250px; 
+      td:last-child { border-bottom: none; }
+      
+      td::before { 
+        content: attr(data-label); 
+        font-weight: 600; 
+        color: var(--primary-dark); 
+        margin-bottom: 4px; 
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
       }
-      .type-selector { 
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 6px;
+      
+      .badge, .type-badge { font-size: 0.75rem; padding: 4px 10px; }
+      .btn-view { width: 100%; justify-content: center; }
+      
+      /* Detail View Mobile */
+      .inner-detail { padding: 15px; margin: 10px; }
+      .detail-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .sub-item { flex-direction: column; padding: 12px 14px; }
+      .status-pill { margin-top: 8px; align-self: flex-start; }
+      
+      .img-preview { width: 100%; max-width: 200px; height: 120px; margin: 8px 0 0; }
+      .img-preview-large { width: 100%; max-width: 250px; height: 150px; }
+      
+      /* Area dropdown mobile */
+      .area-options {
+        position: static;
+        box-shadow: none;
+        border: 1px solid var(--border);
+        max-height: 240px;
+        margin-top: 8px;
+        border-radius: 10px;
       }
-      .type-btn { 
-        font-size: 0.65rem; 
-        padding: 8px 4px; 
-        min-height: 60px;
-      }
-      .type-btn i { 
-        font-size: 1rem; 
-      }
+      .area-selector-wrapper { width: 100%; }
     }
     
     @media (max-width: 480px) {
-      .type-selector { 
-        grid-template-columns: repeat(2, 1fr); 
-      }
-      .type-btn { 
-        font-size: 0.62rem; 
-        min-height: 55px;
-      }
+      .type-selector { grid-template-columns: repeat(2, 1fr); }
+      .type-btn { font-size: 0.65rem; min-height: 64px; padding: 10px 4px; }
+      .type-btn i { font-size: 1rem; }
+      
+      .stats { grid-template-columns: 1fr; }
+      
+      input[type="date"] { width: 100%; }
     }
   </style>
 </head>
 <body>
+  
+  <!-- Loader -->
   <div id="loader" class="loader">
-    <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i>
+    <i class="fas fa-circle-notch"></i>
+    <p>กำลังโหลดข้อมูล...</p>
   </div>
   
+  <!-- Navigation -->
   <nav class="nav">
-    <div><h2>SAFETY DASHBOARD</h2></div>
+    <h2><i class="fas fa-shield-halved"></i> SAFETY DASHBOARD</h2>
     <div class="nav-actions">
-      <a href="Report.html" class="btn-report"><i class="fas fa-chart-line"></i> Action Plan</a>
-      <a href="https://itrequests.netlify.app/safety" class="btn-main"><i class="fas fa-plus"></i> ตรวจสอบพื้นที่</a>
+      <a href="Report.html" class="btn-report">
+        <i class="fas fa-chart-line"></i> Action Plan
+      </a>
+      <a href="https://itrequests.netlify.app/safety" class="btn-main">
+        <i class="fas fa-plus"></i> ตรวจสอบพื้นที่
+      </a>
     </div>
   </nav>
 
   <div class="container">
     
-    <!-- ===== FILTER SECTION ===== -->
+    <!-- Date Filter -->
     <div class="date-filter-box">
-      <i class="fas fa-calendar-alt" style="color:var(--primary); font-size:1.2rem;"></i>
+      <i class="fas fa-calendar-alt"></i>
       <input type="date" id="dateFilter" onchange="loadData()">
     </div>
     
-    <!-- ===== TYPE SELECTOR (ใหม่) ===== -->
+    <!-- Type Selector -->
     <div class="type-filter-section">
       <div class="type-filter-label">
         <i class="fas fa-filter"></i> กรองตามประเภทการตรวจสอบ
@@ -518,23 +791,36 @@
       </div>
     </div>
     
-    <!-- ===== STATS ===== -->
-    <div class="stats">
-      <div class="stat-card" id="card-all" onclick="updateStatusFilter('all')">
-        <small>ทั้งหมดวันนี้</small>
-        <div class="value" id="countTotal" style="font-size:2.2rem; color:#3498db;">0</div>
-      </div>
-      <div class="stat-card" id="card-good" onclick="updateStatusFilter('good')">
-        <small>ปกติ</small>
-        <div class="value" id="countGood" style="font-size:2.2rem; color:var(--success);">0</div>
-      </div>
-      <div class="stat-card" id="card-bad" onclick="updateStatusFilter('bad')">
-        <small>พบปัญหา</small>
-        <div class="value" id="countBad" style="font-size:2.2rem; color:var(--danger);">0</div>
+    <!-- Area Filter (Dynamic) -->
+    <div class="date-filter-box" style="margin-bottom: 20px;">
+      <i class="fas fa-map-marker-alt" style="color:var(--primary);"></i>
+      <div class="area-selector-wrapper">
+        <div class="area-display" id="areaDisplay" onclick="toggleAreaDropdown()">
+          <span id="areaDisplayText">-- ทั้งหมด --</span>
+          <i class="fas fa-chevron-down arrow"></i>
+        </div>
+        <div class="area-options" id="areaOptions"></div>
+        <input type="hidden" id="areaFilter" value="">
       </div>
     </div>
     
-    <!-- ===== TABLE ===== -->
+    <!-- Stats Cards -->
+    <div class="stats">
+      <div class="stat-card" id="card-all" onclick="updateStatusFilter('all')">
+        <small><i class="fas fa-list"></i> ทั้งหมดวันนี้</small>
+        <div class="value" id="countTotal">0</div>
+      </div>
+      <div class="stat-card" id="card-good" onclick="updateStatusFilter('good')">
+        <small><i class="fas fa-check-circle"></i> ปกติ</small>
+        <div class="value" id="countGood">0</div>
+      </div>
+      <div class="stat-card" id="card-bad" onclick="updateStatusFilter('bad')">
+        <small><i class="fas fa-exclamation-triangle"></i> พบปัญหา</small>
+        <div class="value" id="countBad">0</div>
+      </div>
+    </div>
+    
+    <!-- Table -->
     <div class="table-box">
       <table>
         <thead>
@@ -543,243 +829,585 @@
             <th>ประเภท</th>
             <th>พื้นที่</th>
             <th>ผู้ตรวจ</th>
-            <th>สถานะรวม</th>
-            <th>รูปถ่าย</th>
+            <th>สถานะ</th>
+            <th>รูปภาพ</th>
             <th>รายละเอียด</th>
           </tr>
         </thead>
-        <tbody id="tableBody"></tbody>
+        <tbody id="tableBody">
+          <!-- Data will be rendered here -->
+        </tbody>
       </table>
     </div>
   </div>
 
   <script>
-    // ⚠️ นำลิงก์ Web App URL ของคุณมาใส่ตรงนี้ ⚠️
-    const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
-
-    const checklistStructure = {
-      s1: { title: "1. สถานที่ทำงาน", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "Water Mist"] },
-      s2: { title: "2. ท่าทางการทำงาน", questions: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์", "การยกของอย่างถูกต้องและปลอดภัย"] },
-      s3: { title: "3. เครื่องจักร", questions: ["สวมใส่อุปกรณ์ป้องกันอันตราย (PPE)", "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย"] },
-      s4: { title: "4. สารเคมี", questions: ["ไม่มีสารเคมีหกรั่วไหล", "ภาชนะปิดสนิท/มีฉลากชัดเจน", "มีอุปกรณ์ Spill Kit พร้อมใช้"] },
-      s5: { title: "5. ไฟฟ้า", questions: ["อุปกรณ์ไฟฟ้า/ปลั๊กไฟไม่ชำรุด", "ไม่มีการต่อพ่วงไฟฟ้าชั่วคราว", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย"] },
-      s6: { title: "6. อุปกรณ์ฉุกเฉิน", questions: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน"] },
-      s7: { title: "7. อื่นๆ", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
+    // ===================================================================
+    // CONFIGURATION
+    // ===================================================================
+    const CONFIG = {
+      API_URL: "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec",
+      TZ: "GMT+7",
+      
+      // Inspection types
+      SAFETY_TYPES: ["จป.ว", "คปอ.", "Foreman/Mgr.", "Audit", "Accident/Fire"],
+      TYPE_5S: "5S",
+      
+      // Area mapping for display normalization
+      AREA_DISPLAY_MAP: {
+        "OFFICE": "Office (5S)",
+        "Canteen": "Canteen (5S)",
+        "QA&QC": "QA&QC (5S)",
+        "Factory": "Factory (5S)",
+        "EN": "Engineering (5S)",
+        "Outside": "Outside (5S)"
+      }
     };
 
+    // ===================================================================
+    // AREA DATA FOR DROPDOWN
+    // ===================================================================
+    const AREA_DATA = {
+      safety: [
+        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
+        { value: "แผนก Print", label: "🖨️ แผนก Print", icon: "fas fa-print" },
+        { value: "แผนก Laminate", label: "📦 แผนก Laminate", icon: "fas fa-layer-group" },
+        { value: "แผนก Solvent", label: "🧪 แผนก Solvent", icon: "fas fa-flask" },
+        { value: "แผนก Rewinder / Slitter / Packing", label: "🔄 Rewinder/Slitter/Packing", icon: "fas fa-box-open" },
+        { value: "แผนก BAG MAKING", label: "🛍️ แผนก BAG MAKING", icon: "fas fa-shopping-bag" },
+        { value: "แผนก QA & QC", label: "🔬 แผนก QA & QC", icon: "fas fa-vial" },
+        { value: "แผนก Warehouse", label: "🏭 แผนก Warehouse", icon: "fas fa-warehouse" },
+        { value: "Office", label: "🏢 Office", icon: "fas fa-building" },
+        { value: "พื้นที่รอบบริเวณโรงงาน", label: "🌳 พื้นที่รอบโรงงาน", icon: "fas fa-tree" }
+      ],
+      "5S": [
+        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
+        { value: "OFFICE", label: "🖥️ Office", icon: "fas fa-desktop" },
+        { value: "Canteen", label: "🍽️ Canteen", icon: "fas fa-utensils" },
+        { value: "QA&QC", label: "🔬 QA&QC", icon: "fas fa-microscope" },
+        { value: "Factory", label: "🏭 Factory", icon: "fas fa-industry" },
+        { value: "EN", label: "🔧 Engineering", icon: "fas fa-tools" },
+        { value: "Outside", label: "🌳 Outside", icon: "fas fa-tree" }
+      ]
+    };
+
+    // ===================================================================
+    // CHECKLIST STRUCTURES
+    // ===================================================================
+    const CHECKLIST_SAFETY = {
+      s1: { title: "1. สถานที่ทำงาน", icon: "fas fa-building", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "Water Mist"] },
+      s2: { title: "2. ท่าทางการทำงาน", icon: "fas fa-person-walking", questions: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์", "การยกของอย่างถูกต้องและปลอดภัย"] },
+      s3: { title: "3. เครื่องจักร", icon: "fas fa-gears", questions: ["สวมใส่อุปกรณ์ป้องกันอันตราย (PPE)", "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย"] },
+      s4: { title: "4. สารเคมี", icon: "fas fa-flask-vial", questions: ["ไม่มีสารเคมีหกรั่วไหล", "ภาชนะปิดสนิท/มีฉลากชัดเจน", "มีอุปกรณ์ Spill Kit พร้อมใช้"] },
+      s5: { title: "5. ไฟฟ้า", icon: "fas fa-bolt", questions: ["อุปกรณ์ไฟฟ้า/ปลั๊กไฟไม่ชำรุด", "ไม่มีการต่อพ่วงไฟฟ้าชั่วคราว", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย"] },
+      s6: { title: "6. อุปกรณ์ฉุกเฉิน", icon: "fas fa-fire-extinguisher", questions: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน"] },
+      s7: { title: "7. อื่นๆ", icon: "fas fa-ellipsis", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
+    };
+
+    const CHECKLIST_5S = {
+      "OFFICE": {
+        sections: [
+          { title: "1. โต๊ะทำงาน", icon: "fas fa-desktop", questions: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน", "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงาน", "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงาน", "ตะกร้าเอกสารต้องระบุป้ายชี้บ่งให้ชัดเจนและจัดเก็บเอกสารให้เป็นระเบียบ"] },
+          { title: "2. ลิ้นชัก", icon: "fas fa-drawer", questions: ["ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน", "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO", "ลิ้นชักที่ 3 ใส่อุปกรณ์ส่วนตัว"] },
+          { title: "3. การจัดเก็บเอกสาร", icon: "fas fa-folder-open", questions: ["แฟ้มเอกสารทุกแฟ้มต้องใช้ Font: Angsana New ทุกแฟ้ม", "เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน", "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"] },
+          { title: "4. เครื่องคอมพิวเตอร์", icon: "fas fa-computer", questions: ["จัดวางคอมพิวเตอร์/เครื่องแฟกซ์ในตำแหน่งที่เหมาะสม", "ไม่ติดกระดาษโน๊ตต่างๆ ไว้หน้าคอมพิวเตอร์", "จัดเก็บสายไฟให้เป็นระเบียบเรียบร้อย"] },
+          { title: "5. พื้น / ผนัง/เพดาน", icon: "fas fa-house", questions: ["ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น/ผนังห้องต้องไม่มีหยากไย่", "ไม่วางสิ่งกีดขวางทางเดิน", "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม", "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"] },
+          { title: "6. สภาพแวดล้อมทั่วไป", icon: "fas fa-leaf", questions: ["มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมใน Office หรือไม่", "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอ", "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดและกำหนดผู้รับผิดชอบ", "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"] },
+          { title: "7. การตรวจสุขลักษณะส่วนบุคคล", icon: "fas fa-user-check", questions: ["พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
+          { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", icon: "fas fa-award", questions: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
+        ]
+      }
+      // เพิ่มพื้นที่ 5S อื่นๆ ตามต้องการ...
+    };
+
+    // ===================================================================
+    // STATE
+    // ===================================================================
     let fullData = [];
     let currentTypeFilter = 'all';
+    let currentAreaFilter = '';
     let currentStatusFilter = 'all';
-    
-    document.getElementById('dateFilter').valueAsDate = new Date();
+    let isLoading = false;
 
-    function getDriveThumbnailUrl(url) {
-      if(!url) return "";
-      let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if(match && match[1]) {
-        return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w500`;
-      }
-      return url; 
-    }
+    // ===================================================================
+    // INITIALIZATION
+    // ===================================================================
+    window.onload = function() {
+      // Set default date to today
+      document.getElementById('dateFilter').valueAsDate = new Date();
+      
+      // Initialize area options
+      updateAreaOptions('all');
+      
+      // Load data
+      loadData();
+    };
 
-    // ==========================================
-    // TYPE FILTER FUNCTION
-    // ==========================================
+    // ===================================================================
+    // TYPE FILTER
+    // ===================================================================
     function selectTypeFilter(type, el) {
+      if (currentTypeFilter === type) return;
+      
       currentTypeFilter = type;
       
-      // Update active button
+      // Update UI
       document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
       
-      // Re-render table with new filter
-      applyFilters();
+      // Update area options based on type
+      updateAreaOptions(type);
+      
+      // Reset area filter
+      currentAreaFilter = '';
+      document.getElementById('areaFilter').value = '';
+      document.getElementById('areaDisplayText').textContent = '-- ทั้งหมด --';
+      document.querySelectorAll('.area-option').forEach(opt => opt.classList.remove('selected'));
+      
+      // Re-render table
+      renderTable();
     }
-    
+
+    // ===================================================================
+    // AREA DROPDOWN
+    // ===================================================================
+    function updateAreaOptions(type) {
+      const container = document.getElementById('areaOptions');
+      const areaKey = (type === CONFIG.TYPE_5S) ? CONFIG.TYPE_5S : 'safety';
+      const areas = AREA_DATA[areaKey];
+      
+      container.innerHTML = areas.map(area => `
+        <div class="area-option" data-value="${area.value}" onclick="selectArea('${area.value}', '${area.label}', this)">
+          <i class="${area.icon}"></i>
+          <span>${area.label}</span>
+        </div>
+      `).join('');
+    }
+
+    function toggleAreaDropdown() {
+      const dropdown = document.getElementById('areaOptions');
+      const display = document.getElementById('areaDisplay');
+      const isShowing = dropdown.classList.contains('show');
+      
+      // Close all other dropdowns first
+      document.querySelectorAll('.area-options').forEach(d => {
+        if (d !== dropdown) d.classList.remove('show');
+      });
+      document.querySelectorAll('.area-display').forEach(el => {
+        if (el !== display) el.classList.remove('active');
+      });
+      
+      // Toggle current
+      dropdown.classList.toggle('show', !isShowing);
+      display.classList.toggle('active', !isShowing);
+    }
+
+    function selectArea(value, label, el) {
+      currentAreaFilter = value;
+      document.getElementById('areaFilter').value = value;
+      document.getElementById('areaDisplayText').textContent = label;
+      
+      document.querySelectorAll('.area-option').forEach(opt => opt.classList.remove('selected'));
+      el.classList.add('selected');
+      
+      document.getElementById('areaOptions').classList.remove('show');
+      document.getElementById('areaDisplay').classList.remove('active');
+      
+      renderTable();
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      const wrapper = document.querySelector('.area-selector-wrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        document.getElementById('areaOptions').classList.remove('show');
+        document.getElementById('areaDisplay').classList.remove('active');
+      }
+    });
+
+    // ===================================================================
+    // STATUS FILTER
+    // ===================================================================
     function updateStatusFilter(type) {
       currentStatusFilter = type;
       
-      // Update active stat card
+      // Update UI
       document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
       document.getElementById('card-' + type).classList.add('active');
       
-      applyFilters();
+      renderTable();
     }
-    
-    function applyFilters() {
+
+    // ===================================================================
+    // DATA LOADING
+    // ===================================================================
+    async function loadData() {
+      if (isLoading) return;
+      isLoading = true;
+      
+      const loader = document.getElementById('loader');
+      loader.classList.add('show');
+      
+      const dateVal = document.getElementById('dateFilter').value;
+      
+      try {
+        const response = await fetch(`${CONFIG.API_URL}?action=getDashboardData&date=${dateVal}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const data = await response.json();
+        fullData = data.details || [];
+        
+        // Update stats
+        document.getElementById('countTotal').innerText = data.total || 0;
+        document.getElementById('countGood').innerText = data.good || 0;
+        document.getElementById('countBad').innerText = data.bad || 0;
+        
+        // Re-render table with current filters
+        renderTable();
+        
+      } catch (err) {
+        console.error("Load data error:", err);
+        document.getElementById('tableBody').innerHTML = `
+          <tr>
+            <td colspan="7" class="empty-state">
+              <i class="fas fa-triangle-exclamation"></i>
+              <p>ไม่สามารถโหลดข้อมูลได้</p>
+              <small style="color:var(--danger);">${err.message}</small>
+            </td>
+          </tr>
+        `;
+      } finally {
+        isLoading = false;
+        loader.classList.remove('show');
+      }
+    }
+
+    // ===================================================================
+    // TABLE RENDERING
+    // ===================================================================
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      
+      // Apply filters
       let filtered = [...fullData];
       
-      // Filter by type
+      // Type filter
       if (currentTypeFilter !== 'all') {
         filtered = filtered.filter(d => d.inspectionType === currentTypeFilter);
       }
       
-      // Filter by status
+      // Area filter (with normalization)
+      if (currentAreaFilter !== '') {
+        filtered = filtered.filter(d => {
+          const itemArea = normalizeAreaForFilter(d.area, d.inspectionType);
+          return itemArea === currentAreaFilter;
+        });
+      }
+      
+      // Status filter
       if (currentStatusFilter === 'good') {
         filtered = filtered.filter(d => !d.hasBad);
       } else if (currentStatusFilter === 'bad') {
         filtered = filtered.filter(d => d.hasBad);
       }
       
-      renderTable(filtered);
-    }
-
-    // ==========================================
-    // LOAD DATA
-    // ==========================================
-    function loadData() {
-      document.getElementById('loader').style.display = 'flex';
-      let dateVal = document.getElementById('dateFilter').value;
-
-      fetch(API_URL + "?action=getDashboardData&date=" + dateVal)
-      .then(response => response.json())
-      .then(data => {
-        fullData = data.details || [];
-        document.getElementById('countTotal').innerText = data.total || 0;
-        document.getElementById('countGood').innerText = data.good || 0;
-        document.getElementById('countBad').innerText = data.bad || 0;
-        
-        // Reset filters to default
-        currentTypeFilter = 'all';
-        currentStatusFilter = 'all';
-        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector('.type-btn[data-type="all"]').classList.add('active');
-        document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
-        document.getElementById('card-all').classList.add('active');
-        
-        applyFilters();
-        document.getElementById('loader').style.display = 'none';
-      })
-      .catch(err => {
-        document.getElementById('loader').style.display = 'none';
-        console.error("Error loading data", err);
-      });
-    }
-
-    function renderTable(data) {
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '';
-
-      data.forEach(d => {
-        
-        let photoDisplay = '-';
-        if (typeof d.photo === 'object' && d.photo !== null) {
-          let photoCount = Object.values(d.photo).filter(url => url !== "ไม่มีรูปถ่าย" && url.trim() !== "").length;
-          if(photoCount > 0) {
-            photoDisplay = `<span style="color:var(--primary); font-size:0.95rem; font-weight:600;"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
-          }
-        } else if (typeof d.photo === 'string' && d.photo !== "ไม่มีรูปถ่าย" && d.photo.trim() !== "") {
-          photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image fa-lg"></i></a>`;
-        }
-
-        // Get type badge color
-        let typeBadgeColor = '#95a5a6';
-        if (d.inspectionType === 'จป.ว' || d.inspectionType === 'คปอ.' || d.inspectionType === 'Foreman/Mgr.') {
-          typeBadgeColor = '#f39c12';
-        } else if (d.inspectionType === 'Audit') {
-          typeBadgeColor = '#2980b9';
-        } else if (d.inspectionType === 'Accident/Fire') {
-          typeBadgeColor = '#e74c3c';
-        } else if (d.inspectionType === '5S') {
-          typeBadgeColor = '#27ae60';
-        }
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${d.timestamp}</td>
-          <td><span class="badge" style="background:${typeBadgeColor}">${d.inspectionType || '-'}</span></td>
-          <td><strong>${d.area}</strong></td>
-          <td>${d.inspector}</td>
-          <td><span class="badge" style="background:${d.hasBad? 'var(--danger)':'var(--success)'}">${d.hasBad?'พบปัญหา':'ปกติ'}</span></td>
-          <td>${photoDisplay}</td>
-          <td><button class="btn-view" onclick="toggleDetail(${d.id})"><i class="fas fa-chevron-down" id="icon-${d.id}"></i> ดูผลตรวจ</button></td>
+      // Empty state
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="empty-state">
+              <i class="fas fa-search"></i>
+              <p>ไม่พบข้อมูลตามเงื่อนไขที่เลือก</p>
+              <small>ลองปรับการกรองหรือเลือกวันที่อื่น</small>
+            </td>
+          </tr>
         `;
-        tbody.appendChild(tr);
-
-        const detailTr = document.createElement('tr');
-        detailTr.id = `detail-${d.id}`;
-        detailTr.className = 'detail-row';
+        return;
+      }
+      
+      // Render rows
+      tbody.innerHTML = filtered.map(d => {
+        // Photo display
+        let photoDisplay = '<span style="color:#aaa;">-</span>';
+        if (typeof d.photo === 'object' && d.photo !== null) {
+          const photoCount = Object.values(d.photo).filter(url => url && url.trim() !== "").length;
+          if (photoCount > 0) {
+            photoDisplay = `<span style="color:var(--primary);font-weight:600;"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
+          }
+        } else if (typeof d.photo === 'string' && d.photo && d.photo.trim() !== "") {
+          photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image"></i></a>`;
+        }
         
-        let detailHtml = `<div class="inner-detail">
-          <h4 style="margin:0 0 15px 0; color:var(--dark); border-bottom:3px solid var(--primary); padding-bottom:8px;">
-            <i class="fas fa-clipboard-list"></i> รายละเอียดผลการตรวจสอบรายหัวข้อ
-          </h4>`;
+        // Normalize area display
+        const displayArea = normalizeAreaDisplay(d.area, d.inspectionType);
         
-        for(let secKey in checklistStructure) {
-          const section = checklistStructure[secKey];
-          const sNum = secKey.replace('s', '');
+        // Type badge
+        const typeBadge = getTypeBadge(d.inspectionType);
+        
+        // Status badge
+        const statusBadge = d.hasBad 
+          ? `<span class="badge badge-bad"><i class="fas fa-exclamation-triangle"></i> พบปัญหา</span>`
+          : `<span class="badge badge-good"><i class="fas fa-check-circle"></i> ปกติ</span>`;
+        
+        return `
+          <tr>
+            <td data-label="⏰ เวลา">${d.timestamp}</td>
+            <td data-label="🏷️ ประเภท">${typeBadge}</td>
+            <td data-label="📍 พื้นที่"><strong>${displayArea}</strong></td>
+            <td data-label="👤 ผู้ตรวจ">${d.inspector}</td>
+            <td data-label="✅ สถานะ">${statusBadge}</td>
+            <td data-label="📷 รูปภาพ">${photoDisplay}</td>
+            <td data-label="🔍 รายละเอียด">
+              <button class="btn-view" onclick="toggleDetail(${d.id})">
+                <i class="fas fa-chevron-down" id="icon-${d.id}"></i> ดูผลตรวจ
+              </button>
+            </td>
+          </tr>
+          ${renderDetailRow(d)}
+        `;
+      }).join('');
+    }
 
-          detailHtml += `<div class="section-group">
-            <div class="section-head">
-              <span>${section.title}</span>
-            </div>`;
+    // ===================================================================
+    // DETAIL ROW RENDERING
+    // ===================================================================
+    function renderDetailRow(d) {
+      const is5S = d.inspectionType === CONFIG.TYPE_5S;
+      const checklist = is5S ? CHECKLIST_5S : CHECKLIST_SAFETY;
+      const areaKey = is5S ? (d.area || 'OFFICE') : null;
+      
+      let detailHtml = `
+        <tr class="detail-row" id="detail-${d.id}">
+          <td colspan="7" style="padding:0;">
+            <div class="inner-detail">
+              <div class="detail-header">
+                <h4><i class="fas fa-clipboard-list"></i> รายละเอียดผลการตรวจสอบ</h4>
+                <div class="detail-meta">
+                  <span><i class="fas fa-tag"></i> ${d.inspectionType}</span>
+                  <span><i class="fas fa-map-marker-alt"></i> ${normalizeAreaDisplay(d.area, d.inspectionType)}</span>
+                  <span><i class="fas fa-user"></i> ${d.inspector}</span>
+                  <span><i class="fas fa-clock"></i> ${d.timestamp}</span>
+                </div>
+              </div>
+      `;
+      
+      if (is5S) {
+        // === 5S Checklist ===
+        const sections = CHECKLIST_5S[areaKey]?.sections || CHECKLIST_5S["OFFICE"].sections;
+        
+        sections.forEach((sec, sIdx) => {
+          detailHtml += `
+            <div class="section-group">
+              <div class="section-head">
+                <span><i class="${sec.icon}"></i> ${sec.title}</span>
+              </div>
+          `;
           
-          section.questions.forEach((qText, idx) => {
-            const res = d.fullChecklist[`section${sNum}_q${idx}`];
-            const remark = d.fullChecklist[`section${sNum}_remark${idx}`];
+          sec.questions.forEach((qText, qIdx) => {
+            const detailKey = `5s_s${sIdx}_q${qIdx}`;
+            const res = d.fullChecklist[detailKey];
+            const remark = d.fullChecklist[`5s_remark_s${sIdx}_q${qIdx}`];
             const isBad = res === "ไม่ดี";
             
-            let displayQText = qText;
-            if(secKey === 's1' && qText === 'Water Mist') {
-                let waterVal = d.fullChecklist['water_val'];
-                if(waterVal) {
-                    displayQText += ` <span style="color:#e67e22; font-weight:bold;">(${waterVal}%)</span>`;
-                }
-            }
+            // Photos
+            const qPhotoKey = `5s_${sIdx}_${qIdx}`;
+            const photoHtml = renderPhotos(d.photo, qPhotoKey, d.fullChecklist);
             
-            const qPhotoKey = `${secKey}_q${idx}`; 
-            let qPhotoPreviews = ""; 
-            
-            if(typeof d.photo === 'object' && d.photo !== null) {
-               if(d.photo[qPhotoKey] && d.photo[qPhotoKey] !== "") {
-                  let thumbUrl = getDriveThumbnailUrl(d.photo[qPhotoKey]);
-                  qPhotoPreviews += `<div style="margin-right:10px; margin-top:10px;"><a href="${d.photo[qPhotoKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large" onerror="this.src='https://placehold.co/90x90/eeeeee/999999?text=IMG'"></a></div>`;
-               }
-               for(let p = 0; p < 3; p++) {
-                  let pKey = `${qPhotoKey}_${p}`;
-                  if(d.photo[pKey] && d.photo[pKey] !== "") {
-                     let thumbUrl = getDriveThumbnailUrl(d.photo[pKey]);
-                     let imgCaption = d.fullChecklist[`caption_${pKey}`] || ""; 
-                     
-                     qPhotoPreviews += `
-                       <div style="display:flex; flex-direction:column; align-items:center; width:90px; margin-right:12px; margin-top:10px;">
-                         <a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large" onerror="this.src='https://placehold.co/90x90/eeeeee/999999?text=IMG'"></a>
-                         ${imgCaption ? `<span style="font-size:0.75rem; color:#555; text-align:center; margin-top:4px; line-height:1.2; word-break:break-word;">${imgCaption}</span>` : ''}
-                       </div>
-                     `;
-                  }
-               }
-            }
-            
-            detailHtml += `<div class="sub-item">
+            detailHtml += `
+              <div class="sub-item">
                 <div class="sub-item-text">
-                  - ${displayQText} 
-                  ${remark ? `<div class="remark-box"><b>หมายเหตุ:</b> ${remark}</div>` : ''}
-                  ${qPhotoPreviews !== "" ? `<div style="display:flex; flex-wrap:wrap;">${qPhotoPreviews}</div>` : ''}
+                  • ${qText}
+                  ${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''}
+                  ${photoHtml}
+                </div>
+                <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">
+                  ${isBad ? '✘ ไม่ผ่าน' : (res === "ดี" ? '✔ ผ่าน' : '-')}
+                </div>
+              </div>
+            `;
+          });
+          
+          detailHtml += `</div>`; // Close section-group
+        });
+        
+      } else {
+        // === Safety Checklist ===
+        for (let secKey in CHECKLIST_SAFETY) {
+          const section = CHECKLIST_SAFETY[secKey];
+          const sNum = secKey.replace('s', '');
+          
+          detailHtml += `
+            <div class="section-group">
+              <div class="section-head">
+                <span><i class="${section.icon}"></i> ${section.title}</span>
+              </div>
+          `;
+          
+          section.questions.forEach((qText, qIdx) => {
+            const res = d.fullChecklist[`section${sNum}_q${qIdx}`];
+            const remark = d.fullChecklist[`section${sNum}_remark${qIdx}`];
+            const isBad = res === "ไม่ดี";
+            
+            // Special handling for Water Mist
+            let displayQText = qText;
+            if (secKey === 's1' && qText === 'Water Mist') {
+              const waterVal = d.fullChecklist['water_val'];
+              if (waterVal) {
+                displayQText += ` <span style="color:var(--primary);font-weight:bold;">(${waterVal}%)</span>`;
+              }
+            }
+            
+            // Photos
+            const qPhotoKey = `${secKey}_q${qIdx}`;
+            const photoHtml = renderPhotos(d.photo, qPhotoKey, d.fullChecklist);
+            
+            detailHtml += `
+              <div class="sub-item">
+                <div class="sub-item-text">
+                  • ${displayQText}
+                  ${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''}
+                  ${photoHtml}
                 </div>
                 <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">
                   ${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}
                 </div>
-              </div>`;
+              </div>
+            `;
           });
-          detailHtml += `</div>`;
+          
+          detailHtml += `</div>`; // Close section-group
         }
-        detailHtml += `</div>`;
-        detailTr.innerHTML = `<td colspan="7" style="padding:0;">${detailHtml}</td>`;
-        tbody.appendChild(detailTr);
-      });
+      }
+      
+      detailHtml += `
+            </div>
+          </td>
+        </tr>
+      `;
+      
+      return detailHtml;
     }
 
+    // ===================================================================
+    // PHOTO RENDERING
+    // ===================================================================
+    function renderPhotos(photoObj, baseKey, fullChecklist) {
+      if (!photoObj || typeof photoObj !== 'object') return '';
+      
+      let html = '';
+      
+      // Main photo
+      if (photoObj[baseKey] && photoObj[baseKey].trim() !== "") {
+        const thumbUrl = getDriveThumbnailUrl(photoObj[baseKey]);
+        html += `
+          <div style="margin:8px 0;">
+            <a href="${photoObj[baseKey]}" target="_blank">
+              <img src="${thumbUrl}" class="img-preview-large" onerror="this.src='https://placehold.co/90x90/eee/999?text=IMG'" alt="รูป">
+            </a>
+          </div>
+        `;
+      }
+      
+      // Additional photos (_0, _1, _2)
+      const photos = [];
+      for (let p = 0; p < 3; p++) {
+        const pKey = `${baseKey}_${p}`;
+        if (photoObj[pKey] && photoObj[pKey].trim() !== "") {
+          const caption = fullChecklist[`caption_${pKey}`] || '';
+          photos.push({ url: photoObj[pKey], caption, thumb: getDriveThumbnailUrl(photoObj[pKey]) });
+        }
+      }
+      
+      if (photos.length > 0) {
+        html += `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">`;
+        photos.forEach((img, idx) => {
+          html += `
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <a href="${img.url}" target="_blank">
+                <img src="${img.thumb}" class="img-preview" onerror="this.src='https://placehold.co/55x55/eee/999?text=IMG'" alt="รูป${idx+1}">
+              </a>
+              ${img.caption ? `<small style="font-size:10px;color:#666;text-align:center;max-width:90px;line-height:1.2;">${escapeHtml(img.caption)}</small>` : ''}
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+      
+      return html;
+    }
+
+    // ===================================================================
+    // TOGGLE DETAIL
+    // ===================================================================
     function toggleDetail(id) {
-      const row = document.getElementById('detail-' + id);
-      const icon = document.getElementById('icon-' + id);
+      const row = document.getElementById(`detail-${id}`);
+      const icon = document.getElementById(`icon-${id}`);
+      
+      if (!row) return;
+      
       const isVisible = row.style.display === 'table-row';
       row.style.display = isVisible ? 'none' : 'table-row';
       icon.className = isVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+      
+      // Scroll to detail if opening
+      if (!isVisible && window.innerWidth <= 768) {
+        setTimeout(() => {
+          row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }
     }
 
-    // โหลดตารางข้อมูลเมื่อเปิดหน้าเว็บ
-    window.onload = loadData;
+    // ===================================================================
+    // UTILITY FUNCTIONS
+    // ===================================================================
+    
+    function getDriveThumbnailUrl(url) {
+      if (!url || url === "-" || url === "") return "";
+      const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w500` : url;
+    }
+    
+    function getTypeBadge(type) {
+      if (!type) return '<span style="color:#aaa;">-</span>';
+      
+      let badgeClass = 'type-badge-safety';
+      let icon = 'fas fa-shield-halved';
+      
+      if (type === CONFIG.TYPE_5S) {
+        badgeClass = 'type-badge-5s';
+        icon = 'fas fa-broom';
+      } else if (type === 'Audit') {
+        badgeClass = 'type-badge-audit';
+        icon = 'fas fa-search';
+      } else if (type === 'Accident/Fire') {
+        badgeClass = 'type-badge-acc';
+        icon = 'fas fa-fire-extinguisher';
+      }
+      
+      return `<span class="type-badge ${badgeClass}"><i class="${icon}"></i> ${type}</span>`;
+    }
+    
+    function normalizeAreaDisplay(area, inspectionType) {
+      if (inspectionType === CONFIG.TYPE_5S && CONFIG.AREA_DISPLAY_MAP[area]) {
+        return CONFIG.AREA_DISPLAY_MAP[area];
+      }
+      return area || '-';
+    }
+    
+    function normalizeAreaForFilter(area, inspectionType) {
+      if (inspectionType === CONFIG.TYPE_5S) {
+        for (const [key, value] of Object.entries(CONFIG.AREA_DISPLAY_MAP)) {
+          if (area === key || area === value) return key;
+        }
+      }
+      return area;
+    }
+    
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return text.toString().replace(/[&<>"']/g, m => map[m]);
+    }
   </script>
 </body>
 </html>
