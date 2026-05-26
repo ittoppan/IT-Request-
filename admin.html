@@ -4,398 +4,538 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🔧 Admin - SAFETY PATROL</title>
+  
+  <!-- CDN Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3498db',
+            success: '#27ae60',
+            warning: '#f39c12',
+            danger: '#e74c3c',
+            sidebar: '#2c3e50'
+          },
+          fontFamily: {
+            prompt: ['Prompt', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
-    :root { --primary: #3498db; --success: #27ae60; --warning: #f39c12; --danger: #e74c3c; --bg: #f5f7fa; }
-    body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding: 0; }
-    
-    .sidebar { width: 220px; background: #2c3e50; color: white; height: 100vh; position: fixed; padding: 20px; box-sizing: border-box; }
-    .sidebar h3 { margin: 0 0 20px; padding-bottom: 15px; border-bottom: 1px solid #34495e; }
-    .nav-item { padding: 12px 15px; cursor: pointer; border-radius: 8px; margin: 5px 0; display: flex; align-items: center; gap: 10px; }
-    .nav-item:hover, .nav-item.active { background: var(--primary); }
-    
-    .main { margin-left: 220px; padding: 20px; }
-    .header { background: white; padding: 15px 25px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    
-    .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .card h4 { margin: 0 0 15px; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
-    
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #f8f9fa; padding: 12px 15px; text-align: left; font-weight: 600; color: #555; border-bottom: 2px solid #eee; }
-    td { padding: 12px 15px; border-bottom: 1px solid #eee; }
-    
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; }
-    .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Prompt'; box-sizing: border-box; }
-    
-    .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-success { background: var(--success); color: white; }
-    .btn-danger { background: var(--danger); color: white; }
-    .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
-    
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-    .modal.show { display: flex; }
-    .modal-content { background: white; border-radius: 12px; padding: 25px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-    
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; }
-    .badge-active { background: #d4edda; color: #155724; }
-    .badge-inactive { background: #f8d7da; color: #721c24; }
-    
-    @media (max-width: 768px) {
-      .sidebar { width: 100%; height: auto; position: relative; }
-      .main { margin-left: 0; }
-    }
-  </style>
 </head>
-<body>
+<body class="font-prompt bg-gray-100">
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h3>🔧 Admin Panel</h3>
-    <div class="nav-item active" onclick="showTab('types')"><i class="fas fa-list"></i> ประเภทเช็คลิสต์</div>
-    <div class="nav-item" onclick="showTab('areas')"><i class="fas fa-map-marker-alt"></i> พื้นที่</div>
-    <div class="nav-item" onclick="showTab('sections')"><i class="fas fa-th-large"></i> หัวข้อหลัก</div>
-    <div class="nav-item" onclick="showTab('questions')"><i class="fas fa-question-circle"></i> คำถาม</div>
-    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #34495e;">
-      <div class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</div>
+  <!-- Auth Modal -->
+  <div id="authModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+      <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">
+        <i class="fas fa-lock text-primary mr-2"></i>เข้าสู่ระบบ Admin
+      </h3>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Admin Token</label>
+          <input type="password" id="adminTokenInput"
+            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+            placeholder="กรอกรหัสผ่าน">
+        </div>
+        <div class="flex gap-3">
+          <button onclick="cancelAuth()" class="flex-1 py-3 px-4 rounded-xl border border-gray-300 hover:bg-gray-50 transition">
+            ยกเลิก
+          </button>
+          <button onclick="submitAuth()" class="flex-1 py-3 px-4 rounded-xl bg-primary text-white hover:bg-primary/90 transition">
+            เข้าสู่ระบบ
+          </button>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Sidebar (Desktop) / Bottom Nav (Mobile) -->
+  <aside class="fixed md:static top-0 left-0 w-64 md:h-screen bg-sidebar text-white z-40 transform -translate-x-full md:translate-x-0 transition-transform" id="sidebar">
+    <div class="p-5">
+      <h3 class="text-lg font-semibold border-b border-gray-600 pb-4 mb-4">🔧 Admin Panel</h3>
+      <nav class="space-y-2">
+        <button onclick="showTab('types')" class="nav-item w-full text-left py-3 px-4 rounded-xl hover:bg-primary/20 transition flex items-center gap-3" data-tab="types">
+          <i class="fas fa-list w-5"></i> ประเภทเช็คลิสต์
+        </button>
+        <button onclick="showTab('areas')" class="nav-item w-full text-left py-3 px-4 rounded-xl hover:bg-primary/20 transition flex items-center gap-3" data-tab="areas">
+          <i class="fas fa-map-marker-alt w-5"></i> พื้นที่
+        </button>
+        <button onclick="showTab('sections')" class="nav-item w-full text-left py-3 px-4 rounded-xl hover:bg-primary/20 transition flex items-center gap-3" data-tab="sections">
+          <i class="fas fa-th-large w-5"></i> หัวข้อหลัก
+        </button>
+        <button onclick="showTab('questions')" class="nav-item w-full text-left py-3 px-4 rounded-xl hover:bg-primary/20 transition flex items-center gap-3" data-tab="questions">
+          <i class="fas fa-question-circle w-5"></i> คำถาม
+        </button>
+      </nav>
+      <div class="mt-8 pt-4 border-t border-gray-600">
+        <button onclick="logout()" class="w-full text-left py-3 px-4 rounded-xl hover:bg-danger/20 transition flex items-center gap-3 text-danger">
+          <i class="fas fa-sign-out-alt w-5"></i> ออกจากระบบ
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Menu Toggle -->
+  <button onclick="toggleSidebar()" class="md:hidden fixed bottom-4 right-4 w-14 h-14 bg-primary text-white rounded-full shadow-lg z-50 flex items-center justify-center">
+    <i class="fas fa-bars text-xl"></i>
+  </button>
 
   <!-- Main Content -->
-  <div class="main">
-    <div class="header">
-      <h2 id="pageTitle">จัดการประเภทเช็คลิสต์</h2>
-      <button class="btn btn-primary" onclick="openModal('add')"><i class="fas fa-plus"></i> เพิ่มใหม่</button>
-    </div>
-
-    <!-- Tab: Types -->
-    <div id="tab-types" class="tab-content">
-      <div class="card">
-        <h4>📋 ประเภทเช็คลิสต์ (6 ประเภท)</h4>
-        <table>
-          <thead>
-            <tr><th>ชื่อภาษาไทย</th><th>ชื่อภาษาอังกฤษ</th><th>สถานะ</th><th>จัดการ</th></tr>
-          </thead>
-          <tbody id="typesTable"></tbody>
-        </table>
+  <main class="md:ml-64 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-30">
+      <div class="px-6 py-4 flex items-center justify-between">
+        <h2 id="pageTitle" class="text-lg font-semibold text-gray-800">จัดการประเภทเช็คลิสต์</h2>
+        <button onclick="openModal('add')" class="bg-primary text-white py-2 px-4 rounded-xl hover:bg-primary/90 transition flex items-center gap-2">
+          <i class="fas fa-plus"></i> <span class="hidden sm:inline">เพิ่มใหม่</span>
+        </button>
       </div>
-    </div>
+    </header>
 
-    <!-- Tab: Areas -->
-    <div id="tab-areas" class="tab-content" style="display:none;">
-      <div class="card">
-        <h4>🏭 พื้นที่/แผนก</h4>
-        <table>
-          <thead>
-            <tr><th>พื้นที่</th><th>แผนก</th><th>ประเภทที่ใช้ได้</th><th>สถานะ</th><th>จัดการ</th></tr>
-          </thead>
-          <tbody id="areasTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Tab: Sections -->
-    <div id="tab-sections" class="tab-content" style="display:none;">
-      <div class="card">
-        <h4>🗂️ หัวข้อหลัก</h4>
-        <div class="form-group">
-          <label>กรองตามประเภท:</label>
-          <select id="filterSectionType" onchange="renderSections()">
-            <option value="">ทั้งหมด</option>
-          </select>
-        </div>
-        <table>
-          <thead>
-            <tr><th>ประเภท</th><th>ลำดับ</th><th>หัวข้อ (ไทย)</th><th>บังคับตอบ</th><th>จัดการ</th></tr>
-          </thead>
-          <tbody id="sectionsTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Tab: Questions -->
-    <div id="tab-questions" class="tab-content" style="display:none;">
-      <div class="card">
-        <h4>❓ คำถาม</h4>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>ประเภท:</label>
-            <select id="filterQType" onchange="renderQuestions()">
-              <option value="">ทั้งหมด</option>
-            </select>
+    <!-- Content Area -->
+    <div class="p-6">
+      <!-- Tab: Types -->
+      <div id="tab-types" class="tab-content">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="p-5 border-b border-gray-100">
+            <h4 class="font-semibold text-primary">📋 ประเภทเช็คลิสต์ (6 ประเภท)</h4>
           </div>
-          <div class="form-group">
-            <label>หัวข้อ:</label>
-            <select id="filterQSection" onchange="renderQuestions()">
-              <option value="">ทั้งหมด</option>
-            </select>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600">ชื่อภาษาไทย</th>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden md:table-cell">ชื่อภาษาอังกฤษ</th>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600">สถานะ</th>
+                  <th class="py-3 px-5 font-semibold text-gray-600">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="typesTable" class="divide-y divide-gray-100"></tbody>
+            </table>
           </div>
         </div>
-        <table>
-          <thead>
-            <tr><th>หัวข้อ</th><th>คำถาม</th><th>ประเภทคำตอบ</th><th>Due Date</th><th>จัดการ</th></tr>
-          </thead>
-          <tbody id="questionsTable"></tbody>
-        </table>
+      </div>
+
+      <!-- Tab: Areas -->
+      <div id="tab-areas" class="tab-content hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="p-5 border-b border-gray-100">
+            <h4 class="font-semibold text-primary">🏭 พื้นที่/แผนก</h4>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600">พื้นที่</th>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden md:table-cell">แผนก</th>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden lg:table-cell">ประเภทที่ใช้ได้</th>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600">สถานะ</th>
+                  <th class="py-3 px-5 font-semibold text-gray-600">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="areasTable" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Sections -->
+      <div id="tab-sections" class="tab-content hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="p-5 border-b border-gray-100">
+            <h4 class="font-semibold text-primary">🗂️ หัวข้อหลัก</h4>
+            <div class="mt-4">
+              <label class="text-sm text-gray-600">กรองตามประเภท:</label>
+              <select id="filterSectionType" onchange="renderSections()"
+                class="mt-1 w-full md:w-64 px-4 py-2 rounded-lg border border-gray-200 focus:border-primary outline-none">
+                <option value="">ทั้งหมด</option>
+              </select>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden md:table-cell">ประเภท</th>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600">ลำดับ</th>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600">หัวข้อ (ไทย)</th>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden md:table-cell">บังคับตอบ</th>
+                  <th class="py-3 px-5 font-semibold text-gray-600">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="sectionsTable" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Questions -->
+      <div id="tab-questions" class="tab-content hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="p-5 border-b border-gray-100">
+            <h4 class="font-semibold text-primary">❓ คำถาม</h4>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm text-gray-600">ประเภท:</label>
+                <select id="filterQType" onchange="renderQuestions()"
+                  class="mt-1 w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary outline-none">
+                  <option value="">ทั้งหมด</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-sm text-gray-600">หัวข้อ:</label>
+                <select id="filterQSection" onchange="renderQuestions()"
+                  class="mt-1 w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary outline-none">
+                  <option value="">ทั้งหมด</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden md:table-cell">หัวข้อ</th>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600">คำถาม</th>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden lg:table-cell">ประเภทคำตอบ</th>
+                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden md:table-cell">Due Date</th>
+                  <th class="py-3 px-5 font-semibold text-gray-600">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="questionsTable" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </main>
 
-  <!-- Modal -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <h3 id="modalTitle" style="margin-top:0;">เพิ่มข้อมูล</h3>
-      <form id="configForm">
+  <!-- Modal Form -->
+  <div id="modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-gray-100">
+        <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">เพิ่มข้อมูล</h3>
+      </div>
+      <form id="configForm" class="p-6 space-y-4">
         <input type="hidden" id="editId">
         <input type="hidden" id="currentSheet">
-        <div id="formFields"></div>
-        <div style="margin-top: 20px; text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
-          <button type="button" class="btn" onclick="closeModal()">ยกเลิก</button>
-          <button type="submit" class="btn btn-success">💾 บันทึก</button>
+        <div id="formFields" class="space-y-4"></div>
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+          <button type="button" onclick="closeModal()" class="py-2 px-6 rounded-xl border border-gray-300 hover:bg-gray-50 transition">
+            ยกเลิก
+          </button>
+          <button type="submit" class="py-2 px-6 rounded-xl bg-success text-white hover:bg-success/90 transition">
+            💾 บันทึก
+          </button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- Loading Overlay -->
+  <div id="loading" class="fixed inset-0 bg-white/90 z-50 hidden flex-col items-center justify-center">
+    <i class="fas fa-circle-notch fa-spin text-4xl text-primary"></i>
+    <p class="mt-4 font-semibold text-gray-700">กำลังโหลด...</p>
+  </div>
+
   <script>
-    // ✅ API_URL - แก้เป็นของคุณที่นี่
     const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
-    
     let configData = {};
     let currentTab = 'types';
-    
+
     // === Auth ===
     function checkAuth() {
       const token = localStorage.getItem('adminToken');
       if (!token) {
-        Swal.fire({
-          title: '🔐 เข้าสู่ระบบ Admin',
-          input: 'password',
-          inputLabel: 'Admin Token',
-          showCancelButton: true,
-          confirmButtonText: 'เข้าสู่ระบบ',
-          preConfirm: (token) => {
-            localStorage.setItem('adminToken', token);
-            return token;
-          }
-        }).then((result) => {
-          if (result.isConfirmed) loadConfig();
-        });
+        document.getElementById('authModal')!.classList.remove('hidden');
       } else {
+        document.getElementById('authModal')!.classList.add('hidden');
         loadConfig();
       }
     }
-    
+
+    function submitAuth() {
+      const token = document.getElementById('adminTokenInput')!.value;
+      if (token) {
+        localStorage.setItem('adminToken', token);
+        document.getElementById('authModal')!.classList.add('hidden');
+        loadConfig();
+      } else {
+        Swal.fire({ icon: 'warning', title: 'กรุณากรอก Token', confirmButtonColor: '#3498db' });
+      }
+    }
+
+    function cancelAuth() {
+      document.getElementById('adminTokenInput')!.value = '';
+    }
+
     function logout() {
       localStorage.removeItem('adminToken');
       window.location.reload();
     }
-    
+
     // === Load Data ===
     function loadConfig() {
-      Swal.fire({ title: 'กำลังโหลด...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      document.getElementById('loading')!.classList.remove('hidden');
+      document.getElementById('loading')!.classList.add('flex');
       
       fetch(API_URL + "?action=getConfig")
         .then(res => res.json())
         .then(data => {
-          Swal.close();
+          document.getElementById('loading')!.classList.add('hidden');
+          document.getElementById('loading')!.classList.remove('flex');
+          
           if (data.status === 'success') {
             configData = data;
             populateFilters();
             renderAll();
           } else {
-            Swal.fire('ผิดพลาด', data.message, 'error');
+            Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: data.message, confirmButtonColor: '#e74c3c' });
           }
         })
         .catch(err => {
-          Swal.close();
-          Swal.fire('เชื่อมต่อล้มเหลว', 'ตรวจสอบ URL หรืออินเทอร์เน็ต', 'error');
+          document.getElementById('loading')!.classList.add('hidden');
+          document.getElementById('loading')!.classList.remove('flex');
+          Swal.fire({ icon: 'error', title: 'เชื่อมต่อล้มเหลว', text: 'ตรวจสอบ URL หรืออินเทอร์เน็ต', confirmButtonColor: '#e74c3c' });
         });
     }
-    
+
     function populateFilters() {
       const typeOptions = (configData.types || [])
         .filter(t => t.is_active === 'TRUE')
-        .map(t => '<option value="' + t.id + '">' + t.name_th + '</option>')
+        .map(t => `<option value="${t.id}">${t.name_th}</option>`)
         .join('');
       
-      ['filterSectionType', 'filterQType'].forEach(function(id) {
+      ['filterSectionType', 'filterQType'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = '<option value="">ทั้งหมด</option>' + typeOptions;
       });
     }
-    
-    // === Render Functions ===
+
+    // === Tab Navigation ===
     function showTab(tab) {
-      document.querySelectorAll('.tab-content').forEach(function(el) { el.style.display = 'none'; });
-      document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-primary/20'));
       
-      document.getElementById('tab-' + tab).style.display = 'block';
-      event.currentTarget.classList.add('active');
+      document.getElementById('tab-' + tab)!.classList.remove('hidden');
+      event.currentTarget.classList.add('bg-primary/20');
       currentTab = tab;
       
       const titles = {
         'types': 'จัดการประเภทเช็คลิสต์',
-        'areas': 'จัดการพื้นที่/แผนก', 
+        'areas': 'จัดการพื้นที่/แผนก',
         'sections': 'จัดการหัวข้อหลัก',
         'questions': 'จัดการคำถาม'
       };
-      document.getElementById('pageTitle').innerText = titles[tab];
+      document.getElementById('pageTitle')!.innerText = titles[tab];
       
       if (tab === 'types') renderTypes();
       else if (tab === 'areas') renderAreas();
       else if (tab === 'sections') renderSections();
       else if (tab === 'questions') renderQuestions();
+      
+      // Close mobile sidebar
+      document.getElementById('sidebar')!.classList.add('-translate-x-full');
     }
-    
+
+    function toggleSidebar() {
+      document.getElementById('sidebar')!.classList.toggle('-translate-x-full');
+    }
+
+    // === Render Functions ===
     function renderAll() {
       renderTypes();
       renderAreas();
       renderSections();
       renderQuestions();
     }
-    
+
     function renderTypes() {
       const tbody = document.getElementById('typesTable');
       const types = configData.types || [];
-      tbody.innerHTML = types.filter(function(t) { return t.is_active !== undefined; })
-        .map(function(t) {
-          return '<tr>' +
-            '<td><strong>' + t.name_th + '</strong></td>' +
-            '<td>' + (t.name_en || '-') + '</td>' +
-            '<td><span class="badge ' + (t.is_active==='TRUE'?'badge-active':'badge-inactive') + '">' +
-              (t.is_active==='TRUE'?'✅ ใช้งาน':'❌ ปิด') + '</span></td>' +
-            '<td>' +
-              '<button class="btn btn-sm" onclick="editItem(\'Config_Types\', ' + t.id + ')">✏️</button> ' +
-              '<button class="btn btn-sm btn-danger" onclick="deleteItem(\'Config_Types\', ' + t.id + ')">🗑️</button>' +
-            '</td>' +
-          '</tr>';
-        }).join('') || '<tr><td colspan="4" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
+      
+      tbody!.innerHTML = types.filter(t => t.is_active !== undefined)
+        .map(t => `
+          <tr class="hover:bg-gray-50">
+            <td class="py-4 px-5"><strong class="text-gray-800">${t.name_th}</strong></td>
+            <td class="py-4 px-5 text-gray-600 hidden md:table-cell">${t.name_en || '-'}</td>
+            <td class="py-4 px-5">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold ${t.is_active==='TRUE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                ${t.is_active==='TRUE' ? '✅ ใช้งาน' : '❌ ปิด'}
+              </span>
+            </td>
+            <td class="py-4 px-5">
+              <div class="flex gap-2">
+                <button onclick="editItem('Config_Types', ${t.id})" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="deleteItem('Config_Types', ${t.id})" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="4" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
     }
-    
+
     function renderAreas() {
       const tbody = document.getElementById('areasTable');
       const areas = configData.areas || [];
       
-      tbody.innerHTML = areas.map(function(a) {
+      tbody!.innerHTML = areas.map(a => {
         let typesHtml = 'ทั้งหมด';
         if (a.applicable_types) {
-          typesHtml = a.applicable_types.split(',').map(function(id) {
-            const t = (configData.types||[]).find(function(x){ return x.id == id; });
-            return t ? '<span class="badge" style="background:#e1f5fe;color:#0277bd;margin:2px;">' + t.name_th + '</span>' : '';
+          typesHtml = a.applicable_types.split(',').map(id => {
+            const t = (configData.types||[]).find(x => x.id == id);
+            return t ? `<span class="px-2 py-1 rounded-lg text-xs bg-blue-100 text-blue-700 mr-1">${t.name_th}</span>` : '';
           }).join('');
         }
-        return '<tr>' +
-          '<td><strong>' + a.area_name + '</strong></td>' +
-          '<td>' + (a.department || '-') + '</td>' +
-          '<td>' + typesHtml + '</td>' +
-          '<td><span class="badge ' + (a.is_active==='TRUE'?'badge-active':'badge-inactive') + '">' +
-            (a.is_active==='TRUE'?'✅':'❌') + '</span></td>' +
-          '<td>' +
-            '<button class="btn btn-sm" onclick="editItem(\'Config_Areas\', ' + a.id + ')">✏️</button> ' +
-            '<button class="btn btn-sm btn-danger" onclick="deleteItem(\'Config_Areas\', ' + a.id + ')">🗑️</button>' +
-          '</td>' +
-        '</tr>';
-      }).join('') || '<tr><td colspan="5" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
+        return `
+          <tr class="hover:bg-gray-50">
+            <td class="py-4 px-5"><strong class="text-gray-800">${a.area_name}</strong></td>
+            <td class="py-4 px-5 text-gray-600 hidden md:table-cell">${a.department || '-'}</td>
+            <td class="py-4 px-5 hidden lg:table-cell">${typesHtml}</td>
+            <td class="py-4 px-5">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold ${a.is_active==='TRUE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                ${a.is_active==='TRUE' ? '✅' : '❌'}
+              </span>
+            </td>
+            <td class="py-4 px-5">
+              <div class="flex gap-2">
+                <button onclick="editItem('Config_Areas', ${a.id})" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="deleteItem('Config_Areas', ${a.id})" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="5" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
     }
-    
+
     function renderSections() {
-      const typeFilter = document.getElementById('filterSectionType') ? document.getElementById('filterSectionType').value : '';
+      const typeFilter = document.getElementById('filterSectionType')?.value;
       const tbody = document.getElementById('sectionsTable');
       
-      let sections = (configData.sections || []).filter(function(s) { return s.is_active === 'TRUE'; });
-      if (typeFilter) sections = sections.filter(function(s) { return s.type_id == typeFilter; });
-      sections.sort(function(a,b) { return (a.order||0) - (b.order||0); });
+      let sections = (configData.sections || []).filter(s => s.is_active === 'TRUE');
+      if (typeFilter) sections = sections.filter(s => s.type_id == typeFilter);
+      sections.sort((a,b) => (a.order||0) - (b.order||0));
       
-      tbody.innerHTML = sections.map(function(s) {
-        const typeName = (configData.types||[]).find(function(t){ return t.id == s.type_id; })?.name_th || s.type_id;
-        return '<tr>' +
-          '<td><span class="badge" style="background:#e3f2fd;color:#1565c0;">' + typeName + '</span></td>' +
-          '<td>' + (s.order || '-') + '</td>' +
-          '<td><strong>' + s.title_th + '</strong></td>' +
-          '<td>' + (s.is_required==='TRUE'?'✅':'-') + '</td>' +
-          '<td>' +
-            '<button class="btn btn-sm" onclick="editItem(\'Config_Sections\', ' + s.id + ')">✏️</button> ' +
-            '<button class="btn btn-sm btn-danger" onclick="deleteItem(\'Config_Sections\', ' + s.id + ')">🗑️</button>' +
-          '</td>' +
-        '</tr>';
-      }).join('') || '<tr><td colspan="5" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
+      tbody!.innerHTML = sections.map(s => {
+        const typeName = (configData.types||[]).find(t => t.id == s.type_id)?.name_th || s.type_id;
+        return `
+          <tr class="hover:bg-gray-50">
+            <td class="py-4 px-5 hidden md:table-cell">
+              <span class="px-3 py-1 rounded-lg text-xs bg-blue-100 text-blue-700">${typeName}</span>
+            </td>
+            <td class="py-4 px-5 text-gray-600">${s.order || '-'}</td>
+            <td class="py-4 px-5"><strong class="text-gray-800">${s.title_th}</strong></td>
+            <td class="py-4 px-5 hidden md:table-cell">${s.is_required==='TRUE' ? '✅' : '-'}</td>
+            <td class="py-4 px-5">
+              <div class="flex gap-2">
+                <button onclick="editItem('Config_Sections', ${s.id})" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="deleteItem('Config_Sections', ${s.id})" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="5" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
     }
-    
+
     function renderQuestions() {
-      const typeFilter = document.getElementById('filterQType') ? document.getElementById('filterQType').value : '';
-      const sectionFilter = document.getElementById('filterQSection') ? document.getElementById('filterQSection').value : '';
+      const typeFilter = document.getElementById('filterQType')?.value;
+      const sectionFilter = document.getElementById('filterQSection')?.value;
       const tbody = document.getElementById('questionsTable');
       
-      let questions = (configData.questions || []).filter(function(q) { return q.is_active === 'TRUE'; });
+      let questions = (configData.questions || []).filter(q => q.is_active === 'TRUE');
       
       if (typeFilter) {
         const sectionIds = (configData.sections||[])
-          .filter(function(s) { return s.type_id == typeFilter; })
-          .map(function(s) { return s.id; });
-        questions = questions.filter(function(q) { return sectionIds.indexOf(q.section_id) >= 0; });
+          .filter(s => s.type_id == typeFilter)
+          .map(s => s.id);
+        questions = questions.filter(q => sectionIds.includes(q.section_id));
       }
       if (sectionFilter) {
-        questions = questions.filter(function(q) { return q.section_id == sectionFilter; });
+        questions = questions.filter(q => q.section_id == sectionFilter);
       }
-      questions.sort(function(a,b) { return (a.order||0) - (b.order||0); });
+      questions.sort((a,b) => (a.order||0) - (b.order||0));
       
-      tbody.innerHTML = questions.map(function(q) {
-        const section = (configData.sections||[]).find(function(s) { return s.id == q.section_id; });
-        return '<tr>' +
-          '<td><small>' + (section?.title_th || '-') + '</small></td>' +
-          '<td>' + q.question_th + '</td>' +
-          '<td><span class="badge" style="background:#f3e5f5;color:#7b1fa2;">' + q.answer_type + '</span></td>' +
-          '<td>' + (q.has_duedate==='TRUE'?'✅':'-') + '</td>' +
-          '<td>' +
-            '<button class="btn btn-sm" onclick="editItem(\'Config_Questions\', ' + q.id + ')">✏️</button> ' +
-            '<button class="btn btn-sm btn-danger" onclick="deleteItem(\'Config_Questions\', ' + q.id + ')">🗑️</button>' +
-          '</td>' +
-        '</tr>';
-      }).join('') || '<tr><td colspan="5" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
+      tbody!.innerHTML = questions.map(q => {
+        const section = (configData.sections||[]).find(s => s.id == q.section_id);
+        return `
+          <tr class="hover:bg-gray-50">
+            <td class="py-4 px-5 hidden md:table-cell"><small class="text-gray-500">${section?.title_th || '-'}</small></td>
+            <td class="py-4 px-5 text-gray-800">${q.question_th}</td>
+            <td class="py-4 px-5 hidden lg:table-cell">
+              <span class="px-3 py-1 rounded-lg text-xs bg-purple-100 text-purple-700">${q.answer_type}</span>
+            </td>
+            <td class="py-4 px-5 hidden md:table-cell">${q.has_duedate==='TRUE' ? '✅' : '-'}</td>
+            <td class="py-4 px-5">
+              <div class="flex gap-2">
+                <button onclick="editItem('Config_Questions', ${q.id})" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="deleteItem('Config_Questions', ${q.id})" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="5" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
     }
-    
+
     // === Modal & Form ===
     function openModal(mode, sheetName, id) {
       sheetName = sheetName || getSheetByTab(currentTab);
-      document.getElementById('modal').classList.add('show');
-      document.getElementById('modalTitle').innerText = mode === 'add' ? '➕ เพิ่มใหม่' : '✏️ แก้ไข';
-      document.getElementById('editId').value = id || '';
-      document.getElementById('currentSheet').value = sheetName;
+      document.getElementById('modal')!.classList.remove('hidden');
+      document.getElementById('modal')!.classList.add('flex');
+      document.getElementById('modalTitle')!.innerText = mode === 'add' ? '➕ เพิ่มใหม่' : '✏️ แก้ไข';
+      document.getElementById('editId')!.value = id || '';
+      document.getElementById('currentSheet')!.value = sheetName;
       generateFormFields(sheetName, id);
     }
-    
+
     function closeModal() {
-      document.getElementById('modal').classList.remove('show');
-      document.getElementById('configForm').reset();
+      document.getElementById('modal')!.classList.add('hidden');
+      document.getElementById('modal')!.classList.remove('flex');
+      document.getElementById('configForm')!.reset();
     }
-    
+
     function getSheetByTab(tab) {
       const map = {
         'types': 'Config_Types',
         'areas': 'Config_Areas',
-        'sections': 'Config_Sections', 
+        'sections': 'Config_Sections',
         'questions': 'Config_Questions'
       };
       return map[tab] || 'Config_Types';
     }
-    
+
     function generateFormFields(sheetName, editId) {
       const container = document.getElementById('formFields');
       let fields = [];
       let existingData = {};
       
-      // Load existing data if editing
       if (editId) {
         const key = sheetName.replace('Config_', '').toLowerCase() + 's';
         const list = configData[key] || [];
-        for (let i = 0; i < list.length; i++) {
-          if (list[i].id == editId) {
-            existingData = list[i];
+        for (let item of list) {
+          if (item.id == editId) {
+            existingData = item;
             break;
           }
         }
@@ -418,8 +558,7 @@
         ];
       } else if (sheetName === 'Config_Sections') {
         fields = [
-          {name:'type_id', label:'ประเภทเช็คลิสต์*', type:'select', 
-           options:getActiveTypes(), required:true},
+          {name:'type_id', label:'ประเภทเช็คลิสต์*', type:'select', options:getActiveTypes(), required:true},
           {name:'order', label:'ลำดับ', type:'number'},
           {name:'title_th', label:'หัวข้อ (ไทย)*', type:'text', required:true},
           {name:'title_en', label:'หัวข้อ (อังกฤษ)', type:'text'},
@@ -428,13 +567,11 @@
         ];
       } else if (sheetName === 'Config_Questions') {
         fields = [
-          {name:'section_id', label:'หัวข้อหลัก*', type:'select',
-           options:getActiveSections(), required:true},
+          {name:'section_id', label:'หัวข้อหลัก*', type:'select', options:getActiveSections(), required:true},
           {name:'order', label:'ลำดับ', type:'number'},
           {name:'question_th', label:'คำถาม (ไทย)*', type:'textarea', required:true},
           {name:'question_en', label:'คำถาม (อังกฤษ)', type:'textarea'},
-          {name:'answer_type', label:'ประเภทคำตอบ*', type:'select',
-           options:[['radio','✅/❌'],['number','🔢 ตัวเลข'],['text','📝 สั้น']], required:true},
+          {name:'answer_type', label:'ประเภทคำตอบ*', type:'select', options:[['radio','✅/❌'],['number','🔢 ตัวเลข'],['text','📝 สั้น']], required:true},
           {name:'options', label:'ตัวเลือก (คั่นด้วย ,)', type:'text', placeholder:'ดี,ไม่ดี'},
           {name:'is_required', label:'บังคับตอบ', type:'select', options:[['TRUE','✅'],['FALSE','❌']]},
           {name:'has_remark', label:'มีช่องหมายเหตุ', type:'select', options:[['TRUE','✅ มี'],['FALSE','❌ ไม่มี']]},
@@ -444,92 +581,98 @@
         ];
       }
       
-      // สร้างฟอร์ม
       let html = '';
-      for (let i = 0; i < fields.length; i++) {
-        const f = fields[i];
+      for (let f of fields) {
         const val = existingData[f.name] !== undefined ? existingData[f.name] : '';
         
         if (f.type === 'select') {
           let optionsHtml = '';
           if (f.options && Array.isArray(f.options)) {
-            for (let j = 0; j < f.options.length; j++) {
-              const opt = f.options[j];
+            for (let opt of f.options) {
               const selected = (val == opt[0]) ? 'selected' : '';
-              optionsHtml += '<option value="' + opt[0] + '" ' + selected + '>' + opt[1] + '</option>';
+              optionsHtml += `<option value="${opt[0]}" ${selected}>${opt[1]}</option>`;
             }
           }
-          html += '<div class="form-group">' +
-            '<label>' + f.label + '</label>' +
-            '<select name="' + f.name + '" ' + (f.required ? 'required' : '') + '>' +
-            optionsHtml +
-            '</select></div>';
+          html += `
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">${f.label}</label>
+              <select name="${f.name}" ${f.required ? 'required' : ''}
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none">
+                ${optionsHtml}
+              </select>
+            </div>
+          `;
         } else if (f.type === 'textarea') {
-          html += '<div class="form-group">' +
-            '<label>' + f.label + '</label>' +
-            '<textarea name="' + f.name + '" rows="3" ' + (f.required ? 'required' : '') + '>' + (val || '') + '</textarea></div>';
+          html += `
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">${f.label}</label>
+              <textarea name="${f.name}" rows="3" ${f.required ? 'required' : ''}
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none resize-none">${val || ''}</textarea>
+            </div>
+          `;
         } else {
-          html += '<div class="form-group">' +
-            '<label>' + f.label + '</label>' +
-            '<input type="' + f.type + '" name="' + f.name + '" value="' + (val || '') + '" ' + 
-            (f.required ? 'required' : '') + ' placeholder="' + (f.placeholder || '') + '"></div>';
+          html += `
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">${f.label}</label>
+              <input type="${f.type}" name="${f.name}" value="${val || ''}" ${f.required ? 'required' : ''} placeholder="${f.placeholder || ''}"
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none">
+            </div>
+          `;
         }
       }
-      container.innerHTML = html;
+      container!.innerHTML = html;
     }
-    
+
     function getActiveTypes() {
-      return (configData.types || []).filter(function(t) { return t.is_active === 'TRUE'; })
-        .map(function(t) { return [t.id, t.name_th]; });
+      return (configData.types || []).filter(t => t.is_active === 'TRUE')
+        .map(t => [t.id, t.name_th]);
     }
-    
+
     function getActiveSections() {
-      return (configData.sections || []).filter(function(s) { return s.is_active === 'TRUE'; })
-        .map(function(s) { return [s.id, s.title_th]; });
+      return (configData.sections || []).filter(s => s.is_active === 'TRUE')
+        .map(s => [s.id, s.title_th]);
     }
-    
+
     // === CRUD Operations ===
-    document.getElementById('configForm').onsubmit = function(e) {
+    document.getElementById('configForm')!.onsubmit = function(e) {
       e.preventDefault();
       const formData = new FormData(this);
       const data = {};
-      for (const pair of formData.entries()) {
-        data[pair[0]] = pair[1];
+      for (const [key, value] of formData.entries()) {
+        data[key] = value;
       }
       
       const payload = {
-        action: document.getElementById('editId').value ? 'update' : 'create',
-        sheetName: document.getElementById('currentSheet').value,
+        action: document.getElementById('editId')!.value ? 'update' : 'create',
+        sheetName: document.getElementById('currentSheet')!.value,
         data: data,
-        id: document.getElementById('editId').value || null,
+        id: document.getElementById('editId')!.value || null,
         adminToken: localStorage.getItem('adminToken')
       };
       
-      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
+      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), confirmButtonColor: '#3498db' });
       
       fetch(API_URL, {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: { 'Content-Type': 'text/plain' }
       })
-      .then(function(res) { return res.json(); })
-      .then(function(result) {
+      .then(res => res.json())
+      .then(result => {
         Swal.close();
         if (result.status === 'success') {
-          Swal.fire('สำเร็จ!', result.message, 'success').then(function() {
-            closeModal();
-            loadConfig();
-          });
+          Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: result.message, confirmButtonColor: '#27ae60' })
+            .then(() => { closeModal(); loadConfig(); });
         } else {
-          Swal.fire('ผิดพลาด', result.message, 'error');
+          Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: result.message, confirmButtonColor: '#e74c3c' });
         }
       })
-      .catch(function(err) {
+      .catch(err => {
         Swal.close();
-        Swal.fire('เชื่อมต่อล้มเหลว', 'โปรดตรวจสอบอินเทอร์เน็ต', 'error');
+        Swal.fire({ icon: 'error', title: 'เชื่อมต่อล้มเหลว', text: 'โปรดตรวจสอบอินเทอร์เน็ต', confirmButtonColor: '#e74c3c' });
       });
     };
-    
+
     function editItem(sheetName, id) {
       const tabMap = {
         'Config_Types': 'types',
@@ -541,7 +684,7 @@
       showTab(currentTab);
       openModal('edit', sheetName, id);
     }
-    
+
     function deleteItem(sheetName, id) {
       Swal.fire({
         title: 'ยืนยันการลบ?',
@@ -550,8 +693,9 @@
         showCancelButton: true,
         confirmButtonText: '✅ ลบเลย',
         cancelButtonText: '❌ ยกเลิก',
-        confirmButtonColor: '#e74c3c'
-      }).then(function(result) {
+        confirmButtonColor: '#e74c3c',
+        cancelButtonColor: '#95a5a6'
+      }).then((result) => {
         if (result.isConfirmed) {
           fetch(API_URL, {
             method: 'POST',
@@ -563,18 +707,19 @@
             }),
             headers: { 'Content-Type': 'text/plain' }
           })
-          .then(function(res) { return res.json(); })
-          .then(function(result) {
+          .then(res => res.json())
+          .then(result => {
             if (result.status === 'success') {
-              Swal.fire('ลบสำเร็จ!', '', 'success').then(function() { loadConfig(); });
+              Swal.fire({ icon: 'success', title: 'ลบสำเร็จ!', text: '', confirmButtonColor: '#27ae60' })
+                .then(() => loadConfig());
             } else {
-              Swal.fire('ผิดพลาด', result.message, 'error');
+              Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: result.message, confirmButtonColor: '#e74c3c' });
             }
           });
         }
       });
     }
-    
+
     // === Init ===
     window.onload = checkAuth;
   </script>
