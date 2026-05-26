@@ -4,106 +4,172 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SAFETY PATROL REPORT</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --primary: #f39c12;
+      --primary-dark: #e67e22;
+      --dark: #2c3e50;
+      --success: #27ae60;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --info: #2980b9;
+      --bg: #f0f2f5;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --text-muted: #7f8c8d;
+      --border: #e0e0e0;
+      --shadow: 0 4px 15px rgba(0,0,0,0.05);
+      --shadow-hover: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    * { box-sizing: border-box; }
+    
     body { 
       font-family: 'Sarabun', sans-serif; 
       margin: 0; 
       padding: 20px; 
-      background: #f0f2f5; 
-      color: #333; 
+      background: var(--bg); 
+      color: var(--text); 
       -webkit-tap-highlight-color: transparent;
-    }
-    .report-container { 
-      background: white; 
-      padding: 20px; 
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-      overflow-x: auto; 
-      border-radius: 12px; 
+      line-height: 1.5;
     }
     
-    /* ส่วนหัวรายงาน */
+    /* ===== Container ===== */
+    .report-container { 
+      background: var(--card-bg); 
+      padding: 20px; 
+      box-shadow: var(--shadow); 
+      overflow-x: auto; 
+      border-radius: 12px; 
+      margin-bottom: 30px;
+    }
+    
+    /* ===== Header Table ===== */
     .header-table { 
       width: 100%; 
       border-collapse: collapse; 
-      margin-bottom: 15px; 
+      margin-bottom: 20px; 
+      background: linear-gradient(135deg, #fff9f0, #fff);
+      border-radius: 10px;
+      overflow: hidden;
     }
     .header-table td { 
-      border: 1px solid #ddd; 
-      padding: 10px; 
+      border: 1px solid var(--border); 
+      padding: 12px 15px; 
       text-align: center; 
-      font-weight: bold; 
+      font-weight: 600; 
     }
+    .header-table td:first-child { border-right: none; }
+    .header-table td:last-child { border-left: none; }
     .logo { 
       width: 120px; 
+      height: auto;
+      transition: transform 0.2s;
     }
+    .logo:hover { transform: scale(1.05); }
     
-    /* ตารางหลัก */
+    /* ===== Main Table ===== */
     .main-table { 
       width: 100%; 
       border-collapse: collapse; 
       font-size: 13px; 
-      min-width: 1500px; 
-      margin-top: 15px; 
+      min-width: 1600px; 
+      margin-top: 10px; 
     }
     .main-table th { 
-      background: #2c3e50; 
+      background: linear-gradient(135deg, var(--dark), #34495e); 
       color: white; 
-      border: 1px solid #2c3e50; 
-      padding: 12px 8px; 
+      border: 1px solid var(--dark); 
+      padding: 14px 10px; 
       text-align: center; 
       white-space: nowrap; 
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 20;
+      font-weight: 600;
+      font-size: 13px;
     }
     .main-table td { 
-      border: 1px solid #ddd; 
-      padding: 10px 5px; 
+      border: 1px solid var(--border); 
+      padding: 12px 8px; 
       vertical-align: middle; 
       text-align: center; 
+      transition: background 0.15s;
     }
-    .main-table tr:nth-child(even) { 
-      background-color: #fcfcfc; 
-    }
+    .main-table tr:hover td { background: #fffdf9; }
+    .main-table tr:nth-child(even) { background-color: #fcfcfc; }
     
+    /* ===== Images ===== */
     .img-box { 
-      width: 120px; 
-      height: 90px; 
+      width: 110px; 
+      height: 85px; 
       object-fit: cover; 
-      border: 2px solid #eee; 
+      border: 2px solid var(--border); 
       cursor: pointer; 
-      border-radius: 6px; 
-      transition: transform 0.2s; 
-      background: #fff; 
+      border-radius: 8px; 
+      transition: all 0.25s; 
+      background: #f9f9f9;
     }
     .img-box:hover { 
-      transform: scale(1.1); 
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
-      position: relative; 
-      z-index: 10; 
+      transform: scale(1.08); 
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15); 
+      border-color: var(--primary);
+      z-index: 10;
+      position: relative;
     }
+    .img-placeholder {
+      width: 110px; height: 85px;
+      background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); font-size: 11px;
+      flex-direction: column; gap: 4px;
+    }
+    .img-placeholder i { font-size: 1.2rem; opacity: 0.6; }
+    
+    /* ===== Status & Badges ===== */
     .status-open { 
-      color: #e74c3c; 
-      font-weight: bold; 
-      background: #ffebee; 
-      padding: 4px 10px; 
-      border-radius: 4px; 
-      display: inline-block; 
-      font-size: 12px; 
+      color: var(--danger); 
+      font-weight: 600; 
+      background: #fff0f0; 
+      padding: 5px 12px; 
+      border-radius: 20px; 
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; 
+      border: 1px solid #ffcdd2;
     }
     .status-closed { 
-      color: #27ae60; 
-      font-weight: bold; 
-      background: #e8f5e9; 
-      padding: 4px 10px; 
-      border-radius: 4px; 
-      display: inline-block; 
-      font-size: 12px; 
+      color: var(--success); 
+      font-weight: 600; 
+      background: #f0fbf0; 
+      padding: 5px 12px; 
+      border-radius: 20px; 
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px;
+      border: 1px solid #c8e6c9;
     }
     
-    /* ===== Nav และ Filter ===== */
+    .type-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .type-badge-safety { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+    .type-badge-5s { background: linear-gradient(135deg, var(--success), #219a52); }
+    .type-badge-audit { background: linear-gradient(135deg, var(--info), #1f618d); }
+    .type-badge-acc { background: linear-gradient(135deg, var(--danger), #c0392b); }
+    
+    /* ===== Navigation & Filters ===== */
     .nav-bar { 
       margin-bottom: 20px; 
       display: flex; 
@@ -111,30 +177,38 @@
       align-items: center; 
       flex-wrap: wrap; 
       gap: 15px; 
+      background: var(--card-bg);
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
     }
     .btn-back { 
       text-decoration: none; 
-      background: #34495e; 
+      background: var(--dark); 
       color: white; 
-      padding: 10px 15px; 
-      border-radius: 8px; 
-      font-weight: bold; 
-      transition: background 0.2s; 
-      display: inline-block; 
+      padding: 10px 18px; 
+      border-radius: 10px; 
+      font-weight: 600; 
+      transition: all 0.25s; 
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
     }
     .btn-back:hover { 
-      background: #2c3e50; 
+      background: #233242; 
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
     }
     
     .filter-group { 
       display: flex; 
-      gap: 15px; 
+      gap: 12px; 
       align-items: center; 
-      background: white; 
-      padding: 15px; 
-      border-radius: 10px; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+      background: var(--card-bg); 
+      padding: 12px 18px; 
+      border-radius: 12px; 
+      box-shadow: var(--shadow); 
       flex-wrap: wrap; 
       width: 100%; 
       box-sizing: border-box; 
@@ -143,329 +217,452 @@
       display: flex; 
       align-items: center; 
       gap: 8px; 
-      font-weight: bold; 
-      color: #2c3e50; 
+      font-weight: 600; 
+      color: var(--dark); 
       flex: 1; 
-      min-width: 200px; 
+      min-width: 180px; 
+      font-size: 13px;
     }
+    .filter-item i { color: var(--primary); font-size: 14px; }
     .filter-item select, 
     .filter-item input { 
-      padding: 8px 12px; 
-      border-radius: 6px; 
-      border: 1px solid #ddd; 
+      padding: 9px 14px; 
+      border-radius: 8px; 
+      border: 1.5px solid var(--border); 
       font-family: 'Sarabun'; 
       font-size: 14px; 
       outline: none; 
       width: 100%; 
       background: #fafafa; 
+      transition: all 0.2s;
+      color: var(--text);
     }
     .filter-item select:focus, 
     .filter-item input:focus { 
-      border-color: #f39c12; 
+      border-color: var(--primary); 
       background: #fff; 
+      box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
     }
 
     /* ===== TYPE SELECTOR ===== */
     .type-filter-section {
-      background: white;
+      background: var(--card-bg);
       border-radius: 14px;
-      padding: 15px;
-      margin: 15px 0 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      padding: 16px 20px;
+      margin: 0 0 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
     }
     .type-filter-label {
       font-weight: 600;
-      color: #2c3e50;
+      color: var(--dark);
       font-size: 0.95rem;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .type-filter-label i {
-      color: #f39c12;
-    }
+    .type-filter-label i { color: var(--primary); }
+    
     .type-selector {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 8px;
+      gap: 10px;
     }
     .type-btn {
-      padding: 10px 6px;
+      padding: 12px 8px;
       border-radius: 12px;
-      border: 2px solid #e0e0e0;
+      border: 2px solid var(--border);
       background: #f8f9fa;
       text-align: center;
       cursor: pointer;
       font-family: 'Sarabun', sans-serif;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 600;
       color: #666;
       transition: all 0.25s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
-      min-height: 68px;
+      gap: 6px;
+      min-height: 72px;
       user-select: none;
     }
     .type-btn i {
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       transition: transform 0.2s;
+      color: var(--text-muted);
     }
     .type-btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      border-color: #f39c12;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      border-color: var(--primary);
+      background: #fff9f0;
     }
-    .type-btn:active {
-      transform: scale(0.98);
-    }
+    .type-btn:hover i { color: var(--primary); transform: scale(1.1); }
+    .type-btn:active { transform: scale(0.98); }
+    
     .type-btn.active {
       background: linear-gradient(145deg, #fff3e0, #ffe0b2);
-      color: #e67e22;
-      border-color: #e67e22;
-      box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+      color: var(--primary-dark);
+      border-color: var(--primary-dark);
+      box-shadow: 0 6px 20px rgba(230, 126, 34, 0.25);
     }
-    .type-btn.active i {
-      transform: scale(1.1);
-      color: #e67e22;
-    }
+    .type-btn.active i { transform: scale(1.15); color: var(--primary-dark); }
+    
     .type-btn[data-type="5S"].active {
       background: linear-gradient(145deg, #e8f5e9, #c8e6c9);
-      color: #27ae60;
-      border-color: #27ae60;
-      box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+      color: #219a52;
+      border-color: #219a52;
+      box-shadow: 0 6px 20px rgba(39, 174, 96, 0.25);
     }
-    .type-btn[data-type="5S"].active i { color: #27ae60; }
+    .type-btn[data-type="5S"].active i { color: #219a52; }
+    
     .type-btn[data-type="Audit"].active {
       background: linear-gradient(145deg, #e3f2fd, #bbdefb);
       color: #1565c0;
       border-color: #1565c0;
-      box-shadow: 0 4px 15px rgba(21, 101, 192, 0.3);
+      box-shadow: 0 6px 20px rgba(21, 101, 192, 0.25);
     }
     .type-btn[data-type="Audit"].active i { color: #1565c0; }
+    
     .type-btn[data-type="Accident/Fire"].active {
       background: linear-gradient(145deg, #fce4ec, #f8bbd9);
       color: #c62828;
       border-color: #c62828;
-      box-shadow: 0 4px 15px rgba(198, 40, 40, 0.3);
+      box-shadow: 0 6px 20px rgba(198, 40, 40, 0.25);
     }
     .type-btn[data-type="Accident/Fire"].active i { color: #c62828; }
 
-    /* Badge ประเภทในตาราง */
-    .type-badge {
-      padding: 4px 10px;
-      border-radius: 20px;
-      color: white;
-      font-size: 11px;
-      font-weight: 600;
-      display: inline-block;
-      white-space: nowrap;
-    }
-    .type-badge-safety { background: linear-gradient(135deg, #f39c12, #e67e22); }
-    .type-badge-5s { background: linear-gradient(135deg, #27ae60, #219a52); }
-    .type-badge-audit { background: linear-gradient(135deg, #2980b9, #1f618d); }
-    .type-badge-acc { background: linear-gradient(135deg, #e74c3c, #c0392b); }
-
-    /* ===== AREA SELECTOR (Dynamic) ===== */
-    .area-selector-wrapper {
-      position: relative;
-    }
+    /* ===== AREA SELECTOR (Dynamic Dropdown) ===== */
+    .area-selector-wrapper { position: relative; min-width: 200px; }
+    
     .area-options {
       display: none;
       position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
+      top: calc(100% + 5px);
+      left: 0; right: 0;
       background: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
       z-index: 100;
-      max-height: 300px;
+      max-height: 280px;
       overflow-y: auto;
-      margin-top: 5px;
-      padding: 8px;
-    }
-    .area-options.show {
-      display: block;
+      padding: 6px;
       animation: slideDown 0.2s ease;
     }
+    .area-options.show { display: block; }
+    
     @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
+      from { opacity: 0; transform: translateY(-8px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    
     .area-option {
-      padding: 10px 12px;
-      border-radius: 6px;
+      padding: 10px 14px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 13px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      transition: background 0.15s;
+      gap: 10px;
+      transition: all 0.15s;
+      font-weight: 500;
     }
     .area-option:hover {
-      background: #fff3e0;
-      color: #e67e22;
+      background: linear-gradient(135deg, #fff9f0, #fff3e0);
+      color: var(--primary-dark);
+      padding-left: 18px;
     }
     .area-option.selected {
-      background: #ffe0b2;
-      color: #e67e22;
+      background: linear-gradient(135deg, #ffe0b2, #ffd59a);
+      color: var(--primary-dark);
       font-weight: 600;
+      border-left: 3px solid var(--primary-dark);
     }
     .area-option i {
-      width: 18px;
-      text-align: center;
-      color: #f39c12;
+      width: 18px; text-align: center;
+      color: var(--text-muted);
+      transition: color 0.15s;
     }
-    .area-option[data-area="5S"] i { color: #27ae60; }
+    .area-option:hover i, .area-option.selected i { color: inherit; }
     
     .area-display {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      background: #fafafa;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-      cursor: pointer;
-      min-height: 38px;
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 14px; background: #fafafa;
+      border-radius: 8px; border: 1.5px solid var(--border);
+      cursor: pointer; min-height: 40px;
+      font-weight: 500; font-size: 14px;
+      transition: all 0.2s;
     }
     .area-display:hover {
-      border-color: #f39c12;
+      border-color: var(--primary);
       background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .area-display .arrow {
-      margin-left: auto;
-      color: #999;
-      transition: transform 0.2s;
+      margin-left: auto; color: var(--text-muted);
+      transition: transform 0.25s; font-size: 12px;
     }
-    .area-display.active .arrow {
-      transform: rotate(180deg);
+    .area-display.active .arrow { transform: rotate(180deg); }
+
+    /* ===== Action Button ===== */
+    .btn-action {
+      background: linear-gradient(135deg, var(--danger), #c0392b);
+      color: white;
+      padding: 7px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.25s;
+      box-shadow: 0 3px 10px rgba(231, 76, 60, 0.25);
+    }
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 18px rgba(231, 76, 60, 0.4);
+      background: linear-gradient(135deg, #c0392b, #a93226);
+    }
+    .btn-action:active { transform: scale(0.98); }
+
+    /* ===== Loading & Empty States ===== */
+    .loading {
+      text-align: center; padding: 50px 20px;
+      color: var(--text-muted); font-size: 15px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    .loading i { 
+      color: var(--primary); 
+      font-size: 2rem;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.95); }
+    }
+    
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state i {
+      font-size: 3rem; margin-bottom: 15px;
+      opacity: 0.4; color: var(--border);
+    }
+    .empty-state p { font-size: 15px; }
+
+    /* ===== Clear Button ===== */
+    .btn-clear {
+      background: var(--text-muted);
+      color: white;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-clear:hover { 
+      background: #6d7a87; 
+      transform: translateY(-1px);
     }
 
     /* ===== Mobile Responsive ===== */
+    @media screen and (max-width: 1024px) {
+      .type-selector { grid-template-columns: repeat(4, 1fr); }
+    }
+    
     @media screen and (max-width: 768px) {
-      body { padding: 10px; }
-      .nav-bar { flex-direction: column; align-items: stretch; }
-      .filter-group { flex-direction: column; gap: 10px; }
-      .filter-item { flex-direction: column; align-items: flex-start; gap: 4px; width: 100%; }
-      .btn-back { text-align: center; }
+      body { padding: 12px; }
       
-      .report-container { padding: 10px; border-radius: 8px; }
-      .header-table td { display: block; width: 100%; border: none; padding: 5px; }
-      .header-table { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+      .nav-bar { 
+        flex-direction: column; 
+        align-items: stretch; 
+        padding: 12px 15px;
+      }
+      .filter-group { 
+        flex-direction: column; 
+        gap: 12px; 
+        padding: 15px;
+      }
+      .filter-item { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 6px; 
+        width: 100%; 
+      }
+      .btn-back { 
+        width: 100%; 
+        justify-content: center; 
+        padding: 12px;
+      }
       
-      .type-selector { grid-template-columns: repeat(3, 1fr); gap: 6px; }
-      .type-btn { font-size: 0.65rem; padding: 8px 4px; min-height: 62px; }
-      .type-btn i { font-size: 1rem; }
+      .report-container { 
+        padding: 12px; 
+        border-radius: 10px; 
+        margin-bottom: 20px;
+      }
       
+      .header-table td { 
+        display: block; 
+        width: 100%; 
+        border: none; 
+        padding: 8px; 
+        font-size: 14px;
+      }
+      .header-table { 
+        border: 1px solid var(--border); 
+        border-radius: 10px; 
+        overflow: hidden; 
+      }
+      
+      .type-selector { 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 8px; 
+      }
+      .type-btn { 
+        font-size: 0.68rem; 
+        padding: 10px 6px; 
+        min-height: 68px;
+      }
+      .type-btn i { font-size: 1.1rem; }
+      
+      /* Table Card View */
       .main-table thead { display: none; }
       .main-table, .main-table tbody, .main-table tr, .main-table td { 
-        display: block; width: 100%; min-width: auto; box-sizing: border-box; 
+        display: block; 
+        width: 100%; 
+        min-width: auto; 
+        box-sizing: border-box; 
       }
       .main-table tr { 
-        margin-bottom: 15px; border: 1px solid #e1e8ed; border-radius: 10px; 
-        overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); background: #fff;
+        margin-bottom: 18px; 
+        border: 1.5px solid var(--border); 
+        border-radius: 12px; 
+        overflow: hidden; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
+        background: #fff;
       }
       .main-table td { 
-        text-align: left !important; padding: 12px 15px; border: none; 
-        border-bottom: 1px solid #f0f2f5; display: flex; flex-direction: column; 
+        text-align: left !important; 
+        padding: 14px 18px; 
+        border: none; 
+        border-bottom: 1px solid #f5f5f5; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 4px;
         position: relative;
       }
       .main-table td:last-child { border-bottom: none; }
+      
       .main-table td::before { 
-        content: attr(data-label); font-weight: bold; color: #e67e22; 
-        margin-bottom: 6px; font-size: 12px; 
+        content: attr(data-label); 
+        font-weight: 600; 
+        color: var(--primary-dark); 
+        margin-bottom: 4px; 
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
       }
-      .img-box { width: 100%; max-width: 250px; height: 150px; margin: 0 auto; display: block; }
-      .type-badge { font-size: 10px; padding: 3px 8px; }
+      
+      .img-box { 
+        width: 100%; 
+        max-width: 280px; 
+        height: 160px; 
+        margin: 8px auto 0; 
+        display: block; 
+      }
+      .img-placeholder {
+        width: 100%; max-width: 280px; height: 160px;
+        margin: 8px auto 0; display: flex;
+      }
+      
+      .type-badge { font-size: 11px; padding: 4px 10px; }
+      .status-open, .status-closed { font-size: 11px; padding: 4px 10px; }
       
       /* Area dropdown mobile */
       .area-options {
         position: static;
         box-shadow: none;
-        border: 1px solid #eee;
-        max-height: 250px;
+        border: 1px solid var(--border);
+        max-height: 240px;
         margin-top: 8px;
+        border-radius: 10px;
       }
+      .area-selector-wrapper { width: 100%; }
     }
     
     @media (max-width: 480px) {
       .type-selector { grid-template-columns: repeat(2, 1fr); }
-      .type-btn { font-size: 0.62rem; min-height: 58px; }
+      .type-btn { font-size: 0.65rem; min-height: 64px; padding: 10px 4px; }
+      .type-btn i { font-size: 1rem; }
+      
+      .filter-item select, .filter-item input { font-size: 13px; padding: 8px 12px; }
+      .btn-clear { width: 100%; justify-content: center; }
     }
     
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #7f8c8d;
-      font-size: 15px;
+    /* ===== Print Styles ===== */
+    @media print {
+      .nav-bar, .type-filter-section, .btn-back { display: none !important; }
+      body { padding: 0; background: white; }
+      .report-container { box-shadow: none; border-radius: 0; padding: 10px; }
+      .main-table { min-width: auto; font-size: 10px; }
+      .main-table th { background: #eee !important; color: #000 !important; }
+      .img-box { width: 80px; height: 60px; }
     }
-    .loading i { color: #f39c12; margin-right: 8px; }
-    
-    /* Clear filter button */
-    .btn-clear {
-      background: #95a5a6;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      transition: background 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .btn-clear:hover { background: #7f8c8d; }
   </style>
 </head>
 <body>
 
-  <div class="nav-bar">
-    <a href="Dash.html" class="btn-back"><i class="fas fa-arrow-left"></i> กลับหน้า Dashboard</a>
+  <!-- Navigation -->
+  <nav class="nav-bar">
+    <a href="Dash.html" class="btn-back">
+      <i class="fas fa-arrow-left"></i> กลับหน้า Dashboard
+    </a>
     
     <div class="filter-group">
       <div class="filter-item">
-        <span><i class="fas fa-calendar"></i> เดือน:</span> 
+        <i class="fas fa-calendar"></i>
         <input type="month" id="monthFilter" onchange="loadReport()">
       </div>
       
-      <!-- พื้นที่: แบบ Dynamic Dropdown -->
+      <!-- Dynamic Area Dropdown -->
       <div class="filter-item area-selector-wrapper">
-        <span><i class="fas fa-map-marker-alt"></i> พื้นที่:</span>
+        <i class="fas fa-map-marker-alt"></i>
         <div class="area-display" id="areaDisplay" onclick="toggleAreaDropdown()">
           <span id="areaDisplayText">-- ทั้งหมด --</span>
           <i class="fas fa-chevron-down arrow"></i>
         </div>
-        <div class="area-options" id="areaOptions">
-          <!-- Options will be populated by JS -->
-        </div>
+        <div class="area-options" id="areaOptions"></div>
         <input type="hidden" id="areaFilter" value="">
       </div>
       
       <div class="filter-item">
-        <span><i class="fas fa-toggle-on"></i> สถานะ:</span>
+        <i class="fas fa-toggle-on"></i>
         <select id="statusFilter" onchange="renderTable()">
           <option value="">-- ทั้งหมด --</option>
-          <option value="Open">รอดำเนินการ (Open)</option>
-          <option value="Closed">แก้ไขเสร็จสิ้น (Closed)</option>
+          <option value="Open">🔴 รอดำเนินการ</option>
+          <option value="Closed">🟢 แก้ไขเสร็จสิ้น</option>
         </select>
       </div>
       
       <div class="filter-item" style="flex:0; min-width:auto;">
         <button class="btn-clear" onclick="clearFilters()">
-          <i class="fas fa-times"></i> ล้างกรอง
+          <i class="fas fa-rotate-left"></i> ล้างกรอง
         </button>
       </div>
     </div>
-  </div>
+  </nav>
 
-  <!-- ===== TYPE SELECTOR ===== -->
+  <!-- Type Selector -->
   <div class="type-filter-section">
     <div class="type-filter-label">
       <i class="fas fa-filter"></i> กรองตามประเภทการตรวจสอบ
@@ -495,18 +692,27 @@
     </div>
   </div>
 
+  <!-- Report Container -->
   <div class="report-container">
     <table class="header-table">
       <tr>
         <td rowspan="2" style="width: 20%;">
           <img src="https://itrequests.netlify.app/logo.png" class="logo" alt="TOPPAN" onerror="this.style.display='none'">
         </td>
-        <td style="font-size: 18px; color: #2c3e50;"><b>รายงานการตรวจความปลอดภัย</b></td>
-        <td style="width: 20%; background: #f8f9fa;">ประจำเดือน (Monthly)</td>
+        <td style="font-size: 18px; color: var(--dark);">
+          <b>รายงานการติดตามงานแก้ไข</b>
+        </td>
+        <td style="width: 20%; background: #fff9f0;">
+          <span style="color: var(--primary);">📊 Action Plan Report</span>
+        </td>
       </tr>
       <tr>
-        <td style="color: #7f8c8d;">(SAFETY PATROL REPORT)</td>
-        <td id="displayMonth" style="color: #e67e22; font-size: 16px;">-</td>
+        <td style="color: var(--text-muted); font-weight: normal;">
+          SAFETY PATROL & 5S INSPECTION SYSTEM
+        </td>
+        <td id="displayMonth" style="color: var(--primary-dark); font-size: 16px; font-weight: 600;">
+          -
+        </td>
       </tr>
     </table>
 
@@ -515,128 +721,166 @@
         <tr>
           <th>ลำดับ</th>
           <th>ประเภท</th>
-          <th>รูปภาพ (Before)</th>
-          <th>รูปภาพ (After)</th>
-          <th>พื้นที่ (Area)</th>
+          <th>รูปภาพ<br><small style="font-weight:normal;opacity:0.9">(ก่อน)</small></th>
+          <th>รูปภาพ<br><small style="font-weight:normal;opacity:0.9">(หลัง)</small></th>
+          <th>พื้นที่</th>
           <th>JOB NO.</th>
-          <th>รายละเอียดปัญหา</th>
-          <th>แนวทางการแก้ไข</th>
+          <th>ปัญหาที่พบ</th>
+          <th>แนวทางแก้ไข</th>
           <th>ผู้รับผิดชอบ</th>
-          <th>วันที่เริ่ม</th>
-          <th>วันครบกำหนด</th>
-          <th>กำหนดเสร็จ</th>
+          <th>วันที่พบ</th>
+          <th>ครบกำหนด</th>
+          <th>เสร็จสิ้น</th>
           <th>หมายเหตุ</th>
         </tr>
       </thead>
-      <tbody id="reportContent"></tbody>
+      <tbody id="reportContent">
+        <!-- Data will be rendered here -->
+      </tbody>
     </table>
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
-    
-    let allReportData = [];
-    let currentTypeFilter = 'all';
-    
-    // ===== AREA DATA =====
-    const areaData = {
-      // พื้นที่แบบโรงงาน (สำหรับประเภทความปลอดภัย)
+    // ===================================================================
+    // CONFIGURATION
+    // ===================================================================
+    const CONFIG = {
+      API_URL: "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec",
+      TZ: "GMT+7",
+      
+      // Inspection types
+      SAFETY_TYPES: ["จป.ว", "คปอ.", "Foreman/Mgr.", "Audit", "Accident/Fire"],
+      TYPE_5S: "5S",
+      
+      // Area mapping for display normalization
+      AREA_DISPLAY_MAP: {
+        // 5S areas → Friendly Thai names
+        "OFFICE": "Office (5S)",
+        "Canteen": "Canteen (5S)",
+        "QA&QC": "QA&QC (5S)",
+        "Factory": "Factory (5S)",
+        "EN": "Engineering (5S)",
+        "Outside": "Outside (5S)"
+      }
+    };
+
+    // ===================================================================
+    // AREA DATA FOR DROPDOWN
+    // ===================================================================
+    const AREA_DATA = {
       safety: [
         { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
-        { value: "แผนก Print", label: "แผนก Print", icon: "fas fa-print" },
-        { value: "แผนก Laminate", label: "แผนก Laminate", icon: "fas fa-layer-group" },
-        { value: "แผนก Solvent", label: "แผนก Solvent", icon: "fas fa-flask" },
-        { value: "แผนก Rewinder / Slitter / Packing", label: "แผนก Rewinder/Slitter/Packing", icon: "fas fa-box-open" },
-        { value: "แผนก BAG MAKING", label: "แผนก BAG MAKING", icon: "fas fa-shopping-bag" },
-        { value: "แผนก QA & QC", label: "แผนก QA & QC", icon: "fas fa-vial" },
-        { value: "แผนก Warehouse", label: "แผนก Warehouse", icon: "fas fa-warehouse" },
-        { value: "Office", label: "Office", icon: "fas fa-building" },
-        { value: "พื้นที่รอบบริเวณโรงงาน", label: "พื้นที่รอบโรงงาน", icon: "fas fa-tree" }
+        { value: "แผนก Print", label: "🖨️ แผนก Print", icon: "fas fa-print" },
+        { value: "แผนก Laminate", label: "📦 แผนก Laminate", icon: "fas fa-layer-group" },
+        { value: "แผนก Solvent", label: "🧪 แผนก Solvent", icon: "fas fa-flask" },
+        { value: "แผนก Rewinder / Slitter / Packing", label: "🔄 Rewinder/Slitter/Packing", icon: "fas fa-box-open" },
+        { value: "แผนก BAG MAKING", label: "🛍️ แผนก BAG MAKING", icon: "fas fa-shopping-bag" },
+        { value: "แผนก QA & QC", label: "🔬 แผนก QA & QC", icon: "fas fa-vial" },
+        { value: "แผนก Warehouse", label: "🏭 แผนก Warehouse", icon: "fas fa-warehouse" },
+        { value: "Office", label: "🏢 Office", icon: "fas fa-building" },
+        { value: "พื้นที่รอบบริเวณโรงงาน", label: "🌳 พื้นที่รอบโรงงาน", icon: "fas fa-tree" }
       ],
-      // พื้นที่แบบ 5S
       "5S": [
         { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
-        { value: "OFFICE", label: "Office", icon: "fas fa-desktop" },
-        { value: "Canteen", label: "Canteen", icon: "fas fa-utensils" },
-        { value: "QA&QC", label: "QA&QC", icon: "fas fa-microscope" },
-        { value: "Factory", label: "Factory", icon: "fas fa-industry" },
-        { value: "EN", label: "Engineering", icon: "fas fa-tools" },
-        { value: "Outside", label: "Outside", icon: "fas fa-tree" }
+        { value: "OFFICE", label: "🖥️ Office", icon: "fas fa-desktop" },
+        { value: "Canteen", label: "🍽️ Canteen", icon: "fas fa-utensils" },
+        { value: "QA&QC", label: "🔬 QA&QC", icon: "fas fa-microscope" },
+        { value: "Factory", label: "🏭 Factory", icon: "fas fa-industry" },
+        { value: "EN", label: "🔧 Engineering", icon: "fas fa-tools" },
+        { value: "Outside", label: "🌳 Outside", icon: "fas fa-tree" }
       ]
     };
 
-    // ===== TYPE FILTER =====
+    // ===================================================================
+    // STATE
+    // ===================================================================
+    let allReportData = [];
+    let currentTypeFilter = 'all';
+    let isLoading = false;
+
+    // ===================================================================
+    // INITIALIZATION
+    // ===================================================================
+    window.onload = function() {
+      // Set default month to current
+      const now = new Date();
+      const monthStr = now.toISOString().slice(0, 7);
+      document.getElementById('monthFilter').value = monthStr;
+      
+      // Initialize area options
+      updateAreaOptions('all');
+      
+      // Load data
+      loadReport();
+    };
+
+    // ===================================================================
+    // TYPE FILTER
+    // ===================================================================
     function selectTypeFilter(type, el) {
+      if (currentTypeFilter === type) return;
+      
       currentTypeFilter = type;
       
-      // Update active button
+      // Update UI
       document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
       
       // Update area options based on type
       updateAreaOptions(type);
       
-      // Reset area filter when type changes
+      // Reset area filter
       document.getElementById('areaFilter').value = "";
       document.getElementById('areaDisplayText').textContent = "-- ทั้งหมด --";
+      document.querySelectorAll('.area-option').forEach(opt => opt.classList.remove('selected'));
       
+      // Re-render table
       renderTable();
     }
 
-    // ===== AREA DROPDOWN =====
+    // ===================================================================
+    // AREA DROPDOWN
+    // ===================================================================
     function updateAreaOptions(type) {
-      const areaOptions = document.getElementById('areaOptions');
-      const areaKey = type === '5S' ? '5S' : 'safety';
-      const areas = areaData[areaKey];
+      const container = document.getElementById('areaOptions');
+      const areaKey = (type === CONFIG.TYPE_5S) ? CONFIG.TYPE_5S : 'safety';
+      const areas = AREA_DATA[areaKey];
       
-      let html = '';
-      areas.forEach(area => {
-        html += `
-          <div class="area-option" data-area="${area.value}" onclick="selectArea('${area.value}', '${area.label}', this)">
-            <i class="${area.icon}"></i>
-            <span>${area.label}</span>
-          </div>
-        `;
-      });
-      areaOptions.innerHTML = html;
+      container.innerHTML = areas.map(area => `
+        <div class="area-option" data-value="${area.value}" onclick="selectArea('${area.value}', '${area.label}', this)">
+          <i class="${area.icon}"></i>
+          <span>${area.label}</span>
+        </div>
+      `).join('');
     }
 
     function toggleAreaDropdown() {
       const dropdown = document.getElementById('areaOptions');
       const display = document.getElementById('areaDisplay');
-      dropdown.classList.toggle('show');
-      display.classList.toggle('active');
+      const isShowing = dropdown.classList.contains('show');
+      
+      // Close all other dropdowns first
+      document.querySelectorAll('.area-options').forEach(d => {
+        if (d !== dropdown) d.classList.remove('show');
+      });
+      document.querySelectorAll('.area-display').forEach(el => {
+        if (el !== display) el.classList.remove('active');
+      });
+      
+      // Toggle current
+      dropdown.classList.toggle('show', !isShowing);
+      display.classList.toggle('active', !isShowing);
     }
 
     function selectArea(value, label, el) {
       document.getElementById('areaFilter').value = value;
       document.getElementById('areaDisplayText').textContent = label;
       
-      // Update selected style
       document.querySelectorAll('.area-option').forEach(opt => opt.classList.remove('selected'));
       el.classList.add('selected');
       
-      // Close dropdown
       document.getElementById('areaOptions').classList.remove('show');
       document.getElementById('areaDisplay').classList.remove('active');
-      
-      renderTable();
-    }
-
-    function clearFilters() {
-      // Reset all filters
-      currentTypeFilter = 'all';
-      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector('.type-btn[data-type="all"]').classList.add('active');
-      
-      document.getElementById('areaFilter').value = "";
-      document.getElementById('areaDisplayText').textContent = "-- ทั้งหมด --";
-      document.querySelectorAll('.area-option').forEach(opt => opt.classList.remove('selected'));
-      
-      document.getElementById('statusFilter').value = "";
-      
-      // Reset area options to default (safety)
-      updateAreaOptions('all');
       
       renderTable();
     }
@@ -644,122 +888,293 @@
     // Close dropdown when clicking outside
     document.addEventListener('click', function(e) {
       const wrapper = document.querySelector('.area-selector-wrapper');
-      if (!wrapper.contains(e.target)) {
+      if (wrapper && !wrapper.contains(e.target)) {
         document.getElementById('areaOptions').classList.remove('show');
         document.getElementById('areaDisplay').classList.remove('active');
       }
     });
 
-    function getDriveThumb(url) {
-      if(!url || url === "-") return "";
-      let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400` : "";
+    function clearFilters() {
+      // Reset type
+      currentTypeFilter = 'all';
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.type-btn[data-type="all"]').classList.add('active');
+      
+      // Reset area
+      document.getElementById('areaFilter').value = "";
+      document.getElementById('areaDisplayText').textContent = "-- ทั้งหมด --";
+      document.querySelectorAll('.area-option').forEach(opt => opt.classList.remove('selected'));
+      updateAreaOptions('all');
+      
+      // Reset status
+      document.getElementById('statusFilter').value = "";
+      
+      // Re-render
+      renderTable();
     }
 
-    function getTypeBadge(type) {
-      if (!type) return '<span style="color:#aaa;">-</span>';
-      let badgeClass = 'type-badge-safety';
-      if (type === '5S') badgeClass = 'type-badge-5s';
-      else if (type === 'Audit') badgeClass = 'type-badge-audit';
-      else if (type === 'Accident/Fire') badgeClass = 'type-badge-acc';
-      return `<span class="type-badge ${badgeClass}">${type}</span>`;
-    }
-
-    function loadReport() {
-      const monthInput = document.getElementById('monthFilter').value;
+    // ===================================================================
+    // DATA LOADING
+    // ===================================================================
+    async function loadReport() {
+      if (isLoading) return;
+      isLoading = true;
+      
       const reportContent = document.getElementById('reportContent');
-      reportContent.innerHTML = '<tr><td colspan="13" class="loading"><i class="fas fa-circle-notch fa-spin"></i> กำลังโหลดข้อมูล... โปรดรอสักครู่</td></tr>';
+      const monthInput = document.getElementById('monthFilter').value;
+      
+      // Show loading state
+      reportContent.innerHTML = `
+        <tr>
+          <td colspan="13" class="loading">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <div>กำลังโหลดข้อมูลรายงาน...</div>
+            <small style="color:var(--text-muted);font-size:13px;">โปรดรอสักครู่</small>
+          </td>
+        </tr>
+      `;
 
-      let fetchUrl = API_URL + "?action=getReport";
-      if(monthInput) {
+      // Build API URL
+      let fetchUrl = `${CONFIG.API_URL}?action=getReport`;
+      if (monthInput) {
         const d = new Date(monthInput);
         const mStr = d.toLocaleString('en-us', { month: 'short', year: 'numeric' });
-        fetchUrl += "&month=" + mStr;
+        fetchUrl += `&month=${encodeURIComponent(mStr)}`;
         document.getElementById('displayMonth').innerText = mStr;
       } else {
         document.getElementById('displayMonth').innerText = "ทั้งหมด";
       }
 
-      fetch(fetchUrl)
-      .then(res => res.json())
-      .then(data => {
-        allReportData = data; 
-        // Initialize area options with default type
-        updateAreaOptions('all');
-        renderTable();        
-      })
-      .catch(err => {
-        reportContent.innerHTML = '<tr><td colspan="13" style="color:#e74c3c; padding:20px; text-align:center;">❌ เกิดข้อผิดพลาดในการดึงข้อมูล โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต</td></tr>';
-        console.error("Error:", err);
-      });
+      try {
+        const response = await fetch(fetchUrl);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const data = await response.json();
+        allReportData = Array.isArray(data) ? data : [];
+        
+        renderTable();
+        
+      } catch (err) {
+        console.error("Load report error:", err);
+        reportContent.innerHTML = `
+          <tr>
+            <td colspan="13" class="empty-state">
+              <i class="fas fa-triangle-exclamation"></i>
+              <p><b>ไม่สามารถโหลดข้อมูลได้</b></p>
+              <small style="color:var(--danger);">${err.message}</small>
+              <br><br>
+              <button class="btn-clear" onclick="loadReport()" style="background:var(--primary);">
+                <i class="fas fa-rotate-right"></i> ลองใหม่
+              </button>
+            </td>
+          </tr>
+        `;
+      } finally {
+        isLoading = false;
+      }
     }
 
+    // ===================================================================
+    // TABLE RENDERING
+    // ===================================================================
     function renderTable() {
       const areaVal = document.getElementById('areaFilter').value;
       const statusVal = document.getElementById('statusFilter').value;
       const reportContent = document.getElementById('reportContent');
       
-      let filteredData = [...allReportData];
+      // Apply filters
+      let filtered = [...allReportData];
       
-      // Filter by type
       if (currentTypeFilter !== 'all') {
-        filteredData = filteredData.filter(item => item.inspectionType === currentTypeFilter);
+        filtered = filtered.filter(item => item.inspectionType === currentTypeFilter);
       }
-      
-      // Filter by area
       if (areaVal !== "") {
-        filteredData = filteredData.filter(item => item.area === areaVal);
+        filtered = filtered.filter(item => {
+          // Normalize area for comparison (handle 5S vs Safety naming)
+          const itemArea = normalizeAreaForFilter(item.area, item.inspectionType);
+          return itemArea === areaVal;
+        });
       }
-      
-      // Filter by status
       if (statusVal !== "") {
-        filteredData = filteredData.filter(item => item.status === statusVal);
+        filtered = filtered.filter(item => item.status === statusVal);
       }
 
-      reportContent.innerHTML = "";
-      
-      if (filteredData.length === 0) {
-         reportContent.innerHTML = '<tr><td colspan="13" style="padding:40px; color:#7f8c8d; text-align:center;">🔍 ไม่พบข้อมูลงานซ่อมตามเงื่อนไขที่ค้นหา</td></tr>';
-         return;
-      }
-
-      filteredData.forEach((item, index) => {
-        let rowBgColor = item.status === 'Open' ? '#fff5f5' : '#f0fbf0';
-        
-        let actionButtonHtml = "";
-        if (item.status === 'Open') {
-           actionButtonHtml = `<a href="resolve.html?jobid=${item.jobId}" style="background-color: #e74c3c; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px; display: inline-block; box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3); transition: 0.2s;"><i class="fas fa-wrench"></i> อัปเดตงาน</a>`;
-        } else {
-           actionButtonHtml = '<span style="color:#aaa;">-</span>';
-        }
-
-        let row = `
-          <tr style="background-color: ${rowBgColor}; border-bottom: 2px solid #fff;">
-            <td data-label="📌 ลำดับ">${index + 1}</td>
-            <td data-label="🏷️ ประเภท">${getTypeBadge(item.inspectionType)}</td>
-            <td data-label="📷 รูปภาพ (ก่อนแก้)">${item.picBefore ? `<img src="${getDriveThumb(item.picBefore)}" class="img-box" onclick="window.open('${item.picBefore}')">` : '<span style="color:#aaa;">-</span>'}</td>
-            <td data-label="🛠️ รูปภาพ (หลังแก้)">${item.picAfter ? `<img src="${getDriveThumb(item.picAfter)}" class="img-box" onclick="window.open('${item.picAfter}')">` : actionButtonHtml}</td>
-            <td data-label="📍 พื้นที่ (Area)"><b>${item.area}</b></td>
-            <td data-label="🏷️ JOB NO." style="color:#2980b9;"><b>${item.jobId}</b></td>
-            <td data-label="⚠️ รายละเอียดปัญหา" style="text-align:left;">${item.remark}</td> 
-            <td data-label="✅ แนวทางการแก้ไข" style="text-align:left;">${item.correctiveAction || '<span style="color:#aaa;">-</span>'}</td>
-            <td data-label="👤 ผู้รับผิดชอบ">${item.picName || '<span style="color:#aaa;">-</span>'}</td>
-            <td data-label="📅 วันที่พบ">${item.dateFound}</td>
-            <td data-label="⏳ วันครบกำหนด" style="color:#e74c3c; font-weight:bold;">${item.dueDate}</td>
-            <td data-label="🏁 วันที่ซ่อมเสร็จ">${item.finishDate !== "-" ? `<span class="status-closed"><i class="fas fa-check"></i> ${item.finishDate}</span>` : '<span style="color:#aaa;">-</span>'}</td>
-            <td data-label="📝 หมายเหตุ" style="text-align:left;">${item.problem}</td>
+      // Empty state
+      if (filtered.length === 0) {
+        reportContent.innerHTML = `
+          <tr>
+            <td colspan="13" class="empty-state">
+              <i class="fas fa-search"></i>
+              <p><b>ไม่พบข้อมูล</b></p>
+              <small>ลองปรับเงื่อนไขการกรองหรือเลือกเดือนอื่น</small>
+            </td>
           </tr>
         `;
-        reportContent.innerHTML += row;
-      });
+        return;
+      }
+
+      // Render rows
+      reportContent.innerHTML = filtered.map((item, index) => {
+        const rowBg = item.status === 'Open' ? '#fff5f5' : '#f0fbf0';
+        const borderColor = item.status === 'Open' ? '#ffe0e0' : '#d4edda';
+        
+        // Action button for Open items
+        const actionBtn = item.status === 'Open' 
+          ? `<a href="resolve.html?jobid=${encodeURIComponent(item.jobId)}" class="btn-action">
+               <i class="fas fa-wrench"></i> แก้ไขงาน
+             </a>`
+          : `<span style="color:var(--success);font-weight:600;"><i class="fas fa-check-circle"></i> เสร็จสิ้น</span>`;
+        
+        // Images with thumbnail
+        const imgBefore = item.picBefore && item.picBefore !== "-" 
+          ? `<img src="${getDriveThumb(item.picBefore)}" class="img-box" onclick="window.open('${item.picBefore}')" title="คลิกเพื่อดูภาพเต็ม">`
+          : `<div class="img-placeholder"><i class="fas fa-image"></i>ไม่มีรูป</div>`;
+        
+        const imgAfter = item.picAfter && item.picAfter !== "-"
+          ? `<img src="${getDriveThumb(item.picAfter)}" class="img-box" onclick="window.open('${item.picAfter}')" title="คลิกเพื่อดูภาพเต็ม">`
+          : (item.status === 'Open' ? actionBtn : `<span style="color:#aaa;">-</span>`);
+        
+        // Normalize area display
+        const displayArea = normalizeAreaDisplay(item.area, item.inspectionType);
+        
+        // Type badge
+        const typeBadge = getTypeBadge(item.inspectionType);
+        
+        // Date formatting
+        const formatDate = (d) => d && d !== "-" ? d : '<span style="color:#aaa;">-</span>';
+        
+        return `
+          <tr style="background-color: ${rowBg}; border-left: 4px solid ${item.status === 'Open' ? 'var(--danger)' : 'var(--success)'};">
+            <td data-label="📌 ลำดับ" style="font-weight:600;">${index + 1}</td>
+            <td data-label="🏷️ ประเภท">${typeBadge}</td>
+            <td data-label="📷 ก่อนแก้">${imgBefore}</td>
+            <td data-label="🛠️ หลังแก้">${imgAfter}</td>
+            <td data-label="📍 พื้นที่"><b>${displayArea}</b></td>
+            <td data-label="🔖 JOB NO." style="color:var(--info);font-weight:600;font-family:monospace;">${item.jobId}</td>
+            <td data-label="⚠️ ปัญหา" style="text-align:left;max-width:200px;">
+              <div style="font-weight:500;color:var(--dark);">${escapeHtml(item.problem || '-')}</div>
+              ${item.remark && item.remark !== "-" ? 
+                `<small style="color:var(--text-muted);display:block;margin-top:4px;">📝 ${escapeHtml(item.remark)}</small>` : ''}
+            </td>
+            <td data-label="✅ แก้ไข" style="text-align:left;max-width:180px;">
+              ${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span style="color:#aaa;">-</span>'}
+            </td>
+            <td data-label="👤 ผู้รับผิดชอบ">${item.picName || '<span style="color:#aaa;">-</span>'}</td>
+            <td data-label="📅 พบ">${formatDate(item.dateFound)}</td>
+            <td data-label="⏳ ครบกำหนด" style="color:var(--danger);font-weight:600;">${formatDate(item.dueDate)}</td>
+            <td data-label="🏁 เสร็จ">
+              ${item.finishDate && item.finishDate !== "-" 
+                ? `<span class="status-closed"><i class="fas fa-check"></i> ${item.finishDate}</span>` 
+                : '<span style="color:#aaa;">-</span>'}
+            </td>
+            <td data-label="📝 หมายเหตุ" style="text-align:left;max-width:150px;font-size:12px;">
+              ${item.problemNote ? escapeHtml(item.problemNote) : (item.problem && item.problem !== item.remark ? escapeHtml(item.problem) : '<span style="color:#aaa;">-</span>')}
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
-    // Init
-    window.onload = function() {
-      const now = new Date();
-      const monthStr = now.toISOString().slice(0, 7);
-      document.getElementById('monthFilter').value = monthStr;
-      loadReport();
+    // ===================================================================
+    // UTILITY FUNCTIONS
+    // ===================================================================
+    
+    /**
+     * Get Drive thumbnail URL
+     */
+    function getDriveThumb(url) {
+      if (!url || url === "-" || url === "") return "";
+      const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400` : url;
+    }
+    
+    /**
+     * Get type badge HTML
+     */
+    function getTypeBadge(type) {
+      if (!type) return '<span style="color:#aaa;">-</span>';
+      
+      let badgeClass = 'type-badge-safety';
+      let icon = 'fas fa-shield-halved';
+      
+      if (type === CONFIG.TYPE_5S) {
+        badgeClass = 'type-badge-5s';
+        icon = 'fas fa-broom';
+      } else if (type === 'Audit') {
+        badgeClass = 'type-badge-audit';
+        icon = 'fas fa-search';
+      } else if (type === 'Accident/Fire') {
+        badgeClass = 'type-badge-acc';
+        icon = 'fas fa-fire-extinguisher';
+      }
+      
+      return `<span class="type-badge ${badgeClass}"><i class="${icon}"></i> ${type}</span>`;
+    }
+    
+    /**
+     * Normalize area for display (5S areas get friendly names)
+     */
+    function normalizeAreaDisplay(area, inspectionType) {
+      if (inspectionType === CONFIG.TYPE_5S && CONFIG.AREA_DISPLAY_MAP[area]) {
+        return CONFIG.AREA_DISPLAY_MAP[area];
+      }
+      return area || '-';
+    }
+    
+    /**
+     * Normalize area for filtering (reverse mapping)
+     */
+    function normalizeAreaForFilter(area, inspectionType) {
+      // If it's a 5S type and area matches a mapped value, return the original key
+      if (inspectionType === CONFIG.TYPE_5S) {
+        for (const [key, value] of Object.entries(CONFIG.AREA_DISPLAY_MAP)) {
+          if (area === key || area === value) return key;
+        }
+      }
+      return area;
+    }
+    
+    /**
+     * Escape HTML to prevent XSS
+     */
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = {
+        '&': '&amp;', '<': '&lt;', '>': '&gt;',
+        '"': '&quot;', "'": '&#039;'
+      };
+      return text.toString().replace(/[&<>"']/g, m => map[m]);
+    }
+    
+    /**
+     * Debounce function for performance
+     */
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+    
+    // Debounce renderTable for filter changes
+    const debouncedRender = debounce(renderTable, 150);
+    
+    // Override renderTable calls from filters to use debounced version
+    const originalSelectArea = selectArea;
+    selectArea = function(value, label, el) {
+      originalSelectArea(value, label, el);
+      debouncedRender();
+    };
+    
+    const originalSelectType = selectTypeFilter;
+    selectTypeFilter = function(type, el) {
+      originalSelectType(type, el);
+      debouncedRender();
     };
   </script>
 </body>
