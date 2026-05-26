@@ -54,492 +54,229 @@
     </div>
   </header>
 
-  <!-- Main Content -->
+<!-- Main Content -->
   <main class="max-w-2xl mx-auto px-4 py-6 -mt-4 relative z-10">
     <form id="inspectionForm" class="space-y-4">
       
-      <!-- Inspector & Area Card -->
+      <!-- ส่วนเลือกประเภทและพื้นที่ (Dynamic) -->
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
         <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <i class="fas fa-list-alt text-primary mr-1"></i> ประเภทการตรวจสอบ
+            </label>
+            <select id="checklistType" name="checklist_type" required onchange="loadChecklistAndAreas(this.value)"
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none transition font-prompt">
+              <option value="">-- กำลังโหลดประเภท... --</option>
+            </select>
+          </div>
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">
               <i class="fas fa-user-edit text-primary mr-1"></i> ชื่อผู้ตรวจสอบ
             </label>
             <input type="text" name="inspector" placeholder="ระบุชื่อ-นามสกุล" required
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition font-prompt">
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none transition font-prompt">
           </div>
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">
               <i class="fas fa-map-marker-alt text-primary mr-1"></i> พื้นที่สำรวจ
             </label>
-            <select name="area" onchange="toggleWaterMistByArea(this.value)" required
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition font-prompt">
-              <option value="">-- เลือกแผนก --</option>
-              <option value="แผนก Print">1. แผนก Print</option>
-              <option value="แผนก Laminate">2. แผนก Laminate</option>
-              <option value="แผนก Solvent">3. แผนก Solvent</option>
-              <option value="แผนก Rewinder / Slitter / Packing">4. แผนก Rewinder / Slitter / Packing</option>
-              <option value="แผนก BAG MAKING">5. แผนก BAG MAKING</option>
-              <option value="แผนก QA & QC">6. แผนก QA & QC</option>
-              <option value="แผนก Warehouse">7. แผนก Warehouse</option>
-              <option value="Office">8. Office</option>
-              <option value="พื้นที่รอบบริเวณโรงงาน">9. พื้นที่รอบบริเวณโรงงาน</option>
+            <select id="areaSelect" name="area" required disabled
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none transition font-prompt">
+              <option value="">-- กรุณาเลือกประเภทก่อน --</option>
             </select>
           </div>
         </div>
       </div>
 
-      <!-- Checklist Items -->
-      <div id="items" class="space-y-4"></div>
+      <!-- Checklist Items (สร้างอัตโนมัติจาก DB) -->
+      <div id="dynamicItems" class="space-y-4"></div>
 
       <!-- Submit Button -->
-      <button type="submit" id="submitBtn"
-        class="w-full bg-gradient-to-r from-primary to-primary-dark text-white font-semibold py-4 px-6 rounded-2xl shadow-lg shadow-primary/30 hover:shadow-primary/50 active:scale-[0.98] transition-all">
+      <button type="submit" id="submitBtn" disabled
+        class="w-full bg-gray-400 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg transition-all cursor-not-allowed">
         <i class="fas fa-paper-plane mr-2"></i>ส่งรายงานตรวจสอบ
       </button>
     </form>
   </main>
 
   <script>
+    // URL ของ Google Apps Script ของคุณ
     const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
+    
+    let imgB64 = {};
+    let currentChecklistData = [];
 
-    const dataStructure = {
-      s1: { title: "1. สถานที่ทำงาน", qs: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "Water Mist"] },
-      s2: { title: "2. ท่าทางการทำงาน", qs: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์", "การยกของอย่างถูกต้องและปลอดภัย"] },
-      s3: { title: "3. เครื่องจักร", qs: ["สวมใส่อุปกรณ์ป้องกันอันตราย (PPE)", "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย"] },
-      s4: { title: "4. สารเคมี", qs: ["ไม่มีสารเคมีหกรั่วไหล", "ภาชนะปิดสนิท/มีฉลากชัดเจน", "มีอุปกรณ์ Spill Kit พร้อมใช้"] },
-      s5: { title: "5. ไฟฟ้า", qs: ["อุปกรณ์ไฟฟ้า/ปลั๊กไฟไม่ชำรุด", "ไม่มีการต่อพ่วงไฟฟ้าชั่วคราว", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย"] },
-      s6: { title: "6. อุปกรณ์ฉุกเฉิน", qs: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน"] },
-      s7: { title: "7. อื่นๆ (ไม่บังคับ)", qs: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
+    // 1. โหลดประเภททั้งหมดเมื่อเปิดหน้าเว็บ
+    window.onload = function() {
+      showLoading(true, "กำลังเชื่อมต่อฐานข้อมูล...");
+      fetch(API_URL + "?action=getConfig")
+        .then(res => res.json())
+        .then(data => {
+          showLoading(false);
+          const typeSelect = document.getElementById('checklistType');
+          typeSelect.innerHTML = '<option value="">-- เลือกประเภทการตรวจสอบ --</option>';
+          if(data.status === 'success' && data.types) {
+            data.types.forEach(t => {
+              if(t.is_active === 'TRUE') {
+                typeSelect.innerHTML += `<option value="${t.id}">${t.name_th}</option>`;
+              }
+            });
+          }
+        }).catch(err => {
+          showLoading(false);
+          Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
+        });
     };
 
-    let imgB64 = {};
-    const itemsDiv = document.getElementById('items');
-
-    // Generate Checklist UI
-    for(let s in dataStructure) {
-      let sNum = s.replace('s', '');
-      let card = document.createElement('div');
-      card.className = 'bg-white rounded-2xl p-5 shadow-sm border border-gray-100';
+    // 2. โหลดพื้นที่และแบบฟอร์มตามประเภทที่เลือก
+    function loadChecklistAndAreas(typeId) {
+      const areaSelect = document.getElementById('areaSelect');
+      const itemsDiv = document.getElementById('dynamicItems');
+      const submitBtn = document.getElementById('submitBtn');
       
-      let htmlStr = '<h4 class="text-primary-dark font-semibold mb-4 pb-2 border-l-4 border-primary pl-3">' + dataStructure[s].title + '</h4>';
-      
-      dataStructure[s].qs.forEach(function(q, i) {
-        let qKey = s + '_q' + i;
-        let remarkName = 'section' + sNum + '_remark' + i;
-        let dueDateName = 'section' + sNum + '_duedate' + i;
-        let itemDivId = 'item_' + sNum + '_' + i;
-        imgB64[qKey] = [];
-
-        if (s === 's1' && q === 'Water Mist') {
-          htmlStr += '<div class="check-item water-mist-block hidden p-4 border-b border-gray-100 last:border-0" id="' + itemDivId + '">' +
-            '<p class="text-sm font-semibold text-gray-700 mb-3">' + (i+1) + '. ' + q + '</p>' +
-            '<div class="flex items-center gap-3 mb-3">' +
-              '<input type="number" step="any" name="water_val" id="water_val" placeholder="ระบุตัวเลข" ' +
-                'class="w-32 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none" ' +
-                'oninput="evalWater(this.value, \'' + sNum + '\', ' + i + ', \'' + remarkName + '\'); clearError(\'' + itemDivId + '\');">' +
-              '<span class="font-semibold text-gray-600">%</span>' +
-              '<span id="water_badge" class="hidden px-3 py-1 rounded-lg text-sm font-semibold"></span>' +
-            '</div>' +
-            '<input type="hidden" name="section' + sNum + '_q' + i + '" id="hidden_s' + sNum + 'q' + i + '" value="">' +
-            '<textarea name="' + remarkName + '" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..." ' +
-              'class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none resize-none mb-2" ' +
-              'oninput="clearError(\'' + itemDivId + '\')"></textarea>' +
-            '<div id="duedate_container_' + sNum + '_' + i + '" class="hidden mt-3 p-3 bg-red-50 rounded-xl border border-dashed border-red-300">' +
-              '<label class="text-xs text-red-700 font-semibold block mb-2"><i class="fas fa-calendar-times mr-1"></i> กำหนดวันแก้ไขเสร็จ (Due Date) *</label>' +
-              '<input type="date" name="' + dueDateName + '" id="' + dueDateName + '" ' +
-                'class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white focus:border-primary outline-none" ' +
-                'onchange="clearError(\'' + itemDivId + '\')">' +
-            '</div></div>';
-        } else {
-          htmlStr += '<div class="check-item p-4 border-b border-gray-100 last:border-0" id="' + itemDivId + '">' +
-            '<p class="text-sm font-semibold text-gray-700 mb-3">' + (i+1) + '. ' + q + '</p>' +
-            '<div class="grid grid-cols-2 gap-3 mb-3">' +
-              '<label class="cursor-pointer py-3 px-4 rounded-xl bg-gray-100 text-center font-semibold text-gray-600 transition border-2 border-transparent hover:border-gray-300 has-[:checked]:bg-green-50 has-[:checked]:text-green-700 has-[:checked]:border-green-500">' +
-                '<input type="radio" name="section' + sNum + '_q' + i + '" id="s' + sNum + 'y' + i + '" value="ดี" class="hidden" ' +
-                  'onchange="toggleRemark(\'' + remarkName + '\', \'' + dueDateName + '\', \'' + itemDivId + '\', false)">' +
-                '<i class="fas fa-check-circle mr-1"></i> ปกติ' +
-              '</label>' +
-              '<label class="cursor-pointer py-3 px-4 rounded-xl bg-gray-100 text-center font-semibold text-gray-600 transition border-2 border-transparent hover:border-gray-300 has-[:checked]:bg-red-50 has-[:checked]:text-red-700 has-[:checked]:border-red-500">' +
-                '<input type="radio" name="section' + sNum + '_q' + i + '" id="s' + sNum + 'n' + i + '" value="ไม่ดี" class="hidden" ' +
-                  'onchange="toggleRemark(\'' + remarkName + '\', \'' + dueDateName + '\', \'' + itemDivId + '\', true)">' +
-                '<i class="fas fa-exclamation-triangle mr-1"></i> ไม่ปกติ' +
-              '</label>' +
-            '</div>' +
-            '<textarea name="' + remarkName + '" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..." ' +
-              'class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none resize-none mb-2 remark-input" ' +
-              'oninput="clearError(\'' + itemDivId + '\')"></textarea>' +
-            '<div id="duedate_container_' + sNum + '_' + i + '" class="hidden mt-3 p-3 bg-red-50 rounded-xl border border-dashed border-red-300">' +
-              '<label class="text-xs text-red-700 font-semibold block mb-2"><i class="fas fa-calendar-times mr-1"></i> กำหนดวันแก้ไขเสร็จ (Due Date) *</label>' +
-              '<input type="date" name="' + dueDateName + '" id="' + dueDateName + '" ' +
-                'class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white focus:border-primary outline-none" ' +
-                'onchange="clearError(\'' + itemDivId + '\')">' +
-            '</div></div>';
-        }
-        
-        htmlStr += '<div class="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">' +
-          '<div id="preview-container_' + qKey + '" class="flex flex-wrap gap-2 mb-3"></div>' +
-          '<div id="camera-placeholder_' + qKey + '" class="flex gap-3">' +
-            '<button type="button" onclick="document.getElementById(\'fileInputCam_' + qKey + '\').click()" ' +
-              'class="flex-1 py-3 px-4 rounded-xl border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 transition text-center">' +
-              '<i class="fas fa-camera text-primary text-lg"></i><p class="text-xs text-gray-500 font-semibold mt-1">ถ่ายรูป</p>' +
-            '</button>' +
-            '<button type="button" onclick="document.getElementById(\'fileInputGal_' + qKey + '\').click()" ' +
-              'class="flex-1 py-3 px-4 rounded-xl border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 transition text-center">' +
-              '<i class="fas fa-images text-primary text-lg"></i><p class="text-xs text-gray-500 font-semibold mt-1">เลือกรูป</p>' +
-            '</button>' +
-          '</div>' +
-          '<input type="file" id="fileInputCam_' + qKey + '" accept="image/*" capture="environment" class="hidden" onchange="pv(this, \'' + qKey + '\')">' +
-          '<input type="file" id="fileInputGal_' + qKey + '" accept="image/*" class="hidden" onchange="pv(this, \'' + qKey + '\')">' +
-        '</div>';
-      });
-      
-      card.innerHTML = htmlStr;
-      itemsDiv.appendChild(card);
-    }
-
-    // Helper Functions (ใช้ ? แทน ! เพื่อความปลอดภัย)
-    function clearError(id) {
-      var el = document.getElementById(id);
-      if (el) { el.classList.remove('bg-red-50', 'border-red-300'); }
-    }
-
-    function toggleRemark(remarkName, dueDateName, itemDivId, isBad) {
-      var remark = document.getElementsByName(remarkName)[0];
-      var dueContainer = document.getElementById(dueDateName.replace('section', 'duedate_container').replace('_duedate', '_container'));
-      var dueInput = document.getElementById(dueDateName);
-      
-      if (isBad) {
-        if (remark) {
-          remark.required = true;
-          remark.placeholder = '* กรุณาระบุรายละเอียด (บังคับ)';
-          remark.classList.add('border-l-4', 'border-red-500', 'bg-red-50');
-        }
-        if (dueContainer) {
-          dueContainer.classList.remove('hidden');
-          if (dueInput) dueInput.required = true;
-        }
-      } else {
-        if (remark) {
-          remark.required = false;
-          remark.placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...';
-          remark.classList.remove('border-l-4', 'border-red-500', 'bg-red-50');
-        }
-        if (dueContainer) {
-          dueContainer.classList.add('hidden');
-          if (dueInput) {
-            dueInput.required = false;
-            dueInput.value = '';
-          }
-        }
-      }
-      clearError(itemDivId);
-    }
-
-    function toggleWaterMistByArea(selectedArea) {
-      var waterBlock = document.querySelector('.water-mist-block');
-      var waterInput = document.getElementById('water_val');
-      var hiddenInput = document.getElementById('hidden_s1q4');
-      
-      if (!waterBlock) return;
-
-      if (selectedArea === "แผนก Print" || selectedArea === "แผนก Laminate") {
-        waterBlock.classList.remove('hidden');
-      } else {
-        waterBlock.classList.add('hidden');
-        if (waterInput) waterInput.value = "";
-        if (hiddenInput) hiddenInput.value = "";
-        var badge = document.getElementById('water_badge');
-        if (badge) badge.classList.add('hidden');
-        var dueContainer = document.getElementById('duedate_container_1_4');
-        if (dueContainer) dueContainer.classList.add('hidden');
-        var dueInput = document.getElementById('section1_duedate4');
-        if (dueInput) {
-          dueInput.required = false;
-          dueInput.value = '';
-        }
-      }
-    }
-
-    function evalWater(val, sNum, i, remarkName) {
-      var hiddenInput = document.getElementById('hidden_s' + sNum + 'q' + i);
-      var badge = document.getElementById('water_badge');
-      var remark = document.getElementsByName(remarkName)[0];
-      var dueContainer = document.getElementById('duedate_container_' + sNum + '_' + i);
-      var dueInput = document.getElementById('section' + sNum + '_duedate' + i);
-      
-      if (badge) badge.classList.remove('hidden');
-      if (val === "") {
-         if (hiddenInput) hiddenInput.value = "";
-         if (badge) badge.classList.add('hidden');
-         if (remark) {
-           remark.required = false;
-           remark.placeholder = "เพิ่มเติมความเห็น (ถ้ามี)...";
-           remark.classList.remove('border-l-4', 'border-red-500', 'bg-red-50');
-         }
-         if (dueContainer) dueContainer.classList.add('hidden');
-         if (dueInput) {
-           dueInput.required = false;
-           dueInput.value = '';
-         }
-         return;
-      }
-      
-      var num = parseFloat(val);
-      if (num < 50) {
-         if (hiddenInput) hiddenInput.value = "ไม่ดี";
-         if (badge) {
-           badge.className = "px-3 py-1 rounded-lg text-sm font-semibold bg-red-100 text-red-700";
-           badge.innerHTML = "✘ ไม่ปกติ";
-         }
-         if (remark) {
-           remark.required = true;
-           remark.placeholder = "* กรุณาระบุรายละเอียด (ต่ำกว่า 50%)";
-           remark.classList.add('border-l-4', 'border-red-500', 'bg-red-50');
-         }
-         if (dueContainer) dueContainer.classList.remove('hidden');
-         if (dueInput) dueInput.required = true;
-      } else {
-         if (hiddenInput) hiddenInput.value = "ดี";
-         if (badge) {
-           badge.className = "px-3 py-1 rounded-lg text-sm font-semibold bg-green-100 text-green-700";
-           badge.innerHTML = "✔ ปกติ";
-         }
-         if (remark) {
-           remark.required = false;
-           remark.placeholder = "เพิ่มเติมความเห็น (ถ้ามี)...";
-           remark.classList.remove('border-l-4', 'border-red-500', 'bg-red-50');
-         }
-         if (dueContainer) dueContainer.classList.add('hidden');
-         if (dueInput) {
-           dueInput.required = false;
-           dueInput.value = '';
-         }
-      }
-    }
-
-    function pv(input, qKey) {
-      if (input.files && input.files[0]) {
-        if (imgB64[qKey].length >= 3) {
-            Swal.fire({ icon: 'warning', title: 'จำกัดจำนวน', text: 'ถ่ายภาพได้สูงสุด 3 รูปต่อข้อเท่านั้น', confirmButtonColor: '#f39c12' });
-            input.value = "";
-            return;
-        }
-
-        var loading = document.getElementById('loading');
-        if (loading) {
-          loading.classList.remove('hidden');
-          loading.classList.add('flex');
-        }
-        
-        var reader = new FileReader();
-        reader.onload = function(e) {
-          var img = new Image();
-          img.onload = function() {
-            var canvas = document.createElement('canvas');
-            var MAX_WIDTH = 800;
-            var width = img.width; var height = img.height;
-            if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-            canvas.width = width; canvas.height = height;
-            var ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, width, height);
-            
-            imgB64[qKey].push({ b64: canvas.toDataURL("image/jpeg", 0.7), caption: "" });
-            renderPhotos(qKey);
-            if (loading) {
-              loading.classList.add('hidden');
-              loading.classList.remove('flex');
-            }
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(input.files[0]);
-      }
-    }
-
-    function removeImg(qKey, index) {
-      imgB64[qKey].splice(index, 1);
-      renderPhotos(qKey);
-    }
-
-    function updateCaption(qKey, index, value) {
-      if (imgB64[qKey] && imgB64[qKey][index]) {
-        imgB64[qKey][index].caption = value;
-      }
-    }
-
-    function renderPhotos(qKey) {
-      var container = document.getElementById('preview-container_' + qKey);
-      var placeholder = document.getElementById('camera-placeholder_' + qKey);
-      if (!container) return;
-      
-      container.innerHTML = "";
-      imgB64[qKey].forEach(function(imgObj, index) {
-        var safeCaption = imgObj.caption.replace(/"/g, '&quot;');
-        container.innerHTML += 
-          '<div class="relative w-[31%] flex flex-col gap-1">' +
-            '<div class="relative aspect-square">' +
-              '<img src="' + imgObj.b64 + '" class="w-full h-full object-cover rounded-lg border-2 border-gray-200">' +
-              '<button type="button" onclick="event.stopPropagation(); removeImg(\'' + qKey + '\', ' + index + ')" ' +
-                'class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs border-2 border-white hover:bg-red-600 transition">' +
-                '<i class="fas fa-times"></i>' +
-              '</button>' +
-            '</div>' +
-            '<input type="text" value="' + safeCaption + '" placeholder="คอมเมนต์ภาพ.." ' +
-              'class="px-2 py-1 text-xs rounded border border-gray-300 w-full" ' +
-              'onchange="updateCaption(\'' + qKey + '\', ' + index + ', this.value)">' +
-          '</div>';
-      });
-      
-      if (placeholder) {
-        if (imgB64[qKey].length >= 3) {
-          placeholder.style.display = 'none';
-        } else {
-          placeholder.style.display = 'flex';
-        }
-      }
-      var camInput = document.getElementById('fileInputCam_' + qKey);
-      var galInput = document.getElementById('fileInputGal_' + qKey);
-      if (camInput) camInput.value = "";
-      if (galInput) galInput.value = "";
-    }
-
-    // Form Submit
-    document.getElementById('inspectionForm').onsubmit = function(e) {
-      e.preventDefault();
-      var fd = new FormData(this);
-      var isValid = true;
-      var firstErrorElement = null;
-
-      document.querySelectorAll('.check-item').forEach(function(el) {
-        el.classList.remove('bg-red-50', 'border-red-300');
-      });
-
-      for (var s in dataStructure) {
-        var sNum = s.replace('s', '');
-        var isOptional = (s === 's7');
-
-        for (var i = 0; i < dataStructure[s].qs.length; i++) {
-          var itemDivId = 'item_' + sNum + '_' + i;
-          var itemDiv = document.getElementById(itemDivId);
-          var remarkElem = document.getElementsByName('section' + sNum + '_remark' + i)[0];
-          var dueDateElem = document.getElementById('section' + sNum + '_duedate' + i);
-
-          if (s === 's1' && dataStructure[s].qs[i] === 'Water Mist') {
-              var currentArea = fd.get('area');
-              if (currentArea === "แผนก Print" || currentArea === "แผนก Laminate") {
-                  var waterVal = fd.get('water_val');
-                  if (!waterVal || waterVal.trim() === "") {
-                      isValid = false;
-                      if (itemDiv) itemDiv.classList.add('bg-red-50', 'border-red-300');
-                      if (!firstErrorElement) firstErrorElement = document.getElementById('water_val');
-                  } else if (waterVal !== "" && parseFloat(waterVal) < 50) {
-                      var remark = fd.get('section' + sNum + '_remark' + i);
-                      var dueDateVal = fd.get('section' + sNum + '_duedate' + i);
-                      if (!remark || remark.trim() === "" || !dueDateVal) {
-                          isValid = false;
-                          if (itemDiv) itemDiv.classList.add('bg-red-50', 'border-red-300');
-                          if (!firstErrorElement) {
-                             firstErrorElement = (!remark || remark.trim() === "") ? remarkElem : dueDateElem;
-                          }
-                      }
-                  }
-              }
-              continue;
-          }
-
-          var status = fd.get('section' + sNum + '_q' + i);
-          var remark = fd.get('section' + sNum + '_remark' + i);
-          var dueDateVal = fd.get('section' + sNum + '_duedate' + i);
-          
-          if (!isOptional && !status) {
-              isValid = false;
-              if (itemDiv) itemDiv.classList.add('bg-red-50', 'border-red-300');
-              if (!firstErrorElement) firstErrorElement = itemDiv;
-          } else if (status === "ไม่ดี" && (!remark || remark.trim() === "" || !dueDateVal)) {
-              isValid = false;
-              if (itemDiv) itemDiv.classList.add('bg-red-50', 'border-red-300');
-              if (!firstErrorElement) {
-                 firstErrorElement = (!remark || remark.trim() === "") ? remarkElem : dueDateElem;
-              }
-          }
-        }
-      }
-
-      if (!isValid) {
-        Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณาระบุหมายเหตุและกำหนด "Due Date" ให้ครบถ้วนสำหรับข้อที่ไม่ปกติ', confirmButtonColor: '#e74c3c' });
-        if (firstErrorElement) {
-            firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            firstErrorElement.focus();
-        }
+      if(!typeId) {
+        areaSelect.innerHTML = '<option value="">-- กรุณาเลือกประเภทก่อน --</option>';
+        areaSelect.disabled = true;
+        itemsDiv.innerHTML = '';
+        submitBtn.disabled = true;
+        submitBtn.className = "w-full bg-gray-400 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg cursor-not-allowed";
         return;
       }
 
-      var loading = document.getElementById('loading');
-      if (loading) {
-        loading.classList.remove('hidden');
-        loading.classList.add('flex');
-      }
+      showLoading(true, "กำลังโหลดแบบฟอร์ม...");
       
-      var ck = function(s) {
-        var st = "ดี"; var sNum = s.replace('s', ''); var hasData = false;
-        for (var i = 0; i < dataStructure[s].qs.length; i++) {
-          var val = fd.get('section' + sNum + '_q' + i);
-          if (val) hasData = true;
-          if (val === "ไม่ดี") { st = "not_good"; break; }
+      // ดึงข้อมูล 2 อย่างพร้อมกัน: พื้นที่ และ คำถาม
+      Promise.all([
+        fetch(`${API_URL}?action=getAreasByType&typeId=${typeId}`).then(r => r.json()),
+        fetch(`${API_URL}?action=getChecklist&typeId=${typeId}`).then(r => r.json())
+      ]).then(([areaData, checklistData]) => {
+        showLoading(false);
+        
+        // จัดการ Area
+        areaSelect.innerHTML = '<option value="">-- เลือกพื้นที่/แผนก --</option>';
+        if(areaData.status === 'success' && areaData.data) {
+          areaData.data.forEach(a => {
+            areaSelect.innerHTML += `<option value="${a.area_name}">${a.area_name}</option>`;
+          });
+          areaSelect.disabled = false;
         }
-        if (s === 's1') {
-           var currentArea = fd.get('area');
-           if (currentArea === "แผนก Print" || currentArea === "แผนก Laminate") {
-              var waterVal = fd.get('water_val');
-              if (waterVal && parseFloat(waterVal) < 50) return "ไม่ดี";
-           }
-        }
-        if (st === "not_good") return "ไม่ดี";
-        if (s === 's7' && !hasData) return "ดี";
-        return st;
-      };
 
+        // จัดการ Checklist
+        if(checklistData.status === 'success' && checklistData.data) {
+          currentChecklistData = checklistData.data;
+          renderDynamicChecklist(currentChecklistData);
+          
+          // เปิดปุ่ม Submit
+          submitBtn.disabled = false;
+          submitBtn.className = "w-full bg-gradient-to-r from-primary to-primary-dark text-white font-semibold py-4 px-6 rounded-2xl shadow-lg shadow-primary/30 hover:shadow-primary/50 active:scale-[0.98] transition-all";
+        }
+      }).catch(err => {
+        showLoading(false);
+        Swal.fire('ข้อผิดพลาด', 'โหลดข้อมูลไม่สำเร็จ', 'error');
+      });
+    }
+
+    // 3. ฟังก์ชันสร้างหน้าจอ (Render) จากข้อมูล Database
+    function renderDynamicChecklist(sections) {
+      const container = document.getElementById('dynamicItems');
+      container.innerHTML = '';
+      imgB64 = {};
+
+      sections.forEach((sec, sIdx) => {
+        let card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl p-5 shadow-sm border border-gray-100';
+        let htmlStr = `<h4 class="text-primary-dark font-semibold mb-4 pb-2 border-l-4 border-primary pl-3">${sec.title_th}</h4>`;
+
+        sec.questions.forEach((q, qIdx) => {
+          let qKey = `sec${sec.id}_q${q.id}`;
+          imgB64[qKey] = [];
+          
+          htmlStr += `
+            <div class="check-item p-4 border-b border-gray-100 last:border-0" id="item_${qKey}">
+              <p class="text-sm font-semibold text-gray-700 mb-3">${qIdx + 1}. ${q.question_th}</p>
+              
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <label class="cursor-pointer py-3 px-4 rounded-xl bg-gray-100 text-center font-semibold text-gray-600 transition border-2 border-transparent hover:border-gray-300 has-[:checked]:bg-green-50 has-[:checked]:text-green-700 has-[:checked]:border-green-500">
+                  <input type="radio" name="${qKey}" value="ดี" class="hidden" required>
+                  <i class="fas fa-check-circle mr-1"></i> ปกติ
+                </label>
+                <label class="cursor-pointer py-3 px-4 rounded-xl bg-gray-100 text-center font-semibold text-gray-600 transition border-2 border-transparent hover:border-gray-300 has-[:checked]:bg-red-50 has-[:checked]:text-red-700 has-[:checked]:border-red-500">
+                  <input type="radio" name="${qKey}" value="ไม่ดี" class="hidden">
+                  <i class="fas fa-exclamation-triangle mr-1"></i> ไม่ปกติ
+                </label>
+              </div>
+
+              ${q.has_remark === 'TRUE' ? `<textarea name="remark_${qKey}" rows="2" placeholder="เพิ่มเติมความเห็น..." class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none resize-none mb-2"></textarea>` : ''}
+              
+              ${q.has_duedate === 'TRUE' ? `
+              <div class="mt-3 p-3 bg-red-50 rounded-xl border border-dashed border-red-300">
+                <label class="text-xs text-red-700 font-semibold block mb-2"><i class="fas fa-calendar-times mr-1"></i> กำหนดวันแก้ไขเสร็จ (Due Date)</label>
+                <input type="date" name="duedate_${qKey}" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white focus:border-primary outline-none">
+              </div>` : ''}
+
+              <!-- ส่วนกล้องถ่ายรูป -->
+              <div class="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div id="preview-container_${qKey}" class="flex flex-wrap gap-2 mb-3"></div>
+                <div id="camera-placeholder_${qKey}" class="flex gap-3">
+                  <button type="button" onclick="document.getElementById('fileInputCam_${qKey}').click()" class="flex-1 py-3 px-4 rounded-xl border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 transition text-center">
+                    <i class="fas fa-camera text-primary text-lg"></i><p class="text-xs text-gray-500 font-semibold mt-1">ถ่ายรูป</p>
+                  </button>
+                </div>
+                <input type="file" id="fileInputCam_${qKey}" accept="image/*" capture="environment" class="hidden" onchange="pv(this, '${qKey}')">
+              </div>
+            </div>
+          `;
+        });
+        card.innerHTML = htmlStr;
+        container.appendChild(card);
+      });
+    }
+
+    // (เก็บฟังก์ชัน pv(), removeImg(), renderPhotos() ของเดิมไว้ตรงนี้ได้เลย เพราะทำงานเกี่ยวกับการแปลงรูปภาพเป็น base64 เหมือนเดิม)
+    // ... โค้ดแปลงรูป ...
+
+    function showLoading(show, text = 'กำลังประมวลผล...') {
+      const el = document.getElementById('loading');
+      if (show) {
+        el.querySelector('p').innerText = text;
+        el.classList.remove('hidden'); el.classList.add('flex');
+      } else {
+        el.classList.add('hidden'); el.classList.remove('flex');
+      }
+    }
+
+    // 4. ตอน Submit ส่งแบบ Dynamic ไปหา Backend
+    document.getElementById('inspectionForm').onsubmit = function(e) {
+      e.preventDefault();
+      var fd = new FormData(this);
+      
       var fdDetails = {};
       for (var pair of fd.entries()) { fdDetails[pair[0]] = pair[1]; }
       
       var flatImages = {};
-      for (var key in imgB64) {
-          imgB64[key].forEach(function(imgObj, idx) {
-              flatImages[key + '_' + idx] = imgObj.b64;
-              fdDetails['caption_' + key + '_' + idx] = imgObj.caption;
-          });
-      }
-
+      // วนลูปเอารูปภาพแพ็คใส่ Object (ใช้ Logic เดิมของคุณ)
+      // ... 
+      
       var payload = {
-        inspector: fd.get('inspector'), area: fd.get('area'),
-        images: flatImages,
+        action: "submitDynamic", // ส่ง action ใหม่ให้ backend รู้วิธีจัดการ
+        inspector: fd.get('inspector'),
+        area: fd.get('area'),
+        checklist_type: fd.get('checklist_type'),
         details: fdDetails,
-        s1_res: ck('s1'), s2_res: ck('s2'), s3_res: ck('s3'), s4_res: ck('s4'), s5_res: ck('s5'), s6_res: ck('s6'), s7_res: ck('s7')
+        images: flatImages
       };
 
+      showLoading(true, "กำลังบันทึกข้อมูล...");
       fetch(API_URL, {
         method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload)
       })
-      .then(function(response) { return response.json(); })
-      .then(function(res) {
-        if (loading) {
-          loading.classList.add('hidden');
-          loading.classList.remove('flex');
-        }
+      .then(r => r.json())
+      .then(res => {
+        showLoading(false);
         if (res.status === 'success') {
-           Swal.fire({ icon: 'success', title: 'ส่งรายงานสำเร็จ', text: res.message, confirmButtonColor: '#f39c12' })
-             .then(function() { window.location.href = "Dash.html"; });
-        } else {
-           Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message, confirmButtonColor: '#e74c3c' });
+           Swal.fire({ icon: 'success', title: 'ส่งรายงานสำเร็จ' }).then(() => window.location.reload());
         }
-      })
-      .catch(function(err) {
-        if (loading) {
-          loading.classList.add('hidden');
-          loading.classList.remove('flex');
-        }
-        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต', confirmButtonColor: '#e74c3c' });
       });
     };
   </script>
