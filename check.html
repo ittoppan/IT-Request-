@@ -18,129 +18,435 @@
       --green: #27ae60;
       --blue: #2980b9;
       --purple: #8e44ad;
+      --gray: #95a5a6;
     }
     * { box-sizing: border-box; }
-    body { font-family: 'Prompt', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--text); -webkit-tap-highlight-color: transparent; }
+    body { 
+      font-family: 'Prompt', sans-serif; 
+      background-color: var(--bg); 
+      margin: 0; 
+      padding: 0; 
+      color: var(--text); 
+      -webkit-tap-highlight-color: transparent; 
+    }
 
     /* ===== HEADER ===== */
-    .header { background: linear-gradient(135deg, #ff8c00, var(--primary)); color: white; padding: 20px 15px 50px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
-    .header h2 { margin: 8px 0 0; font-size: 1.4rem; letter-spacing: 1px; font-weight: 700; }
-    .header p { margin: 4px 0 0; font-size: 0.8rem; opacity: 0.85; }
-    .btn-back { display: inline-block; text-decoration: none; color: rgba(255,255,255,0.9); font-size: 0.85rem; }
+    .header { 
+      background: linear-gradient(135deg, #ff8c00, var(--primary)); 
+      color: white; 
+      padding: 20px 15px 50px; 
+      text-align: center; 
+      position: sticky; 
+      top: 0; 
+      z-index: 100; 
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15); 
+    }
+    .header h2 { 
+      margin: 8px 0 0; 
+      font-size: 1.4rem; 
+      letter-spacing: 1px; 
+      font-weight: 700; 
+    }
+    .header p { 
+      margin: 4px 0 0; 
+      font-size: 0.8rem; 
+      opacity: 0.85; 
+    }
+    .btn-back { 
+      display: inline-block; 
+      text-decoration: none; 
+      color: rgba(255,255,255,0.9); 
+      font-size: 0.85rem; 
+    }
 
     /* ===== CONTAINER ===== */
-    .container { max-width: 620px; margin: -28px auto 60px; padding: 0 12px; position: relative; z-index: 101; }
-    .card { background: var(--card-bg); border-radius: 18px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 14px; }
+    .container { 
+      max-width: 620px; 
+      margin: -28px auto 60px; 
+      padding: 0 12px; 
+      position: relative; 
+      z-index: 101; 
+    }
+    .card { 
+      background: var(--card-bg); 
+      border-radius: 18px; 
+      padding: 20px; 
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06); 
+      margin-bottom: 14px; 
+    }
 
     /* ===== INSPECTION TYPE SELECTOR ===== */
-    .type-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 4px; }
-    .type-btn {
-      padding: 10px 6px; border-radius: 12px; border: 2px solid #e0e0e0;
-      background: #f7f7f7; text-align: center; cursor: pointer;
-      font-family: 'Prompt', sans-serif; font-size: 0.8rem; font-weight: 600;
-      color: #888; transition: all 0.2s; line-height: 1.3;
+    .type-selector { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 10px; 
+      margin-bottom: 4px; 
     }
-    .type-btn i { display: block; font-size: 1.3rem; margin-bottom: 4px; }
-    .type-btn.active-safety { background: #fff3e0; color: #e67e22; border-color: #e67e22; }
-    .type-btn.active-5s    { background: #e8f5e9; color: #27ae60; border-color: #27ae60; }
-    .type-btn.active-audit { background: #e3f2fd; color: #1565c0; border-color: #1565c0; }
-    .type-btn.active-acc   { background: #fce4ec; color: #c62828; border-color: #c62828; }
+    .type-btn {
+      padding: 12px 8px; 
+      border-radius: 14px; 
+      border: 2px solid #e0e0e0;
+      background: #f7f7f7; 
+      text-align: center; 
+      cursor: pointer;
+      font-family: 'Prompt', sans-serif; 
+      font-size: 0.75rem; 
+      font-weight: 600;
+      color: #888; 
+      transition: all 0.25s ease; 
+      line-height: 1.3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .type-btn i { 
+      font-size: 1.4rem; 
+      margin-bottom: 2px; 
+    }
+    .type-btn:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+    }
+    .type-btn:active { 
+      transform: scale(0.98); 
+    }
+    .type-btn.active-safety { 
+      background: #fff3e0; 
+      color: #e67e22; 
+      border-color: #e67e22; 
+      box-shadow: 0 4px 15px rgba(230, 126, 34, 0.25);
+    }
+    .type-btn.active-audit { 
+      background: #e3f2fd; 
+      color: #1565c0; 
+      border-color: #1565c0; 
+      box-shadow: 0 4px 15px rgba(21, 101, 192, 0.25);
+    }
+    .type-btn.active-acc { 
+      background: #fce4ec; 
+      color: #c62828; 
+      border-color: #c62828; 
+      box-shadow: 0 4px 15px rgba(198, 40, 40, 0.25);
+    }
 
     /* Highlight สี per type */
-    body.type-5S    { --primary: #27ae60; --primary-dark: #219a52; }
-    body.type-5S    .header { background: linear-gradient(135deg, #43a047, #27ae60); }
     body.type-Audit { --primary: #1565c0; --primary-dark: #0d47a1; }
     body.type-Audit .header { background: linear-gradient(135deg, #1976d2, #1565c0); }
-    body.type-Acc   { --primary: #c62828; --primary-dark: #b71c1c; }
-    body.type-Acc   .header { background: linear-gradient(135deg, #e53935, #c62828); }
+    body.type-Acc { --primary: #c62828; --primary-dark: #b71c1c; }
+    body.type-Acc .header { background: linear-gradient(135deg, #e53935, #c62828); }
 
-    /* ===== 5S AREA SELECTOR ===== */
-    #area5S-row { display: none; margin-top: 10px; }
-    .area5s-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
-    .area5s-btn {
-      padding: 10px 6px; border-radius: 10px; border: 2px solid #e0e0e0;
-      background: #f7f7f7; text-align: center; cursor: pointer;
-      font-family: 'Prompt', sans-serif; font-size: 0.78rem; font-weight: 600; color: #888;
-      transition: all 0.2s;
+    /* ===== AREA SELECTOR (แบบปุ่มสวยงาม) ===== */
+    .area-selector { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 10px; 
+      margin-top: 10px; 
     }
-    .area5s-btn.active { background: #e8f5e9; color: #27ae60; border-color: #27ae60; }
+    .area-btn {
+      padding: 14px 10px; 
+      border-radius: 14px; 
+      border: 2px solid #e0e0e0;
+      background: linear-gradient(145deg, #fafafa, #f0f0f0);
+      text-align: center; 
+      cursor: pointer;
+      font-family: 'Prompt', sans-serif; 
+      font-size: 0.8rem; 
+      font-weight: 600; 
+      color: #555;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-height: 85px;
+    }
+    .area-btn i {
+      font-size: 1.5rem;
+      color: var(--primary);
+      transition: color 0.2s;
+    }
+    .area-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      border-color: var(--primary);
+    }
+    .area-btn:active {
+      transform: scale(0.98);
+    }
+    .area-btn.active { 
+      background: linear-gradient(145deg, #fff3e0, #ffe0b2); 
+      color: #e67e22; 
+      border-color: #e67e22;
+      box-shadow: 0 6px 20px rgba(230, 126, 34, 0.3);
+    }
+    .area-btn.active i {
+      color: #e67e22;
+      transform: scale(1.1);
+    }
 
     /* ===== FORM ELEMENTS ===== */
-    label { font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 6px; color: #555; }
-    label.section-label { color: var(--primary-dark); font-size: 1rem; border-left: 4px solid var(--primary); padding-left: 10px; margin: 0 0 14px; }
-    input[type="text"], input[type="number"], input[type="date"], select, textarea {
-      width: 100%; padding: 13px; margin: 4px 0 12px;
-      border-radius: 12px; border: 1.5px solid #e0e0e0; font-family: 'Prompt', sans-serif;
-      font-size: 15px; background-color: #f9f9f9; transition: border 0.2s; color: var(--text);
+    label { 
+      font-weight: 600; 
+      font-size: 0.9rem; 
+      display: block; 
+      margin-bottom: 8px; 
+      color: #555; 
     }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background-color: #fff; }
-    textarea { resize: vertical; min-height: 72px; }
+    label.section-label { 
+      color: var(--primary-dark); 
+      font-size: 1rem; 
+      border-left: 4px solid var(--primary); 
+      padding-left: 10px; 
+      margin: 0 0 14px; 
+    }
+    input[type="text"], 
+    input[type="number"], 
+    input[type="date"], 
+    select, 
+    textarea {
+      width: 100%; 
+      padding: 13px; 
+      margin: 4px 0 12px;
+      border-radius: 12px; 
+      border: 1.5px solid #e0e0e0; 
+      font-family: 'Prompt', sans-serif;
+      font-size: 15px; 
+      background-color: #f9f9f9; 
+      transition: border 0.2s; 
+      color: var(--text);
+    }
+    input:focus, select:focus, textarea:focus { 
+      outline: none; 
+      border-color: var(--primary); 
+      background-color: #fff; 
+      box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
+    }
+    textarea { 
+      resize: vertical; 
+      min-height: 72px; 
+    }
 
     /* ===== CHECK ITEMS ===== */
-    .check-item { background: #fff; padding: 14px; margin-bottom: 10px; border-radius: 10px; border: 1.5px solid #f0f0f0; transition: background 0.2s; }
-    .check-item.error { background: #fff0f0; border-color: #ffc8c8; }
-    .check-item small { font-size: 0.93rem; color: var(--text); font-weight: 600; line-height: 1.5; display: block; margin-bottom: 10px; }
-    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0; }
+    .check-item { 
+      background: #fff; 
+      padding: 14px; 
+      margin-bottom: 10px; 
+      border-radius: 12px; 
+      border: 1.5px solid #f0f0f0; 
+      transition: all 0.2s; 
+    }
+    .check-item.error { 
+      background: #fff0f0; 
+      border-color: #ffc8c8; 
+      animation: shake 0.3s;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    .check-item small { 
+      font-size: 0.93rem; 
+      color: var(--text); 
+      font-weight: 600; 
+      line-height: 1.5; 
+      display: block; 
+      margin-bottom: 10px; 
+    }
+    .options { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 10px; 
+      margin: 8px 0; 
+    }
     .options label {
-      cursor: pointer; padding: 11px; border-radius: 10px;
-      background: #f0f0f0; text-align: center; font-weight: 600; font-size: 0.88rem;
-      margin-bottom: 0; transition: all 0.2s; border: 2px solid transparent; color: #777;
+      cursor: pointer; 
+      padding: 12px; 
+      border-radius: 12px;
+      background: #f8f9fa; 
+      text-align: center; 
+      font-weight: 600; 
+      font-size: 0.88rem;
+      margin-bottom: 0; 
+      transition: all 0.2s; 
+      border: 2px solid transparent; 
+      color: #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .options label:hover {
+      background: #f0f0f0;
     }
     input[type="radio"] { display: none; }
-    input[value="ดี"]:checked + label    { background: #e8f5e9; color: #2e7d32; border-color: #2e7d32; }
-    input[value="ไม่ดี"]:checked + label { background: #ffebee; color: #c62828; border-color: #c62828; }
+    input[value="ดี"]:checked + label { 
+      background: linear-gradient(145deg, #e8f5e9, #c8e6c9); 
+      color: #2e7d32; 
+      border-color: #2e7d32; 
+      box-shadow: 0 3px 10px rgba(46, 125, 50, 0.15);
+    }
+    input[value="ไม่ดี"]:checked + label { 
+      background: linear-gradient(145deg, #ffebee, #ffcdd2); 
+      color: #c62828; 
+      border-color: #c62828; 
+      box-shadow: 0 3px 10px rgba(198, 40, 40, 0.15);
+    }
 
     /* ===== DUE DATE BOX ===== */
     .duedate-box {
-      display: none; margin-top: 8px; background: #fff5f5; padding: 10px 12px;
-      border-radius: 8px; border: 1px dashed var(--danger);
+      display: none; 
+      margin-top: 10px; 
+      background: linear-gradient(145deg, #fff5f5, #ffebee); 
+      padding: 12px 14px;
+      border-radius: 10px; 
+      border: 1.5px dashed var(--danger);
+      animation: fadeIn 0.3s;
     }
-    .duedate-box label { font-size: 0.82rem; color: #c0392b; margin-bottom: 4px; }
-    .duedate-box input[type="date"] { margin: 0; padding: 9px; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .duedate-box label { 
+      font-size: 0.82rem; 
+      color: #c0392b; 
+      margin-bottom: 6px; 
+      display: block;
+    }
+    .duedate-box input[type="date"] { 
+      margin: 0; 
+      padding: 10px; 
+      border-radius: 8px;
+    }
 
     /* ===== PHOTO UPLOAD ===== */
-    .photo-area { background: #fafafa; padding: 10px 12px; border-radius: 10px; border: 1.5px solid #eee; margin-top: 10px; }
-    .btn-cam-split {
-      flex: 1; text-align: center; cursor: pointer; padding: 11px;
-      border: 2px dashed #d1d8e0; border-radius: 10px; background: #fff; transition: 0.2s;
+    .photo-area { 
+      background: #fafafa; 
+      padding: 12px; 
+      border-radius: 12px; 
+      border: 1.5px solid #eee; 
+      margin-top: 12px; 
     }
-    .btn-cam-split:active { background: #f0f0f0; }
-    .camera-row { display: flex; gap: 10px; }
+    .btn-cam-split {
+      flex: 1; 
+      text-align: center; 
+      cursor: pointer; 
+      padding: 14px 10px;
+      border: 2px dashed #d1d8e0; 
+      border-radius: 12px; 
+      background: #fff; 
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-cam-split:hover { 
+      background: #f5f7fa; 
+      border-color: var(--primary); 
+      transform: translateY(-2px);
+    }
+    .btn-cam-split:active { 
+      transform: scale(0.98); 
+    }
+    .camera-row { 
+      display: flex; 
+      gap: 10px; 
+    }
 
     /* ===== SUBMIT ===== */
     .btn-submit {
-      width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white; border: none; padding: 18px; border-radius: 15px;
-      font-weight: 700; font-size: 1.05rem; cursor: pointer;
-      box-shadow: 0 6px 20px rgba(230, 126, 34, 0.3); margin-top: 6px;
-      font-family: 'Prompt', sans-serif; transition: transform 0.1s, box-shadow 0.1s;
+      width: 100%; 
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white; 
+      border: none; 
+      padding: 18px; 
+      border-radius: 16px;
+      font-weight: 700; 
+      font-size: 1.05rem; 
+      cursor: pointer;
+      box-shadow: 0 6px 25px rgba(230, 126, 34, 0.35); 
+      margin-top: 10px;
+      font-family: 'Prompt', sans-serif; 
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .btn-submit:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(230, 126, 34, 0.45);
+    }
+    .btn-submit:active { 
+      transform: scale(0.98); 
+      box-shadow: 0 3px 12px rgba(0,0,0,0.15); 
+    }
 
     /* ===== LOADING ===== */
     .loading-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255,255,255,0.92); display: none;
-      flex-direction: column; align-items: center; justify-content: center; z-index: 2000;
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%;
+      background: rgba(255,255,255,0.95); 
+      display: none;
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 2000;
+      backdrop-filter: blur(5px);
     }
-    .loading-overlay.show { display: flex; }
+    .loading-overlay.show { 
+      display: flex; 
+    }
 
     /* ===== SECTION BADGE ===== */
     .section-badge {
-      display: inline-block; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white; font-size: 0.72rem; font-weight: 700; padding: 3px 10px;
-      border-radius: 20px; margin-bottom: 12px; letter-spacing: 0.5px;
+      display: inline-block; 
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white; 
+      font-size: 0.72rem; 
+      font-weight: 700; 
+      padding: 4px 12px;
+      border-radius: 20px; 
+      margin-bottom: 14px; 
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(230, 126, 34, 0.2);
     }
 
     /* Water mist badge */
-    #water_badge { padding: 5px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-left: 12px; display: none; }
+    #water_badge { 
+      padding: 5px 12px; 
+      border-radius: 8px; 
+      font-size: 0.85rem; 
+      font-weight: 600; 
+      margin-left: 12px; 
+      display: none; 
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .type-selector { grid-template-columns: repeat(2, 1fr); }
+      .area-selector { grid-template-columns: 1fr; }
+      .header h2 { font-size: 1.25rem; }
+      .type-btn { font-size: 0.7rem; padding: 10px 6px; }
+      .area-btn { font-size: 0.85rem; padding: 16px 12px; }
+    }
   </style>
 </head>
 <body>
 
   <div id="loading" class="loading-overlay">
     <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i>
-    <p style="margin-top:15px; font-weight:600;" id="loadingText">กำลังบันทึกข้อมูล...</p>
+    <p style="margin-top:18px; font-weight:600; font-size:1rem;" id="loadingText">กำลังบันทึกข้อมูล...</p>
   </div>
 
   <div class="header" id="pageHeader">
@@ -173,42 +479,46 @@
           <div class="type-btn" onclick="selectType('Accident/Fire', this)">
             <i class="fas fa-fire-extinguisher"></i>Accident/Fire
           </div>
-          <div class="type-btn" onclick="selectType('5S', this)">
-            <i class="fas fa-broom"></i>5S
-          </div>
         </div>
         <input type="hidden" id="inspectionType" name="inspectionType" value="จป.ว">
 
-        <!-- 5S Area selector (show only when 5S selected) -->
-        <div id="area5S-row">
-          <label style="margin-top:12px;"><i class="fas fa-map-marker-alt" style="color:var(--green)"></i> พื้นที่ 5S</label>
-          <div class="area5s-grid">
-            <div class="area5s-btn active" onclick="select5SArea('OFFICE', this)"><i class="fas fa-desktop" style="display:block;font-size:1.1rem;margin-bottom:3px;"></i>Office</div>
-            <div class="area5s-btn" onclick="select5SArea('Canteen', this)"><i class="fas fa-utensils" style="display:block;font-size:1.1rem;margin-bottom:3px;"></i>Canteen</div>
-            <div class="area5s-btn" onclick="select5SArea('QA&QC', this)"><i class="fas fa-microscope" style="display:block;font-size:1.1rem;margin-bottom:3px;"></i>QA&QC</div>
-            <div class="area5s-btn" onclick="select5SArea('Factory', this)"><i class="fas fa-industry" style="display:block;font-size:1.1rem;margin-bottom:3px;"></i>Factory</div>
-            <div class="area5s-btn" onclick="select5SArea('EN', this)"><i class="fas fa-tools" style="display:block;font-size:1.1rem;margin-bottom:3px;"></i>Engineering</div>
-            <div class="area5s-btn" onclick="select5SArea('Outside', this)"><i class="fas fa-tree" style="display:block;font-size:1.1rem;margin-bottom:3px;"></i>บริเวณนอก</div>
-          </div>
-          <input type="hidden" id="area5S" name="area5S" value="OFFICE">
-        </div>
-
-        <label style="margin-top:14px;"><i class="fas fa-user-edit" style="color:var(--primary)"></i> ชื่อผู้ตรวจสอบ</label>
+        <!-- ชื่อผู้ตรวจสอบ -->
+        <label style="margin-top:18px;"><i class="fas fa-user-edit" style="color:var(--primary)"></i> ชื่อผู้ตรวจสอบ</label>
         <input type="text" name="inspector" placeholder="ระบุชื่อ-นามสกุล" required>
 
+        <!-- พื้นที่สำรวจ (แบบปุ่มสวยงาม) -->
         <label><i class="fas fa-map-marker-alt" style="color:var(--primary)"></i> พื้นที่สำรวจ</label>
-        <select name="area" id="areaSelect" onchange="toggleWaterMistByArea(this.value)" required>
-          <option value="">-- เลือกแผนก --</option>
-          <option value="แผนก Print">1. แผนก Print</option>
-          <option value="แผนก Laminate">2. แผนก Laminate</option>
-          <option value="แผนก Solvent">3. แผนก Solvent</option>
-          <option value="แผนก Rewinder / Slitter / Packing">4. แผนก Rewinder / Slitter / Packing</option>
-          <option value="แผนก BAG MAKING">5. แผนก BAG MAKING</option>
-          <option value="แผนก QA & QC">6. แผนก QA & QC</option>
-          <option value="แผนก Warehouse">7. แผนก Warehouse</option>
-          <option value="Office">8. Office</option>
-          <option value="พื้นที่รอบบริเวณโรงงาน">9. พื้นที่รอบบริเวณโรงงาน</option>
-        </select>
+        <div class="area-selector" id="areaSelector">
+          <div class="area-btn active" onclick="selectArea('แผนก Print', this)">
+            <i class="fas fa-print"></i>Print
+          </div>
+          <div class="area-btn" onclick="selectArea('แผนก Laminate', this)">
+            <i class="fas fa-layer-group"></i>Laminate
+          </div>
+          <div class="area-btn" onclick="selectArea('แผนก Solvent', this)">
+            <i class="fas fa-flask"></i>Solvent
+          </div>
+          <div class="area-btn" onclick="selectArea('แผนก Rewinder / Slitter / Packing', this)">
+            <i class="fas fa-box-open"></i>Rewinder/Slitter/Packing
+          </div>
+          <div class="area-btn" onclick="selectArea('แผนก BAG MAKING', this)">
+            <i class="fas fa-shopping-bag"></i>BAG MAKING
+          </div>
+          <div class="area-btn" onclick="selectArea('แผนก QA & QC', this)">
+            <i class="fas fa-vial"></i>QA & QC
+          </div>
+          <div class="area-btn" onclick="selectArea('แผนก Warehouse', this)">
+            <i class="fas fa-warehouse"></i>Warehouse
+          </div>
+          <div class="area-btn" onclick="selectArea('Office', this)">
+            <i class="fas fa-building"></i>Office
+          </div>
+          <div class="area-btn" onclick="selectArea('พื้นที่รอบบริเวณโรงงาน', this)">
+            <i class="fas fa-tree"></i>พื้นที่รอบโรงงาน
+          </div>
+        </div>
+        <input type="hidden" id="area" name="area" value="แผนก Print">
+
       </div>
 
       <!-- ===== CHECKLIST AREA (dynamic) ===== -->
@@ -236,73 +546,11 @@ const dataStructure = {
   s7: { title: "7. อื่นๆ (ไม่บังคับ)", qs: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
 };
 
-const data5S = {
-  "OFFICE": { sections: [
-    { title: "1. โต๊ะทำงาน", qs: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน","ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงาน","การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงาน","ตะกร้าเอกสารต้องระบุป้ายชี้บ่งให้ชัดเจนและจัดเก็บเอกสารให้เป็นระเบียบ"] },
-    { title: "2. ลิ้นชัก", qs: ["ลิ้นชักที่ 1 ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน","ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO","ลิ้นชักที่ 3 ใส่อุปกรณ์ส่วนตัว"] },
-    { title: "3. การจัดเก็บเอกสาร", qs: ["แฟ้มเอกสารทุกแฟ้มต้องใช้ Font: Angsana New ทุกแฟ้ม","เอกสารต้องเรียงเป็นระเบียบไม่วางซ้อนกัน","หน้าตู้ต้องระบุรายชื่อเอกสารและติดป้ายแผนก"] },
-    { title: "4. เครื่องคอมพิวเตอร์", qs: ["จัดวางคอมพิวเตอร์/เครื่องแฟกซ์ในตำแหน่งที่เหมาะสม","ไม่ติดกระดาษโน๊ตต่างๆ ไว้หน้าคอมพิวเตอร์","จัดเก็บสายไฟให้เป็นระเบียบเรียบร้อย"] },
-    { title: "5. พื้น / ผนัง/เพดาน", qs: ["ไม่มีเศษขยะหล่นตามพื้น/ผนังต้องไม่มีหยากไย่","ไม่วางสิ่งกีดขวางทางเดิน","กำหนดเวลาทำความสะอาดประจำ","ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"] },
-    { title: "6. สภาพแวดล้อมทั่วไป", qs: ["มีสิ่งของไม่จำเป็นวางในจุดที่ไม่เหมาะสมหรือไม่","ถังขยะอยู่ในตำแหน่งที่เหมาะสมและมีป้ายชี้บ่ง","มีการกำหนดที่วางอุปกรณ์ทำความสะอาดและกำหนดผู้รับผิดชอบ","ควบคุมสิ่งแวดล้อมที่ไม่ก่อให้เกิดแมลง"] },
-    { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: ["พนักงานแต่งกายถูกต้องตามกฏระเบียบบริษัทฯ","พนักงานมีสุขลักษณะส่วนบุคคลที่สะอาด","พนักงานมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
-    { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน","มีการนำเสนอเรื่องราวความสำเร็จ (ภาพก่อนและหลัง)","นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบหรือไม่?","มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
-  ]},
-  "Canteen": { sections: [
-    { title: "1. ห้องอาหาร (CANTEEN)", qs: ["โต๊ะอาหารและเก้าอี้สะอาดและพร้อมใช้งาน ไม่ทิ้งสิ่งของไม่จำเป็น","ชั้นวางอาหารสะอาดและจัดเก็บเรียบร้อยแบ่งแยกชัดเจน","ไม่มีเศษขยะหล่นตามพื้น ผนังห้องต้องไม่มีหยากไย่","ถังขยะอยู่ในตำแหน่งที่เหมาะสม ดูแลความสะอาดสม่ำเสมอ"] },
-    { title: "2. ห้องประชุม", qs: ["เก็บโต๊ะและเก้าอี้ให้เป็นระเบียบเข้าที่ก่อน-หลังใช้งาน","ไม่มีเศษขยะหล่นตามพื้น ผนังห้องต้องไม่มีหยากไย่","ห้องประชุมต้องพร้อมใช้งานอยู่เสมอ"] },
-    { title: "3. ห้องกาแฟ", qs: ["ทำความสะอาดล้างภาชนะหลังใช้งาน","แบ่งแยกอุปกรณ์เครื่องใช้ออกให้ชัดเจนและเป็นระเบียบ","จัดวางสิ่งของแยกตามชนิด ไม่วางของกีดขวางกัน"] },
-    { title: "4. LOCKER (เสื้อผ้าชาย/หญิง)", qs: ["ป้ายใช้ชำรุดและระบุชื่อพนักงานให้ชัดเจน","หลังตู้สะอาดไม่มีฝุ่นหรือสิ่งของไม่จำเป็น","ไม่มีเศษขยะหล่นตามพื้น ผนังห้องต้องไม่มีหยากไย่"] },
-    { title: "5. LOCKER (รองเท้า)", qs: ["ป้ายใช้ชำรุดและระบุชื่อพนักงานให้ชัดเจน","ห้ามนำอาหาร/เครื่องดื่มไปไว้ใน Locker และต้องไม่มีเศษขยะ"] },
-    { title: "6. ห้องสุขา (ชาย/หญิง)", qs: ["ทำความสะอาดล้างหน้า/กระจก/พื้น/โถชักโครก/ผนัง ด้วยน้ำ","กระดาษชำระ สบู่ ผ้าเช็ดมือ ดูแลอย่าให้ขาด"] },
-    { title: "7. ทางเข้า (AIR SHOWER)", qs: ["ทำความสะอาดล้างมือ/ที่เป่ามือ/กระจก/ราวน้ำ","ไม่มีเศษขยะหล่นตามพื้น ผนังห้องต้องไม่มีหยากไย่","ชั้นวางรองเท้าแตะต้องดีวางให้ถูกช่อง สะอาดไม่มีฝุ่น"] }
-  ]},
-  "QA&QC": { sections: [
-    { title: "1. โต๊ะทำงาน", qs: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน","ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงาน","การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงาน","ตะกร้าเอกสารต้องระบุป้ายชี้บ่งให้ชัดเจนและจัดเก็บเป็นระเบียบ"] },
-    { title: "2. ลิ้นชัก", qs: ["ลิ้นชักที่ 1 อุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน","ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO","ลิ้นชักที่ 3 อุปกรณ์ส่วนตัว"] },
-    { title: "3. การจัดเก็บเอกสาร", qs: ["ในตู้เอกสารต้องเรียงเป็นระเบียบไม่วางเอกสารซ้อนกัน","หน้าตู้ต้องระบุรายชื่อเอกสารและติดป้ายแผนก"] },
-    { title: "4. เครื่องคอมพิวเตอร์", qs: ["จัดวางคอมพิวเตอร์/เครื่องแฟกซ์ในตำแหน่งที่เหมาะสม","ไม่ติดกระดาษโน๊ตต่างๆ ไว้หน้าคอมพิวเตอร์","จัดเก็บสายไฟให้เป็นระเบียบเรียบร้อย"] },
-    { title: "5. พื้น / ผนัง/เพดาน", qs: ["ไม่มีเศษขยะหล่นตามพื้น/ผนังต้องไม่มีหยากไย่","ไม่วางสิ่งกีดขวางทางเดิน","กำหนดเวลาทำความสะอาดประจำ","ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"] },
-    { title: "6. สภาพแวดล้อมทั่วไป", qs: ["มีสิ่งของไม่จำเป็นวางในจุดที่ไม่เหมาะสมหรือไม่","ถังขยะอยู่ในตำแหน่งที่เหมาะสมและมีป้ายชี้บ่ง","มีการกำหนดที่วางอุปกรณ์ทำความสะอาดและผู้รับผิดชอบ","ควบคุมสิ่งแวดล้อมที่ไม่ก่อให้เกิดแมลง"] },
-    { title: "7. สุขลักษณะส่วนบุคคล", qs: ["พนักงานแต่งกายถูกต้องตามกฏระเบียบ","พนักงานมีสุขลักษณะส่วนบุคคลที่สะอาด","พนักงานมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
-    { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน","มีการนำเสนอเรื่องราวความสำเร็จ (ภาพก่อนและหลัง)","นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบหรือไม่?","มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
-  ]},
-  "Factory": { sections: [
-    { title: "1. เครื่องจักร", qs: ["ทำความสะอาดเครื่องจักรทุกครั้งก่อน-หลังเลิกงาน ระบุผู้รับผิดชอบเป็นปัจจุบัน","ติดเส้นกำหนดจุดที่ตั้ง (รอบเครื่องจักรด้วยสีเหลือง)","แต่งกายให้รัดกุมและสวมอุปกรณ์ป้องกันส่วนบุคคลก่อนทำงาน"] },
-    { title: "2. เครื่องมือ", qs: ["กำหนดตำแหน่งวางเครื่องมือให้ง่ายต่อการหยิบใช้และนำมาคืน","หลังจากนำเครื่องมือไปใช้ให้เก็บเข้าที่เสมอ","เก็บวางเครื่องมืออย่างเป็นระเบียบในพื้นที่ที่กำหนด","กำหนดผู้รับผิดชอบให้ชัดเจน"] },
-    { title: "3. การจัดวางวัตถุดิบ/ผลิตภัณฑ์", qs: ["วางในจุดที่กำหนดเท่านั้น ไม่ล้นเกินเส้นกำหนด","ควบคุมการจัดวางตามหลัก FIFO","มีสถานะป้ายชี้บ่ง"] },
-    { title: "4. โต๊ะทำงาน / ลิ้นชัก", qs: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะ","ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์บนโต๊ะ","ลิ้นชักใส่เอกสารตามมาตรฐานที่กำหนด"] },
-    { title: "5. การจัดเก็บเอกสาร", qs: ["ในตู้เอกสารต้องเรียงเป็นระเบียบไม่วางซ้อนกัน","หน้าตู้ต้องระบุรายชื่อเอกสารและติดป้ายแผนก"] },
-    { title: "6. พื้น / ผนัง/เพดาน", qs: ["ไม่มีเศษขยะหล่นตามพื้น ผนังต้องไม่มีหยากไย่","ไม่มีคราบสี, Solvent / น้ำมันพื้น","กำหนดเวลาทำความสะอาดประจำ"] },
-    { title: "7. สภาพแวดล้อมทั่วไป", qs: ["มีสิ่งของไม่จำเป็นวางในจุดที่ไม่เหมาะสมหรือไม่","ถังขยะอยู่ในตำแหน่งที่เหมาะสมและมีป้ายชี้บ่ง","มีการกำหนดที่วางอุปกรณ์ทำความสะอาดและผู้รับผิดชอบ"] },
-    { title: "8. สุขลักษณะส่วนบุคคล", qs: ["พนักงานแต่งกายถูกต้องตามกฏระเบียบ","พนักงานมีสุขลักษณะส่วนบุคคลที่สะอาด","พนักงานมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
-    { title: "9. ความตระหนัก ความสำเร็จ ผลงาน", qs: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน","มีการนำเสนอเรื่องราวความสำเร็จ (ภาพก่อนและหลัง)","นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบหรือไม่?","มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
-  ]},
-  "EN": { sections: [
-    { title: "1. โต๊ะทำงาน", qs: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะ","ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์บนโต๊ะ","การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะให้เหมาะสม","ตะกร้าเอกสารต้องระบุป้ายชี้บ่งและจัดเก็บเป็นระเบียบ"] },
-    { title: "2. ลิ้นชัก", qs: ["ลิ้นชักที่ 1 อุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน","ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO","ลิ้นชักที่ 3 อุปกรณ์ส่วนตัว"] },
-    { title: "3. การจัดเก็บเอกสาร", qs: ["ในตู้เอกสารต้องเรียงเป็นระเบียบไม่วางซ้อนกัน","หน้าตู้ต้องระบุรายชื่อเอกสารและติดป้ายแผนก"] },
-    { title: "4. เครื่องมือ/อุปกรณ์ช่าง", qs: ["กำหนดตำแหน่งวางเครื่องมือให้ง่ายต่อการหยิบและนำมาคืน","หลังใช้เครื่องมือให้เก็บเข้าที่เสมอ","เก็บวางอย่างเป็นระเบียบและมีป้ายบอก","ชิ้นส่วนขนาดเล็กหาภาชนะกล่องที่เหมาะสมใส่"] },
-    { title: "5. พื้น / ผนัง/เพดาน", qs: ["ไม่มีเศษขยะหล่นตามพื้น ผนังต้องไม่มีหยากไย่","ไม่วางสิ่งกีดขวางทางเดิน","กำหนดเวลาทำความสะอาดประจำ"] },
-    { title: "6. สภาพแวดล้อมทั่วไป", qs: ["มีสิ่งของไม่จำเป็นวางในจุดที่ไม่เหมาะสมหรือไม่","ถังขยะอยู่ในตำแหน่งที่เหมาะสมและมีป้ายชี้บ่ง","มีการกำหนดที่วางอุปกรณ์ทำความสะอาดและผู้รับผิดชอบ","ควบคุมสิ่งแวดล้อมที่ไม่ก่อให้เกิดแมลง"] },
-    { title: "7. สุขลักษณะส่วนบุคคล", qs: ["พนักงานแต่งกายถูกต้องตามกฏระเบียบ","พนักงานมีสุขลักษณะส่วนบุคคลที่สะอาด","พนักงานมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
-    { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน","มีการนำเสนอเรื่องราวความสำเร็จ (ภาพก่อนและหลัง)","นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบหรือไม่?","มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
-  ]},
-  "Outside": { sections: [
-    { title: "1. พื้นที่โดยรอบบริษัท", qs: ["มีเศษกันบูรีตกหล่นตามทางเดินและที่จอดรถหรือไม่","หญ้าขึ้นรกสูงเกินไปตามท่อระบายน้ำและรอบบริเวณโรงงานหรือไม่","สายยางใช้แล้วเก็บเป็นระเบียบเรียบร้อยหรือไม่","อุปกรณ์กำจัดสัตว์พาหะมีการชำรุด/แตกหักหรือไม่","รอบรั้วโรงงานมีรอยชำรุดเสียหายหรือไม่"] },
-    { title: "2. โรงเก็บขยะ", qs: ["จัดเรียงปี๊บสัง 200 ลิตร เป็นระเบียบเรียบร้อยหรือไม่","แยกชนิดขยะให้ชัดเจนและมีป้ายชี้บ่ง","ขยะมูลฝอยต้องไม่ล้น ปิดฝาสนิท ไม่มีตราบหกเลอเทอะ","ถังสารเคมีอันตรายต้องไม่ล้นออกนอกบริเวณ"] },
-    { title: "3. ป้อมยาม", qs: ["จัดเก็บเอกสารเรียบร้อยและปัดเช็ดถูทำความสะอาดสม่ำเสมอ","อุปกรณ์ต่างๆ สามารถหยิบใช้ได้สะดวกและปลอดภัย","กำหนดจำนวนอุปกรณ์บนโต๊ะทำงานให้เหมาะสม"] },
-    { title: "4. ห้องสุขา (ป้อมรปภ.)", qs: ["ทำความสะอาดล้างหน้า/กระจก/พื้น/โถชักโครก/ผนัง","กระดาษชำระ สบู่ ผ้าเช็ดมือ ดูแลอย่าให้ขาด"] },
-    { title: "5. สภาพแวดล้อมทั่วไป", qs: ["มีสิ่งของไม่จำเป็นวางในจุดที่ไม่เหมาะสมรอบนอกโรงงานหรือไม่","ถังขยะอยู่ในตำแหน่งที่เหมาะสมและมีป้ายชี้บ่ง","มีการกำหนดที่วางอุปกรณ์ทำความสะอาดหรือไม่"] },
-    { title: "6. ถังแก๊ส/ถังก๊าซ", qs: ["ระบุป้ายชี้บ่งให้ชัดเจน ป้ายไม่ชำรุด","เก็บถังในลักษณะตั้งตรง และมีเครื่องป้องกันการล้ม","ไม่วางสิ่งของไม่จำเป็นรอบๆ บริเวณที่เก็บก๊าซ"] },
-    { title: "7. โรงจอดรถ", qs: ["จอดรถเป็นระเบียบไม่มีความเสี่ยงอุบัติเหตุ","หลังคา พื้น ที่กั้นสื่อ มีสภาพปกติไม่เสียหาย"] }
-  ]}
-};
-
 // ===================================================================
 // STATE
 // ===================================================================
 let currentType = "จป.ว";
-let current5SArea = "OFFICE";
+let currentArea = "แผนก Print";
 let imgB64 = {};
 
 // ===================================================================
@@ -314,29 +562,29 @@ function selectType(type, el) {
 
   // Clear active classes
   document.querySelectorAll('.type-btn').forEach(b => {
-    b.classList.remove('active-safety','active-5s','active-audit','active-acc');
+    b.classList.remove('active-safety','active-audit','active-acc');
   });
 
   // Apply active class
-  const is5S = type === "5S";
   const isAudit = type === "Audit";
   const isAcc = type === "Accident/Fire";
-  const cls = is5S ? 'active-5s' : isAudit ? 'active-audit' : isAcc ? 'active-acc' : 'active-safety';
+  const cls = isAudit ? 'active-audit' : isAcc ? 'active-acc' : 'active-safety';
   el.classList.add(cls);
-
-  // Toggle 5S area selector
-  document.getElementById('area5S-row').style.display = is5S ? 'block' : 'none';
 
   // Update header
   const titles = {
-    "จป.ว": "SAFETY PATROL", "คปอ.": "คณะกรรมการความปลอดภัย",
-    "Foreman/Mgr.": "FOREMAN / MGR. PATROL", "Audit": "SAFETY AUDIT",
-    "Accident/Fire": "ACCIDENT / FIRE REPORT", "5S": "การตรวจ 5ส"
+    "จป.ว": "SAFETY PATROL", 
+    "คปอ.": "คณะกรรมการความปลอดภัย",
+    "Foreman/Mgr.": "FOREMAN / MGR. PATROL", 
+    "Audit": "SAFETY AUDIT",
+    "Accident/Fire": "ACCIDENT / FIRE REPORT"
   };
   const subs = {
-    "จป.ว": "ระบบตรวจสอบความปลอดภัย", "คปอ.": "การตรวจสอบโดยคณะกรรมการ",
-    "Foreman/Mgr.": "การตรวจสอบโดยหัวหน้างาน/ผู้จัดการ", "Audit": "การตรวจประเมินความปลอดภัย",
-    "Accident/Fire": "รายงานอุบัติเหตุ/อัคคีภัย", "5S": "กิจกรรม 5 ส"
+    "จป.ว": "ระบบตรวจสอบความปลอดภัย", 
+    "คปอ.": "การตรวจสอบโดยคณะกรรมการ",
+    "Foreman/Mgr.": "การตรวจสอบโดยหัวหน้างาน/ผู้จัดการ", 
+    "Audit": "การตรวจประเมินความปลอดภัย",
+    "Accident/Fire": "รายงานอุบัติเหตุ/อัคคีภัย"
   };
   document.getElementById('headerTitle').textContent = titles[type] || type;
   document.getElementById('headerSub').textContent = subs[type] || "";
@@ -345,12 +593,19 @@ function selectType(type, el) {
   buildChecklist();
 }
 
-function select5SArea(area, el) {
-  current5SArea = area;
-  document.getElementById('area5S').value = area;
-  document.querySelectorAll('.area5s-btn').forEach(b => b.classList.remove('active'));
+// ===================================================================
+// AREA SELECTION (แบบปุ่ม)
+// ===================================================================
+function selectArea(area, el) {
+  currentArea = area;
+  document.getElementById('area').value = area;
+  
+  // Update active button
+  document.querySelectorAll('.area-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-  buildChecklist();
+  
+  // Toggle Water Mist visibility
+  toggleWaterMistByArea(area);
 }
 
 // ===================================================================
@@ -360,12 +615,7 @@ function buildChecklist() {
   const itemsDiv = document.getElementById('items');
   itemsDiv.innerHTML = "";
   imgB64 = {};
-
-  if (currentType === "5S") {
-    build5SChecklist(itemsDiv);
-  } else {
-    buildSafetyChecklist(itemsDiv);
-  }
+  buildSafetyChecklist(itemsDiv);
 }
 
 function buildSafetyChecklist(container) {
@@ -397,64 +647,24 @@ function buildSafetyChecklist(container) {
   }
 }
 
-function build5SChecklist(container) {
-  let sections = (data5S[current5SArea] || data5S["OFFICE"]).sections;
-  sections.forEach((sec, sIdx) => {
-    let card = document.createElement('div');
-    card.className = 'card';
-    let html = `<div class="section-badge" style="background:linear-gradient(135deg,#27ae60,#1e8449)"><i class="fas fa-broom"></i> 5S</div>
-      <label class="section-label" style="border-color:#27ae60; color:#1e8449;">${sec.title}</label>`;
-
-    sec.qs.forEach((q, qIdx) => {
-      let qKey = `5s_${sIdx}_${qIdx}`;
-      imgB64[qKey] = [];
-      let detailKey = `5s_s${sIdx}_q${qIdx}`;
-      let remarkName = `5s_remark_s${sIdx}_q${qIdx}`;
-      let dueDateName = `5s_duedate_s${sIdx}_q${qIdx}`;
-      let itemId = `item5s_${sIdx}_${qIdx}`;
-
-      html += `<div class="check-item" id="${itemId}" style="padding:14px;">
-        <small>${qIdx+1}. ${q}</small>
-        <div class="options">
-          <input type="radio" name="${detailKey}" id="y5s_${sIdx}_${qIdx}" value="ดี"
-            onchange="onRadioChange5S(this,'${remarkName}','${dueDateName}','${itemId}',false)">
-          <label for="y5s_${sIdx}_${qIdx}"><i class="fas fa-check-circle"></i> ผ่าน</label>
-          <input type="radio" name="${detailKey}" id="n5s_${sIdx}_${qIdx}" value="ไม่ดี"
-            onchange="onRadioChange5S(this,'${remarkName}','${dueDateName}','${itemId}',true)">
-          <label for="n5s_${sIdx}_${qIdx}" style=""><i class="fas fa-exclamation-triangle"></i> ไม่ผ่าน</label>
-        </div>
-        <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..." style="margin-bottom:0;"></textarea>
-        <div class="duedate-box" id="dd_${itemId}">
-          <label><i class="fas fa-calendar-times"></i> กำหนดวันแก้ไขเสร็จ (Due Date) *</label>
-          <input type="date" name="${dueDateName}" id="${dueDateName}" style="margin:0;padding:9px;">
-        </div>`;
-      html += buildPhotoUpload(qKey);
-      html += `</div>`;
-    });
-
-    card.innerHTML = html;
-    container.appendChild(card);
-  });
-}
-
 // ===================================================================
 // ITEM BUILDERS
 // ===================================================================
 function buildWaterMistItem(sNum, i, itemId, remarkName, dueDateName) {
   return `<div class="check-item water-mist-block" id="${itemId}" style="padding:14px; display:none;">
     <small>${i+1}. Water Mist</small>
-    <div style="margin:10px 0; display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
-      <input type="number" step="any" name="water_val" id="water_val" placeholder="ระบุตัวเลข"
-        style="width:130px; margin:0; padding:10px;"
+    <div style="margin:12px 0; display:flex; align-items:center; flex-wrap:wrap; gap:12px;">
+      <input type="number" step="any" name="water_val" id="water_val" placeholder="ระบุ %"
+        style="width:120px; margin:0; padding:12px; font-weight:600;"
         oninput="evalWater(this.value,'${sNum}',${i},'${remarkName}')">
-      <span style="font-weight:600;color:#555;">%</span>
+      <span style="font-weight:600;color:#555; font-size:1.1rem;">%</span>
       <span id="water_badge"></span>
     </div>
     <input type="hidden" name="section${sNum}_q${i}" id="hidden_s${sNum}q${i}" value="">
     <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..." style="margin-bottom:0;"></textarea>
     <div class="duedate-box" id="dd_${itemId}">
       <label><i class="fas fa-calendar-times"></i> กำหนดวันแก้ไขเสร็จ (Due Date) *</label>
-      <input type="date" name="${dueDateName}" id="${dueDateName}" style="margin:0;padding:9px;">
+      <input type="date" name="${dueDateName}" id="${dueDateName}" style="margin:0;padding:10px;">
     </div>`;
 }
 
@@ -472,21 +682,21 @@ function buildRadioItem(sNum, i, q, itemId, remarkName, dueDateName, optional) {
     <textarea name="${remarkName}" rows="2" placeholder="เพิ่มเติมความเห็น (ถ้ามี)..." style="margin-bottom:0;"></textarea>
     <div class="duedate-box" id="dd_${itemId}">
       <label><i class="fas fa-calendar-times"></i> กำหนดวันแก้ไขเสร็จ (Due Date) *</label>
-      <input type="date" name="${dueDateName}" id="${dueDateName}" style="margin:0;padding:9px;">
+      <input type="date" name="${dueDateName}" id="${dueDateName}" style="margin:0;padding:10px;">
     </div>`;
 }
 
 function buildPhotoUpload(qKey) {
   return `<div class="photo-area">
-    <div id="preview-container_${qKey}" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;"></div>
+    <div id="preview-container_${qKey}" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;"></div>
     <div class="camera-row" id="camera-placeholder_${qKey}">
       <div class="btn-cam-split" onclick="document.getElementById('fileCam_${qKey}').click()">
-        <i class="fas fa-camera" style="color:var(--primary);font-size:1.2rem;"></i>
-        <div style="font-size:0.78rem;font-weight:600;color:#7f8c8d;margin-top:4px;">ถ่ายรูป</div>
+        <i class="fas fa-camera" style="color:var(--primary);font-size:1.3rem;"></i>
+        <div style="font-size:0.8rem;font-weight:600;color:#7f8c8d;">ถ่ายรูป</div>
       </div>
       <div class="btn-cam-split" onclick="document.getElementById('fileGal_${qKey}').click()">
-        <i class="fas fa-images" style="color:var(--primary);font-size:1.2rem;"></i>
-        <div style="font-size:0.78rem;font-weight:600;color:#7f8c8d;margin-top:4px;">เลือกรูป</div>
+        <i class="fas fa-images" style="color:var(--primary);font-size:1.3rem;"></i>
+        <div style="font-size:0.8rem;font-weight:600;color:#7f8c8d;">เลือกรูป</div>
       </div>
     </div>
     <input type="file" id="fileCam_${qKey}" accept="image/*" capture="environment" style="display:none" onchange="pv(this,'${qKey}')">
@@ -504,16 +714,17 @@ function onRadioChange(radio, remarkName, dueDateName, itemId, isBad) {
   let item = document.getElementById(itemId);
   item.classList.remove('error');
   if (isBad) {
-    remark.required = true; remark.placeholder = '* กรุณาระบุรายละเอียด (บังคับ)';
-    ddBox.style.display = 'block'; ddInput.required = true;
+    remark.required = true; 
+    remark.placeholder = '* กรุณาระบุรายละเอียด (บังคับ)';
+    ddBox.style.display = 'block'; 
+    ddInput.required = true;
   } else {
-    remark.required = false; remark.placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...';
-    ddBox.style.display = 'none'; ddInput.required = false; ddInput.value = '';
+    remark.required = false; 
+    remark.placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...';
+    ddBox.style.display = 'none'; 
+    ddInput.required = false; 
+    ddInput.value = '';
   }
-}
-
-function onRadioChange5S(radio, remarkName, dueDateName, itemId, isBad) {
-  onRadioChange(radio, remarkName, dueDateName, itemId, isBad);
 }
 
 // ===================================================================
@@ -540,23 +751,34 @@ function evalWater(val, sNum, i, remarkName) {
   let remark = document.getElementsByName(remarkName)[0];
   let ddBox = document.getElementById(`dd_item_${sNum}_${i}`);
   let ddInput = document.getElementById(`section${sNum}_duedate${i}`);
+  
   badge.style.display = 'inline-block';
-  if (!val) {
-    hid.value = ""; badge.style.display = 'none';
-    remark.required = false; remark.placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...';
+  
+  if (!val || val.trim() === '') {
+    hid.value = ""; 
+    badge.style.display = 'none';
+    remark.required = false; 
+    remark.placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...';
     if (ddBox) { ddBox.style.display = 'none'; ddInput.required = false; ddInput.value = ''; }
     return;
   }
+  
   let num = parseFloat(val);
   if (num < 50) {
     hid.value = "ไม่ดี";
-    badge.style.background = "#ffebee"; badge.style.color = "#c62828"; badge.innerHTML = "✘ ไม่ปกติ";
-    remark.required = true; remark.placeholder = '* กรุณาระบุรายละเอียด (ต่ำกว่า 50%)';
+    badge.style.background = "#ffebee"; 
+    badge.style.color = "#c62828"; 
+    badge.innerHTML = "⚠️ ไม่ปกติ";
+    remark.required = true; 
+    remark.placeholder = '* กรุณาระบุรายละเอียด (ต่ำกว่า 50%)';
     if (ddBox) { ddBox.style.display = 'block'; ddInput.required = true; }
   } else {
     hid.value = "ดี";
-    badge.style.background = "#e8f5e9"; badge.style.color = "#27ae60"; badge.innerHTML = "✔ ปกติ";
-    remark.required = false; remark.placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...';
+    badge.style.background = "#e8f5e9"; 
+    badge.style.color = "#27ae60"; 
+    badge.innerHTML = "✅ ปกติ";
+    remark.required = false; 
+    remark.placeholder = 'เพิ่มเติมความเห็น (ถ้ามี)...';
     if (ddBox) { ddBox.style.display = 'none'; ddInput.required = false; ddInput.value = ''; }
   }
 }
@@ -602,12 +824,12 @@ function renderPhotos(qKey) {
   (imgB64[qKey] || []).forEach((imgObj, idx) => {
     let safe = imgObj.caption.replace(/"/g, '&quot;');
     container.innerHTML += `
-      <div style="position:relative;width:31%;display:flex;flex-direction:column;gap:5px;">
+      <div style="position:relative;width:32%;display:flex;flex-direction:column;gap:6px;">
         <div style="position:relative;aspect-ratio:1/1;">
-          <img src="${imgObj.b64}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;border:2px solid #ddd;">
-          <div style="position:absolute;top:-7px;right:-7px;background:#e74c3c;color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid white;font-size:11px;" onclick="event.stopPropagation();removeImg('${qKey}',${idx})"><i class="fas fa-times"></i></div>
+          <img src="${imgObj.b64}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;border:2px solid #ddd;">
+          <div style="position:absolute;top:-6px;right:-6px;background:#e74c3c;color:white;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid white;font-size:12px;" onclick="event.stopPropagation();removeImg('${qKey}',${idx})"><i class="fas fa-times"></i></div>
         </div>
-        <input type="text" value="${safe}" placeholder="คอมเมนต์.." style="padding:4px;font-size:0.72rem;border-radius:4px;border:1px solid #ccc;width:100%;margin:0;" onchange="updateCaption('${qKey}',${idx},this.value)">
+        <input type="text" value="${safe}" placeholder="คอมเมนต์.." style="padding:5px;font-size:0.75rem;border-radius:6px;border:1px solid #ccc;width:100%;margin:0;" onchange="updateCaption('${qKey}',${idx},this.value)">
       </div>`;
   });
   if (placeholder) placeholder.style.display = (imgB64[qKey] || []).length >= 3 ? 'none' : 'flex';
@@ -626,15 +848,16 @@ document.getElementById('f').onsubmit = function(e) {
 
   document.querySelectorAll('.check-item').forEach(el => el.classList.remove('error'));
 
-  if (currentType === "5S") {
-    isValid = validate5S(fd);
-  } else {
-    isValid = validateSafety(fd);
-  }
+  isValid = validateSafety(fd);
 
   if (!isValid) {
     firstErr = document.querySelector('.check-item.error');
-    Swal.fire({ title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณาระบุหมายเหตุและกำหนด Due Date ให้ครบถ้วนสำหรับข้อที่ไม่ผ่าน', icon: 'warning', confirmButtonColor: '#e74c3c' });
+    Swal.fire({ 
+      title: 'ข้อมูลไม่ครบถ้วน', 
+      text: 'กรุณาระบุหมายเหตุและกำหนด Due Date ให้ครบถ้วนสำหรับข้อที่ไม่ผ่าน', 
+      icon: 'warning', 
+      confirmButtonColor: '#e74c3c' 
+    });
     if (firstErr) { firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     return;
   }
@@ -653,38 +876,31 @@ document.getElementById('f').onsubmit = function(e) {
 
   let payload = {
     inspector: fd.get('inspector'),
-    area: fd.get('area'),
+    area: currentArea,
     inspectionType: currentType,
-    area5S: current5SArea,
     images: flatImages,
     details: fdDetails
   };
 
-  if (currentType === "5S") {
-    // For 5S, section results are always "ดี" unless there's a ไม่ดี found (backend handles per-item)
-    payload.s1_res = "ดี"; payload.s2_res = "ดี"; payload.s3_res = "ดี";
-    payload.s4_res = "ดี"; payload.s5_res = "ดี"; payload.s6_res = "ดี"; payload.s7_res = "ดี";
-  } else {
-    const ck = (s) => {
-      let sNum = s.replace('s',''), hasData = false;
-      for (let i = 0; i < dataStructure[s].qs.length; i++) {
-        let val = fd.get(`section${sNum}_q${i}`);
-        if (val) hasData = true;
-        if (val === "ไม่ดี") return "ไม่ดี";
+  // Calculate section results
+  const ck = (s) => {
+    let sNum = s.replace('s',''), hasData = false;
+    for (let i = 0; i < dataStructure[s].qs.length; i++) {
+      let val = fd.get(`section${sNum}_q${i}`);
+      if (val) hasData = true;
+      if (val === "ไม่ดี") return "ไม่ดี";
+    }
+    if (s === 's1') {
+      if (currentArea === "แผนก Print" || currentArea === "แผนก Laminate") {
+        let wv = fd.get('water_val');
+        if (wv && parseFloat(wv) < 50) return "ไม่ดี";
       }
-      if (s === 's1') {
-        let area = fd.get('area');
-        if (area === "แผนก Print" || area === "แผนก Laminate") {
-          let wv = fd.get('water_val');
-          if (wv && parseFloat(wv) < 50) return "ไม่ดี";
-        }
-      }
-      if (s === 's7' && !hasData) return "ดี";
-      return "ดี";
-    };
-    payload.s1_res = ck('s1'); payload.s2_res = ck('s2'); payload.s3_res = ck('s3');
-    payload.s4_res = ck('s4'); payload.s5_res = ck('s5'); payload.s6_res = ck('s6'); payload.s7_res = ck('s7');
-  }
+    }
+    if (s === 's7' && !hasData) return "ดี";
+    return "ดี";
+  };
+  payload.s1_res = ck('s1'); payload.s2_res = ck('s2'); payload.s3_res = ck('s3');
+  payload.s4_res = ck('s4'); payload.s5_res = ck('s5'); payload.s6_res = ck('s6'); payload.s7_res = ck('s7');
 
   fetch(API_URL, {
     method: "POST",
@@ -720,8 +936,7 @@ function validateSafety(fd) {
       if (!item) continue;
 
       if (s === 's1' && dataStructure[s].qs[i] === 'Water Mist') {
-        let area = fd.get('area');
-        if (area === "แผนก Print" || area === "แผนก Laminate") {
+        if (currentArea === "แผนก Print" || currentArea === "แผนก Laminate") {
           let wv = fd.get('water_val');
           if (!wv || wv.trim() === '') { item.classList.add('error'); valid = false; continue; }
           if (parseFloat(wv) < 50) {
@@ -739,24 +954,6 @@ function validateSafety(fd) {
       else if (status === "ไม่ดี" && (!remark || !remark.trim() || !dd)) { item.classList.add('error'); valid = false; }
     }
   }
-  return valid;
-}
-
-function validate5S(fd) {
-  let valid = true;
-  let sections = (data5S[current5SArea] || data5S["OFFICE"]).sections;
-  sections.forEach((sec, sIdx) => {
-    sec.qs.forEach((q, qIdx) => {
-      let itemId = `item5s_${sIdx}_${qIdx}`;
-      let item = document.getElementById(itemId);
-      if (!item) return;
-      let status = fd.get(`5s_s${sIdx}_q${qIdx}`);
-      let remark = fd.get(`5s_remark_s${sIdx}_q${qIdx}`);
-      let dd = fd.get(`5s_duedate_s${sIdx}_q${qIdx}`);
-      if (!status) { item.classList.add('error'); valid = false; }
-      else if (status === "ไม่ดี" && (!remark || !remark.trim() || !dd)) { item.classList.add('error'); valid = false; }
-    });
-  });
   return valid;
 }
 
