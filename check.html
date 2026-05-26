@@ -3,280 +3,343 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>🛡️ SAFETY PATROL - ตรวจสอบพื้นที่</title>
-  
-  <!-- Tailwind CSS (CDN - สำหรับพัฒนา/ทดสอบ) -->
+  <title>🛡️ Checklist System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#f39c12',
-            'primary-dark': '#e67e22',
-            success: '#27ae60',
-            danger: '#e74c3c'
-          },
-          fontFamily: {
-            prompt: ['Prompt', 'sans-serif']
-          }
-        }
-      }
+      theme: { extend: { colors: { primary: '#f39c12', 'primary-dark': '#e67e22', danger: '#e74c3c' }, fontFamily: { prompt: ['Prompt', 'sans-serif'] } } }
     }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
-  <!-- SweetAlert2 Custom Style -->
   <style>
+    body { -webkit-tap-highlight-color: transparent; }
     .swal2-popup { font-family: 'Prompt', sans-serif !important; border-radius: 1rem !important; }
-    .swal2-title { font-size: 1.25rem !important; font-weight: 600 !important; }
-    .swal2-confirm { border-radius: 0.75rem !important; font-weight: 500 !important; }
   </style>
 </head>
 <body class="font-prompt bg-gray-100 text-gray-800">
 
-  <!-- Loading Overlay -->
   <div id="loading" class="fixed inset-0 bg-white/90 z-50 hidden flex-col items-center justify-center">
     <i class="fas fa-circle-notch fa-spin text-4xl text-primary"></i>
     <p class="mt-4 font-semibold text-gray-700">กำลังบันทึกข้อมูล...</p>
   </div>
 
-  <!-- Header -->
   <header class="bg-gradient-to-r from-orange-500 to-primary text-white py-4 px-4 sticky top-0 z-40 shadow-md">
     <div class="max-w-2xl mx-auto flex items-center justify-between">
-      <a href="Dash.html" class="text-white/90 hover:text-white transition">
-        <i class="fas fa-chevron-left mr-1"></i> กลับหน้าหลัก
-      </a>
-      <h1 class="text-lg font-semibold tracking-wide">SAFETY PATROL</h1>
-      <div class="w-16"></div>
+      <h1 class="text-lg font-semibold tracking-wide"><i class="fas fa-clipboard-check mr-2"></i>ระบบ Checklist</h1>
     </div>
   </header>
 
-<!-- Main Content -->
-  <main class="max-w-2xl mx-auto px-4 py-6 -mt-4 relative z-10">
+  <main class="max-w-2xl mx-auto px-4 py-6 relative z-10">
     <form id="inspectionForm" class="space-y-4">
       
-      <!-- ส่วนเลือกประเภทและพื้นที่ (Dynamic) -->
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <i class="fas fa-list-alt text-primary mr-1"></i> ประเภทการตรวจสอบ
-            </label>
-            <select id="checklistType" name="checklist_type" required onchange="loadChecklistAndAreas(this.value)"
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none transition font-prompt">
-              <option value="">-- กำลังโหลดประเภท... --</option>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">👤 ชื่อผู้ตรวจสอบ</label>
+            <input type="text" name="inspector" placeholder="ระบุชื่อ-นามสกุล" required class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none transition">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">📋 ประเภทการตรวจ</label>
+            <select id="typeSelect" name="type" required onchange="updateAreas()" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none transition">
+              <option value="">-- เลือกประเภท --</option>
+              <option value="Safety Patrol">Safety Patrol (จป.ว, คปอ., Foreman, Audit)</option>
+              <option value="5S">5S (5ส)</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <i class="fas fa-user-edit text-primary mr-1"></i> ชื่อผู้ตรวจสอบ
-            </label>
-            <input type="text" name="inspector" placeholder="ระบุชื่อ-นามสกุล" required
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none transition font-prompt">
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <i class="fas fa-map-marker-alt text-primary mr-1"></i> พื้นที่สำรวจ
-            </label>
-            <select id="areaSelect" name="area" required disabled
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none transition font-prompt">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">📍 พื้นที่สำรวจ</label>
+            <select id="areaSelect" name="area" required onchange="renderChecklist()" disabled class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none transition">
               <option value="">-- กรุณาเลือกประเภทก่อน --</option>
             </select>
           </div>
         </div>
       </div>
 
-      <!-- Checklist Items (สร้างอัตโนมัติจาก DB) -->
-      <div id="dynamicItems" class="space-y-4"></div>
+      <div id="checklistContainer" class="space-y-4"></div>
 
-      <!-- Submit Button -->
-      <button type="submit" id="submitBtn" disabled
-        class="w-full bg-gray-400 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg transition-all cursor-not-allowed">
-        <i class="fas fa-paper-plane mr-2"></i>ส่งรายงานตรวจสอบ
+      <button type="submit" id="submitBtn" disabled class="w-full bg-gray-400 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg transition-all">
+        <i class="fas fa-paper-plane mr-2"></i>ส่งรายงาน
       </button>
     </form>
   </main>
 
   <script>
-    // URL ของ Google Apps Script ของคุณ
+    // 🔴 เปลี่ยน API_URL ตรงนี้ให้เป็นของคุณ 🔴
     const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
     
-    let imgB64 = {};
-    let currentChecklistData = [];
-
-    // 1. โหลดประเภททั้งหมดเมื่อเปิดหน้าเว็บ
-    window.onload = function() {
-      showLoading(true, "กำลังเชื่อมต่อฐานข้อมูล...");
-      fetch(API_URL + "?action=getConfig")
-        .then(res => res.json())
-        .then(data => {
-          showLoading(false);
-          const typeSelect = document.getElementById('checklistType');
-          typeSelect.innerHTML = '<option value="">-- เลือกประเภทการตรวจสอบ --</option>';
-          if(data.status === 'success' && data.types) {
-            data.types.forEach(t => {
-              if(t.is_active === 'TRUE') {
-                typeSelect.innerHTML += `<option value="${t.id}">${t.name_th}</option>`;
-              }
-            });
-          }
-        }).catch(err => {
-          showLoading(false);
-          Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
-        });
+    // ==========================================
+    // ฐานข้อมูลหัวข้อทั้งหมด (ฝังไว้ในเว็บให้ทำงานเร็วที่สุด)
+    // ==========================================
+    const db = {
+      "Safety Patrol": {
+        areas: ["แผนก Print", "แผนก Laminate", "แผนก Solvent", "แผนก Rewinder / Slitter / Packing", "แผนก BAG MAKING", "แผนก QA & QC", "แผนก Warehouse", "Office", "พื้นที่รอบบริเวณโรงงาน"],
+        sections: [
+          { title: "1. สถานที่ทำงาน", qs: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "การจัดเก็บ และกองวัสดุมีการกำหนดสูงไม่เกิน กองวัสดุมีความปลอดภัย"] },
+          { title: "2. ท่าทางการทำงาน", qs: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์, หรืออุปกรณ์ที่มีล้อในการเคลื่อนย้ายสิ่งของ", "การยกของอย่างถูกต้องและปลอดภัย"] },
+          { title: "3. เครื่องจักร", qs: ["พนักงานสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงานตามที่กำหนด", "การปฏิบัติงานตามวิธีการทำงานหรือมาตรฐานการทำงานที่ปลอดภัย", "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย", "ไม่มีเสียง/สั่นผิดปกติ และไม่มีน้ำมันรั่วไหล"] },
+          { title: "4. สารเคมี", qs: ["การสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงานตามที่กำหนด", "ไม่มีสารเคมีหกรั่วไหล, ไม่มีกลิ่นสารเคมีฟุ้งกระจายในอากาศ", "ภาชนะปิดสนิท, สภาพถังใส่สารเคมีแข็งแรงปลอดภัยและสะอาด, อุปกรณ์ใช้งานกับสารเคมีไม่ชำรุด รั่วซึม", "อากาศถ่ายเท", "มีอุปกรณ์ Spill Kit พร้อมใช้งาน", "มีขั้นตอนการปฎิบัติงาน", "บันทึกการตรวจสายกราวด์", "มีฉลากระบุสารเคมี และมี SDS"] },
+          { title: "5. ไฟฟ้า", qs: ["ตรวจสอบอุปกรณ์ไฟฟ้าเช่น สายไฟ ปลั๊กไฟ ต้องไม่ชำรุดเสียหาย", "ปล๊กไฟ/เต้าเสียบไม่หลวม", "ไม่มีการต่ออุปกรณ์พวงไฟฟ้าแบบชั่วคราว", "อุปกรณ์ไฟฟ้าต้องมีการต่อสายดิน", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย, ไม่มีสายไฟโผล่, ไม่มีสิ่งกีดขวางหน้าตู้", "ไม่มีสิ่งของต่างๆหรือฝุ่นละอองสะสมอยู่บนแผงควบคุมไฟฟ้า, ไม่มีสิ่งติดไฟง่ายอยู่ในตู้ไฟและติดหน้าตู้ไฟ"] },
+          { title: "6. ระบบป้องกันอัคคีภัย", qs: ["ทางหนีไฟไม่มีสิ่งกีขวาง", "ป้าย EXIT และ Layout ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน (เข็มอยู่ตำแหน่งสีเขียว)", "พื้นที่สะอาด ไม่มีของวางเกะกะ"] },
+          { title: "7. การกำจัดของเสีย", qs: ["มีการแยกประเภทขยะ, การปิดฝาถังขยะ, ถังขยะไม่มีชำรุด แตกหัก"] }
+        ]
+      },
+      "5S": {
+        areas: ["OFFICE", "CANTEEN", "QA&QC", "FACTORY", "EN", "บริเวนนอกโรงงาน"],
+        sectionsByArea: {
+          "OFFICE": [
+            { title: "1. โต๊ะทำงาน", qs: ["1.1 ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน", "1.2 ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานให้หยิบใช้สะดวก", "1.3 กำหนดจำนวนอุปกรณ์ เครื่องมือให้เหมาะสมกับมาตรฐานพื้นที่", "1.4 ตะกร้าเอกสารระบุป้ายชัดเจนและจัดเก็บเป็นระเบียบ"] },
+            { title: "2. ลิ้นชัก", qs: ["2.1 ลิ้นชักที่ 1 ใส่เฉพาะอุปกรณ์เครื่องเขียน", "2.2 ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ/สมุดโน๊ต", "2.3 ลิ้นชักที่ 3 ใส่อุปกรณ์ส่วนตัว"] },
+            { title: "3. การจัดเก็บเอกสาร", qs: ["3.1 ในตู้เอกสารเรียงเป็นระเบียบไม่วางซ้อนกัน", "3.2 หน้าตู้ระบุรายชื่อเอกสารแต่ละประเภทและป้ายแผนก"] },
+            { title: "4. เครื่องคอมพิวเตอร์", qs: ["4.1 จัดวางคอมพิวเตอร์ เครื่องแฟกซ์เหมาะสมสะดวกใช้งาน", "4.2 ไม่ติดกระดาษโน๊ตไว้หน้าคอมพิวเตอร์", "4.3 จัดเก็บสายไฟให้เป็นระเบียบเรียบร้อย"] },
+            { title: "5. พื้น/ผนังห้อง/ฝ้า/เพดาน", qs: ["5.1 ไม่มีเศษขยะ/เศษกระดาษหล่นตามพื้น/ผนังไม่มีหยากไย่", "5.2 ไม่วางสิ่งกีดขวางทางเดิน", "5.3 กำหนดเวลาทำความสะอาดประจำ", "5.4 ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"] },
+            { title: "6. สภาพแวดล้อมทั่วไป", qs: ["6.1 มีสิ่งของที่ไม่จำเป็นวางในจุดที่ไม่เหมาะสมหรือไม่", "6.2 ถังขยะอยู่ตำแหน่งเหมาะสมและมีป้ายชัดเจนไม่ชำรุด", "6.3 มีการกำหนดที่วางอุปกรณ์ทำความสะอาดและผู้รับผิดชอบ", "6.4 ควบคุมสิ่งแวดล้อมภายในไม่ก่อให้เกิดแมลง"] },
+            { title: "7. สุขลักษณะส่วนบุคคล", qs: ["7.1 พนักงานแต่งกายถูกต้องตามระเบียบ", "7.2 พนักงานมีสุขลักษณะส่วนบุคคลที่สะอาด", "7.3 พนักงานมีสุขภาพแข็งแรง"] },
+            { title: "8. ความตระหนัก ความสำเร็จ", qs: ["8.1 มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "8.2 มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "8.3 นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่", "8.4 มีการแสดง KPI ด้านประสิทธิภาพให้เห็นหรือไม่"] }
+          ],
+          "CANTEEN": [
+            { title: "1. ห้องอาหาร", qs: ["1.1 โต๊ะอาหารและเก้าอี้สะอาดพร้อมใช้งาน", "1.2 ชั้นวางอาหารสะอาดแยกแผนกชัดเจน", "1.3 ไม่มีเศษขยะ/ฝุ่นตามพื้นและผนัง", "1.4 ถังขยะอยู่ตำแหน่งเหมาะสมและป้ายชัดเจน"] },
+            { title: "2. ห้องประชุม", qs: ["2.1 เก็บโต๊ะและเก้าอี้เป็นระเบียบก่อน-หลังใช้งาน", "2.2 ไม่มีเศษขยะและฝุ่นตามพื้นและผนัง", "2.3 ห้องประชุมต้องพร้อมใช้งานอยู่เสมอ"] },
+            { title: "3. ห้องกาแฟ", qs: ["3.1 ทำความสะอาดอ่างล้างภาชนะหลังใช้งาน/การแต่งกายแม่ครัว", "3.2 แบ่งแยกอุปกรณ์เครื่องใช้ออกให้ชัดเจน", "3.3 จัดวางสิ่งของแยกตามชนิดไม่ปะปนกัน"] },
+            { title: "4. LOCKER (เสื้อผ้า)", qs: ["4.1 ป้ายไม่ชำรุดระบุชื่อพนักงานชัดเจน", "4.2 หลังตู้สะอาดไม่มีของไม่จำเป็นวาง", "4.3 ไม่มีเศษขยะและฝุ่นตามพื้น"] },
+            { title: "5. LOCKER (รองเท้า)", qs: ["5.1 ป้ายไม่ชำรุดระบุชื่อชัดเจน", "5.2 ห้ามนำอาหาร/เครื่องดื่มไปไว้และต้องไม่มีขยะ"] },
+            { title: "6. ห้องสุขา", qs: ["6.1 ทำความสะอาดอ่างล้างหน้า/กระจก/ชักโครกด้วยน้ำ", "6.2 กระดาษชำระ สบู่ ผ้าเช็ดมือ ดูแลอย่าให้ขาด"] },
+            { title: "7. ทางเข้า (AIR SHOWER)", qs: ["7.1 ทำความสะอาดอ่างล้างมือ/ที่เป่ามือ/กระจก", "7.2 ไม่มีขยะ/ฝุ่นตามพื้น", "7.3 ชั้นวางรองเท้าวางถูกช่อง สีขาวรองเท้าเซฟตี้/สีดำรองเท้าแตะ"] }
+          ],
+          "QA&QC": [
+             { title: "1. โต๊ะทำงาน", qs: ["1.1 ความสะอาดของโต๊ะทำงาน/เก้าอี้", "1.2 ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์", "1.3 การกำหนดจำนวนอุปกรณ์ให้เหมาะสม"] },
+             { title: "2. ลิ้นชัก", qs: ["2.1 ลิ้นชักที่ 1 อุปกรณ์เครื่องเขียน", "2.2 ลิ้นชักที่ 2 สมุดโน๊ต/MEMO", "2.3 ลิ้นชักที่ 3 ใส่อุปกรณ์ในการทำงาน", "2.4 ลิ้นชักกลางใส่เอกสาร"] },
+             { title: "3. การจัดเก็บเอกสาร", qs: ["3.1 ในตู้เอกสารเรียงเป็นระเบียบ", "3.2 หน้าตู้ระบุรายชื่อและแผนกชัดเจน"] },
+             { title: "4. พื้น/ผนังห้อง/ฝ้า", qs: ["4.1 ไม่มีขยะ/ฝุ่นตามพื้นและผนัง", "4.2 ไม่วางสิ่งกีดขวางทางเดิน", "4.3 กำหนดเวลาทำความสะอาดประจำ"] },
+             { title: "5. เครื่องคอมพิวเตอร์", qs: ["5.1 จัดวางคอมพิวเตอร์เหมาะสม", "5.2 ไม่ติดกระดาษโน๊ตไว้หน้าจอ", "5.3 จัดเก็บสายไฟเป็นระเบียบ", "5.4 ไม่เปิดประตูค้างไว้"] },
+             { title: "6. เครื่องมือและอุปกรณ์", qs: ["6.1 กำหนดตำแหน่งวางเครื่องมือ", "6.2 นำเครื่องมือไปใช้ให้เก็บเข้าที่เสมอ", "6.3 เก็บวางในพื้นที่ที่กำหนด", "6.4 กำหนดผู้รับผิดชอบชัดเจน", "6.5 ควบคุมสิ่งแวดล้อมไม่ให้เกิดแมลง"] },
+             { title: "7. สุขลักษณะส่วนบุคคล", qs: ["7.1 พนักงานแต่งกายถูกต้อง", "7.2 สุขลักษณะส่วนบุคคลสะอาด", "7.3 สุขภาพร่างกายแข็งแรง"] },
+             { title: "8. ความตระหนัก", qs: ["8.1 ตระหนักในกิจกรรม 5ส", "8.2 นำเสนอเรื่องราวความสำเร็จ", "8.3 นำ 3ส มาใช้อย่างเต็มรูปแบบ", "8.4 แสดง KPI ด้านประสิทธิภาพ"] }
+          ],
+          "FACTORY": [
+             { title: "1. เครื่องจักร", qs: ["1.1 ทำความสะอาดเครื่องจักรก่อน-หลังใช้งาน", "1.2 ตีเส้นกำหนดจุดที่ตั้งสีเหลือง", "1.3 แต่งกายรัดกุมและสวม PPE"] },
+             { title: "2. เครื่องมือ", qs: ["2.1 กำหนดตำแหน่งวางของเครื่องมือ", "2.2 เก็บเข้าที่เสมอหลังใช้งาน", "2.3 เก็บอย่างเป็นระเบียบ", "2.4 กำหนดผู้รับผิดชอบชัดเจน"] },
+             { title: "3. วัตถุดิบและผลิตภัณฑ์", qs: ["3.1 วางในจุดกำหนดไม่ล้นเส้น", "3.2 จัดวางตามหลัก FIFO", "3.3 มีสถานะป้ายชี้บ่ง"] },
+             { title: "4. โต๊ะทำงาน (Production)", qs: ["4.1 ความสะอาดโต๊ะ/เก้าอี้", "4.2 ความเป็นระเบียบของอุปกรณ์", "4.3 ลิ้นชักใส่เอกสารตรงมาตรฐาน"] },
+             { title: "5. การจัดเก็บเอกสาร", qs: ["5.1 ตู้เอกสารเรียงเป็นระเบียบ", "5.2 หน้าตู้ระบุชื่อเอกสารและแผนก"] },
+             { title: "6. พื้น/ผนังห้อง", qs: ["6.1 ไม่มีขยะ/ฝุ่น", "6.2 ไม่มีคราบสี, Solvent/น้ำนองพื้น", "6.3 กำหนดเวลาทำความสะอาด"] },
+             { title: "7. สภาพแวดล้อมทั่วไป", qs: ["7.1 มีของไม่จำเป็นวางในแผนกหรือไม่", "7.2 ถังขยะตำแหน่งเหมาะสมป้ายชัดเจน", "7.3 มีการกำหนดที่วางอุปกรณ์ทำความสะอาด"] },
+             { title: "8. สุขลักษณะส่วนบุคคล", qs: ["8.1 แต่งกายถูกต้องตามระเบียบ", "8.2 สุขลักษณะส่วนบุคคลสะอาด", "8.3 สุขภาพร่างกายแข็งแรงสมบูรณ์"] },
+             { title: "9. ความตระหนัก", qs: ["9.1 มีความตระหนักในกิจกรรม 5ส", "9.2 มีการนำเสนอเรื่องราวความสำเร็จ", "9.3 นำ 3ส มาใช้เต็มรูปแบบ", "9.4 แสดง KPI ด้านประสิทธิภาพ"] }
+          ],
+          "EN": [
+             { title: "1. โต๊ะทำงาน", qs: ["1.1 ความสะอาดของโต๊ะทำงาน", "1.2 ความเป็นระเบียบในการจัดอุปกรณ์", "1.3 กำหนดจำนวนอุปกรณ์บนโต๊ะให้เหมาะสม"] },
+             { title: "2. ลิ้นชัก", qs: ["2.1 ลิ้นชักที่ 1 เครื่องเขียน", "2.2 ลิ้นชักที่ 2 สมุดโน๊ต", "2.3 ลิ้นชักที่ 3 ของส่วนตัว"] },
+             { title: "3. การจัดเก็บเอกสาร", qs: ["3.1 สันแฟ้มใช้ Font Angsana New มีระบุเล่มที่", "3.2 เอกสารเรียงเป็นระเบียบ", "3.3 หน้าตู้ระบุชื่อเอกสารและแผนก"] },
+             { title: "4. เครื่องมือ", qs: ["4.1 กำหนดตำแหน่งวางเครื่องมือ", "4.2 นำเครื่องมือไปใช้เก็บเข้าที่", "4.3 เก็บวางเป็นระเบียบมีป้ายฉลาก", "4.4 ชิ้นส่วนเล็กควรหากล่องใส่"] },
+             { title: "5. พื้น/ผนังห้อง", qs: ["5.1 ไม่มีขยะ/ฝุ่น", "5.2 ไม่วางสิ่งของกีดขวาง", "5.3 กำหนดเวลาทำความสะอาด", "5.4 ไม่เปิดประตูค้างไว้"] },
+             { title: "6. สภาพแวดล้อม", qs: ["6.1 มีของไม่จำเป็นวางหรือไม่", "6.2 ถังขยะอยู่ตำแหน่งเหมาะสม", "6.3 ป้ายชี้บ่งชัดเจนไม่ชำรุด", "6.4 กำหนดที่วางอุปกรณ์ทำความสะอาด", "6.5 ควบคุมไม่ให้เกิดแมลง"] },
+             { title: "7. สุขลักษณะส่วนบุคคล", qs: ["7.1 แต่งกายถูกต้อง", "7.2 บุคคลสะอาด", "7.3 ร่างกายแข็งแรง"] },
+             { title: "8. ความตระหนัก", qs: ["8.1 ตระหนักกิจกรรม 5ส", "8.2 นำเสนอความสำเร็จ", "8.3 นำ 3ส มาใช้", "8.4 แสดง KPI"] }
+          ],
+          "บริเวนนอกโรงงาน": [
+             { title: "1. พื้นที่โดยรอบ", qs: ["1.1 มีเศษก้นบุหรี่ตกหล่นหรือไม่", "1.2 ท่อระบายน้ำหญ้าขึ้นรกหรือไม่", "1.3 สายยางเก็บเรียบร้อยหรือไม่", "1.4 อุปกรณ์กำจัดสัตว์พาหะชำรุดหรือไม่", "1.5 รอบรั้วโรงงานชำรุดหรือไม่"] },
+             { title: "2. โรงเก็บขยะ", qs: ["2.1 จัดเรียงปี๊บสี,ถัง 200 ลิตรเรียบร้อย", "2.2 แยกชนิดขยะและป้ายชี้บ่ง", "2.3 ขยะไม่ล้น/ปิดฝามิดชิด/ไม่เลอะ", "2.4 ถังเก็บสารเคมีขยะต้องไม่ล้น"] },
+             { title: "3. ป้อมยาม", qs: ["3.1 จัดเก็บเอกสารและทำความสะอาดสม่ำเสมอ", "3.2 อุปกรณ์หยิบใช้สะดวก", "3.3 กำหนดจำนวนอุปกรณ์ให้เหมาะสม"] },
+             { title: "4. ห้องสุขา (ป้อมรปภ.)", qs: ["4.1 ทำความสะอาดอ่าง/กระจก/ชักโครก", "4.2 กระดาษชำระ สบู่ ดูแลอย่าให้ขาด"] },
+             { title: "5. สภาพแวดล้อม", qs: ["5.1 มีสิ่งของไม่จำเป็นวางหรือไม่", "5.2 ถังขยะเหมาะสมและป้ายชัดเจน", "5.3 กำหนดที่วางอุปกรณ์ทำความสะอาด"] },
+             { title: "6. ถังแก๊ส/โรงจอดรถ", qs: ["6.1 ระบุป้ายชัดเจนไม่ชำรุด", "6.2 ถังแก๊สตั้งตรงมีเครื่องป้องกันล้ม", "6.3 ไม่วางสิ่งของไม่จำเป็นรอบถังแก๊ส", "6.4 จอดรถเป็นระเบียบ", "6.5 หลังคา/พื้นโรงจอดรถสภาพปกติ"] }
+          ]
+        }
+      }
     };
 
-    // 2. โหลดพื้นที่และแบบฟอร์มตามประเภทที่เลือก
-    function loadChecklistAndAreas(typeId) {
+    let imgB64 = {};
+    let currentSections = [];
+
+    function updateAreas() {
+      const type = document.getElementById('typeSelect').value;
       const areaSelect = document.getElementById('areaSelect');
-      const itemsDiv = document.getElementById('dynamicItems');
       const submitBtn = document.getElementById('submitBtn');
+      const container = document.getElementById('checklistContainer');
       
-      if(!typeId) {
-        areaSelect.innerHTML = '<option value="">-- กรุณาเลือกประเภทก่อน --</option>';
+      areaSelect.innerHTML = '<option value="">-- เลือกพื้นที่/แผนก --</option>';
+      container.innerHTML = '';
+      submitBtn.disabled = true;
+      submitBtn.className = "w-full bg-gray-400 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg transition-all";
+
+      if(type && db[type]) {
+        db[type].areas.forEach(a => areaSelect.innerHTML += `<option value="${a}">${a}</option>`);
+        areaSelect.disabled = false;
+      } else {
         areaSelect.disabled = true;
-        itemsDiv.innerHTML = '';
-        submitBtn.disabled = true;
-        submitBtn.className = "w-full bg-gray-400 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg cursor-not-allowed";
-        return;
       }
-
-      showLoading(true, "กำลังโหลดแบบฟอร์ม...");
-      
-      // ดึงข้อมูล 2 อย่างพร้อมกัน: พื้นที่ และ คำถาม
-      Promise.all([
-        fetch(`${API_URL}?action=getAreasByType&typeId=${typeId}`).then(r => r.json()),
-        fetch(`${API_URL}?action=getChecklist&typeId=${typeId}`).then(r => r.json())
-      ]).then(([areaData, checklistData]) => {
-        showLoading(false);
-        
-        // จัดการ Area
-        areaSelect.innerHTML = '<option value="">-- เลือกพื้นที่/แผนก --</option>';
-        if(areaData.status === 'success' && areaData.data) {
-          areaData.data.forEach(a => {
-            areaSelect.innerHTML += `<option value="${a.area_name}">${a.area_name}</option>`;
-          });
-          areaSelect.disabled = false;
-        }
-
-        // จัดการ Checklist
-        if(checklistData.status === 'success' && checklistData.data) {
-          currentChecklistData = checklistData.data;
-          renderDynamicChecklist(currentChecklistData);
-          
-          // เปิดปุ่ม Submit
-          submitBtn.disabled = false;
-          submitBtn.className = "w-full bg-gradient-to-r from-primary to-primary-dark text-white font-semibold py-4 px-6 rounded-2xl shadow-lg shadow-primary/30 hover:shadow-primary/50 active:scale-[0.98] transition-all";
-        }
-      }).catch(err => {
-        showLoading(false);
-        Swal.fire('ข้อผิดพลาด', 'โหลดข้อมูลไม่สำเร็จ', 'error');
-      });
     }
 
-    // 3. ฟังก์ชันสร้างหน้าจอ (Render) จากข้อมูล Database
-    function renderDynamicChecklist(sections) {
-      const container = document.getElementById('dynamicItems');
-      container.innerHTML = '';
+    function renderChecklist() {
+      const type = document.getElementById('typeSelect').value;
+      const area = document.getElementById('areaSelect').value;
+      const container = document.getElementById('checklistContainer');
+      const submitBtn = document.getElementById('submitBtn');
       imgB64 = {};
 
-      sections.forEach((sec, sIdx) => {
-        let card = document.createElement('div');
-        card.className = 'bg-white rounded-2xl p-5 shadow-sm border border-gray-100';
-        let htmlStr = `<h4 class="text-primary-dark font-semibold mb-4 pb-2 border-l-4 border-primary pl-3">${sec.title_th}</h4>`;
+      if(!area) { container.innerHTML = ''; submitBtn.disabled = true; return; }
 
-        sec.questions.forEach((q, qIdx) => {
-          let qKey = `sec${sec.id}_q${q.id}`;
+      // ค้นหาชุดคำถามที่ตรงกับเงื่อนไข
+      if(type === "Safety Patrol") { currentSections = db["Safety Patrol"].sections; }
+      else if(type === "5S") { currentSections = db["5S"].sectionsByArea[area] || []; }
+
+      let html = '';
+      currentSections.forEach((sec, sIdx) => {
+        let cardHtml = `<div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <h4 class="text-primary-dark font-semibold mb-4 pb-2 border-l-4 border-primary pl-3">${sec.title}</h4>`;
+        
+        sec.qs.forEach((qText, qIdx) => {
+          let qKey = `sec${sIdx}_q${qIdx}`;
           imgB64[qKey] = [];
-          
-          htmlStr += `
-            <div class="check-item p-4 border-b border-gray-100 last:border-0" id="item_${qKey}">
-              <p class="text-sm font-semibold text-gray-700 mb-3">${qIdx + 1}. ${q.question_th}</p>
+
+          cardHtml += `
+            <div class="p-4 border-b border-gray-100 last:border-0" id="item_${qKey}">
+              <p class="text-sm font-semibold text-gray-700 mb-3">${qText}</p>
               
               <div class="grid grid-cols-2 gap-3 mb-3">
                 <label class="cursor-pointer py-3 px-4 rounded-xl bg-gray-100 text-center font-semibold text-gray-600 transition border-2 border-transparent hover:border-gray-300 has-[:checked]:bg-green-50 has-[:checked]:text-green-700 has-[:checked]:border-green-500">
-                  <input type="radio" name="${qKey}" value="ดี" class="hidden" required>
+                  <input type="radio" name="${qKey}" value="ดี" class="hidden" required onchange="toggleBad('${qKey}', false)">
                   <i class="fas fa-check-circle mr-1"></i> ปกติ
                 </label>
                 <label class="cursor-pointer py-3 px-4 rounded-xl bg-gray-100 text-center font-semibold text-gray-600 transition border-2 border-transparent hover:border-gray-300 has-[:checked]:bg-red-50 has-[:checked]:text-red-700 has-[:checked]:border-red-500">
-                  <input type="radio" name="${qKey}" value="ไม่ดี" class="hidden">
+                  <input type="radio" name="${qKey}" value="ไม่ดี" class="hidden" onchange="toggleBad('${qKey}', true)">
                   <i class="fas fa-exclamation-triangle mr-1"></i> ไม่ปกติ
                 </label>
               </div>
 
-              ${q.has_remark === 'TRUE' ? `<textarea name="remark_${qKey}" rows="2" placeholder="เพิ่มเติมความเห็น..." class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none resize-none mb-2"></textarea>` : ''}
-              
-              ${q.has_duedate === 'TRUE' ? `
-              <div class="mt-3 p-3 bg-red-50 rounded-xl border border-dashed border-red-300">
-                <label class="text-xs text-red-700 font-semibold block mb-2"><i class="fas fa-calendar-times mr-1"></i> กำหนดวันแก้ไขเสร็จ (Due Date)</label>
-                <input type="date" name="duedate_${qKey}" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white focus:border-primary outline-none">
-              </div>` : ''}
+              <div id="bad_group_${qKey}" class="hidden mt-3 space-y-3 p-4 bg-red-50 rounded-xl border border-dashed border-red-300">
+                 <textarea id="remark_${qKey}" name="remark_${qKey}" rows="2" placeholder="* ระบุปัญหาที่พบ (บังคับ)" class="w-full px-3 py-2 rounded-lg border border-red-300 bg-white focus:border-red-500 outline-none resize-none"></textarea>
+                 
+                 <div>
+                   <label class="text-xs text-red-700 font-semibold block mb-1"><i class="fas fa-calendar-times mr-1"></i> กำหนดวันแก้ไขเสร็จ (Due Date) *</label>
+                   <input type="date" id="duedate_${qKey}" name="duedate_${qKey}" class="w-full px-3 py-2 rounded-lg border border-red-300 bg-white focus:border-red-500 outline-none">
+                 </div>
 
-              <!-- ส่วนกล้องถ่ายรูป -->
-              <div class="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <div id="preview-container_${qKey}" class="flex flex-wrap gap-2 mb-3"></div>
-                <div id="camera-placeholder_${qKey}" class="flex gap-3">
-                  <button type="button" onclick="document.getElementById('fileInputCam_${qKey}').click()" class="flex-1 py-3 px-4 rounded-xl border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 transition text-center">
-                    <i class="fas fa-camera text-primary text-lg"></i><p class="text-xs text-gray-500 font-semibold mt-1">ถ่ายรูป</p>
-                  </button>
-                </div>
-                <input type="file" id="fileInputCam_${qKey}" accept="image/*" capture="environment" class="hidden" onchange="pv(this, '${qKey}')">
+                 <div class="pt-2">
+                   <div id="preview_${qKey}" class="flex flex-wrap gap-2 mb-2"></div>
+                   <button type="button" onclick="document.getElementById('file_${qKey}').click()" class="w-full py-2 px-4 rounded-lg border-2 border-dashed border-red-300 bg-white text-red-600 font-semibold text-sm hover:bg-red-100 transition">
+                     <i class="fas fa-camera mr-1"></i> แนบรูปภาพปัญหา
+                   </button>
+                   <input type="file" id="file_${qKey}" accept="image/*" capture="environment" class="hidden" onchange="processImage(this, '${qKey}')">
+                 </div>
               </div>
-            </div>
-          `;
+            </div>`;
         });
-        card.innerHTML = htmlStr;
-        container.appendChild(card);
+        cardHtml += `</div>`;
+        html += cardHtml;
       });
+
+      container.innerHTML = html;
+      submitBtn.disabled = false;
+      submitBtn.className = "w-full bg-gradient-to-r from-primary to-primary-dark text-white font-semibold py-4 px-6 rounded-2xl shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all";
     }
 
-    // (เก็บฟังก์ชัน pv(), removeImg(), renderPhotos() ของเดิมไว้ตรงนี้ได้เลย เพราะทำงานเกี่ยวกับการแปลงรูปภาพเป็น base64 เหมือนเดิม)
-    // ... โค้ดแปลงรูป ...
-
-    function showLoading(show, text = 'กำลังประมวลผล...') {
-      const el = document.getElementById('loading');
-      if (show) {
-        el.querySelector('p').innerText = text;
-        el.classList.remove('hidden'); el.classList.add('flex');
+    function toggleBad(qKey, isBad) {
+      const group = document.getElementById(`bad_group_${qKey}`);
+      const remark = document.getElementById(`remark_${qKey}`);
+      const duedate = document.getElementById(`duedate_${qKey}`);
+      if(isBad) {
+        group.classList.remove('hidden');
+        remark.required = true;
+        duedate.required = true;
       } else {
-        el.classList.add('hidden'); el.classList.remove('flex');
+        group.classList.add('hidden');
+        remark.required = false; remark.value = '';
+        duedate.required = false; duedate.value = '';
       }
     }
 
-    // 4. ตอน Submit ส่งแบบ Dynamic ไปหา Backend
+    function processImage(input, qKey) {
+      if (input.files && input.files[0]) {
+        if(imgB64[qKey].length >= 3) { Swal.fire('จำกัด', 'ใส่รูปได้สูงสุด 3 รูปต่อข้อ', 'warning'); return; }
+        const loading = document.getElementById('loading');
+        loading.classList.remove('hidden'); loading.classList.add('flex');
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800; 
+            let width = img.width, height = img.height;
+            if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+            canvas.width = width; canvas.height = height;
+            canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+            
+            imgB64[qKey].push(canvas.toDataURL("image/jpeg", 0.7));
+            renderPreview(qKey);
+            loading.classList.add('hidden'); loading.classList.remove('flex');
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function renderPreview(qKey) {
+      const container = document.getElementById(`preview_${qKey}`);
+      container.innerHTML = '';
+      imgB64[qKey].forEach((b64, idx) => {
+        container.innerHTML += `<div class="relative w-16 h-16"><img src="${b64}" class="w-full h-full object-cover rounded-lg border border-red-200"><div onclick="removeImg('${qKey}', ${idx})" class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer border border-white"><i class="fas fa-times"></i></div></div>`;
+      });
+      document.getElementById(`file_${qKey}`).value = '';
+    }
+    function removeImg(qKey, idx) { imgB64[qKey].splice(idx, 1); renderPreview(qKey); }
+
     document.getElementById('inspectionForm').onsubmit = function(e) {
       e.preventDefault();
-      var fd = new FormData(this);
+      const fd = new FormData(this);
       
-      var fdDetails = {};
-      for (var pair of fd.entries()) { fdDetails[pair[0]] = pair[1]; }
-      
-      var flatImages = {};
-      // วนลูปเอารูปภาพแพ็คใส่ Object (ใช้ Logic เดิมของคุณ)
-      // ... 
-      
-      var payload = {
-        action: "submitDynamic", // ส่ง action ใหม่ให้ backend รู้วิธีจัดการ
+      let answers = [];
+      let flatImages = {};
+      let imgCounter = 0;
+
+      // รวบรวมคำตอบและแยกรูป
+      currentSections.forEach((sec, sIdx) => {
+        sec.qs.forEach((qText, qIdx) => {
+          let qKey = `sec${sIdx}_q${qIdx}`;
+          let status = fd.get(qKey);
+          if(!status) return;
+
+          let remark = fd.get(`remark_${qKey}`) || "";
+          let dueDate = fd.get(`duedate_${qKey}`) || "";
+          let picKey = "";
+
+          // ถ้ารูปมีให้สร้างคีย์อ้างอิง
+          if(imgB64[qKey] && imgB64[qKey].length > 0) {
+            picKey = `img_${imgCounter}`;
+            flatImages[picKey] = imgB64[qKey][0]; // ส่งรูปแรกไปสร้าง Action Plan
+            imgCounter++;
+          }
+
+          answers.push({ section: sec.title, question: qText, status: status, remark: remark, dueDate: dueDate, picKey: picKey });
+        });
+      });
+
+      const payload = {
+        action: "submit_v2",
         inspector: fd.get('inspector'),
+        type: fd.get('type'),
         area: fd.get('area'),
-        checklist_type: fd.get('checklist_type'),
-        details: fdDetails,
+        answers: answers,
         images: flatImages
       };
 
-      showLoading(true, "กำลังบันทึกข้อมูล...");
-      fetch(API_URL, {
-        method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload)
-      })
-      .then(r => r.json())
+      const loading = document.getElementById('loading');
+      loading.classList.remove('hidden'); loading.classList.add('flex');
+      
+      fetch(API_URL, { method: "POST", body: JSON.stringify(payload), headers: { "Content-Type": "text/plain" } })
+      .then(res => res.json())
       .then(res => {
-        showLoading(false);
-        if (res.status === 'success') {
-           Swal.fire({ icon: 'success', title: 'ส่งรายงานสำเร็จ' }).then(() => window.location.reload());
-        }
+        loading.classList.add('hidden'); loading.classList.remove('flex');
+        if(res.status === 'success') {
+          Swal.fire({ icon: 'success', title: 'ส่งรายงานสำเร็จ!', text: 'ข้อมูลถูกบันทึกลงระบบเรียบร้อยแล้ว' }).then(() => window.location.reload());
+        } else { Swal.fire('ผิดพลาด', res.message, 'error'); }
+      }).catch(() => {
+        loading.classList.add('hidden'); loading.classList.remove('flex');
+        Swal.fire('เชื่อมต่อล้มเหลว', 'โปรดตรวจสอบอินเทอร์เน็ต', 'error');
       });
     };
   </script>
