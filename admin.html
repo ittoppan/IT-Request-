@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🔧 Admin - SAFETY PATROL</title>
   
-  <!-- CDN Libraries -->
+  <!-- Tailwind CSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -28,6 +28,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <!-- SweetAlert2 Custom Style -->
+  <style>
+    .swal2-popup { font-family: 'Prompt', sans-serif !important; border-radius: 1rem !important; }
+    .swal2-title { font-size: 1.25rem !important; font-weight: 600 !important; }
+    .swal2-confirm { border-radius: 0.75rem !important; font-weight: 500 !important; }
+  </style>
 </head>
 <body class="font-prompt bg-gray-100">
 
@@ -56,7 +63,7 @@
     </div>
   </div>
 
-  <!-- Sidebar (Desktop) / Bottom Nav (Mobile) -->
+  <!-- Sidebar -->
   <aside class="fixed md:static top-0 left-0 w-64 md:h-screen bg-sidebar text-white z-40 transform -translate-x-full md:translate-x-0 transition-transform" id="sidebar">
     <div class="p-5">
       <h3 class="text-lg font-semibold border-b border-gray-600 pb-4 mb-4">🔧 Admin Panel</h3>
@@ -246,26 +253,28 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
-    let configData = {};
-    let currentTab = 'types';
+    // ✅ API_URL - แก้เป็นของคุณที่นี่
+    var API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
+    
+    var configData = {};
+    var currentTab = 'types';
 
-    // === Auth ===
+    // === Auth Functions ===
     function checkAuth() {
-      const token = localStorage.getItem('adminToken');
+      var token = localStorage.getItem('adminToken');
       if (!token) {
-        document.getElementById('authModal')!.classList.remove('hidden');
+        document.getElementById('authModal').classList.remove('hidden');
       } else {
-        document.getElementById('authModal')!.classList.add('hidden');
+        document.getElementById('authModal').classList.add('hidden');
         loadConfig();
       }
     }
 
     function submitAuth() {
-      const token = document.getElementById('adminTokenInput')!.value;
+      var token = document.getElementById('adminTokenInput').value;
       if (token) {
         localStorage.setItem('adminToken', token);
-        document.getElementById('authModal')!.classList.add('hidden');
+        document.getElementById('authModal').classList.add('hidden');
         loadConfig();
       } else {
         Swal.fire({ icon: 'warning', title: 'กรุณากรอก Token', confirmButtonColor: '#3498db' });
@@ -273,7 +282,7 @@
     }
 
     function cancelAuth() {
-      document.getElementById('adminTokenInput')!.value = '';
+      document.getElementById('adminTokenInput').value = '';
     }
 
     function logout() {
@@ -283,14 +292,19 @@
 
     // === Load Data ===
     function loadConfig() {
-      document.getElementById('loading')!.classList.remove('hidden');
-      document.getElementById('loading')!.classList.add('flex');
+      var loading = document.getElementById('loading');
+      if (loading) {
+        loading.classList.remove('hidden');
+        loading.classList.add('flex');
+      }
       
       fetch(API_URL + "?action=getConfig")
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('loading')!.classList.add('hidden');
-          document.getElementById('loading')!.classList.remove('flex');
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (loading) {
+            loading.classList.add('hidden');
+            loading.classList.remove('flex');
+          }
           
           if (data.status === 'success') {
             configData = data;
@@ -300,41 +314,57 @@
             Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: data.message, confirmButtonColor: '#e74c3c' });
           }
         })
-        .catch(err => {
-          document.getElementById('loading')!.classList.add('hidden');
-          document.getElementById('loading')!.classList.remove('flex');
+        .catch(function(err) {
+          if (loading) {
+            loading.classList.add('hidden');
+            loading.classList.remove('flex');
+          }
           Swal.fire({ icon: 'error', title: 'เชื่อมต่อล้มเหลว', text: 'ตรวจสอบ URL หรืออินเทอร์เน็ต', confirmButtonColor: '#e74c3c' });
         });
     }
 
     function populateFilters() {
-      const typeOptions = (configData.types || [])
-        .filter(t => t.is_active === 'TRUE')
-        .map(t => `<option value="${t.id}">${t.name_th}</option>`)
-        .join('');
+      var typeOptions = '';
+      var types = configData.types || [];
+      for (var i = 0; i < types.length; i++) {
+        if (types[i].is_active === 'TRUE') {
+          typeOptions += '<option value="' + types[i].id + '">' + types[i].name_th + '</option>';
+        }
+      }
       
-      ['filterSectionType', 'filterQType'].forEach(id => {
-        const el = document.getElementById(id);
+      var filterIds = ['filterSectionType', 'filterQType'];
+      for (var j = 0; j < filterIds.length; j++) {
+        var el = document.getElementById(filterIds[j]);
         if (el) el.innerHTML = '<option value="">ทั้งหมด</option>' + typeOptions;
-      });
+      }
     }
 
     // === Tab Navigation ===
     function showTab(tab) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-primary/20'));
+      var tabs = document.querySelectorAll('.tab-content');
+      for (var i = 0; i < tabs.length; i++) {
+        tabs[i].classList.add('hidden');
+      }
       
-      document.getElementById('tab-' + tab)!.classList.remove('hidden');
+      var navItems = document.querySelectorAll('.nav-item');
+      for (var i = 0; i < navItems.length; i++) {
+        navItems[i].classList.remove('bg-primary/20');
+      }
+      
+      var currentTabEl = document.getElementById('tab-' + tab);
+      if (currentTabEl) currentTabEl.classList.remove('hidden');
+      
       event.currentTarget.classList.add('bg-primary/20');
       currentTab = tab;
       
-      const titles = {
+      var titles = {
         'types': 'จัดการประเภทเช็คลิสต์',
         'areas': 'จัดการพื้นที่/แผนก',
         'sections': 'จัดการหัวข้อหลัก',
         'questions': 'จัดการคำถาม'
       };
-      document.getElementById('pageTitle')!.innerText = titles[tab];
+      var pageTitle = document.getElementById('pageTitle');
+      if (pageTitle) pageTitle.innerText = titles[tab];
       
       if (tab === 'types') renderTypes();
       else if (tab === 'areas') renderAreas();
@@ -342,11 +372,13 @@
       else if (tab === 'questions') renderQuestions();
       
       // Close mobile sidebar
-      document.getElementById('sidebar')!.classList.add('-translate-x-full');
+      var sidebar = document.getElementById('sidebar');
+      if (sidebar) sidebar.classList.add('-translate-x-full');
     }
 
     function toggleSidebar() {
-      document.getElementById('sidebar')!.classList.toggle('-translate-x-full');
+      var sidebar = document.getElementById('sidebar');
+      if (sidebar) sidebar.classList.toggle('-translate-x-full');
     }
 
     // === Render Functions ===
@@ -358,165 +390,214 @@
     }
 
     function renderTypes() {
-      const tbody = document.getElementById('typesTable');
-      const types = configData.types || [];
+      var tbody = document.getElementById('typesTable');
+      if (!tbody) return;
       
-      tbody!.innerHTML = types.filter(t => t.is_active !== undefined)
-        .map(t => `
-          <tr class="hover:bg-gray-50">
-            <td class="py-4 px-5"><strong class="text-gray-800">${t.name_th}</strong></td>
-            <td class="py-4 px-5 text-gray-600 hidden md:table-cell">${t.name_en || '-'}</td>
-            <td class="py-4 px-5">
-              <span class="px-3 py-1 rounded-full text-xs font-semibold ${t.is_active==='TRUE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
-                ${t.is_active==='TRUE' ? '✅ ใช้งาน' : '❌ ปิด'}
-              </span>
-            </td>
-            <td class="py-4 px-5">
-              <div class="flex gap-2">
-                <button onclick="editItem('Config_Types', ${t.id})" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="deleteItem('Config_Types', ${t.id})" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        `).join('') || '<tr><td colspan="4" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
+      var types = configData.types || [];
+      var html = '';
+      
+      for (var i = 0; i < types.length; i++) {
+        var t = types[i];
+        if (t.is_active === undefined) continue;
+        
+        var statusBadge = t.is_active === 'TRUE' 
+          ? '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">✅ ใช้งาน</span>'
+          : '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">❌ ปิด</span>';
+        
+        html += '<tr class="hover:bg-gray-50">' +
+          '<td class="py-4 px-5"><strong class="text-gray-800">' + t.name_th + '</strong></td>' +
+          '<td class="py-4 px-5 text-gray-600 hidden md:table-cell">' + (t.name_en || '-') + '</td>' +
+          '<td class="py-4 px-5">' + statusBadge + '</td>' +
+          '<td class="py-4 px-5">' +
+            '<div class="flex gap-2">' +
+              '<button onclick="editItem(\'Config_Types\', ' + t.id + ')" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition"><i class="fas fa-edit"></i></button>' +
+              '<button onclick="deleteItem(\'Config_Types\', ' + t.id + ')" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+          '</td>' +
+        '</tr>';
+      }
+      
+      tbody.innerHTML = html || '<tr><td colspan="4" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
     }
 
     function renderAreas() {
-      const tbody = document.getElementById('areasTable');
-      const areas = configData.areas || [];
+      var tbody = document.getElementById('areasTable');
+      if (!tbody) return;
       
-      tbody!.innerHTML = areas.map(a => {
-        let typesHtml = 'ทั้งหมด';
+      var areas = configData.areas || [];
+      var html = '';
+      
+      for (var i = 0; i < areas.length; i++) {
+        var a = areas[i];
+        var typesHtml = 'ทั้งหมด';
+        
         if (a.applicable_types) {
-          typesHtml = a.applicable_types.split(',').map(id => {
-            const t = (configData.types||[]).find(x => x.id == id);
-            return t ? `<span class="px-2 py-1 rounded-lg text-xs bg-blue-100 text-blue-700 mr-1">${t.name_th}</span>` : '';
-          }).join('');
+          var typeIds = a.applicable_types.split(',');
+          typesHtml = '';
+          for (var j = 0; j < typeIds.length; j++) {
+            var t = findInArray(configData.types || [], 'id', typeIds[j]);
+            if (t) {
+              typesHtml += '<span class="px-2 py-1 rounded-lg text-xs bg-blue-100 text-blue-700 mr-1">' + t.name_th + '</span>';
+            }
+          }
         }
-        return `
-          <tr class="hover:bg-gray-50">
-            <td class="py-4 px-5"><strong class="text-gray-800">${a.area_name}</strong></td>
-            <td class="py-4 px-5 text-gray-600 hidden md:table-cell">${a.department || '-'}</td>
-            <td class="py-4 px-5 hidden lg:table-cell">${typesHtml}</td>
-            <td class="py-4 px-5">
-              <span class="px-3 py-1 rounded-full text-xs font-semibold ${a.is_active==='TRUE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
-                ${a.is_active==='TRUE' ? '✅' : '❌'}
-              </span>
-            </td>
-            <td class="py-4 px-5">
-              <div class="flex gap-2">
-                <button onclick="editItem('Config_Areas', ${a.id})" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="deleteItem('Config_Areas', ${a.id})" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('') || '<tr><td colspan="5" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
+        
+        var statusBadge = a.is_active === 'TRUE' 
+          ? '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">✅</span>'
+          : '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">❌</span>';
+        
+        html += '<tr class="hover:bg-gray-50">' +
+          '<td class="py-4 px-5"><strong class="text-gray-800">' + a.area_name + '</strong></td>' +
+          '<td class="py-4 px-5 text-gray-600 hidden md:table-cell">' + (a.department || '-') + '</td>' +
+          '<td class="py-4 px-5 hidden lg:table-cell">' + typesHtml + '</td>' +
+          '<td class="py-4 px-5">' + statusBadge + '</td>' +
+          '<td class="py-4 px-5">' +
+            '<div class="flex gap-2">' +
+              '<button onclick="editItem(\'Config_Areas\', ' + a.id + ')" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition"><i class="fas fa-edit"></i></button>' +
+              '<button onclick="deleteItem(\'Config_Areas\', ' + a.id + ')" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+          '</td>' +
+        '</tr>';
+      }
+      
+      tbody.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
     }
 
     function renderSections() {
-      const typeFilter = document.getElementById('filterSectionType')?.value;
-      const tbody = document.getElementById('sectionsTable');
+      var typeFilter = document.getElementById('filterSectionType');
+      var filterVal = typeFilter ? typeFilter.value : '';
+      var tbody = document.getElementById('sectionsTable');
+      if (!tbody) return;
       
-      let sections = (configData.sections || []).filter(s => s.is_active === 'TRUE');
-      if (typeFilter) sections = sections.filter(s => s.type_id == typeFilter);
-      sections.sort((a,b) => (a.order||0) - (b.order||0));
+      var sections = filterArray(configData.sections || [], function(s) { return s.is_active === 'TRUE'; });
+      if (filterVal) {
+        sections = filterArray(sections, function(s) { return s.type_id == filterVal; });
+      }
+      sections.sort(function(a,b) { return (a.order||0) - (b.order||0); });
       
-      tbody!.innerHTML = sections.map(s => {
-        const typeName = (configData.types||[]).find(t => t.id == s.type_id)?.name_th || s.type_id;
-        return `
-          <tr class="hover:bg-gray-50">
-            <td class="py-4 px-5 hidden md:table-cell">
-              <span class="px-3 py-1 rounded-lg text-xs bg-blue-100 text-blue-700">${typeName}</span>
-            </td>
-            <td class="py-4 px-5 text-gray-600">${s.order || '-'}</td>
-            <td class="py-4 px-5"><strong class="text-gray-800">${s.title_th}</strong></td>
-            <td class="py-4 px-5 hidden md:table-cell">${s.is_required==='TRUE' ? '✅' : '-'}</td>
-            <td class="py-4 px-5">
-              <div class="flex gap-2">
-                <button onclick="editItem('Config_Sections', ${s.id})" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="deleteItem('Config_Sections', ${s.id})" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('') || '<tr><td colspan="5" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
+      var html = '';
+      for (var i = 0; i < sections.length; i++) {
+        var s = sections[i];
+        var type = findInArray(configData.types || [], 'id', s.type_id);
+        var typeName = type ? type.name_th : s.type_id;
+        
+        html += '<tr class="hover:bg-gray-50">' +
+          '<td class="py-4 px-5 hidden md:table-cell"><span class="px-3 py-1 rounded-lg text-xs bg-blue-100 text-blue-700">' + typeName + '</span></td>' +
+          '<td class="py-4 px-5 text-gray-600">' + (s.order || '-') + '</td>' +
+          '<td class="py-4 px-5"><strong class="text-gray-800">' + s.title_th + '</strong></td>' +
+          '<td class="py-4 px-5 hidden md:table-cell">' + (s.is_required === 'TRUE' ? '✅' : '-') + '</td>' +
+          '<td class="py-4 px-5">' +
+            '<div class="flex gap-2">' +
+              '<button onclick="editItem(\'Config_Sections\', ' + s.id + ')" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition"><i class="fas fa-edit"></i></button>' +
+              '<button onclick="deleteItem(\'Config_Sections\', ' + s.id + ')" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+          '</td>' +
+        '</tr>';
+      }
+      
+      tbody.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
     }
 
     function renderQuestions() {
-      const typeFilter = document.getElementById('filterQType')?.value;
-      const sectionFilter = document.getElementById('filterQSection')?.value;
-      const tbody = document.getElementById('questionsTable');
+      var typeFilterEl = document.getElementById('filterQType');
+      var sectionFilterEl = document.getElementById('filterQSection');
+      var typeFilter = typeFilterEl ? typeFilterEl.value : '';
+      var sectionFilter = sectionFilterEl ? sectionFilterEl.value : '';
+      var tbody = document.getElementById('questionsTable');
+      if (!tbody) return;
       
-      let questions = (configData.questions || []).filter(q => q.is_active === 'TRUE');
+      var questions = filterArray(configData.questions || [], function(q) { return q.is_active === 'TRUE'; });
       
       if (typeFilter) {
-        const sectionIds = (configData.sections||[])
-          .filter(s => s.type_id == typeFilter)
-          .map(s => s.id);
-        questions = questions.filter(q => sectionIds.includes(q.section_id));
+        var sectionIds = mapArray(
+          filterArray(configData.sections || [], function(s) { return s.type_id == typeFilter; }),
+          function(s) { return s.id; }
+        );
+        questions = filterArray(questions, function(q) { return sectionIds.indexOf(q.section_id) >= 0; });
       }
       if (sectionFilter) {
-        questions = questions.filter(q => q.section_id == sectionFilter);
+        questions = filterArray(questions, function(q) { return q.section_id == sectionFilter; });
       }
-      questions.sort((a,b) => (a.order||0) - (b.order||0));
+      questions.sort(function(a,b) { return (a.order||0) - (b.order||0); });
       
-      tbody!.innerHTML = questions.map(q => {
-        const section = (configData.sections||[]).find(s => s.id == q.section_id);
-        return `
-          <tr class="hover:bg-gray-50">
-            <td class="py-4 px-5 hidden md:table-cell"><small class="text-gray-500">${section?.title_th || '-'}</small></td>
-            <td class="py-4 px-5 text-gray-800">${q.question_th}</td>
-            <td class="py-4 px-5 hidden lg:table-cell">
-              <span class="px-3 py-1 rounded-lg text-xs bg-purple-100 text-purple-700">${q.answer_type}</span>
-            </td>
-            <td class="py-4 px-5 hidden md:table-cell">${q.has_duedate==='TRUE' ? '✅' : '-'}</td>
-            <td class="py-4 px-5">
-              <div class="flex gap-2">
-                <button onclick="editItem('Config_Questions', ${q.id})" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="deleteItem('Config_Questions', ${q.id})" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('') || '<tr><td colspan="5" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
+      var html = '';
+      for (var i = 0; i < questions.length; i++) {
+        var q = questions[i];
+        var section = findInArray(configData.sections || [], 'id', q.section_id);
+        
+        html += '<tr class="hover:bg-gray-50">' +
+          '<td class="py-4 px-5 hidden md:table-cell"><small class="text-gray-500">' + (section ? section.title_th : '-') + '</small></td>' +
+          '<td class="py-4 px-5 text-gray-800">' + q.question_th + '</td>' +
+          '<td class="py-4 px-5 hidden lg:table-cell"><span class="px-3 py-1 rounded-lg text-xs bg-purple-100 text-purple-700">' + q.answer_type + '</span></td>' +
+          '<td class="py-4 px-5 hidden md:table-cell">' + (q.has_duedate === 'TRUE' ? '✅' : '-') + '</td>' +
+          '<td class="py-4 px-5">' +
+            '<div class="flex gap-2">' +
+              '<button onclick="editItem(\'Config_Questions\', ' + q.id + ')" class="p-2 rounded-lg hover:bg-warning/10 text-warning transition"><i class="fas fa-edit"></i></button>' +
+              '<button onclick="deleteItem(\'Config_Questions\', ' + q.id + ')" class="p-2 rounded-lg hover:bg-danger/10 text-danger transition"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+          '</td>' +
+        '</tr>';
+      }
+      
+      tbody.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
+    }
+
+    // === Helper Functions ===
+    function findInArray(arr, key, value) {
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i][key] == value) return arr[i];
+      }
+      return null;
+    }
+
+    function filterArray(arr, predicate) {
+      var result = [];
+      for (var i = 0; i < arr.length; i++) {
+        if (predicate(arr[i])) result.push(arr[i]);
+      }
+      return result;
+    }
+
+    function mapArray(arr, fn) {
+      var result = [];
+      for (var i = 0; i < arr.length; i++) {
+        result.push(fn(arr[i]));
+      }
+      return result;
     }
 
     // === Modal & Form ===
     function openModal(mode, sheetName, id) {
       sheetName = sheetName || getSheetByTab(currentTab);
-      document.getElementById('modal')!.classList.remove('hidden');
-      document.getElementById('modal')!.classList.add('flex');
-      document.getElementById('modalTitle')!.innerText = mode === 'add' ? '➕ เพิ่มใหม่' : '✏️ แก้ไข';
-      document.getElementById('editId')!.value = id || '';
-      document.getElementById('currentSheet')!.value = sheetName;
+      var modal = document.getElementById('modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+      
+      var modalTitle = document.getElementById('modalTitle');
+      if (modalTitle) modalTitle.innerText = mode === 'add' ? '➕ เพิ่มใหม่' : '✏️ แก้ไข';
+      
+      var editId = document.getElementById('editId');
+      var currentSheet = document.getElementById('currentSheet');
+      if (editId) editId.value = id || '';
+      if (currentSheet) currentSheet.value = sheetName;
+      
       generateFormFields(sheetName, id);
     }
 
     function closeModal() {
-      document.getElementById('modal')!.classList.add('hidden');
-      document.getElementById('modal')!.classList.remove('flex');
-      document.getElementById('configForm')!.reset();
+      var modal = document.getElementById('modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+      var form = document.getElementById('configForm');
+      if (form) form.reset();
     }
 
     function getSheetByTab(tab) {
-      const map = {
+      var map = {
         'types': 'Config_Types',
         'areas': 'Config_Areas',
         'sections': 'Config_Sections',
@@ -526,16 +607,19 @@
     }
 
     function generateFormFields(sheetName, editId) {
-      const container = document.getElementById('formFields');
-      let fields = [];
-      let existingData = {};
+      var container = document.getElementById('formFields');
+      if (!container) return;
       
+      var fields = [];
+      var existingData = {};
+      
+      // Load existing data if editing
       if (editId) {
-        const key = sheetName.replace('Config_', '').toLowerCase() + 's';
-        const list = configData[key] || [];
-        for (let item of list) {
-          if (item.id == editId) {
-            existingData = item;
+        var key = sheetName.replace('Config_', '').toLowerCase() + 's';
+        var list = configData[key] || [];
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].id == editId) {
+            existingData = list[i];
             break;
           }
         }
@@ -581,100 +665,114 @@
         ];
       }
       
-      let html = '';
-      for (let f of fields) {
-        const val = existingData[f.name] !== undefined ? existingData[f.name] : '';
+      var html = '';
+      for (var i = 0; i < fields.length; i++) {
+        var f = fields[i];
+        var val = existingData[f.name] !== undefined ? existingData[f.name] : '';
         
         if (f.type === 'select') {
-          let optionsHtml = '';
+          var optionsHtml = '';
           if (f.options && Array.isArray(f.options)) {
-            for (let opt of f.options) {
-              const selected = (val == opt[0]) ? 'selected' : '';
-              optionsHtml += `<option value="${opt[0]}" ${selected}>${opt[1]}</option>`;
+            for (var j = 0; j < f.options.length; j++) {
+              var opt = f.options[j];
+              var selected = (val == opt[0]) ? 'selected' : '';
+              optionsHtml += '<option value="' + opt[0] + '" ' + selected + '>' + opt[1] + '</option>';
             }
           }
-          html += `
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">${f.label}</label>
-              <select name="${f.name}" ${f.required ? 'required' : ''}
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none">
-                ${optionsHtml}
-              </select>
-            </div>
-          `;
+          html += '<div>' +
+            '<label class="block text-sm font-medium text-gray-700 mb-2">' + f.label + '</label>' +
+            '<select name="' + f.name + '" ' + (f.required ? 'required' : '') +
+              ' class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none">' +
+              optionsHtml +
+            '</select>' +
+          '</div>';
         } else if (f.type === 'textarea') {
-          html += `
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">${f.label}</label>
-              <textarea name="${f.name}" rows="3" ${f.required ? 'required' : ''}
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none resize-none">${val || ''}</textarea>
-            </div>
-          `;
+          html += '<div>' +
+            '<label class="block text-sm font-medium text-gray-700 mb-2">' + f.label + '</label>' +
+            '<textarea name="' + f.name + '" rows="3" ' + (f.required ? 'required' : '') +
+              ' class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none resize-none">' + (val || '') + '</textarea>' +
+          '</div>';
         } else {
-          html += `
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">${f.label}</label>
-              <input type="${f.type}" name="${f.name}" value="${val || ''}" ${f.required ? 'required' : ''} placeholder="${f.placeholder || ''}"
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none">
-            </div>
-          `;
+          html += '<div>' +
+            '<label class="block text-sm font-medium text-gray-700 mb-2">' + f.label + '</label>' +
+            '<input type="' + f.type + '" name="' + f.name + '" value="' + (val || '') + '" ' + (f.required ? 'required' : '') + ' placeholder="' + (f.placeholder || '') + '"' +
+              ' class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary outline-none">' +
+          '</div>';
         }
       }
-      container!.innerHTML = html;
+      container.innerHTML = html;
     }
 
     function getActiveTypes() {
-      return (configData.types || []).filter(t => t.is_active === 'TRUE')
-        .map(t => [t.id, t.name_th]);
+      var result = [];
+      var types = configData.types || [];
+      for (var i = 0; i < types.length; i++) {
+        if (types[i].is_active === 'TRUE') {
+          result.push([types[i].id, types[i].name_th]);
+        }
+      }
+      return result;
     }
 
     function getActiveSections() {
-      return (configData.sections || []).filter(s => s.is_active === 'TRUE')
-        .map(s => [s.id, s.title_th]);
+      var result = [];
+      var sections = configData.sections || [];
+      for (var i = 0; i < sections.length; i++) {
+        if (sections[i].is_active === 'TRUE') {
+          result.push([sections[i].id, sections[i].title_th]);
+        }
+      }
+      return result;
     }
 
     // === CRUD Operations ===
-    document.getElementById('configForm')!.onsubmit = function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      const data = {};
-      for (const [key, value] of formData.entries()) {
-        data[key] = value;
-      }
-      
-      const payload = {
-        action: document.getElementById('editId')!.value ? 'update' : 'create',
-        sheetName: document.getElementById('currentSheet')!.value,
-        data: data,
-        id: document.getElementById('editId')!.value || null,
-        adminToken: localStorage.getItem('adminToken')
-      };
-      
-      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), confirmButtonColor: '#3498db' });
-      
-      fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: { 'Content-Type': 'text/plain' }
-      })
-      .then(res => res.json())
-      .then(result => {
-        Swal.close();
-        if (result.status === 'success') {
-          Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: result.message, confirmButtonColor: '#27ae60' })
-            .then(() => { closeModal(); loadConfig(); });
-        } else {
-          Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: result.message, confirmButtonColor: '#e74c3c' });
+    var configForm = document.getElementById('configForm');
+    if (configForm) {
+      configForm.onsubmit = function(e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        var data = {};
+        for (var pair of formData.entries()) {
+          data[pair[0]] = pair[1];
         }
-      })
-      .catch(err => {
-        Swal.close();
-        Swal.fire({ icon: 'error', title: 'เชื่อมต่อล้มเหลว', text: 'โปรดตรวจสอบอินเทอร์เน็ต', confirmButtonColor: '#e74c3c' });
-      });
-    };
+        
+        var editIdEl = document.getElementById('editId');
+        var currentSheetEl = document.getElementById('currentSheet');
+        
+        var payload = {
+          action: editIdEl && editIdEl.value ? 'update' : 'create',
+          sheetName: currentSheetEl ? currentSheetEl.value : '',
+          data: data,
+          id: editIdEl ? editIdEl.value : null,
+          adminToken: localStorage.getItem('adminToken')
+        };
+        
+        Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); }, confirmButtonColor: '#3498db' });
+        
+        fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'text/plain' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(result) {
+          Swal.close();
+          if (result.status === 'success') {
+            Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: result.message, confirmButtonColor: '#27ae60' })
+              .then(function() { closeModal(); loadConfig(); });
+          } else {
+            Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: result.message, confirmButtonColor: '#e74c3c' });
+          }
+        })
+        .catch(function(err) {
+          Swal.close();
+          Swal.fire({ icon: 'error', title: 'เชื่อมต่อล้มเหลว', text: 'โปรดตรวจสอบอินเทอร์เน็ต', confirmButtonColor: '#e74c3c' });
+        });
+      };
+    }
 
     function editItem(sheetName, id) {
-      const tabMap = {
+      var tabMap = {
         'Config_Types': 'types',
         'Config_Areas': 'areas',
         'Config_Sections': 'sections',
@@ -695,7 +793,7 @@
         cancelButtonText: '❌ ยกเลิก',
         confirmButtonColor: '#e74c3c',
         cancelButtonColor: '#95a5a6'
-      }).then((result) => {
+      }).then(function(result) {
         if (result.isConfirmed) {
           fetch(API_URL, {
             method: 'POST',
@@ -707,11 +805,11 @@
             }),
             headers: { 'Content-Type': 'text/plain' }
           })
-          .then(res => res.json())
-          .then(result => {
+          .then(function(res) { return res.json(); })
+          .then(function(result) {
             if (result.status === 'success') {
               Swal.fire({ icon: 'success', title: 'ลบสำเร็จ!', text: '', confirmButtonColor: '#27ae60' })
-                .then(() => loadConfig());
+                .then(function() { loadConfig(); });
             } else {
               Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: result.message, confirmButtonColor: '#e74c3c' });
             }
