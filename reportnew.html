@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SAFETY PATROL REPORT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { 
+      font-family: 'Sarabun', sans-serif; 
+      margin: 0; 
+      padding: 20px; 
+      background: #f0f2f5; 
+      color: #333; 
+      -webkit-tap-highlight-color: transparent;
+    }
+    .report-container { 
+      background: white; 
+      padding: 20px; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+      overflow-x: auto; 
+      border-radius: 12px; 
+    }
+    
+    /* ส่วนหัวรายงาน */
+    .header-table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-bottom: 15px; 
+    }
+    .header-table td { 
+      border: 1px solid #ddd; 
+      padding: 10px; 
+      text-align: center; 
+      font-weight: bold; 
+    }
+    .logo { 
+      width: 120px; 
+    }
+    
+    /* ตารางหลัก */
+    .main-table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      font-size: 13px; 
+      min-width: 1500px; 
+      margin-top: 15px; 
+    }
+    .main-table th { 
+      background: #2c3e50; 
+      color: white; 
+      border: 1px solid #2c3e50; 
+      padding: 12px 8px; 
+      text-align: center; 
+      white-space: nowrap; 
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .main-table td { 
+      border: 1px solid #ddd; 
+      padding: 10px 5px; 
+      vertical-align: middle; 
+      text-align: center; 
+    }
+    .main-table tr:nth-child(even) { 
+      background-color: #fcfcfc; 
+    }
+    
+    .img-box { 
+      width: 120px; 
+      height: 90px; 
+      object-fit: cover; 
+      border: 2px solid #eee; 
+      cursor: pointer; 
+      border-radius: 6px; 
+      transition: transform 0.2s; 
+      background: #fff; 
+    }
+    .img-box:hover { 
+      transform: scale(1.1); 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+      position: relative; 
+      z-index: 10; 
+    }
+    .status-open { 
+      color: #e74c3c; 
+      font-weight: bold; 
+      background: #ffebee; 
+      padding: 4px 10px; 
+      border-radius: 4px; 
+      display: inline-block; 
+      font-size: 12px; 
+    }
+    .status-closed { 
+      color: #27ae60; 
+      font-weight: bold; 
+      background: #e8f5e9; 
+      padding: 4px 10px; 
+      border-radius: 4px; 
+      display: inline-block; 
+      font-size: 12px; 
+    }
+    
+    /* ===== Nav และ Filter ===== */
+    .nav-bar { 
+      margin-bottom: 20px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      flex-wrap: wrap; 
+      gap: 15px; 
+    }
+    .btn-back { 
+      text-decoration: none; 
+      background: #34495e; 
+      color: white; 
+      padding: 10px 15px; 
+      border-radius: 8px; 
+      font-weight: bold; 
+      transition: background 0.2s; 
+      display: inline-block; 
+    }
+    .btn-back:hover { 
+      background: #2c3e50; 
+      transform: translateY(-2px);
+    }
+    
+    .filter-group { 
+      display: flex; 
+      gap: 15px; 
+      align-items: center; 
+      background: white; 
+      padding: 15px; 
+      border-radius: 10px; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+      flex-wrap: wrap; 
+      width: 100%; 
+      box-sizing: border-box; 
+    }
+    .filter-item { 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+      font-weight: bold; 
+      color: #2c3e50; 
+      flex: 1; 
+      min-width: 200px; 
+    }
+    .filter-item select, 
+    .filter-item input { 
+      padding: 8px 12px; 
+      border-radius: 6px; 
+      border: 1px solid #ddd; 
+      font-family: 'Sarabun'; 
+      font-size: 14px; 
+      outline: none; 
+      width: 100%; 
+      background: #fafafa; 
+    }
+    .filter-item select:focus, 
+    .filter-item input:focus { 
+      border-color: #f39c12; 
+      background: #fff; 
+    }
+
+    /* ===== TYPE SELECTOR (ใหม่) ===== */
+    .type-filter-section {
+      background: white;
+      border-radius: 14px;
+      padding: 15px;
+      margin: 15px 0 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .type-filter-label {
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .type-filter-label i {
+      color: #f39c12;
+    }
+    .type-selector {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .type-btn {
+      padding: 10px 6px;
+      border-radius: 12px;
+      border: 2px solid #e0e0e0;
+      background: #f8f9fa;
+      text-align: center;
+      cursor: pointer;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #666;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      min-height: 68px;
+      user-select: none;
+    }
+    .type-btn i {
+      font-size: 1.15rem;
+      transition: transform 0.2s;
+    }
+    .type-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-color: #f39c12;
+    }
+    .type-btn:active {
+      transform: scale(0.98);
+    }
+    .type-btn.active {
+      background: linear-gradient(145deg, #fff3e0, #ffe0b2);
+      color: #e67e22;
+      border-color: #e67e22;
+      box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+    }
+    .type-btn.active i {
+      transform: scale(1.1);
+      color: #e67e22;
+    }
+    /* สีเฉพาะประเภท */
+    .type-btn[data-type="5S"].active {
+      background: linear-gradient(145deg, #e8f5e9, #c8e6c9);
+      color: #27ae60;
+      border-color: #27ae60;
+      box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    }
+    .type-btn[data-type="5S"].active i { color: #27ae60; }
+    
+    .type-btn[data-type="Audit"].active {
+      background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+      color: #1565c0;
+      border-color: #1565c0;
+      box-shadow: 0 4px 15px rgba(21, 101, 192, 0.3);
+    }
+    .type-btn[data-type="Audit"].active i { color: #1565c0; }
+    
+    .type-btn[data-type="Accident/Fire"].active {
+      background: linear-gradient(145deg, #fce4ec, #f8bbd9);
+      color: #c62828;
+      border-color: #c62828;
+      box-shadow: 0 4px 15px rgba(198, 40, 40, 0.3);
+    }
+    .type-btn[data-type="Accident/Fire"].active i { color: #c62828; }
+
+    /* Badge ประเภทในตาราง */
+    .type-badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .type-badge-safety { background: linear-gradient(135deg, #f39c12, #e67e22); }
+    .type-badge-5s { background: linear-gradient(135deg, #27ae60, #219a52); }
+    .type-badge-audit { background: linear-gradient(135deg, #2980b9, #1f618d); }
+    .type-badge-acc { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
+    /* ===== Mobile Responsive ===== */
+    @media screen and (max-width: 768px) {
+      body { padding: 10px; }
+      .nav-bar { flex-direction: column; align-items: stretch; }
+      .filter-group { flex-direction: column; gap: 10px; }
+      .filter-item { flex-direction: column; align-items: flex-start; gap: 4px; width: 100%; }
+      .btn-back { text-align: center; }
+      
+      .report-container { padding: 10px; border-radius: 8px; }
+      .header-table td { display: block; width: 100%; border: none; padding: 5px; }
+      .header-table { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+      
+      /* Type Selector Mobile */
+      .type-selector { 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 6px;
+      }
+      .type-btn { 
+        font-size: 0.65rem; 
+        padding: 8px 4px; 
+        min-height: 62px;
+      }
+      .type-btn i { font-size: 1rem; }
+      
+      /* ตารางโหมดมือถือ */
+      .main-table thead { display: none; }
+      .main-table, .main-table tbody, .main-table tr, .main-table td { 
+        display: block; 
+        width: 100%; 
+        min-width: auto; 
+        box-sizing: border-box; 
+      }
+      
+      .main-table tr { 
+        margin-bottom: 15px; 
+        border: 1px solid #e1e8ed; 
+        border-radius: 10px; 
+        overflow: hidden; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+        background: #fff;
+      }
+      
+      .main-table td { 
+        text-align: left !important; 
+        padding: 12px 15px; 
+        border: none; 
+        border-bottom: 1px solid #f0f2f5; 
+        display: flex; 
+        flex-direction: column; 
+        position: relative;
+      }
+      .main-table td:last-child { border-bottom: none; }
+      
+      .main-table td::before { 
+        content: attr(data-label); 
+        font-weight: bold; 
+        color: #e67e22; 
+        margin-bottom: 6px; 
+        font-size: 12px; 
+      }
+      
+      .img-box { 
+        width: 100%; 
+        max-width: 250px; 
+        height: 150px; 
+        margin: 0 auto; 
+        display: block; 
+      }
+      
+      .type-badge {
+        font-size: 10px;
+        padding: 3px 8px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .type-selector { grid-template-columns: repeat(2, 1fr); }
+      .type-btn { font-size: 0.62rem; min-height: 58px; }
+    }
+    
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #7f8c8d;
+      font-size: 15px;
+    }
+    .loading i {
+      color: #f39c12;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nav-bar">
+    <a href="Dash.html" class="btn-back"><i class="fas fa-arrow-left"></i> กลับหน้า Dashboard</a>
+    
+    <div class="filter-group">
+      <div class="filter-item">
+        <span><i class="fas fa-calendar"></i> เดือน:</span> 
+        <input type="month" id="monthFilter" onchange="loadReport()">
+      </div>
+      <div class="filter-item">
+        <span><i class="fas fa-map-marker-alt"></i> พื้นที่:</span> 
+        <select id="areaFilter" onchange="renderTable()">
+          <option value="">-- ทั้งหมด --</option>
+          <option value="แผนก Print">แผนก Print</option>
+          <option value="แผนก Laminate">แผนก Laminate</option>
+          <option value="แผนก Solvent">แผนก Solvent</option>
+          <option value="แผนก Rewinder / Slitter / Packing">แผนก Rewinder / Slitter / Packing</option>
+          <option value="แผนก BAG MAKING">แผนก BAG MAKING</option>
+          <option value="แผนก QA & QC">แผนก QA & QC</option>
+          <option value="แผนก Warehouse">แผนก Warehouse</option>
+          <option value="Office">Office</option>
+          <option value="พื้นที่รอบบริเวณโรงงาน">พื้นที่รอบบริเวณโรงงาน</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <span><i class="fas fa-toggle-on"></i> สถานะ:</span>
+        <select id="statusFilter" onchange="renderTable()">
+          <option value="">-- ทั้งหมด --</option>
+          <option value="Open">รอดำเนินการ (Open)</option>
+          <option value="Closed">แก้ไขเสร็จสิ้น (Closed)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TYPE SELECTOR (ใหม่) ===== -->
+  <div class="type-filter-section">
+    <div class="type-filter-label">
+      <i class="fas fa-filter"></i> กรองตามประเภทการตรวจสอบ
+    </div>
+    <div class="type-selector">
+      <div class="type-btn active" data-type="all" onclick="selectTypeFilter('all', this)">
+        <i class="fas fa-list"></i>ทั้งหมด
+      </div>
+      <div class="type-btn" data-type="จป.ว" onclick="selectTypeFilter('จป.ว', this)">
+        <i class="fas fa-hard-hat"></i>จป.ว
+      </div>
+      <div class="type-btn" data-type="คปอ." onclick="selectTypeFilter('คปอ.', this)">
+        <i class="fas fa-users-cog"></i>คปอ.
+      </div>
+      <div class="type-btn" data-type="Foreman/Mgr." onclick="selectTypeFilter('Foreman/Mgr.', this)">
+        <i class="fas fa-user-tie"></i>Foreman/Mgr.
+      </div>
+      <div class="type-btn" data-type="Audit" onclick="selectTypeFilter('Audit', this)">
+        <i class="fas fa-search"></i>Audit
+      </div>
+      <div class="type-btn" data-type="Accident/Fire" onclick="selectTypeFilter('Accident/Fire', this)">
+        <i class="fas fa-fire-extinguisher"></i>Accident/Fire
+      </div>
+      <div class="type-btn" data-type="5S" onclick="selectTypeFilter('5S', this)">
+        <i class="fas fa-broom"></i>5S
+      </div>
+    </div>
+  </div>
+
+  <div class="report-container">
+    <table class="header-table">
+      <tr>
+        <td rowspan="2" style="width: 20%;">
+          <img src="https://itrequests.netlify.app/logo.png" class="logo" alt="TOPPAN" onerror="this.style.display='none'">
+        </td>
+        <td style="font-size: 18px; color: #2c3e50;"><b>รายงานการตรวจความปลอดภัย</b></td>
+        <td style="width: 20%; background: #f8f9fa;">ประจำเดือน (Monthly)</td>
+      </tr>
+      <tr>
+        <td style="color: #7f8c8d;">(SAFETY PATROL REPORT)</td>
+        <td id="displayMonth" style="color: #e67e22; font-size: 16px;">-</td>
+      </tr>
+    </table>
+
+    <table class="main-table">
+      <thead>
+        <tr>
+          <th>ลำดับ</th>
+          <th>ประเภท</th>
+          <th>รูปภาพ (Before)</th>
+          <th>รูปภาพ (After)</th>
+          <th>พื้นที่ (Area)</th>
+          <th>JOB NO.</th>
+          <th>รายละเอียดปัญหา</th>
+          <th>แนวทางการแก้ไข</th>
+          <th>ผู้รับผิดชอบ</th>
+          <th>วันที่เริ่ม</th>
+          <th>วันครบกำหนด</th>
+          <th>กำหนดเสร็จ</th>
+          <th>หมายเหตุ</th>
+        </tr>
+      </thead>
+      <tbody id="reportContent">
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
+    
+    let allReportData = [];
+    let currentTypeFilter = 'all';
+
+    function getDriveThumb(url) {
+      if(!url || url === "-") return "";
+      let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400` : "";
+    }
+
+    // ===== TYPE FILTER =====
+    function selectTypeFilter(type, el) {
+      currentTypeFilter = type;
+      
+      // Update active button
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      
+      renderTable();
+    }
+
+    function getTypeBadge(type) {
+      if (!type) return '<span style="color:#aaa;">-</span>';
+      
+      let badgeClass = 'type-badge-safety';
+      if (type === '5S') badgeClass = 'type-badge-5s';
+      else if (type === 'Audit') badgeClass = 'type-badge-audit';
+      else if (type === 'Accident/Fire') badgeClass = 'type-badge-acc';
+      
+      return `<span class="type-badge ${badgeClass}">${type}</span>`;
+    }
+
+    function loadReport() {
+      const monthInput = document.getElementById('monthFilter').value;
+      const reportContent = document.getElementById('reportContent');
+      reportContent.innerHTML = '<tr><td colspan="13" class="loading"><i class="fas fa-circle-notch fa-spin"></i> กำลังโหลดข้อมูล... โปรดรอสักครู่</td></tr>';
+
+      let fetchUrl = API_URL + "?action=getReport";
+      if(monthInput) {
+        const d = new Date(monthInput);
+        const mStr = d.toLocaleString('en-us', { month: 'short', year: 'numeric' });
+        fetchUrl += "&month=" + mStr;
+        document.getElementById('displayMonth').innerText = mStr;
+      } else {
+        document.getElementById('displayMonth').innerText = "ทั้งหมด";
+      }
+
+      fetch(fetchUrl)
+      .then(res => res.json())
+      .then(data => {
+        allReportData = data; 
+        renderTable();        
+      })
+      .catch(err => {
+        reportContent.innerHTML = '<tr><td colspan="13" style="color:#e74c3c; padding:20px; text-align:center;">❌ เกิดข้อผิดพลาดในการดึงข้อมูล โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต</td></tr>';
+        console.error("Error:", err);
+      });
+    }
+
+    function renderTable() {
+      const areaVal = document.getElementById('areaFilter').value;
+      const statusVal = document.getElementById('statusFilter').value;
+      const reportContent = document.getElementById('reportContent');
+      
+      let filteredData = [...allReportData];
+      
+      // Filter by type
+      if (currentTypeFilter !== 'all') {
+        filteredData = filteredData.filter(item => item.inspectionType === currentTypeFilter);
+      }
+      
+      // Filter by area
+      if (areaVal !== "") {
+        filteredData = filteredData.filter(item => item.area === areaVal);
+      }
+      
+      // Filter by status
+      if (statusVal !== "") {
+        filteredData = filteredData.filter(item => item.status === statusVal);
+      }
+
+      reportContent.innerHTML = "";
+      
+      if (filteredData.length === 0) {
+         reportContent.innerHTML = '<tr><td colspan="13" style="padding:40px; color:#7f8c8d; text-align:center;">🔍 ไม่พบข้อมูลงานซ่อมตามเงื่อนไขที่ค้นหา</td></tr>';
+         return;
+      }
+
+      filteredData.forEach((item, index) => {
+        // สีพื้นหลังตามสถานะ
+        let rowBgColor = item.status === 'Open' ? '#fff5f5' : '#f0fbf0';
+        
+        // ปุ่ม Action
+        let actionButtonHtml = "";
+        if (item.status === 'Open') {
+           actionButtonHtml = `<a href="resolve.html?jobid=${item.jobId}" style="background-color: #e74c3c; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px; display: inline-block; box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3); transition: 0.2s;"><i class="fas fa-wrench"></i> อัปเดตงาน</a>`;
+        } else {
+           actionButtonHtml = '<span style="color:#aaa;">-</span>';
+        }
+
+        let row = `
+          <tr style="background-color: ${rowBgColor}; border-bottom: 2px solid #fff;">
+            <td data-label="📌 ลำดับ">${index + 1}</td>
+            <td data-label="🏷️ ประเภท">${getTypeBadge(item.inspectionType)}</td>
+            <td data-label="📷 รูปภาพ (ก่อนแก้)">${item.picBefore ? `<img src="${getDriveThumb(item.picBefore)}" class="img-box" onclick="window.open('${item.picBefore}')">` : '<span style="color:#aaa;">-</span>'}</td>
+            <td data-label="🛠️ รูปภาพ (หลังแก้)">${item.picAfter ? `<img src="${getDriveThumb(item.picAfter)}" class="img-box" onclick="window.open('${item.picAfter}')">` : actionButtonHtml}</td>
+            <td data-label="📍 พื้นที่ (Area)"><b>${item.area}</b></td>
+            <td data-label="🏷️ JOB NO." style="color:#2980b9;"><b>${item.jobId}</b></td>
+            <td data-label="⚠️ รายละเอียดปัญหา" style="text-align:left;">${item.remark}</td> 
+            <td data-label="✅ แนวทางการแก้ไข" style="text-align:left;">${item.correctiveAction || '<span style="color:#aaa;">-</span>'}</td>
+            <td data-label="👤 ผู้รับผิดชอบ">${item.picName || '<span style="color:#aaa;">-</span>'}</td>
+            <td data-label="📅 วันที่พบ">${item.dateFound}</td>
+            <td data-label="⏳ วันครบกำหนด" style="color:#e74c3c; font-weight:bold;">${item.dueDate}</td>
+            <td data-label="🏁 วันที่ซ่อมเสร็จ">${item.finishDate !== "-" ? `<span class="status-closed"><i class="fas fa-check"></i> ${item.finishDate}</span>` : '<span style="color:#aaa;">-</span>'}</td>
+            <td data-label="📝 หมายเหตุ" style="text-align:left;">${item.problem}</td>
+          </tr>
+        `;
+        reportContent.innerHTML += row;
+      });
+    }
+
+    // Init
+    window.onload = function() {
+      const now = new Date();
+      const monthStr = now.toISOString().slice(0, 7);
+      document.getElementById('monthFilter').value = monthStr;
+      loadReport();
+    };
+  </script>
+</body>
+</html>
