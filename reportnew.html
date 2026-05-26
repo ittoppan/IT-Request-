@@ -165,7 +165,7 @@
       background: #fff; 
     }
 
-    /* ===== TYPE SELECTOR (ใหม่) ===== */
+    /* ===== TYPE SELECTOR ===== */
     .type-filter-section {
       background: white;
       border-radius: 14px;
@@ -231,7 +231,6 @@
       transform: scale(1.1);
       color: #e67e22;
     }
-    /* สีเฉพาะประเภท */
     .type-btn[data-type="5S"].active {
       background: linear-gradient(145deg, #e8f5e9, #c8e6c9);
       color: #27ae60;
@@ -239,7 +238,6 @@
       box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
     }
     .type-btn[data-type="5S"].active i { color: #27ae60; }
-    
     .type-btn[data-type="Audit"].active {
       background: linear-gradient(145deg, #e3f2fd, #bbdefb);
       color: #1565c0;
@@ -247,7 +245,6 @@
       box-shadow: 0 4px 15px rgba(21, 101, 192, 0.3);
     }
     .type-btn[data-type="Audit"].active i { color: #1565c0; }
-    
     .type-btn[data-type="Accident/Fire"].active {
       background: linear-gradient(145deg, #fce4ec, #f8bbd9);
       color: #c62828;
@@ -271,6 +268,84 @@
     .type-badge-audit { background: linear-gradient(135deg, #2980b9, #1f618d); }
     .type-badge-acc { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 
+    /* ===== AREA SELECTOR (Dynamic) ===== */
+    .area-selector-wrapper {
+      position: relative;
+    }
+    .area-options {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 100;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 5px;
+      padding: 8px;
+    }
+    .area-options.show {
+      display: block;
+      animation: slideDown 0.2s ease;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .area-option {
+      padding: 10px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+    .area-option:hover {
+      background: #fff3e0;
+      color: #e67e22;
+    }
+    .area-option.selected {
+      background: #ffe0b2;
+      color: #e67e22;
+      font-weight: 600;
+    }
+    .area-option i {
+      width: 18px;
+      text-align: center;
+      color: #f39c12;
+    }
+    .area-option[data-area="5S"] i { color: #27ae60; }
+    
+    .area-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #fafafa;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      min-height: 38px;
+    }
+    .area-display:hover {
+      border-color: #f39c12;
+      background: #fff;
+    }
+    .area-display .arrow {
+      margin-left: auto;
+      color: #999;
+      transition: transform 0.2s;
+    }
+    .area-display.active .arrow {
+      transform: rotate(180deg);
+    }
+
     /* ===== Mobile Responsive ===== */
     @media screen and (max-width: 768px) {
       body { padding: 10px; }
@@ -283,66 +358,38 @@
       .header-table td { display: block; width: 100%; border: none; padding: 5px; }
       .header-table { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
       
-      /* Type Selector Mobile */
-      .type-selector { 
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 6px;
-      }
-      .type-btn { 
-        font-size: 0.65rem; 
-        padding: 8px 4px; 
-        min-height: 62px;
-      }
+      .type-selector { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .type-btn { font-size: 0.65rem; padding: 8px 4px; min-height: 62px; }
       .type-btn i { font-size: 1rem; }
       
-      /* ตารางโหมดมือถือ */
       .main-table thead { display: none; }
       .main-table, .main-table tbody, .main-table tr, .main-table td { 
-        display: block; 
-        width: 100%; 
-        min-width: auto; 
-        box-sizing: border-box; 
+        display: block; width: 100%; min-width: auto; box-sizing: border-box; 
       }
-      
       .main-table tr { 
-        margin-bottom: 15px; 
-        border: 1px solid #e1e8ed; 
-        border-radius: 10px; 
-        overflow: hidden; 
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-        background: #fff;
+        margin-bottom: 15px; border: 1px solid #e1e8ed; border-radius: 10px; 
+        overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); background: #fff;
       }
-      
       .main-table td { 
-        text-align: left !important; 
-        padding: 12px 15px; 
-        border: none; 
-        border-bottom: 1px solid #f0f2f5; 
-        display: flex; 
-        flex-direction: column; 
+        text-align: left !important; padding: 12px 15px; border: none; 
+        border-bottom: 1px solid #f0f2f5; display: flex; flex-direction: column; 
         position: relative;
       }
       .main-table td:last-child { border-bottom: none; }
-      
       .main-table td::before { 
-        content: attr(data-label); 
-        font-weight: bold; 
-        color: #e67e22; 
-        margin-bottom: 6px; 
-        font-size: 12px; 
+        content: attr(data-label); font-weight: bold; color: #e67e22; 
+        margin-bottom: 6px; font-size: 12px; 
       }
+      .img-box { width: 100%; max-width: 250px; height: 150px; margin: 0 auto; display: block; }
+      .type-badge { font-size: 10px; padding: 3px 8px; }
       
-      .img-box { 
-        width: 100%; 
-        max-width: 250px; 
-        height: 150px; 
-        margin: 0 auto; 
-        display: block; 
-      }
-      
-      .type-badge {
-        font-size: 10px;
-        padding: 3px 8px;
+      /* Area dropdown mobile */
+      .area-options {
+        position: static;
+        box-shadow: none;
+        border: 1px solid #eee;
+        max-height: 250px;
+        margin-top: 8px;
       }
     }
     
@@ -351,17 +398,30 @@
       .type-btn { font-size: 0.62rem; min-height: 58px; }
     }
     
-    /* Loading */
     .loading {
       text-align: center;
       padding: 40px;
       color: #7f8c8d;
       font-size: 15px;
     }
-    .loading i {
-      color: #f39c12;
-      margin-right: 8px;
+    .loading i { color: #f39c12; margin-right: 8px; }
+    
+    /* Clear filter button */
+    .btn-clear {
+      background: #95a5a6;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
+    .btn-clear:hover { background: #7f8c8d; }
   </style>
 </head>
 <body>
@@ -374,21 +434,20 @@
         <span><i class="fas fa-calendar"></i> เดือน:</span> 
         <input type="month" id="monthFilter" onchange="loadReport()">
       </div>
-      <div class="filter-item">
-        <span><i class="fas fa-map-marker-alt"></i> พื้นที่:</span> 
-        <select id="areaFilter" onchange="renderTable()">
-          <option value="">-- ทั้งหมด --</option>
-          <option value="แผนก Print">แผนก Print</option>
-          <option value="แผนก Laminate">แผนก Laminate</option>
-          <option value="แผนก Solvent">แผนก Solvent</option>
-          <option value="แผนก Rewinder / Slitter / Packing">แผนก Rewinder / Slitter / Packing</option>
-          <option value="แผนก BAG MAKING">แผนก BAG MAKING</option>
-          <option value="แผนก QA & QC">แผนก QA & QC</option>
-          <option value="แผนก Warehouse">แผนก Warehouse</option>
-          <option value="Office">Office</option>
-          <option value="พื้นที่รอบบริเวณโรงงาน">พื้นที่รอบบริเวณโรงงาน</option>
-        </select>
+      
+      <!-- พื้นที่: แบบ Dynamic Dropdown -->
+      <div class="filter-item area-selector-wrapper">
+        <span><i class="fas fa-map-marker-alt"></i> พื้นที่:</span>
+        <div class="area-display" id="areaDisplay" onclick="toggleAreaDropdown()">
+          <span id="areaDisplayText">-- ทั้งหมด --</span>
+          <i class="fas fa-chevron-down arrow"></i>
+        </div>
+        <div class="area-options" id="areaOptions">
+          <!-- Options will be populated by JS -->
+        </div>
+        <input type="hidden" id="areaFilter" value="">
       </div>
+      
       <div class="filter-item">
         <span><i class="fas fa-toggle-on"></i> สถานะ:</span>
         <select id="statusFilter" onchange="renderTable()">
@@ -397,10 +456,16 @@
           <option value="Closed">แก้ไขเสร็จสิ้น (Closed)</option>
         </select>
       </div>
+      
+      <div class="filter-item" style="flex:0; min-width:auto;">
+        <button class="btn-clear" onclick="clearFilters()">
+          <i class="fas fa-times"></i> ล้างกรอง
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- ===== TYPE SELECTOR (ใหม่) ===== -->
+  <!-- ===== TYPE SELECTOR ===== -->
   <div class="type-filter-section">
     <div class="type-filter-label">
       <i class="fas fa-filter"></i> กรองตามประเภทการตรวจสอบ
@@ -463,8 +528,7 @@
           <th>หมายเหตุ</th>
         </tr>
       </thead>
-      <tbody id="reportContent">
-      </tbody>
+      <tbody id="reportContent"></tbody>
     </table>
   </div>
 
@@ -473,12 +537,33 @@
     
     let allReportData = [];
     let currentTypeFilter = 'all';
-
-    function getDriveThumb(url) {
-      if(!url || url === "-") return "";
-      let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400` : "";
-    }
+    
+    // ===== AREA DATA =====
+    const areaData = {
+      // พื้นที่แบบโรงงาน (สำหรับประเภทความปลอดภัย)
+      safety: [
+        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
+        { value: "แผนก Print", label: "แผนก Print", icon: "fas fa-print" },
+        { value: "แผนก Laminate", label: "แผนก Laminate", icon: "fas fa-layer-group" },
+        { value: "แผนก Solvent", label: "แผนก Solvent", icon: "fas fa-flask" },
+        { value: "แผนก Rewinder / Slitter / Packing", label: "แผนก Rewinder/Slitter/Packing", icon: "fas fa-box-open" },
+        { value: "แผนก BAG MAKING", label: "แผนก BAG MAKING", icon: "fas fa-shopping-bag" },
+        { value: "แผนก QA & QC", label: "แผนก QA & QC", icon: "fas fa-vial" },
+        { value: "แผนก Warehouse", label: "แผนก Warehouse", icon: "fas fa-warehouse" },
+        { value: "Office", label: "Office", icon: "fas fa-building" },
+        { value: "พื้นที่รอบบริเวณโรงงาน", label: "พื้นที่รอบโรงงาน", icon: "fas fa-tree" }
+      ],
+      // พื้นที่แบบ 5S
+      "5S": [
+        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
+        { value: "OFFICE", label: "Office", icon: "fas fa-desktop" },
+        { value: "Canteen", label: "Canteen", icon: "fas fa-utensils" },
+        { value: "QA&QC", label: "QA&QC", icon: "fas fa-microscope" },
+        { value: "Factory", label: "Factory", icon: "fas fa-industry" },
+        { value: "EN", label: "Engineering", icon: "fas fa-tools" },
+        { value: "Outside", label: "Outside", icon: "fas fa-tree" }
+      ]
+    };
 
     // ===== TYPE FILTER =====
     function selectTypeFilter(type, el) {
@@ -488,17 +573,95 @@
       document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
       
+      // Update area options based on type
+      updateAreaOptions(type);
+      
+      // Reset area filter when type changes
+      document.getElementById('areaFilter').value = "";
+      document.getElementById('areaDisplayText').textContent = "-- ทั้งหมด --";
+      
       renderTable();
+    }
+
+    // ===== AREA DROPDOWN =====
+    function updateAreaOptions(type) {
+      const areaOptions = document.getElementById('areaOptions');
+      const areaKey = type === '5S' ? '5S' : 'safety';
+      const areas = areaData[areaKey];
+      
+      let html = '';
+      areas.forEach(area => {
+        html += `
+          <div class="area-option" data-area="${area.value}" onclick="selectArea('${area.value}', '${area.label}', this)">
+            <i class="${area.icon}"></i>
+            <span>${area.label}</span>
+          </div>
+        `;
+      });
+      areaOptions.innerHTML = html;
+    }
+
+    function toggleAreaDropdown() {
+      const dropdown = document.getElementById('areaOptions');
+      const display = document.getElementById('areaDisplay');
+      dropdown.classList.toggle('show');
+      display.classList.toggle('active');
+    }
+
+    function selectArea(value, label, el) {
+      document.getElementById('areaFilter').value = value;
+      document.getElementById('areaDisplayText').textContent = label;
+      
+      // Update selected style
+      document.querySelectorAll('.area-option').forEach(opt => opt.classList.remove('selected'));
+      el.classList.add('selected');
+      
+      // Close dropdown
+      document.getElementById('areaOptions').classList.remove('show');
+      document.getElementById('areaDisplay').classList.remove('active');
+      
+      renderTable();
+    }
+
+    function clearFilters() {
+      // Reset all filters
+      currentTypeFilter = 'all';
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.type-btn[data-type="all"]').classList.add('active');
+      
+      document.getElementById('areaFilter').value = "";
+      document.getElementById('areaDisplayText').textContent = "-- ทั้งหมด --";
+      document.querySelectorAll('.area-option').forEach(opt => opt.classList.remove('selected'));
+      
+      document.getElementById('statusFilter').value = "";
+      
+      // Reset area options to default (safety)
+      updateAreaOptions('all');
+      
+      renderTable();
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      const wrapper = document.querySelector('.area-selector-wrapper');
+      if (!wrapper.contains(e.target)) {
+        document.getElementById('areaOptions').classList.remove('show');
+        document.getElementById('areaDisplay').classList.remove('active');
+      }
+    });
+
+    function getDriveThumb(url) {
+      if(!url || url === "-") return "";
+      let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w400` : "";
     }
 
     function getTypeBadge(type) {
       if (!type) return '<span style="color:#aaa;">-</span>';
-      
       let badgeClass = 'type-badge-safety';
       if (type === '5S') badgeClass = 'type-badge-5s';
       else if (type === 'Audit') badgeClass = 'type-badge-audit';
       else if (type === 'Accident/Fire') badgeClass = 'type-badge-acc';
-      
       return `<span class="type-badge ${badgeClass}">${type}</span>`;
     }
 
@@ -521,6 +684,8 @@
       .then(res => res.json())
       .then(data => {
         allReportData = data; 
+        // Initialize area options with default type
+        updateAreaOptions('all');
         renderTable();        
       })
       .catch(err => {
@@ -559,10 +724,8 @@
       }
 
       filteredData.forEach((item, index) => {
-        // สีพื้นหลังตามสถานะ
         let rowBgColor = item.status === 'Open' ? '#fff5f5' : '#f0fbf0';
         
-        // ปุ่ม Action
         let actionButtonHtml = "";
         if (item.status === 'Open') {
            actionButtonHtml = `<a href="resolve.html?jobid=${item.jobId}" style="background-color: #e74c3c; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px; display: inline-block; box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3); transition: 0.2s;"><i class="fas fa-wrench"></i> อัปเดตงาน</a>`;
