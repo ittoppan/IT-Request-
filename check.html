@@ -1,0 +1,103 @@
+// ใน check.html - ส่วนโหลด Checklist
+async function loadChecklist(typeId, areaId) {
+  try {
+    const res = await fetch(`${API_URL}?action=getChecklist&typeId=${typeId}&areaId=${areaId}`);
+    const result = await res.json();
+    
+    if (result.status === 'success') {
+      if (result.mode === 'legacy') {
+        // 📦 ใช้โครงสร้างเดิม (Hardcoded)
+        renderLegacyForm(result.data);
+      } else {
+        // 🚀 ใช้โครงสร้างใหม่ (Dynamic)
+        renderDynamicForm(result.data);
+      }
+    }
+  } catch(e) {
+    console.error('โหลด Checklist ล้มเหลว:', e);
+    // Fallback to legacy
+    renderLegacyForm(getLegacyStructure());
+  }
+}
+
+// ฟังก์ชันเดิมของคุณ (เก็บไว้)
+function renderLegacyForm(dataStructure) {
+  // → โค้ดเดิมของคุณที่สร้างฟอร์มจาก dataStructure
+  // → ทำงานเหมือนเดิม 100%
+}
+
+// ฟังก์ชันใหม่สำหรับโหมดไดนามิก
+function renderDynamicForm(sections) {
+  const container = document.getElementById('items');
+  container.innerHTML = '';
+  
+  sections.forEach(section => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    
+    let html = `<h4 style="color:var(--primary-dark); margin:0 0 15px 0; border-left:4px solid var(--primary); padding-left:10px;">
+      ${section.title_th}
+    </h4>`;
+    
+    section.questions.forEach((q, idx) => {
+      const qKey = `q_${section.id}_${idx}`;
+      const remarkName = `remark_${qKey}`;
+      const dueDateName = `duedate_${qKey}`;
+      
+      // สร้าง Input ตามประเภทคำตอบ
+      let inputHtml = '';
+      if (q.answer_type === 'radio') {
+        inputHtml = `
+          <div class="options">
+            <input type="radio" name="${qKey}" id="${qKey}_good" value="ดี">
+            <label for="${qKey}_good"><i class="fas fa-check-circle"></i> ปกติ</label>
+            <input type="radio" name="${qKey}" id="${qKey}_bad" value="ไม่ดี">
+            <label for="${qKey}_bad"><i class="fas fa-exclamation-triangle"></i> ไม่ปกติ</label>
+          </div>
+        `;
+      } else if (q.answer_type === 'number') {
+        inputHtml = `<input type="number" name="${qKey}" step="any" placeholder="ระบุค่า">`;
+      } else {
+        inputHtml = `<input type="text" name="${qKey}" placeholder="ระบุคำตอบ">`;
+      }
+      
+      // เพิ่ม Remark/Due Date/Photo ถ้าต้องการ
+      let extraHtml = '';
+      if (q.has_remark === 'TRUE') {
+        extraHtml += `<textarea name="${remarkName}" rows="2" placeholder="หมายเหตุ (ถ้ามี)" style="margin-top:10px;"></textarea>`;
+      }
+      if (q.has_duedate === 'TRUE') {
+        extraHtml += `
+          <div class="duedate-container" style="display:none; margin-top:10px; background:#fff5f5; padding:10px; border-radius:8px;">
+            <label style="font-size:0.85rem; color:#c0392b;"><i class="fas fa-calendar-times"></i> กำหนดเสร็จ *</label>
+            <input type="date" name="${dueDateName}" style="margin:5px 0 0 0;">
+          </div>
+        `;
+      }
+      
+      html += `
+        <div class="check-item" id="item_${qKey}" style="padding:15px; border-bottom:1px solid #eee;">
+          <small>${idx+1}. ${q.question_th}</small>
+          ${inputHtml}
+          ${extraHtml}
+        </div>
+      `;
+    });
+    
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+  
+  // เพิ่ม Event Listener สำหรับแสดง Due Date เมื่อเลือก "ไม่ดี"
+  document.querySelectorAll('input[value="ไม่ดี"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      const itemDiv = this.closest('.check-item');
+      const dueContainer = itemDiv.querySelector('.duedate-container');
+      const dueInput = itemDiv.querySelector('input[type="date"]');
+      if (dueContainer && dueInput) {
+        dueContainer.style.display = 'block';
+        dueInput.required = true;
+      }
+    });
+  });
+}
