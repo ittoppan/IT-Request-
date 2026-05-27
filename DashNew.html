@@ -1198,10 +1198,13 @@ AREA_DISPLAY_MAP: {
     // ===================================================================
     // TABLE RENDERING
     // ===================================================================
-    function renderTable() {
+   function renderTable() {
+      // 1. ดึงค่าจาก DOM (ประกาศตัวแปรให้ครบ)
+      const areaVal = document.getElementById('areaFilter').value;
+      const statusVal = document.getElementById('statusFilter').value;
       const tbody = document.getElementById('tableBody');
       
-      // Apply filters
+      // 2. Apply filters
       let filtered = [...fullData];
       
       // Type filter
@@ -1209,48 +1212,41 @@ AREA_DISPLAY_MAP: {
         filtered = filtered.filter(d => d.inspectionType === currentTypeFilter);
       }
       
-     // Area filter
-     // ใช้ตรรกะนี้ใน DashNew.html และ reportnew.html
-// เปลี่ยนบรรทัดนี้ในฟังก์ชัน renderTable()
-if (areaVal !== "") {
-    filtered = filtered.filter(item => {
-        // ใช้ฟังก์ชันใหม่นี้ตรวจสอบพื้นที่
-        const normalizedItemArea = normalizeAreaForFilter(item.area);
-        
-        // เงื่อนไขรวมพื้นที่
-        if (areaVal === "OFFICE_ALL") return normalizedItemArea === "OFFICE";
-        if (areaVal === "QA_ALL") return normalizedItemArea === "QA&QC";
-        if (areaVal === "OUTSIDE_ALL") return normalizedItemArea === "OUTSIDE";
-        
-        // กรองแบบปกติ
-        return normalizedItemArea === areaVal;
-    });
-}
+      // 3. Area filter (รวมกลุ่มพื้นที่)
+      if (areaVal !== "") {
+        filtered = filtered.filter(item => {
+          const normalizedItemArea = normalizeAreaForFilter(item.area);
+          
+          if (areaVal === "OFFICE_ALL") return normalizedItemArea === "OFFICE";
+          if (areaVal === "QA_ALL") return normalizedItemArea === "QA&QC";
+          if (areaVal === "OUTSIDE_ALL") return normalizedItemArea === "OUTSIDE";
+          
+          return normalizedItemArea === areaVal;
+        });
+      }
       
-      // Status filter
+      // 4. Status filter
       if (currentStatusFilter === 'good') {
         filtered = filtered.filter(d => !d.hasBad);
       } else if (currentStatusFilter === 'bad') {
         filtered = filtered.filter(d => d.hasBad);
       }
       
-      // Empty state
+      // 5. Empty state
       if (filtered.length === 0) {
         tbody.innerHTML = `
           <tr>
             <td colspan="7" class="empty-state">
               <i class="fas fa-search"></i>
               <p>ไม่พบข้อมูลตามเงื่อนไขที่เลือก</p>
-              <small>ลองปรับการกรองหรือเลือกวันที่อื่น</small>
             </td>
           </tr>
         `;
         return;
       }
       
-      // Render rows
+      // 6. Render rows
       tbody.innerHTML = filtered.map(d => {
-        // Photo display
         let photoDisplay = '<span style="color:#aaa;">-</span>';
         if (typeof d.photo === 'object' && d.photo !== null) {
           const photoCount = Object.values(d.photo).filter(url => url && url.trim() !== "").length;
@@ -1261,13 +1257,8 @@ if (areaVal !== "") {
           photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image"></i></a>`;
         }
         
-        // Normalize area display
         const displayArea = normalizeAreaDisplay(d.area, d.inspectionType);
-        
-        // Type badge
         const typeBadge = getTypeBadge(d.inspectionType);
-        
-        // Status badge
         const statusBadge = d.hasBad 
           ? `<span class="badge badge-bad"><i class="fas fa-exclamation-triangle"></i> พบปัญหา</span>`
           : `<span class="badge badge-good"><i class="fas fa-check-circle"></i> ปกติ</span>`;
@@ -1510,13 +1501,12 @@ if (areaVal !== "") {
       return `<span class="type-badge ${badgeClass}"><i class="${icon}"></i> ${type}</span>`;
     }
     
-    function normalizeAreaDisplay(area, inspectionType) {
-      if (inspectionType === CONFIG.TYPE_5S && CONFIG.AREA_DISPLAY_MAP[area]) {
-        return CONFIG.AREA_DISPLAY_MAP[area];
-      }
-      return area || '-';
-    }
-    
+   function normalizeAreaDisplay(area) {
+  // แปลงให้เป็นชื่อมาตรฐานก่อนหา
+  const normArea = normalizeAreaForFilter(area);
+  // ถ้ามีชื่อสวยๆ ใน CONFIG.AREA_DISPLAY_MAP ให้ใช้ชื่อนั้น
+  return CONFIG.AREA_DISPLAY_MAP[normArea] || normArea;
+}
     function normalizeAreaForFilter(area, inspectionType) {
       if (inspectionType === CONFIG.TYPE_5S) {
         for (const [key, value] of Object.entries(CONFIG.AREA_DISPLAY_MAP)) {
