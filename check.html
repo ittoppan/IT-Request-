@@ -74,6 +74,9 @@
     .water-badge.warning { background: #ffebee; color: #c62828; }
     .water-badge.success { background: #e8f5e9; color: #27ae60; }
 
+
+
+    
     /* Photo Upload */
     .photo-area { background: #fafafa; padding: 10px; border-radius: 10px; border: 1.5px dashed var(--border); margin-top: 10px; }
     .photo-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
@@ -107,6 +110,73 @@
       .header h2 { font-size: 1.15rem; }
     }
     @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:0.01ms!important; transition-duration:0.01ms!important; } }
+  
+  /* ✅ 3-Level Score Options (สำหรับ 5S) */
+.score-options { 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 8px; 
+  margin: 6px 0; 
+}
+.score-options input[type="radio"] { display: none; }
+.score-label {
+  padding: 10px 6px; 
+  border-radius: 10px; 
+  text-align: center; 
+  font-weight: 600; 
+  font-size: 0.8rem;
+  cursor: pointer; 
+  transition: all 0.2s; 
+  border: 2px solid var(--border); 
+  background: #f8f9fa; 
+  color: #666;
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 4px;
+  min-height: 60px;
+}
+.score-label:hover { background: #f0f0f0; transform: translateY(-1px); }
+.score-label i { font-size: 1.1rem; }
+
+/* ✅ สีเมื่อเลือก */
+input[value="ดี"]:checked + .score-label { 
+  background: linear-gradient(145deg, #e8f5e9, #c8e6c9); 
+  color: #2e7d32; 
+  border-color: #2e7d32; 
+}
+input[value="พอใช้"]:checked + .score-label { 
+  background: linear-gradient(145deg, #fff3e0, #ffe0b2); 
+  color: #e65100; 
+  border-color: #e65100; 
+}
+input[value="ปรับปรุง"]:checked + .score-label { 
+  background: linear-gradient(145deg, #ffebee, #ffcdd2); 
+  color: #c62828; 
+  border-color: #c62828; 
+}
+
+/* ✅ แยกสไตล์สำหรับ Safety (2 ปุ่ม) */
+.options-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0; }
+.options-2 input[type="radio"] { display: none; }
+.options-2 label {
+  cursor: pointer; padding: 10px; border-radius: 10px; background: #f8f9fa;
+  text-align: center; font-weight: 600; font-size: 0.85rem; margin: 0;
+  transition: 0.2s; border: 2px solid transparent; color: #666;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.options-2 label:hover { background: #f0f0f0; }
+input[value="ดี"]:checked + .options-2 label { 
+  background: linear-gradient(145deg, #e8f5e9, #c8e6c9); color: #2e7d32; border-color: #2e7d32; 
+}
+input[value="ไม่ดี"]:checked + .options-2 label { 
+  background: linear-gradient(145deg, #ffebee, #ffcdd2); color: #c62828; border-color: #c62828; 
+}
+  
+  
+  
+  
+  
   </style>
 </head>
 <body>
@@ -452,36 +522,69 @@
       });
     }
 
-    function render5SChecklist(container) {
-      // ✅ ใช้ CHECKLIST_5S[state.area5S] โดย state.area5S เป็นรหัสมาตรฐานแล้ว
-      const sections = (CHECKLIST_5S[state.area5S] || CHECKLIST_5S["OFFICE"]).sections;
+    // ✅ Handler สำหรับ 5S (3 ระดับ: ดี/พอใช้/ปรับปรุง)
+function handle5SStatusChange(qKey, status) {
+  const el = document.getElementById(`item_${qKey}`);
+  const remark = el.querySelector('textarea');
+  const ddBox = document.getElementById(`dd_${qKey}`);
+  const ddInput = ddBox.querySelector('input');
+  
+  // บันทึกค่าลง state
+  state.responses[qKey] = { status };
+  
+  // ✅ เฉพาะ "ปรับปรุง" เท่านั้นที่ต้องการหมายเหตุ + Due Date
+  if (status === "ปรับปรุง") {
+    el.classList.add('needs-attention');
+    remark.required = true; 
+    remark.placeholder = '* กรุณาระบุปัญหาที่ต้องแก้ไข';
+    ddBox.style.display = 'block'; 
+    ddInput.required = true;
+  } else {
+    // "ดี" หรือ "พอใช้" = ไม่บังคับ
+    el.classList.remove('needs-attention');
+    remark.required = false; 
+    remark.placeholder = 'หมายเหตุ (ถ้ามี)';
+    ddBox.style.display = 'none'; 
+    ddInput.required = false; 
+    ddInput.value = '';
+  }
+}
+   function render5SChecklist(container) {
+  const sections = (CHECKLIST_5S[state.area5S] || CHECKLIST_5S["OFFICE"]).sections;
+  
+  sections.forEach((sec, sIdx) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    let html = `<div class="section-badge" style="display:inline-block;background:var(--success);color:#fff;padding:3px 10px;border-radius:15px;font-size:0.7rem;font-weight:700;margin-bottom:10px;">5S</div>
+      <label class="section-label" style="border-color:var(--success);color:var(--success)">${sec.title}</label>`;
+
+    sec.qs.forEach((q, qIdx) => {
+      const qKey = `5s_s${sIdx}_q${qIdx}`;
       
-      sections.forEach((sec, sIdx) => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        let html = `<div class="section-badge" style="display:inline-block;background:var(--success);color:#fff;padding:3px 10px;border-radius:15px;font-size:0.7rem;font-weight:700;margin-bottom:10px;">5S</div>
-          <label class="section-label" style="border-color:var(--success);color:var(--success)">${sec.title}</label>`;
-
-        sec.qs.forEach((q, qIdx) => {
-          const qKey = `5s_s${sIdx}_q${qIdx}`;
-          html += `<div class="check-item" id="item_${qKey}">
-            <small>${qIdx+1}. ${q}</small>
-            <div class="options">
-              <input type="radio" name="5s_s${sIdx}_q${qIdx}" id="y_${qKey}" value="ดี" onchange="handleStatusChange('${qKey}', 'ดี')">
-              <label for="y_${qKey}"><i class="fas fa-check-circle"></i> ผ่าน</label>
-              <input type="radio" name="5s_s${sIdx}_q${qIdx}" id="n_${qKey}" value="ไม่ดี" onchange="handleStatusChange('${qKey}', 'ไม่ดี')">
-              <label for="n_${qKey}"><i class="fas fa-exclamation-triangle"></i> ไม่ผ่าน</label>
-            </div>
-            <textarea name="5s_remark_s${sIdx}_q${qIdx}" placeholder="หมายเหตุ (ถ้ามี)" style="margin:8px 0 0;"></textarea>
-            <div class="duedate-box" id="dd_${qKey}"><label><i class="fas fa-calendar-times"></i> วันแก้ไขเสร็จ *</label><input type="date" name="5s_duedate_s${sIdx}_q${qIdx}"></div>
-            ${photoUploadHTML(qKey)}
-          </div>`;
-        });
-        card.innerHTML = html;
-        container.appendChild(card);
-      });
-    }
-
+      // ✅ 5S ใช้ 3 ปุ่ม: ดี / พอใช้ / ปรับปรุง
+      html += `<div class="check-item" id="item_${qKey}">
+        <small>${qIdx+1}. ${q}</small>
+        
+        <div class="score-options">
+          <input type="radio" name="5s_s${sIdx}_q${qIdx}" id="g_${qKey}" value="ดี" onchange="handle5SStatusChange('${qKey}', 'ดี')">
+          <label for="g_${qKey}" class="score-label"><i class="fas fa-check-circle"></i>ดี</label>
+          
+          <input type="radio" name="5s_s${sIdx}_q${qIdx}" id="f_${qKey}" value="พอใช้" onchange="handle5SStatusChange('${qKey}', 'พอใช้')">
+          <label for="f_${qKey}" class="score-label"><i class="fas fa-circle-half-stroke"></i>พอใช้</label>
+          
+          <input type="radio" name="5s_s${sIdx}_q${qIdx}" id="p_${qKey}" value="ปรับปรุง" onchange="handle5SStatusChange('${qKey}', 'ปรับปรุง')">
+          <label for="p_${qKey}" class="score-label"><i class="fas fa-wrench"></i>ปรับปรุง</label>
+        </div>
+        
+        <textarea name="5s_remark_s${sIdx}_q${qIdx}" placeholder="หมายเหตุ (ถ้ามี)" style="margin:8px 0 0;"></textarea>
+        <div class="duedate-box" id="dd_${qKey}"><label><i class="fas fa-calendar-times"></i> วันแก้ไขเสร็จ *</label><input type="date" name="5s_duedate_s${sIdx}_q${qIdx}"></div>
+        ${photoUploadHTML(qKey)}
+      </div>`;
+    });
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+}
     function photoUploadHTML(qKey) {
       return `<div class="photo-area">
         <div id="preview_${qKey}" class="photo-preview"></div>
@@ -530,20 +633,30 @@
     function removePhoto(qKey, idx) { state.images[qKey].splice(idx, 1); renderPhotos(qKey); }
     function updateCaption(qKey, idx, val) { if (state.images[qKey][idx]) state.images[qKey][idx].caption = val; }
 
-    function handleStatusChange(qKey, status) {
-      const el = document.getElementById(`item_${qKey}`);
-      const remark = el.querySelector('textarea');
-      const ddBox = document.getElementById(`dd_${qKey}`);
-      const ddInput = ddBox.querySelector('input');
-      state.responses[qKey] = { status };
-      if (status === 'ไม่ดี') {
-        remark.required = true; remark.placeholder = '* กรุณาระบุรายละเอียด';
-        ddBox.style.display = 'block'; ddInput.required = true;
-      } else {
-        remark.required = false; remark.placeholder = 'หมายเหตุ (ถ้ามี)';
-        ddBox.style.display = 'none'; ddInput.required = false; ddInput.value = '';
-      }
-    }
+   // ✅ Handler สำหรับ Safety Types (2 ระดับ: ดี/ไม่ดี)
+function handleStatusChange(qKey, status) {
+  const el = document.getElementById(`item_${qKey}`);
+  const remark = el.querySelector('textarea');
+  const ddBox = document.getElementById(`dd_${qKey}`);
+  const ddInput = ddBox.querySelector('input');
+  
+  state.responses[qKey] = { status };
+  
+  if (status === 'ไม่ดี') {
+    el.classList.add('needs-attention');
+    remark.required = true; 
+    remark.placeholder = '* กรุณาระบุรายละเอียด';
+    ddBox.style.display = 'block'; 
+    ddInput.required = true;
+  } else {
+    el.classList.remove('needs-attention');
+    remark.required = false; 
+    remark.placeholder = 'หมายเหตุ (ถ้ามี)';
+    ddBox.style.display = 'none'; 
+    ddInput.required = false; 
+    ddInput.value = '';
+  }
+}
 
     function handleWaterMist(val, sNum, i) {
       const qKey = `s${sNum}_q${i}`;
@@ -571,32 +684,74 @@
     // VALIDATION & SUBMIT
     // ===================================================================
     function validate() {
-      if (!document.getElementById('inspectorName').value.trim()) { showToast('กรุณาระบุชื่อผู้ตรวจสอบ', 'error'); return false; }
-      document.querySelectorAll('.check-item').forEach(el => el.classList.remove('error'));
-      let valid = true;
-      document.querySelectorAll('.check-item').forEach(el => {
-        if (el.style.display === 'none') return;
-        const qKey = el.id.replace('item_', '');
-        const radios = el.querySelectorAll('input[type="radio"]');
-        if (radios.length > 0) {
-          const checked = el.querySelector('input[type="radio"]:checked');
-          if (!checked && !el.classList.contains('water-mist-block')) { el.classList.add('error'); valid = false; }
-          else if (checked?.value === 'ไม่ดี') {
-            if (!el.querySelector('textarea').value.trim() || !el.querySelector('input[type="date"]').value) { el.classList.add('error'); valid = false; }
+  if (!document.getElementById('inspectorName').value.trim()) { 
+    showToast('กรุณาระบุชื่อผู้ตรวจสอบ', 'error'); 
+    return false; 
+  }
+  
+  document.querySelectorAll('.check-item').forEach(el => el.classList.remove('error', 'needs-attention'));
+  let valid = true;
+  
+  document.querySelectorAll('.check-item').forEach(el => {
+    if (el.style.display === 'none') return;
+    const qKey = el.id.replace('item_', '');
+    
+    // 🔹 ตรวจสอบ 5S (3 ปุ่ม)
+    if (state.type === '5S') {
+      const radios = el.querySelectorAll('.score-options input[type="radio"]');
+      if (radios.length > 0) {
+        const checked = el.querySelector('.score-options input[type="radio"]:checked');
+        if (!checked) { 
+          el.classList.add('error'); 
+          valid = false; 
+        } else if (checked.value === 'ปรับปรุง') {
+          // "ปรับปรุง" ต้องมีหมายเหตุ + Due Date
+          const remark = el.querySelector('textarea');
+          const dueDate = el.querySelector('input[type="date"]');
+          if (!remark.value.trim() || !dueDate.value) { 
+            el.classList.add('error'); 
+            valid = false; 
           }
         }
-        if (el.classList.contains('water-mist-block') && el.style.display !== 'none') {
-          const wv = el.querySelector('input[type="number"]');
-          if (!wv.value.trim()) { el.classList.add('error'); valid = false; }
-          else if (parseFloat(wv.value) < 50) {
-            if (!el.querySelector('textarea').value.trim() || !el.querySelector('input[type="date"]').value) { el.classList.add('error'); valid = false; }
+      }
+    } 
+    // 🔹 ตรวจสอบ Safety Types (2 ปุ่ม)
+    else {
+      const radios = el.querySelectorAll('input[type="radio"]');
+      if (radios.length > 0) {
+        const checked = el.querySelector('input[type="radio"]:checked');
+        if (!checked && !el.classList.contains('water-mist-block')) { 
+          el.classList.add('error'); 
+          valid = false; 
+        } else if (checked?.value === 'ไม่ดี') {
+          if (!el.querySelector('textarea').value.trim() || !el.querySelector('input[type="date"]').value) { 
+            el.classList.add('error'); 
+            valid = false; 
           }
         }
-      });
-      if (!valid) document.querySelector('.check-item.error')?.scrollIntoView({ behavior:'smooth', block:'center' });
-      return valid;
+      }
+      // Water Mist special validation
+      if (el.classList.contains('water-mist-block') && el.style.display !== 'none') {
+        const wv = el.querySelector('input[type="number"]');
+        if (!wv.value.trim()) { 
+          el.classList.add('error'); 
+          valid = false; 
+        } else if (parseFloat(wv.value) < 50) {
+          if (!el.querySelector('textarea').value.trim() || !el.querySelector('input[type="date"]').value) { 
+            el.classList.add('error'); 
+            valid = false; 
+          }
+        }
+      }
     }
-
+  });
+  
+  if (!valid) {
+    const firstErr = document.querySelector('.check-item.error');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  return valid;
+}
     async function handleSubmit(e) {
       e.preventDefault();
       if (!validate()) return;
@@ -613,18 +768,28 @@
       finally { document.getElementById('loader').classList.remove('show'); document.getElementById('submitBtn').disabled = false; }
     }
 
-    function buildPayload() {
-      const details = {}, images = {}, is5S = state.type === '5S', area = is5S ? state.area5S : state.area;
-      Object.entries(state.responses).forEach(([qKey, resp]) => {
-        if (!resp.status) return;
-        const prefix = qKey.startsWith('5s_') ? qKey : qKey.replace('s', 'section');
-        details[qKey] = resp.status;
-        if (resp.status === 'ไม่ดี') {
-          details[`${prefix}_remark`] = document.querySelector(`#item_${qKey} textarea`).value;
-          details[`${prefix}_duedate`] = document.querySelector(`#item_${qKey} input[type="date"]`).value;
-        }
-        if (resp.waterValue !== undefined) details.water_val = resp.waterValue;
-      });
+ function buildPayload() {
+  const details = {}, images = {};
+  const is5S = state.type === '5S';
+  const area = is5S ? state.area5S : state.area;
+  
+  Object.entries(state.responses).forEach(([qKey, resp]) => {
+    if (!resp.status) return;
+    
+    // ✅ 5S ใช้ key เดิม แต่ค่าเป็น "ดี"/"พอใช้"/"ปรับปรุง"
+    // ✅ Safety ใช้ key แบบ sectionX_qY และค่าเป็น "ดี"/"ไม่ดี"
+    const prefix = qKey.startsWith('5s_') ? qKey : qKey.replace('s', 'section');
+    details[qKey] = resp.status;
+    
+    // เฉพาะ "ปรับปรุง" (5S) หรือ "ไม่ดี" (Safety) ที่ต้องการหมายเหตุ + Due Date
+    if ((is5S && resp.status === 'ปรับปรุง') || (!is5S && resp.status === 'ไม่ดี')) {
+      details[`${prefix}_remark`] = document.querySelector(`#item_${qKey} textarea`).value;
+      details[`${prefix}_duedate`] = document.querySelector(`#item_${qKey} input[type="date"]`).value;
+    }
+    
+    if (resp.waterValue !== undefined) details.water_val = resp.waterValue;
+  });
+  
       Object.entries(state.images).forEach(([qKey, imgs]) => imgs.forEach((img, idx) => {
         images[`${qKey}_${idx}`] = img.b64;
         if (img.caption.trim()) details[`caption_${qKey}_${idx}`] = img.caption;
@@ -640,15 +805,15 @@
         });
       }
       return { 
-        inspector: document.getElementById('inspectorName').value.trim(), 
-        area, 
-        inspectionType: state.type, 
-        area5S: is5S ? area : null, 
-        images, 
-        details, 
-        ...secRes 
-      };
-    }
+    inspector: document.getElementById('inspectorName').value.trim(), 
+    area, 
+    inspectionType: state.type, 
+    area5S: is5S ? area : null, 
+    images, 
+    details, 
+    ...secRes 
+  };
+}
 
     async function fetchWithRetry(url, options, retries = 3) {
       for (let i=0; i<retries; i++) { try { const res = await fetch(url, options); return await res.json(); } catch(e) { if(i===retries-1) throw e; await new Promise(r=>setTimeout(r, 1000*(i+1))); } }
