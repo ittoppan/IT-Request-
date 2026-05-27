@@ -1137,113 +1137,96 @@ AREA_DISPLAY_MAP: {
  // ===================================================================
     // DATA LOADING
     // ===================================================================
-    async function loadData() {
-      if (isLoading) return;
-      isLoading = true;
-      
-      const loader = document.getElementById('loader');
-      if (loader) loader.classList.add('show');
-      
-      const dateFilter = document.getElementById('dateFilter');
-      const dateVal = dateFilter ? dateFilter.value : "";
-      
-      try {
-        const response = await fetch(`${CONFIG.API_URL}?action=getDashboardData&date=${dateVal}`);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        
-        const data = await response.json();
-        fullData = data.details || [];
-        
-        // 🌟 เช็คสถานะ 5S จาก JSON โดยตรง
-        fullData.forEach(d => {
-          if (d.inspectionType === CONFIG.TYPE_5S && d.fullChecklist) {
-            d.hasBad = Object.values(d.fullChecklist).includes("ไม่ดี");
-          }
-        });
-
-        // Update stats
-        const total = fullData.length;
-        const bad = fullData.filter(d => d.hasBad).length;
-        const good = total - bad;
-        
-        if (document.getElementById('countTotal')) document.getElementById('countTotal').innerText = total;
-        if (document.getElementById('countGood')) document.getElementById('countGood').innerText = good;
-        if (document.getElementById('countBad')) document.getElementById('countBad').innerText = bad;
-        
-        // renderTable หลังจากข้อมูลโหลดเสร็จ
-        renderTable();
-        
-      } catch (err) {
-        console.error("Load data error:", err);
-      } finally {
-        isLoading = false;
-        if (loader) loader.classList.remove('show');
-      }
-    }
-
     // ===================================================================
-    // TABLE RENDERING
-    // ===================================================================
-    function renderTable() {
-      const tbody = document.getElementById('tableBody');
-      if (!tbody) return; // กัน Error ถ้าหา tableBody ไม่เจอ
-      
-      // ดึงค่า Filter แบบปลอดภัย (เช็ค null ก่อน)
-      const areaEl = document.getElementById('areaFilter');
-      const statusEl = document.getElementById('statusFilter');
-      const areaVal = areaEl ? areaEl.value : "";
-      const statusVal = statusEl ? statusEl.value : "";
-      
-      let filtered = [...fullData];
-      
-      // 1. Type filter
-      if (currentTypeFilter !== 'all') {
-        filtered = filtered.filter(d => d.inspectionType === currentTypeFilter);
+// DATA LOADING - แก้ไขให้ปลอดภัยต่อ DOM
+// ===================================================================
+async function loadData() {
+  if (isLoading) return;
+  isLoading = true;
+  
+  const loader = document.getElementById('loader');
+  if (loader) loader.classList.add('show');
+  
+  const dateFilter = document.getElementById('dateFilter');
+  const dateVal = dateFilter ? dateFilter.value : "";
+  
+  try {
+    const response = await fetch(`${CONFIG.API_URL}?action=getDashboardData&date=${dateVal}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
+    const data = await response.json();
+    fullData = data.details || [];
+    
+    // คำนวณ hasBad สำหรับ 5S
+    fullData.forEach(d => {
+      if (d.inspectionType === CONFIG.TYPE_5S && d.fullChecklist) {
+        d.hasBad = Object.values(d.fullChecklist).includes("ไม่ดี");
       }
+    });
+
+    // Update UI Stats
+    const total = fullData.length;
+    const bad = fullData.filter(d => d.hasBad).length;
+    const good = total - bad;
+    
+    if (document.getElementById('countTotal')) document.getElementById('countTotal').innerText = total;
+    if (document.getElementById('countGood')) document.getElementById('countGood').innerText = good;
+    if (document.getElementById('countBad')) document.getElementById('countBad').innerText = bad;
+    
+    renderTable(); 
+    
+  } catch (err) {
+    console.error("Load data error:", err);
+  } finally {
+    isLoading = false;
+    if (loader) loader.classList.remove('show');
+  }
+}
+
+// ===================================================================
+// TABLE RENDERING - แก้ไขการกรองให้ครอบคลุมชื่อเก่าและชื่อใหม่
+// ===================================================================
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  if (!tbody) return;
+  
+  const areaFilterEl = document.getElementById('areaFilter');
+  const areaVal = areaFilterEl ? areaFilterEl.value : "";
+  
+  let filtered = [...fullData];
+  
+  if (currentTypeFilter !== 'all') {
+    filtered = filtered.filter(d => d.inspectionType === currentTypeFilter);
+  }
+  
+  if (areaVal !== "") {
+    filtered = filtered.filter(item => {
+      // ใช้ฟังก์ชันแปลงชื่อที่สร้างไว้ด้านล่าง
+      const normArea = normalizeAreaForFilter(item.area);
       
-      // 2. Area filter (รวมกลุ่มพื้นที่)
-      if (areaVal !== "") {
-        filtered = filtered.filter(item => {
-          const normalizedItemArea = normalizeAreaForFilter(item.area);
-          
-          if (areaVal === "OFFICE_ALL") return normalizedItemArea === "OFFICE";
-          if (areaVal === "QA_ALL") return normalizedItemArea === "QA&QC";
-          if (areaVal === "OUTSIDE_ALL") return normalizedItemArea === "OUTSIDE";
-          
-          return normalizedItemArea === areaVal;
-        });
-      }
+      // เงื่อนไขรวมพื้นที่พิเศษ
+      if (areaVal === "OFFICE_ALL") return normArea === "OFFICE";
+      if (areaVal === "QA_ALL") return normArea === "QA&QC";
+      if (areaVal === "OUTSIDE_ALL") return normArea === "OUTSIDE";
       
-      // 3. Status filter
-      if (currentStatusFilter === 'good') {
-        filtered = filtered.filter(d => !d.hasBad);
-      } else if (currentStatusFilter === 'bad') {
-        filtered = filtered.filter(d => d.hasBad);
-      }
-      
-      // 4. Empty state
-      if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-search"></i><p>ไม่พบข้อมูลตามเงื่อนไขที่เลือก</p></td></tr>';
-        return;
-      }
-      
-      // 5. Render rows
-      tbody.innerHTML = filtered.map(d => {
-        let photoDisplay = '<span style="color:#aaa;">-</span>';
-        if (typeof d.photo === 'object' && d.photo !== null) {
-          const photoCount = Object.values(d.photo).filter(url => url && url.trim() !== "").length;
-          if (photoCount > 0) {
-            photoDisplay = `<span style="color:var(--primary);font-weight:600;"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
-          }
-        } else if (typeof d.photo === 'string' && d.photo && d.photo.trim() !== "") {
-          photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image"></i></a>`;
-        }
-        
-        const displayArea = normalizeAreaDisplay(d.area);
-        const typeBadge = getTypeBadge(d.inspectionType);
-        const statusBadge = d.hasBad 
-          ? `<span class="badge badge-bad"><i class="fas fa-exclamation-triangle"></i> พบปัญหา</span>`
-          : `<span class="badge badge-good"><i class="fas fa-check-circle"></i> ปกติ</span>`;
+      // กรองเทียบกับชื่อมาตรฐาน (PRINT, LAMINATE, ...)
+      return normArea === areaVal;
+    });
+  }
+  
+  if (currentStatusFilter === 'good') filtered = filtered.filter(d => !d.hasBad);
+  else if (currentStatusFilter === 'bad') filtered = filtered.filter(d => d.hasBad);
+  
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>ไม่พบข้อมูลตามเงื่อนไข</p></td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = filtered.map(d => {
+    // ใช้ฟังก์ชันแสดงผลพื้นที่ (ที่ดึงชื่อสวยๆ มาจาก CONFIG)
+    const displayArea = normalizeAreaDisplay(d.area);
+    const typeBadge = getTypeBadge(d.inspectionType);
+    const statusBadge = d.hasBad ? `<span class="badge badge-bad">✘ พบปัญหา</span>` : `<span class="badge badge-good">✔ ปกติ</span>`;
         
         return `
           <tr>
