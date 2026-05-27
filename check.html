@@ -562,27 +562,21 @@
         </div>
 
         <!-- พื้นที่สำรวจ: แบบ 5S (แสดงเมื่อเลือก 5S) -->
-        <div id="area-5s" style="display:none;">
+     <div id="area-5s" style="display:none;">
           <label><i class="fas fa-map-marker-alt" style="color:var(--green)"></i> พื้นที่ 5S</label>
           <div class="area-selector-5s">
-            <div class="area-btn-5s active" onclick="select5SArea('OFFICE', this)">
-              <i class="fas fa-desktop"></i>Office
-            </div>
-            <div class="area-btn-5s" onclick="select5SArea('Canteen', this)">
-              <i class="fas fa-utensils"></i>Canteen
-            </div>
-            <div class="area-btn-5s" onclick="select5SArea('QA&QC', this)">
-              <i class="fas fa-microscope"></i>QA&QC
-            </div>
-            <div class="area-btn-5s" onclick="select5SArea('Factory', this)">
-              <i class="fas fa-industry"></i>Factory
-            </div>
-            <div class="area-btn-5s" onclick="select5SArea('EN', this)">
-              <i class="fas fa-tools"></i>Engineering
-            </div>
-            <div class="area-btn-5s" onclick="select5SArea('Outside', this)">
-              <i class="fas fa-tree"></i>Outside
-            </div>
+            <div class="area-btn-5s active" onclick="select5SArea('OFFICE', this)"><i class="fas fa-desktop"></i>Office</div>
+            <div class="area-btn-5s" onclick="select5SArea('Canteen', this)"><i class="fas fa-utensils"></i>Canteen</div>
+            <div class="area-btn-5s" onclick="select5SArea('QA&QC', this)"><i class="fas fa-microscope"></i>QA&QC</div>
+            <div class="area-btn-5s" onclick="select5SArea('EN', this)"><i class="fas fa-tools"></i>Engineering</div>
+            <div class="area-btn-5s" onclick="select5SArea('Outside', this)"><i class="fas fa-tree"></i>Outside</div>
+            
+            <!-- 🌟 แยกแผนกจาก Factory เดิม -->
+            <div class="area-btn-5s" onclick="select5SArea('แผนก Print', this)"><i class="fas fa-print"></i>Print</div>
+            <div class="area-btn-5s" onclick="select5SArea('แผนก Laminate', this)"><i class="fas fa-layer-group"></i>Laminate</div>
+            <div class="area-btn-5s" onclick="select5SArea('แผนก Rewinder / Slitter / Packing', this)"><i class="fas fa-box-open"></i>Rewinder/Slitter/Packing</div>
+            <div class="area-btn-5s" onclick="select5SArea('แผนก BAG MAKING', this)"><i class="fas fa-shopping-bag"></i>BAG MAKING</div>
+            <div class="area-btn-5s" onclick="select5SArea('แผนก Warehouse', this)"><i class="fas fa-warehouse"></i>Warehouse</div>
           </div>
           <input type="hidden" id="area5S" name="area5S" value="OFFICE">
         </div>
