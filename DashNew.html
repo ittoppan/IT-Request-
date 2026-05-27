@@ -1211,15 +1211,19 @@ AREA_DISPLAY_MAP: {
       
      // Area filter
      // ใช้ตรรกะนี้ใน DashNew.html และ reportnew.html
+// เปลี่ยนบรรทัดนี้ในฟังก์ชัน renderTable()
 if (areaVal !== "") {
     filtered = filtered.filter(item => {
-        // เงื่อนไขรวมพื้นที่ (Grouping)
-        if (areaVal === "OFFICE_ALL") return item.area === "OFFICE";
-        if (areaVal === "QA_ALL") return item.area === "QA&QC";
-        if (areaVal === "OUTSIDE_ALL") return item.area === "OUTSIDE";
+        // ใช้ฟังก์ชันใหม่นี้ตรวจสอบพื้นที่
+        const normalizedItemArea = normalizeAreaForFilter(item.area);
+        
+        // เงื่อนไขรวมพื้นที่
+        if (areaVal === "OFFICE_ALL") return normalizedItemArea === "OFFICE";
+        if (areaVal === "QA_ALL") return normalizedItemArea === "QA&QC";
+        if (areaVal === "OUTSIDE_ALL") return normalizedItemArea === "OUTSIDE";
         
         // กรองแบบปกติ
-        return item.area === areaVal;
+        return normalizedItemArea === areaVal;
     });
 }
       
