@@ -1074,6 +1074,8 @@ AREA_DISPLAY_MAP: {
       `).join('');
     }
 
+
+    
     function toggleAreaDropdown() {
       const dropdown = document.getElementById('areaOptions');
       const display = document.getElementById('areaDisplay');
@@ -1241,6 +1243,81 @@ AREA_DISPLAY_MAP: {
         `;
       }).join('');
     }
+
+// ===================================================================
+// DETAIL ROW RENDERING - ฟังก์ชันนี้จำเป็นสำหรับการดูรายละเอียด
+// ===================================================================
+function renderDetailRow(d) {
+  const is5S = d.inspectionType === CONFIG.TYPE_5S;
+  const areaKey = is5S ? (d.area || 'OFFICE') : null;
+  
+  let detailHtml = `
+    <tr class="detail-row" id="detail-${d.id}">
+      <td colspan="7" style="padding:0;">
+        <div class="inner-detail">
+          <div class="detail-header">
+            <h4><i class="fas fa-clipboard-list"></i> รายละเอียดผลการตรวจสอบ</h4>
+            <div class="detail-meta">
+              <span><i class="fas fa-tag"></i> ${d.inspectionType}</span>
+              <span><i class="fas fa-map-marker-alt"></i> ${normalizeAreaDisplay(d.area)}</span>
+              <span><i class="fas fa-user"></i> ${d.inspector}</span>
+              <span><i class="fas fa-clock"></i> ${d.timestamp}</span>
+            </div>
+          </div>
+  `;
+  
+  if (is5S) {
+    const sections = CHECKLIST_5S[areaKey]?.sections || CHECKLIST_5S["OFFICE"].sections;
+    sections.forEach((sec, sIdx) => {
+      detailHtml += `<div class="section-group"><div class="section-head"><span><i class="${sec.icon}"></i> ${sec.title}</span></div>`;
+      sec.questions.forEach((qText, qIdx) => {
+        const detailKey = `5s_s${sIdx}_q${qIdx}`;
+        const res = d.fullChecklist[detailKey];
+        const remark = d.fullChecklist[`5s_remark_s${sIdx}_q${qIdx}`];
+        const isBad = res === "ไม่ดี";
+        const photoHtml = renderPhotos(d.photo, `5s_${sIdx}_${qIdx}`, d.fullChecklist);
+        
+        detailHtml += `
+          <div class="sub-item">
+            <div class="sub-item-text">• ${qText} ${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''} ${photoHtml}</div>
+            <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">
+              ${isBad ? '✘ ไม่ผ่าน' : (res === "ดี" ? '✔ ผ่าน' : '-')}
+            </div>
+          </div>`;
+      });
+      detailHtml += `</div>`;
+    });
+  } else {
+    for (let secKey in CHECKLIST_SAFETY) {
+      const section = CHECKLIST_SAFETY[secKey];
+      const sNum = secKey.replace('s', '');
+      detailHtml += `<div class="section-group"><div class="section-head"><span><i class="${section.icon}"></i> ${section.title}</span></div>`;
+      
+      section.questions.forEach((qText, qIdx) => {
+        const res = d.fullChecklist[`section${sNum}_q${qIdx}`];
+        const remark = d.fullChecklist[`section${sNum}_remark${qIdx}`];
+        const isBad = res === "ไม่ดี";
+        const photoHtml = renderPhotos(d.photo, `${secKey}_q${qIdx}`, d.fullChecklist);
+        
+        detailHtml += `
+          <div class="sub-item">
+            <div class="sub-item-text">• ${qText} ${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''} ${photoHtml}</div>
+            <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">
+              ${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}
+            </div>
+          </div>`;
+      });
+      detailHtml += `</div>`;
+    }
+  }
+  
+  detailHtml += `</div></td></tr>`;
+  return detailHtml;
+}
+
+
+
+    
     // ===================================================================
     // UTILITY FUNCTIONS - รวมไว้จุดเดียว
     // ===================================================================
