@@ -1501,32 +1501,16 @@ AREA_DISPLAY_MAP: {
       return `<span class="type-badge ${badgeClass}"><i class="${icon}"></i> ${type}</span>`;
     }
     
-   function normalizeAreaDisplay(area) {
-  // แปลงให้เป็นชื่อมาตรฐานก่อนหา
+  function normalizeAreaDisplay(area) {
+  // 1. แปลงเป็นชื่อมาตรฐานก่อน
   const normArea = normalizeAreaForFilter(area);
-  // ถ้ามีชื่อสวยๆ ใน CONFIG.AREA_DISPLAY_MAP ให้ใช้ชื่อนั้น
+  // 2. ดึงชื่อสวยๆ จาก CONFIG.AREA_DISPLAY_MAP มาแสดง
   return CONFIG.AREA_DISPLAY_MAP[normArea] || normArea;
 }
-    function normalizeAreaForFilter(area, inspectionType) {
-      if (inspectionType === CONFIG.TYPE_5S) {
-        for (const [key, value] of Object.entries(CONFIG.AREA_DISPLAY_MAP)) {
-          if (area === key || area === value) return key;
-        }
-      }
-      return area;
-    }
-    
-    function escapeHtml(text) {
-      if (!text) return '';
-      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-      return text.toString().replace(/[&<>"']/g, m => map[m]);
-    }
-    /**
- * ฟังก์ชันสำหรับแปลงชื่อพื้นที่เก่า ให้เป็นชื่อมาตรฐานใหม่
- * ช่วยให้ระบบกรองข้อมูลได้แม่นยำ แม้ข้อมูลในชีตจะเป็นชื่อเก่า
+   /**
+ * ฟังก์ชันกลางสำหรับแปลงพื้นที่ทุกรูปแบบ ให้เป็น "ชื่อมาตรฐาน" (เช่น PRINT, OFFICE)
  */
 function normalizeAreaForFilter(area) {
-  // ตารางแปลงชื่อเก่า (Key) ไปเป็นชื่อมาตรฐานใหม่ (Value)
   const aliasMap = {
     "แผนก Print": "PRINT",
     "แผนก Laminate": "LAMINATE",
@@ -1538,13 +1522,7 @@ function normalizeAreaForFilter(area) {
     "Office": "OFFICE",
     "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE"
   };
-
-  // ถ้าเจอชื่อเก่าในตาราง ให้เปลี่ยนเป็นชื่อใหม่ทันที
-  if (aliasMap[area]) {
-    return aliasMap[area];
-  }
-  // ถ้าไม่ใช่ชื่อเก่า (เช่น เป็นชื่อใหม่แล้ว) ให้ส่งค่าเดิมกลับไป
-  return area;
+  return aliasMap[area] || area;
 }
   </script>
 </body>
