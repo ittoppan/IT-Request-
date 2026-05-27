@@ -1506,6 +1506,21 @@ function normalizeAreaForFilter(area) {
   };
   return aliasMap[area] || area;
 }
+    /**
+ * ฟังก์ชันสำหรับแปลงตัวอักษรพิเศษให้เป็น HTML Entity
+ * ช่วยป้องกัน Error เวลาแสดงผลหมายเหตุที่มีตัวอักษรพิเศษ
+ */
+function escapeHtml(text) {
+  if (!text) return '';
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.toString().replace(/[&<>"']/g, m => map[m]);
+}
   </script>
 </body>
 </html>
