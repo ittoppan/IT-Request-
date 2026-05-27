@@ -925,6 +925,32 @@ if (areaVal !== "") {
       originalSelectType(type, el);
       debouncedRender();
     };
+
+    /**
+ * ฟังก์ชันสำหรับแปลงชื่อพื้นที่เก่า ให้เป็นชื่อมาตรฐานใหม่
+ * ช่วยให้ระบบกรองข้อมูลได้แม่นยำ แม้ข้อมูลในชีตจะเป็นชื่อเก่า
+ */
+function normalizeAreaForFilter(area) {
+  // ตารางแปลงชื่อเก่า (Key) ไปเป็นชื่อมาตรฐานใหม่ (Value)
+  const aliasMap = {
+    "แผนก Print": "PRINT",
+    "แผนก Laminate": "LAMINATE",
+    "แผนก Solvent": "SOLVENT",
+    "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING",
+    "แผนก BAG MAKING": "BAG MAKING",
+    "แผนก QA & QC": "QA&QC",
+    "แผนก Warehouse": "WAREHOUSE",
+    "Office": "OFFICE",
+    "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE"
+  };
+
+  // ถ้าเจอชื่อเก่าในตาราง ให้เปลี่ยนเป็นชื่อใหม่ทันที
+  if (aliasMap[area]) {
+    return aliasMap[area];
+  }
+  // ถ้าไม่ใช่ชื่อเก่า (เช่น เป็นชื่อใหม่แล้ว) ให้ส่งค่าเดิมกลับไป
+  return area;
+}
   </script>
 </body>
 </html>
