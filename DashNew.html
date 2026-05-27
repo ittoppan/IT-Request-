@@ -1171,14 +1171,21 @@ AREA_DISPLAY_MAP: {
     // ===================================================================
     // TABLE RENDERING
     // ===================================================================
+// ===================================================================
+    // TABLE RENDERING (ฉบับสมบูรณ์)
+    // ===================================================================
     function renderTable() {
       const tbody = document.getElementById('tableBody');
       if (!tbody) return;
-      const areaEl = document.getElementById('areaFilter');
-      const areaVal = areaEl ? areaEl.value : "";
+      
+      const areaFilterEl = document.getElementById('areaFilter');
+      const areaVal = areaFilterEl ? areaFilterEl.value : "";
       
       let filtered = [...fullData];
-      if (currentTypeFilter !== 'all') filtered = filtered.filter(d => d.inspectionType === currentTypeFilter);
+      
+      if (currentTypeFilter !== 'all') {
+        filtered = filtered.filter(d => d.inspectionType === currentTypeFilter);
+      }
       
       if (areaVal !== "") {
         filtered = filtered.filter(item => {
@@ -1194,18 +1201,46 @@ AREA_DISPLAY_MAP: {
       else if (currentStatusFilter === 'bad') filtered = filtered.filter(d => d.hasBad);
       
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>ไม่พบข้อมูลตามเงื่อนไข</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>ไม่พบข้อมูลตามเงื่อนไขที่เลือก</p></td></tr>';
         return;
       }
       
       tbody.innerHTML = filtered.map(d => {
+        // Photo display
+        let photoDisplay = '<span style="color:#aaa;">-</span>';
+        if (typeof d.photo === 'object' && d.photo !== null) {
+          const photoCount = Object.values(d.photo).filter(url => url && url.trim() !== "").length;
+          if (photoCount > 0) {
+            photoDisplay = `<span style="color:var(--primary);font-weight:600;"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
+          }
+        } else if (typeof d.photo === 'string' && d.photo && d.photo.trim() !== "") {
+          photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image"></i></a>`;
+        }
+        
         const displayArea = normalizeAreaDisplay(d.area);
         const typeBadge = getTypeBadge(d.inspectionType);
-        const statusBadge = d.hasBad ? `<span class="badge badge-bad">✘ พบปัญหา</span>` : `<span class="badge badge-good">✔ ปกติ</span>`;
-        return `<tr>... (คงเดิม) ...</tr>`;
+        const statusBadge = d.hasBad 
+          ? `<span class="badge badge-bad"><i class="fas fa-exclamation-triangle"></i> พบปัญหา</span>`
+          : `<span class="badge badge-good"><i class="fas fa-check-circle"></i> ปกติ</span>`;
+        
+        return `
+          <tr>
+            <td data-label="⏰ เวลา">${d.timestamp}</td>
+            <td data-label="🏷️ ประเภท">${typeBadge}</td>
+            <td data-label="📍 พื้นที่"><strong>${displayArea}</strong></td>
+            <td data-label="👤 ผู้ตรวจ">${d.inspector}</td>
+            <td data-label="✅ สถานะ">${statusBadge}</td>
+            <td data-label="📷 รูปภาพ">${photoDisplay}</td>
+            <td data-label="🔍 รายละเอียด">
+              <button class="btn-view" onclick="toggleDetail(${d.id})">
+                <i class="fas fa-chevron-down" id="icon-${d.id}"></i> ดูผลตรวจ
+              </button>
+            </td>
+          </tr>
+          ${renderDetailRow(d)}
+        `;
       }).join('');
     }
-
     // ===================================================================
     // UTILITY FUNCTIONS - รวมไว้จุดเดียว
     // ===================================================================
