@@ -1134,14 +1134,18 @@ AREA_DISPLAY_MAP: {
   // ===================================================================
     // DATA LOADING
     // ===================================================================
+ // ===================================================================
+    // DATA LOADING
+    // ===================================================================
     async function loadData() {
       if (isLoading) return;
       isLoading = true;
       
       const loader = document.getElementById('loader');
-      loader.classList.add('show');
+      if (loader) loader.classList.add('show');
       
-      const dateVal = document.getElementById('dateFilter').value;
+      const dateFilter = document.getElementById('dateFilter');
+      const dateVal = dateFilter ? dateFilter.value : "";
       
       try {
         const response = await fetch(`${CONFIG.API_URL}?action=getDashboardData&date=${dateVal}`);
@@ -1150,69 +1154,54 @@ AREA_DISPLAY_MAP: {
         const data = await response.json();
         fullData = data.details || [];
         
-        // 🌟 เพิ่มโค้ดส่วนนี้: บังคับให้ระบบหน้าบ้านเช็คสถานะของ 5S จาก JSON ด้วยตัวเอง
+        // 🌟 เช็คสถานะ 5S จาก JSON โดยตรง
         fullData.forEach(d => {
           if (d.inspectionType === CONFIG.TYPE_5S && d.fullChecklist) {
-            let foundBad = false;
-            // วนลูปเช็คทุกคำตอบใน JSON ว่ามีข้อไหนตอบ "ไม่ดี" หรือไม่
-            for (let key in d.fullChecklist) {
-              if (d.fullChecklist[key] === "ไม่ดี") {
-                foundBad = true;
-                break; // เจอข้อเดียวถือว่าพบปัญหาเลย
-              }
-            }
-            d.hasBad = foundBad; // อัปเดตสถานะให้ตัวแปรหลัก
+            d.hasBad = Object.values(d.fullChecklist).includes("ไม่ดี");
           }
         });
 
-        // 🌟 คำนวณสรุปตัวเลข Card ด้านบนใหม่จากข้อมูลที่เช็คแล้ว
+        // Update stats
         const total = fullData.length;
         const bad = fullData.filter(d => d.hasBad).length;
         const good = total - bad;
         
-        // Update stats
-        document.getElementById('countTotal').innerText = total;
-        document.getElementById('countGood').innerText = good;
-        document.getElementById('countBad').innerText = bad;
+        if (document.getElementById('countTotal')) document.getElementById('countTotal').innerText = total;
+        if (document.getElementById('countGood')) document.getElementById('countGood').innerText = good;
+        if (document.getElementById('countBad')) document.getElementById('countBad').innerText = bad;
         
-        // Re-render table with current filters
+        // renderTable หลังจากข้อมูลโหลดเสร็จ
         renderTable();
         
       } catch (err) {
         console.error("Load data error:", err);
-        document.getElementById('tableBody').innerHTML = `
-          <tr>
-            <td colspan="7" class="empty-state">
-              <i class="fas fa-triangle-exclamation"></i>
-              <p>ไม่สามารถโหลดข้อมูลได้</p>
-              <small style="color:var(--danger);">${err.message}</small>
-            </td>
-          </tr>
-        `;
       } finally {
         isLoading = false;
-        loader.classList.remove('show');
+        if (loader) loader.classList.remove('show');
       }
     }
 
     // ===================================================================
     // TABLE RENDERING
     // ===================================================================
-   function renderTable() {
-      // 1. ดึงค่าจาก DOM (ประกาศตัวแปรให้ครบ)
-      const areaVal = document.getElementById('areaFilter').value;
-      const statusVal = document.getElementById('statusFilter').value;
+    function renderTable() {
       const tbody = document.getElementById('tableBody');
+      if (!tbody) return; // กัน Error ถ้าหา tableBody ไม่เจอ
       
-      // 2. Apply filters
+      // ดึงค่า Filter แบบปลอดภัย (เช็ค null ก่อน)
+      const areaEl = document.getElementById('areaFilter');
+      const statusEl = document.getElementById('statusFilter');
+      const areaVal = areaEl ? areaEl.value : "";
+      const statusVal = statusEl ? statusEl.value : "";
+      
       let filtered = [...fullData];
       
-      // Type filter
+      // 1. Type filter
       if (currentTypeFilter !== 'all') {
         filtered = filtered.filter(d => d.inspectionType === currentTypeFilter);
       }
       
-      // 3. Area filter (รวมกลุ่มพื้นที่)
+      // 2. Area filter (รวมกลุ่มพื้นที่)
       if (areaVal !== "") {
         filtered = filtered.filter(item => {
           const normalizedItemArea = normalizeAreaForFilter(item.area);
@@ -1225,27 +1214,20 @@ AREA_DISPLAY_MAP: {
         });
       }
       
-      // 4. Status filter
+      // 3. Status filter
       if (currentStatusFilter === 'good') {
         filtered = filtered.filter(d => !d.hasBad);
       } else if (currentStatusFilter === 'bad') {
         filtered = filtered.filter(d => d.hasBad);
       }
       
-      // 5. Empty state
+      // 4. Empty state
       if (filtered.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="7" class="empty-state">
-              <i class="fas fa-search"></i>
-              <p>ไม่พบข้อมูลตามเงื่อนไขที่เลือก</p>
-            </td>
-          </tr>
-        `;
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-search"></i><p>ไม่พบข้อมูลตามเงื่อนไขที่เลือก</p></td></tr>';
         return;
       }
       
-      // 6. Render rows
+      // 5. Render rows
       tbody.innerHTML = filtered.map(d => {
         let photoDisplay = '<span style="color:#aaa;">-</span>';
         if (typeof d.photo === 'object' && d.photo !== null) {
@@ -1257,7 +1239,7 @@ AREA_DISPLAY_MAP: {
           photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image"></i></a>`;
         }
         
-        const displayArea = normalizeAreaDisplay(d.area, d.inspectionType);
+        const displayArea = normalizeAreaDisplay(d.area);
         const typeBadge = getTypeBadge(d.inspectionType);
         const statusBadge = d.hasBad 
           ? `<span class="badge badge-bad"><i class="fas fa-exclamation-triangle"></i> พบปัญหา</span>`
