@@ -1477,21 +1477,14 @@ function renderTable() {
  */
 function normalizeAreaForFilter(area) {
   const aliasMap = {
-    "แผนก Print": "PRINT",
-    "แผนก Laminate": "LAMINATE",
-    "แผนก Solvent": "SOLVENT",
-    "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING",
-    "แผนก BAG MAKING": "BAG MAKING",
-    "แผนก QA & QC": "QA&QC",
-    "แผนก Warehouse": "WAREHOUSE",
-    "Office": "OFFICE",
-    "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE"
+    "แผนก Print": "PRINT", "แผนก Laminate": "LAMINATE",
+    "แผนก Solvent": "SOLVENT", "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING",
+    "แผนก BAG MAKING": "BAG MAKING", "แผนก QA & QC": "QA&QC",
+    "แผนก Warehouse": "WAREHOUSE", "Office": "OFFICE",
+    "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE", "Canteen": "CANTEEN", "EN": "ENGINEERING"
   };
-  return aliasMap[area] || area;
-}
-    /**
- * ฟังก์ชันสำหรับแปลงตัวอักษรพิเศษให้เป็น HTML Entity
- * ช่วยป้องกัน Error เวลาแสดงผลหมายเหตุที่มีตัวอักษรพิเศษ
+  return aliasMap[area] || area; // คืนค่าชื่อมาตรฐาน หรือชื่อเดิมถ้าไม่พบใน Map
+} เวลาแสดงผลหมายเหตุที่มีตัวอักษรพิเศษ
  */
 function escapeHtml(text) {
   if (!text) return '';
@@ -1508,34 +1501,27 @@ function escapeHtml(text) {
     // UTILITY FUNCTIONS (รวมไว้ที่นี่จุดเดียวเพื่อป้องกัน Error)
     // ===================================================================
 
-    // 1. ฟังก์ชันป้องกัน XSS
-    function escapeHtml(text) {
-      if (!text) return '';
-      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-      return text.toString().replace(/[&<>"']/g, m => map[m]);
-    }
+   function escapeHtml(text) {
+  if (!text) return '';
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text.toString().replace(/[&<>"']/g, m => map[m]);
+}
 
-    // 2. ฟังก์ชันแปลงพื้นที่เก่าเป็นชื่อใหม่
-    function normalizeAreaForFilter(area) {
-      const aliasMap = {
-        "แผนก Print": "PRINT",
-        "แผนก Laminate": "LAMINATE",
-        "แผนก Solvent": "SOLVENT",
-        "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING",
-        "แผนก BAG MAKING": "BAG MAKING",
-        "แผนก QA & QC": "QA&QC",
-        "แผนก Warehouse": "WAREHOUSE",
-        "Office": "OFFICE",
-        "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE"
-      };
-      return aliasMap[area] || area;
-    }
+ function normalizeAreaForFilter(area) {
+  const aliasMap = {
+    "แผนก Print": "PRINT", "แผนก Laminate": "LAMINATE",
+    "แผนก Solvent": "SOLVENT", "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING",
+    "แผนก BAG MAKING": "BAG MAKING", "แผนก QA & QC": "QA&QC",
+    "แผนก Warehouse": "WAREHOUSE", "Office": "OFFICE",
+    "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE", "Canteen": "CANTEEN", "EN": "ENGINEERING"
+  };
+  return aliasMap[area] || area; // คืนค่าชื่อมาตรฐาน หรือชื่อเดิมถ้าไม่พบใน Map
+}
 
-    // 3. ฟังก์ชันดึงชื่อสวยๆ มาแสดง
-    function normalizeAreaDisplay(area) {
-      const normArea = normalizeAreaForFilter(area);
-      return CONFIG.AREA_DISPLAY_MAP[normArea] || normArea;
-    }
+   function normalizeAreaDisplay(area) {
+  const normArea = normalizeAreaForFilter(area);
+  return CONFIG.AREA_DISPLAY_MAP[normArea] || normArea;
+}
 
     // 4. ฟังก์ชันแสดง Badge ตามประเภท
     function getTypeBadge(type) {
