@@ -489,48 +489,47 @@ AREA_DISPLAY_MAP: {
     // ===================================================================
     // AREA DATA FOR DROPDOWN
     // ===================================================================
-  const AREA_DATA = {
-      all: [
-        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
-        { value: "OFFICE_ALL", label: "🏢 OFFICE (รวม)", icon: "fas fa-building" },
-        { value: "QA_ALL", label: "🔬 QA & QC (รวม)", icon: "fas fa-vial" },
-        { value: "OUTSIDE_ALL", label: "🌳 พื้นที่รอบโรงงาน (รวม)", icon: "fas fa-tree" },
-        { value: "แผนก Print", label: "🖨️ แผนก PRINT", icon: "fas fa-print" },
-        { value: "แผนก Laminate", label: "📦 แผนก LAMINATE", icon: "fas fa-layer-group" },
-        { value: "แผนก Solvent", label: "🧪 แผนก SOLVENT", icon: "fas fa-flask" },
-        { value: "แผนก Rewinder / Slitter / Packing", label: "🔄 แผนก REWINDER / SLITTER / PACKING", icon: "fas fa-box-open" },
-        { value: "แผนก BAG MAKING", label: "🛍️ แผนก BAG MAKING", icon: "fas fa-shopping-bag" },
-        { value: "แผนก Warehouse", label: "🏭 แผนก WAREHOUSE", icon: "fas fa-warehouse" },
-        { value: "Canteen", label: "🍽️ CANTEEN", icon: "fas fa-utensils" },
-        { value: "EN", label: "🔧 ENGINEERING", icon: "fas fa-tools" }
-      ],
-      safety: [
-        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
-        { value: "แผนก Print", label: "🖨️ แผนก PRINT", icon: "fas fa-print" },
-        { value: "แผนก Laminate", label: "📦 แผนก LAMINATE", icon: "fas fa-layer-group" },
-        { value: "แผนก Solvent", label: "🧪 แผนก SOLVENT", icon: "fas fa-flask" },
-        { value: "แผนก Rewinder / Slitter / Packing", label: "🔄 แผนก REWINDER / SLITTER / PACKING", icon: "fas fa-box-open" },
-        { value: "แผนก BAG MAKING", label: "🛍️ แผนก BAG MAKING", icon: "fas fa-shopping-bag" },
-        { value: "แผนก QA & QC", label: "🔬 แผนก QA & QC", icon: "fas fa-vial" },
-        { value: "แผนก Warehouse", label: "🏭 แผนก WAREHOUSE", icon: "fas fa-warehouse" },
-        { value: "Office", label: "🏢 OFFICE", icon: "fas fa-building" },
-        { value: "พื้นที่รอบบริเวณโรงงาน", label: "🌳 พื้นที่รอบบริเวณโรงงาน", icon: "fas fa-tree" }
-      ],
-      "5S": [
-        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
-        { value: "OFFICE", label: "🖥️ OFFICE", icon: "fas fa-desktop" },
-        { value: "Canteen", label: "🍽️ CANTEEN", icon: "fas fa-utensils" },
-        { value: "QA&QC", label: "🔬 QA&QC", icon: "fas fa-microscope" },
-        { value: "EN", label: "🔧 ENGINEERING", icon: "fas fa-tools" },
-        { value: "Outside", label: "🌳 พื้นที่รอบโรงงาน", icon: "fas fa-tree" },
-        // 🌟 เพิ่มแผนกที่แยกจาก Factory ลงใน Dropdown ของ 5S
-        { value: "แผนก Print", label: "🖨️ แผนก PRINT", icon: "fas fa-print" },
-        { value: "แผนก Laminate", label: "📦 แผนก LAMINATE", icon: "fas fa-layer-group" },
-        { value: "แผนก Rewinder / Slitter / Packing", label: "🔄 แผนก REWINDER / SLITTER / PACKING", icon: "fas fa-box-open" },
-        { value: "แผนก BAG MAKING", label: "🛍️ แผนก BAG MAKING", icon: "fas fa-shopping-bag" },
-        { value: "แผนก Warehouse", label: "🏭 แผนก WAREHOUSE", icon: "fas fa-warehouse" }
-      ]
-    };
+const AREA_DATA = {
+  all: [
+    { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
+    { value: "OFFICE_ALL", label: "🏢 OFFICE (รวม)", icon: "fas fa-building" },
+    { value: "QA_ALL", label: "🔬 QA & QC (รวม)", icon: "fas fa-vial" },
+    { value: "OUTSIDE_ALL", label: "🌳 พื้นที่รอบโรงงาน (รวม)", icon: "fas fa-tree" },
+    { value: "PRINT", label: "🖨️ PRINT", icon: "fas fa-print" },
+    { value: "LAMINATE", label: "📦 LAMINATE", icon: "fas fa-layer-group" },
+    { value: "SOLVENT", label: "🧪 SOLVENT", icon: "fas fa-flask" },
+    { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER/PACKING", icon: "fas fa-box-open" },
+    { value: "BAG MAKING", label: "🛍️ BAG MAKING", icon: "fas fa-shopping-bag" },
+    { value: "WAREHOUSE", label: "🏭 WAREHOUSE", icon: "fas fa-warehouse" },
+    { value: "CANTEEN", label: "🍽️ CANTEEN", icon: "fas fa-utensils" },
+    { value: "ENGINEERING", label: "🔧 ENGINEERING", icon: "fas fa-tools" }
+  ],
+  safety: [
+    { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
+    { value: "PRINT", label: "🖨️ PRINT", icon: "fas fa-print" },
+    { value: "LAMINATE", label: "📦 LAMINATE", icon: "fas fa-layer-group" },
+    { value: "SOLVENT", label: "🧪 SOLVENT", icon: "fas fa-flask" },
+    { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER/PACKING", icon: "fas fa-box-open" },
+    { value: "BAG MAKING", label: "🛍️ BAG MAKING", icon: "fas fa-shopping-bag" },
+    { value: "QA&QC", label: "🔬 QA&QC", icon: "fas fa-vial" },
+    { value: "WAREHOUSE", label: "🏭 WAREHOUSE", icon: "fas fa-warehouse" },
+    { value: "OFFICE", label: "🏢 OFFICE", icon: "fas fa-building" },
+    { value: "OUTSIDE", label: "🌳 OUTSIDE", icon: "fas fa-tree" }
+  ],
+  "5S": [
+    { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
+    { value: "OFFICE", label: "🖥️ OFFICE", icon: "fas fa-desktop" },
+    { value: "CANTEEN", label: "🍽️ CANTEEN", icon: "fas fa-utensils" },
+    { value: "QA&QC", label: "🔬 QA&QC", icon: "fas fa-microscope" },
+    { value: "ENGINEERING", label: "🔧 ENGINEERING", icon: "fas fa-tools" },
+    { value: "OUTSIDE", label: "🌳 OUTSIDE", icon: "fas fa-tree" },
+    { value: "PRINT", label: "🖨️ PRINT", icon: "fas fa-print" },
+    { value: "LAMINATE", label: "📦 LAMINATE", icon: "fas fa-layer-group" },
+    { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER/PACKING", icon: "fas fa-box-open" },
+    { value: "BAG MAKING", label: "🛍️ BAG MAKING", icon: "fas fa-shopping-bag" },
+    { value: "WAREHOUSE", label: "🏭 WAREHOUSE", icon: "fas fa-warehouse" }
+  ]
+};
 
     // ===================================================================
     // STATE
