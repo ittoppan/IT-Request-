@@ -44,20 +44,18 @@
     .type-btn.active-5s i { color: #219a52; }
 
     /* Inputs & Selects */
-    input[type="text"], input[type="number"], input[type="date"], select, textarea {
+    input[type="text"], input[type="number"], input[type="date"], select, textarea, .form-select {
       width: 100%; padding: 11px 12px; border-radius: 10px; border: 1.5px solid var(--border);
       font-family: 'Prompt'; font-size: 14px; background: #fafafa; transition: 0.2s; color: var(--text);
     }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15); }
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;
+      cursor: pointer;
+    }
+    input:focus, select:focus, textarea:focus, .form-select:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15); }
     textarea { resize: vertical; min-height: 65px; }
-
-    /* Area Buttons */
-    .area-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-    .area-btn { padding: 10px 6px; border-radius: 12px; border: 2px solid var(--border); background: #f8f9fa; text-align: center; cursor: pointer; font-family: 'Prompt'; font-size: 0.72rem; font-weight: 600; color: #666; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 58px; }
-    .area-btn i { font-size: 1.1rem; color: var(--gray); }
-    .area-btn:hover { transform: translateY(-2px); border-color: var(--primary); }
-    .area-btn.active { background: linear-gradient(145deg, #fff3e0, #ffe0b2); color: var(--primary-dark); border-color: var(--primary-dark); }
-    .area-btn.active i { color: var(--primary-dark); }
 
     /* Check Items */
     .check-item { background: #fff; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 1.5px solid var(--border); transition: 0.2s; }
@@ -106,7 +104,6 @@
     /* Responsive */
     @media (max-width: 480px) {
       .type-selector { grid-template-columns: repeat(2, 1fr); }
-      .area-grid { grid-template-columns: repeat(2, 1fr); }
       .header h2 { font-size: 1.15rem; }
     }
     @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:0.01ms!important; transition-duration:0.01ms!important; } }
@@ -140,14 +137,17 @@
         </div>
         <input type="hidden" id="inspectionType" value="จป.ว">
 
+        <!-- ✅ DROPDOWN: Safety Area -->
         <div id="areaSafety" style="margin-top:12px;">
           <label><i class="fas fa-map-marker-alt" style="color:var(--primary)"></i> พื้นที่สำรวจ</label>
-          <div class="area-grid" id="areaSafetyGrid"></div>
+          <select id="areaSafetySelect" class="form-select" onchange="handleAreaChange(this.value)"></select>
           <input type="hidden" id="areaSafetyVal" value="PRINT">
         </div>
+
+        <!-- ✅ DROPDOWN: 5S Area -->
         <div id="area5S" style="margin-top:12px; display:none;">
           <label><i class="fas fa-broom" style="color:var(--success)"></i> พื้นที่ 5S</label>
-          <div class="area-grid" id="area5SGrid"></div>
+          <select id="area5SSelect" class="form-select" onchange="handle5SAreaChange(this.value)"></select>
           <input type="hidden" id="area5SVal" value="OFFICE">
         </div>
 
@@ -177,19 +177,19 @@
     };
 
     const AREA_SAFETY = [
-      { value: "PRINT", label: "PRINT", icon: "fa-print" }, { value: "LAMINATE", label: "LAMINATE", icon: "fa-layer-group" },
-      { value: "SOLVENT", label: "SOLVENT", icon: "fa-flask" }, { value: "REWINDER/SLITTER/PACKING", label: "REWINDER/SLITTER", icon: "fa-box-open" },
-      { value: "BAG MAKING", label: "BAG MAKING", icon: "fa-shopping-bag" }, { value: "QA&QC", label: "QA&QC", icon: "fa-vial" },
-      { value: "WAREHOUSE", label: "WAREHOUSE", icon: "fa-warehouse" }, { value: "OFFICE", label: "OFFICE", icon: "fa-building" },
-      { value: "OUTSIDE", label: "OUTSIDE", icon: "fa-tree" }
+      { value: "PRINT", label: "🖨️ PRINT" }, { value: "LAMINATE", label: "📦 LAMINATE" },
+      { value: "SOLVENT", label: "🧪 SOLVENT" }, { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER/PACKING" },
+      { value: "BAG MAKING", label: "🛍️ BAG MAKING" }, { value: "QA&QC", label: "🔬 QA&QC" },
+      { value: "WAREHOUSE", label: "🏭 WAREHOUSE" }, { value: "OFFICE", label: "🏢 OFFICE" },
+      { value: "OUTSIDE", label: "🌳 OUTSIDE" }
     ];
 
     const AREA_5S = [
-      { value: "PRINT", label: "PRINT", icon: "fa-print" }, { value: "LAMINATE", label: "LAMINATE", icon: "fa-layer-group" },
-      { value: "REWINDER/SLITTER/PACKING", label: "REWINDER/SLITTER", icon: "fa-box-open" }, { value: "BAG MAKING", label: "BAG MAKING", icon: "fa-shopping-bag" },
-      { value: "WAREHOUSE", label: "WAREHOUSE", icon: "fa-warehouse" }, { value: "OFFICE", label: "OFFICE", icon: "fa-desktop" },
-      { value: "CANTEEN", label: "CANTEEN", icon: "fa-utensils" }, { value: "QA&QC", label: "QA&QC", icon: "fa-microscope" },
-      { value: "ENGINEERING", label: "ENGINEERING", icon: "fa-tools" }, { value: "OUTSIDE", label: "OUTSIDE", icon: "fa-tree" }
+      { value: "OFFICE", label: "🖥️ OFFICE" }, { value: "CANTEEN", label: "🍽️ CANTEEN" },
+      { value: "QA&QC", label: "🔬 QA&QC" }, { value: "ENGINEERING", label: "🔧 ENGINEERING" },
+      { value: "OUTSIDE", label: "🌳 OUTSIDE" }, { value: "PRINT", label: "🖨️ PRINT" },
+      { value: "LAMINATE", label: "📦 LAMINATE" }, { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER" },
+      { value: "BAG MAKING", label: "🛍️ BAG MAKING" }, { value: "WAREHOUSE", label: "🏭 WAREHOUSE" }
     ];
 
     const CHECKLIST_SAFETY = {
@@ -279,40 +279,31 @@
     // INIT & RENDER
     // ===================================================================
     function init() {
-      renderAreas();
+      populateDropdowns();
       buildChecklist();
       loadDraft();
       setupAutoSave();
-      
       document.getElementById('safetyForm').addEventListener('submit', handleSubmit);
     }
 
-    function renderAreas() {
-      const createGrid = (containerId, items, isActive, onChange) => {
-        const container = document.getElementById(containerId);
-        container.innerHTML = items.map(a => `
-          <div class="area-btn ${isActive(a.value) ? 'active' : ''}" data-value="${a.value}" onclick="${onChange}('${a.value}', this)">
-            <i class="fas ${a.icon}"></i>${a.label}
-          </div>
-        `).join('');
+    function populateDropdowns() {
+      const fillSelect = (id, data, defaultVal) => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = data.map(d => `<option value="${d.value}" ${d.value===defaultVal?'selected':''}>${d.label}</option>`).join('');
       };
-      createGrid('areaSafetyGrid', AREA_SAFETY, v => v === state.area, (v, el) => setArea(v, el));
-      createGrid('area5SGrid', AREA_5S, v => v === state.area5S, (v, el) => set5SArea(v, el));
+      fillSelect('areaSafetySelect', AREA_SAFETY, state.area);
+      fillSelect('area5SSelect', AREA_5S, state.area5S);
     }
 
-    function setArea(val, el) {
+    function handleAreaChange(val) {
       state.area = val;
       document.getElementById('areaSafetyVal').value = val;
-      document.querySelectorAll('#areaSafetyGrid .area-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
       buildChecklist();
     }
 
-    function set5SArea(val, el) {
+    function handle5SAreaChange(val) {
       state.area5S = val;
       document.getElementById('area5SVal').value = val;
-      document.querySelectorAll('#area5SGrid .area-btn-5s, #area5SGrid .area-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
       buildChecklist();
     }
 
@@ -435,18 +426,14 @@
     // ===================================================================
     // EVENT HANDLERS
     // ===================================================================
-    function triggerInput(type, qKey) {
-      document.getElementById(`${type}_${qKey}`).click();
-    }
+    function triggerInput(type, qKey) { document.getElementById(`${type}_${qKey}`).click(); }
 
     function handlePhoto(input, qKey) {
       if (!input.files[0]) return;
       if (!state.images[qKey]) state.images[qKey] = [];
       if (state.images[qKey].length >= CONFIG.MAX_IMAGES_PER_ITEM) {
-        showToast('จำกัดสูงสุด 3 รูปต่อข้อ', 'error');
-        input.value = ''; return;
+        showToast('จำกัดสูงสุด 3 รูปต่อข้อ', 'error'); input.value = ''; return;
       }
-
       const reader = new FileReader();
       reader.onload = e => {
         const img = new Image();
@@ -455,24 +442,16 @@
           const scale = Math.min(CONFIG.IMAGE_MAX_WIDTH / img.width, CONFIG.IMAGE_MAX_WIDTH / img.height, 1);
           canvas.width = img.width * scale; canvas.height = img.height * scale;
           canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-          const b64 = canvas.toDataURL('image/jpeg', CONFIG.IMAGE_QUALITY);
-          
-          state.images[qKey].push({ b64, caption: '' });
-          renderPhotos(qKey);
-          input.value = '';
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(input.files[0]);
+          state.images[qKey].push({ b64: canvas.toDataURL('image/jpeg', CONFIG.IMAGE_QUALITY), caption: '' });
+          renderPhotos(qKey); input.value = '';
+        }; img.src = e.target.result;
+      }; reader.readAsDataURL(input.files[0]);
     }
 
     function renderPhotos(qKey) {
       const container = document.getElementById(`preview_${qKey}`);
       container.innerHTML = (state.images[qKey] || []).map((img, idx) => `
-        <div class="photo-thumb">
-          <img src="${img.b64}">
-          <div class="photo-remove" onclick="removePhoto('${qKey}', ${idx})"><i class="fas fa-times"></i></div>
-        </div>
+        <div class="photo-thumb"><img src="${img.b64}"><div class="photo-remove" onclick="removePhoto('${qKey}', ${idx})"><i class="fas fa-times"></i></div></div>
         <input class="photo-caption" value="${escapeHtml(img.caption)}" placeholder="คอมเมนต์.." onchange="updateCaption('${qKey}', ${idx}, this.value)">
       `).join('');
     }
@@ -485,7 +464,6 @@
       const remark = el.querySelector('textarea');
       const ddBox = document.getElementById(`dd_${qKey}`);
       const ddInput = ddBox.querySelector('input');
-
       state.responses[qKey] = { status };
       if (status === 'ไม่ดี') {
         remark.required = true; remark.placeholder = '* กรุณาระบุรายละเอียด';
@@ -506,8 +484,7 @@
       const hidden = document.getElementById(`hidden_${qKey}`);
 
       if (!val) { badge.style.display='none'; hidden.value=''; state.responses[qKey] = {}; return; }
-      const num = parseFloat(val);
-      badge.style.display = 'inline-block';
+      const num = parseFloat(val); badge.style.display = 'inline-block';
       if (num < 50) {
         badge.textContent = '⚠️ ไม่ปกติ'; badge.className = 'water-badge warning';
         hidden.value = 'ไม่ดี'; state.responses[qKey] = { status: 'ไม่ดี', waterValue: num };
@@ -523,150 +500,79 @@
     // VALIDATION & SUBMIT
     // ===================================================================
     function validate() {
-      const inspector = document.getElementById('inspectorName').value.trim();
-      if (!inspector) { showToast('กรุณาระบุชื่อผู้ตรวจสอบ', 'error'); return false; }
-
+      if (!document.getElementById('inspectorName').value.trim()) { showToast('กรุณาระบุชื่อผู้ตรวจสอบ', 'error'); return false; }
       document.querySelectorAll('.check-item').forEach(el => el.classList.remove('error'));
       let valid = true;
-      const items = document.querySelectorAll('.check-item');
-
-      items.forEach(el => {
-        const qKey = el.id.replace('item_', '');
+      document.querySelectorAll('.check-item').forEach(el => {
         if (el.style.display === 'none') return;
-        
+        const qKey = el.id.replace('item_', '');
         const radios = el.querySelectorAll('input[type="radio"]');
         if (radios.length > 0) {
           const checked = el.querySelector('input[type="radio"]:checked');
-          if (!checked && !el.classList.contains('water-mist-block')) {
-            el.classList.add('error'); valid = false;
-          } else if (checked?.value === 'ไม่ดี') {
-            const remark = el.querySelector('textarea');
-            const dd = el.querySelector('input[type="date"]');
-            if (!remark.value.trim() || !dd.value) { el.classList.add('error'); valid = false; }
+          if (!checked && !el.classList.contains('water-mist-block')) { el.classList.add('error'); valid = false; }
+          else if (checked?.value === 'ไม่ดี') {
+            if (!el.querySelector('textarea').value.trim() || !el.querySelector('input[type="date"]').value) { el.classList.add('error'); valid = false; }
           }
         }
         if (el.classList.contains('water-mist-block') && el.style.display !== 'none') {
           const wv = el.querySelector('input[type="number"]');
           if (!wv.value.trim()) { el.classList.add('error'); valid = false; }
           else if (parseFloat(wv.value) < 50) {
-            const remark = el.querySelector('textarea');
-            const dd = el.querySelector('input[type="date"]');
-            if (!remark.value.trim() || !dd.value) { el.classList.add('error'); valid = false; }
+            if (!el.querySelector('textarea').value.trim() || !el.querySelector('input[type="date"]').value) { el.classList.add('error'); valid = false; }
           }
         }
       });
-      if (!valid) {
-        const firstErr = document.querySelector('.check-item.error');
-        if (firstErr) firstErr.scrollIntoView({ behavior:'smooth', block:'center' });
-      }
+      if (!valid) document.querySelector('.check-item.error')?.scrollIntoView({ behavior:'smooth', block:'center' });
       return valid;
     }
 
     async function handleSubmit(e) {
       e.preventDefault();
       if (!validate()) return;
-
       document.getElementById('loader').classList.add('show');
       document.getElementById('submitBtn').disabled = true;
-
       try {
-        const payload = buildPayload();
-        const res = await fetchWithRetry(CONFIG.API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify(payload)
-        });
-
+        const res = await fetchWithRetry(CONFIG.API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(buildPayload()) });
         if (res.status === 'success') {
           showToast('✅ ส่งรายงานสำเร็จ', 'success');
           localStorage.removeItem(CONFIG.DRAFT_KEY);
           setTimeout(() => window.location.href = 'Dash.html', 1500);
-        } else {
-          throw new Error(res.message || 'Submission failed');
-        }
-      } catch (err) {
-        showToast(`❌ ${err.message}`, 'error');
-      } finally {
-        document.getElementById('loader').classList.remove('show');
-        document.getElementById('submitBtn').disabled = false;
-      }
+        } else throw new Error(res.message || 'Submission failed');
+      } catch (err) { showToast(`❌ ${err.message}`, 'error'); }
+      finally { document.getElementById('loader').classList.remove('show'); document.getElementById('submitBtn').disabled = false; }
     }
 
     function buildPayload() {
-      const details = {};
-      const images = {};
-      const is5S = state.type === '5S';
-      const area = is5S ? state.area5S : state.area;
-
-      // Collect responses & images
+      const details = {}, images = {}, is5S = state.type === '5S', area = is5S ? state.area5S : state.area;
       Object.entries(state.responses).forEach(([qKey, resp]) => {
-        if (resp.status) {
-          if (qKey.startsWith('5s_')) {
-            details[qKey] = resp.status;
-            if (resp.status === 'ไม่ดี') {
-              details[`${qKey}_remark`] = document.querySelector(`#item_${qKey} textarea`).value;
-              details[`${qKey}_duedate`] = document.querySelector(`#item_${qKey} input[type="date"]`).value;
-            }
-          } else {
-            details[qKey] = resp.status;
-            if (resp.status === 'ไม่ดี') {
-              details[`${qKey.replace('s', 'section')}_remark`] = document.querySelector(`#item_${qKey} textarea`).value;
-              details[`${qKey.replace('s', 'section')}_duedate`] = document.querySelector(`#item_${qKey} input[type="date"]`).value;
-            }
-          }
+        if (!resp.status) return;
+        const prefix = qKey.startsWith('5s_') ? qKey : qKey.replace('s', 'section');
+        details[qKey] = resp.status;
+        if (resp.status === 'ไม่ดี') {
+          details[`${prefix}_remark`] = document.querySelector(`#item_${qKey} textarea`).value;
+          details[`${prefix}_duedate`] = document.querySelector(`#item_${qKey} input[type="date"]`).value;
         }
         if (resp.waterValue !== undefined) details.water_val = resp.waterValue;
       });
-
-      Object.entries(state.images).forEach(([qKey, imgs]) => {
-        imgs.forEach((img, idx) => {
-          images[`${qKey}_${idx}`] = img.b64;
-          if (img.caption.trim()) details[`caption_${qKey}_${idx}`] = img.caption;
-        });
-      });
-
-      // Calculate section results
+      Object.entries(state.images).forEach(([qKey, imgs]) => imgs.forEach((img, idx) => {
+        images[`${qKey}_${idx}`] = img.b64;
+        if (img.caption.trim()) details[`caption_${qKey}_${idx}`] = img.caption;
+      }));
       const secRes = {};
-      if (is5S) {
-        ['s1','s2','s3','s4','s5','s6','s7'].forEach(s => secRes[`${s}_res`] = 'ดี');
-      } else {
+      if (is5S) ['s1','s2','s3','s4','s5','s6','s7'].forEach(s => secRes[`${s}_res`] = 'ดี');
+      else {
         Object.keys(CHECKLIST_SAFETY).forEach(sKey => {
-          const sNum = sKey.replace('s','');
           let hasBad = false;
-          const qs = CHECKLIST_SAFETY[sKey].qs;
-          qs.forEach((_, i) => {
-            const val = details[`section${sNum}_q${i}`];
-            if (val === 'ไม่ดี') hasBad = true;
-          });
-          if (sKey === 's1' && (area === 'PRINT' || area === 'LAMINATE')) {
-            const wv = parseFloat(details.water_val);
-            if (wv < 50) hasBad = true;
-          }
+          CHECKLIST_SAFETY[sKey].qs.forEach((_, i) => { if (details[`section${sKey.replace('s','')}_q${i}`] === 'ไม่ดี') hasBad = true; });
+          if (sKey === 's1' && (area === 'PRINT' || area === 'LAMINATE') && parseFloat(details.water_val) < 50) hasBad = true;
           secRes[`${sKey}_res`] = hasBad ? 'ไม่ดี' : 'ดี';
         });
       }
-
-      return {
-        inspector: document.getElementById('inspectorName').value.trim(),
-        area: area,
-        inspectionType: state.type,
-        area5S: is5S ? area : null,
-        images,
-        details,
-        ...secRes
-      };
+      return { inspector: document.getElementById('inspectorName').value.trim(), area, inspectionType: state.type, area5S: is5S ? area : null, images, details, ...secRes };
     }
 
     async function fetchWithRetry(url, options, retries = 3) {
-      for (let i = 0; i < retries; i++) {
-        try {
-          const res = await fetch(url, options);
-          return await res.json();
-        } catch (err) {
-          if (i === retries - 1) throw err;
-          await new Promise(r => setTimeout(r, 1000 * (i + 1)));
-        }
-      }
+      for (let i=0; i<retries; i++) { try { const res = await fetch(url, options); return await res.json(); } catch(e) { if(i===retries-1) throw e; await new Promise(r=>setTimeout(r, 1000*(i+1))); } }
     }
 
     // ===================================================================
@@ -674,13 +580,10 @@
     // ===================================================================
     function setupAutoSave() {
       setInterval(() => {
-        const draft = {
+        localStorage.setItem(CONFIG.DRAFT_KEY, JSON.stringify({
           type: state.type, area: state.area, area5S: state.area5S,
-          inspector: document.getElementById('inspectorName').value,
-          timestamp: Date.now()
-        };
-        // Note: images are too large for localStorage in draft, skip or compress further if needed
-        localStorage.setItem(CONFIG.DRAFT_KEY, JSON.stringify(draft));
+          inspector: document.getElementById('inspectorName').value, timestamp: Date.now()
+        }));
       }, 30000);
     }
 
@@ -688,33 +591,25 @@
       const raw = localStorage.getItem(CONFIG.DRAFT_KEY);
       if (!raw) return;
       try {
-        const draft = JSON.parse(raw);
-        if (Date.now() - draft.timestamp < 24 * 60 * 60 * 1000) {
-          document.getElementById('inspectorName').value = draft.inspector || '';
-          if (draft.type) selectType(draft.type, document.querySelector(`.type-btn[data-type="${draft.type}"]`));
-          if (draft.area) { state.area = draft.area; document.getElementById('areaSafetyVal').value = draft.area; }
-          if (draft.area5S) { state.area5S = draft.area5S; document.getElementById('area5SVal').value = draft.area5S; }
-          renderAreas();
-          buildChecklist();
+        const d = JSON.parse(raw);
+        if (Date.now() - d.timestamp < 86400000) {
+          document.getElementById('inspectorName').value = d.inspector || '';
+          if (d.type) selectType(d.type, document.querySelector(`.type-btn[data-type="${d.type}"]`));
+          state.area = d.area || 'PRINT'; state.area5S = d.area5S || 'OFFICE';
+          populateDropdowns(); buildChecklist();
           showToast('📥 โหลดข้อมูลล่าสุดจากเครื่อง', 'success');
         }
       } catch {}
     }
 
-    function escapeHtml(text) { return text ? text.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])) : ''; }
-
+    function escapeHtml(t) { return t ? t.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])) : ''; }
     function showToast(msg, type='info') {
-      const t = document.createElement('div');
-      t.className = `toast ${type}`;
+      const t = document.createElement('div'); t.className = `toast ${type}`;
       t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i><span>${msg}</span>`;
       document.body.appendChild(t);
       setTimeout(() => { t.style.animation = 'slideOut 0.3s'; setTimeout(()=>t.remove(), 300); }, 3000);
     }
-    const slideOutStyle = document.createElement('style');
-    slideOutStyle.textContent = `@keyframes slideOut{from{opacity:1}to{opacity:0;transform:translateX(100px)}}`;
-    document.head.appendChild(slideOutStyle);
-
-    // Start
+    document.head.appendChild(Object.assign(document.createElement('style'), {textContent:`@keyframes slideOut{from{opacity:1}to{opacity:0;transform:translateX(100px)}}`}));
     init();
   </script>
 </body>
