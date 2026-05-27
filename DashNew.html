@@ -1099,6 +1099,9 @@
     // ===================================================================
     // DATA LOADING
     // ===================================================================
+  // ===================================================================
+    // DATA LOADING
+    // ===================================================================
     async function loadData() {
       if (isLoading) return;
       isLoading = true;
@@ -1115,10 +1118,30 @@
         const data = await response.json();
         fullData = data.details || [];
         
+        // 🌟 เพิ่มโค้ดส่วนนี้: บังคับให้ระบบหน้าบ้านเช็คสถานะของ 5S จาก JSON ด้วยตัวเอง
+        fullData.forEach(d => {
+          if (d.inspectionType === CONFIG.TYPE_5S && d.fullChecklist) {
+            let foundBad = false;
+            // วนลูปเช็คทุกคำตอบใน JSON ว่ามีข้อไหนตอบ "ไม่ดี" หรือไม่
+            for (let key in d.fullChecklist) {
+              if (d.fullChecklist[key] === "ไม่ดี") {
+                foundBad = true;
+                break; // เจอข้อเดียวถือว่าพบปัญหาเลย
+              }
+            }
+            d.hasBad = foundBad; // อัปเดตสถานะให้ตัวแปรหลัก
+          }
+        });
+
+        // 🌟 คำนวณสรุปตัวเลข Card ด้านบนใหม่จากข้อมูลที่เช็คแล้ว
+        const total = fullData.length;
+        const bad = fullData.filter(d => d.hasBad).length;
+        const good = total - bad;
+        
         // Update stats
-        document.getElementById('countTotal').innerText = data.total || 0;
-        document.getElementById('countGood').innerText = data.good || 0;
-        document.getElementById('countBad').innerText = data.bad || 0;
+        document.getElementById('countTotal').innerText = total;
+        document.getElementById('countGood').innerText = good;
+        document.getElementById('countBad').innerText = bad;
         
         // Re-render table with current filters
         renderTable();
