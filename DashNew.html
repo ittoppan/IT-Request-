@@ -853,14 +853,26 @@
       SAFETY_TYPES: ["จป.ว", "คปอ.", "Foreman/Mgr.", "Audit", "Accident/Fire"],
       TYPE_5S: "5S",
       
-      // Area mapping for display normalization
+    // Area mapping for display normalization
       AREA_DISPLAY_MAP: {
-        "OFFICE": "Office (5S)",
-        "Canteen": "Canteen (5S)",
+        // 5S Areas
+        "OFFICE": "OFFICE (5S)",
+        "Canteen": "CANTEEN (5S)",
         "QA&QC": "QA&QC (5S)",
-        "Factory": "Factory (5S)",
-        "EN": "Engineering (5S)",
-        "Outside": "Outside (5S)"
+        "Factory": "FACTORY (5S)",
+        "EN": "ENGINEERING (5S)",
+        "Outside": "พื้นที่รอบโรงงาน (5S)",
+        
+        // Safety Areas
+        "แผนก Print": "แผนก PRINT",
+        "แผนก Laminate": "แผนก LAMINATE",
+        "แผนก Solvent": "แผนก SOLVENT",
+        "แผนก Rewinder / Slitter / Packing": "แผนก REWINDER / SLITTER / PACKING",
+        "แผนก BAG MAKING": "แผนก BAG MAKING",
+        "แผนก QA & QC": "แผนก QA & QC",
+        "แผนก Warehouse": "แผนก WAREHOUSE",
+        "Office": "OFFICE",
+        "พื้นที่รอบบริเวณโรงงาน": "พื้นที่รอบบริเวณโรงงาน"
       }
     };
 
@@ -868,26 +880,46 @@
     // AREA DATA FOR DROPDOWN
     // ===================================================================
     const AREA_DATA = {
+      all: [
+        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
+        // พื้นที่ที่ทับซ้อนกัน (รวมให้ค้นหาทีเดียวเจอทั้ง 5S และ Safety)
+        { value: "OFFICE_ALL", label: "🏢 OFFICE (รวม)", icon: "fas fa-building" },
+        { value: "QA_ALL", label: "🔬 QA & QC (รวม)", icon: "fas fa-vial" },
+        { value: "OUTSIDE_ALL", label: "🌳 พื้นที่รอบโรงงาน (รวม)", icon: "fas fa-tree" },
+        
+        // พื้นที่เฉพาะของ Safety
+        { value: "แผนก Print", label: "🖨️ แผนก PRINT", icon: "fas fa-print" },
+        { value: "แผนก Laminate", label: "📦 แผนก LAMINATE", icon: "fas fa-layer-group" },
+        { value: "แผนก Solvent", label: "🧪 แผนก SOLVENT", icon: "fas fa-flask" },
+        { value: "แผนก Rewinder / Slitter / Packing", label: "🔄 แผนก REWINDER / SLITTER / PACKING", icon: "fas fa-box-open" },
+        { value: "แผนก BAG MAKING", label: "🛍️ แผนก BAG MAKING", icon: "fas fa-shopping-bag" },
+        { value: "แผนก Warehouse", label: "🏭 แผนก WAREHOUSE", icon: "fas fa-warehouse" },
+
+        // พื้นที่เฉพาะของ 5S
+        { value: "Canteen", label: "🍽️ CANTEEN", icon: "fas fa-utensils" },
+        { value: "Factory", label: "🏭 FACTORY", icon: "fas fa-industry" },
+        { value: "EN", label: "🔧 ENGINEERING", icon: "fas fa-tools" }
+      ],
       safety: [
         { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
-        { value: "แผนก Print", label: "🖨️ แผนก Print", icon: "fas fa-print" },
-        { value: "แผนก Laminate", label: "📦 แผนก Laminate", icon: "fas fa-layer-group" },
-        { value: "แผนก Solvent", label: "🧪 แผนก Solvent", icon: "fas fa-flask" },
-        { value: "แผนก Rewinder / Slitter / Packing", label: "🔄 Rewinder/Slitter/Packing", icon: "fas fa-box-open" },
+        { value: "แผนก Print", label: "🖨️ แผนก PRINT", icon: "fas fa-print" },
+        { value: "แผนก Laminate", label: "📦 แผนก LAMINATE", icon: "fas fa-layer-group" },
+        { value: "แผนก Solvent", label: "🧪 แผนก SOLVENT", icon: "fas fa-flask" },
+        { value: "แผนก Rewinder / Slitter / Packing", label: "🔄 แผนก REWINDER / SLITTER / PACKING", icon: "fas fa-box-open" },
         { value: "แผนก BAG MAKING", label: "🛍️ แผนก BAG MAKING", icon: "fas fa-shopping-bag" },
         { value: "แผนก QA & QC", label: "🔬 แผนก QA & QC", icon: "fas fa-vial" },
-        { value: "แผนก Warehouse", label: "🏭 แผนก Warehouse", icon: "fas fa-warehouse" },
-        { value: "Office", label: "🏢 Office", icon: "fas fa-building" },
-        { value: "พื้นที่รอบบริเวณโรงงาน", label: "🌳 พื้นที่รอบโรงงาน", icon: "fas fa-tree" }
+        { value: "แผนก Warehouse", label: "🏭 แผนก WAREHOUSE", icon: "fas fa-warehouse" },
+        { value: "Office", label: "🏢 OFFICE", icon: "fas fa-building" },
+        { value: "พื้นที่รอบบริเวณโรงงาน", label: "🌳 พื้นที่รอบบริเวณโรงงาน", icon: "fas fa-tree" }
       ],
       "5S": [
         { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
-        { value: "OFFICE", label: "🖥️ Office", icon: "fas fa-desktop" },
-        { value: "Canteen", label: "🍽️ Canteen", icon: "fas fa-utensils" },
+        { value: "OFFICE", label: "🖥️ OFFICE", icon: "fas fa-desktop" },
+        { value: "Canteen", label: "🍽️ CANTEEN", icon: "fas fa-utensils" },
         { value: "QA&QC", label: "🔬 QA&QC", icon: "fas fa-microscope" },
-        { value: "Factory", label: "🏭 Factory", icon: "fas fa-industry" },
-        { value: "EN", label: "🔧 Engineering", icon: "fas fa-tools" },
-        { value: "Outside", label: "🌳 Outside", icon: "fas fa-tree" }
+        { value: "Factory", label: "🏭 FACTORY", icon: "fas fa-industry" },
+        { value: "EN", label: "🔧 ENGINEERING", icon: "fas fa-tools" },
+        { value: "Outside", label: "🌳 พื้นที่รอบโรงงาน", icon: "fas fa-tree" }
       ]
     };
 
@@ -1029,9 +1061,15 @@
     // ===================================================================
     // AREA DROPDOWN
     // ===================================================================
-    function updateAreaOptions(type) {
+  function updateAreaOptions(type) {
       const container = document.getElementById('areaOptions');
-      const areaKey = (type === CONFIG.TYPE_5S) ? CONFIG.TYPE_5S : 'safety';
+      
+      // ดึงคีย์ให้ตรงกับประเภทที่เลือก (ถ้าเลือกทั้งหมด ให้ใช้ all)
+      let areaKey = type;
+      if (type !== 'all' && type !== CONFIG.TYPE_5S) {
+        areaKey = 'safety';
+      }
+      
       const areas = AREA_DATA[areaKey];
       
       container.innerHTML = areas.map(area => `
@@ -1177,11 +1215,13 @@
         filtered = filtered.filter(d => d.inspectionType === currentTypeFilter);
       }
       
-      // Area filter (with normalization)
+     // Area filter
       if (currentAreaFilter !== '') {
         filtered = filtered.filter(d => {
-          const itemArea = normalizeAreaForFilter(d.area, d.inspectionType);
-          return itemArea === currentAreaFilter;
+          if (currentAreaFilter === "OFFICE_ALL") return d.area === "Office" || d.area === "OFFICE";
+          if (currentAreaFilter === "QA_ALL") return d.area === "แผนก QA & QC" || d.area === "QA&QC";
+          if (currentAreaFilter === "OUTSIDE_ALL") return d.area === "พื้นที่รอบบริเวณโรงงาน" || d.area === "Outside";
+          return d.area === currentAreaFilter;
         });
       }
       
