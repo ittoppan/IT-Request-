@@ -469,30 +469,21 @@
       TYPE_5S: "5S",
       
     // Area mapping for display normalization
-      AREA_DISPLAY_MAP: {
-        // 5S Areas
-        "OFFICE": "OFFICE (5S)",
-        "Canteen": "CANTEEN (5S)",
-        "QA&QC": "QA&QC (5S)",
-        "EN": "ENGINEERING (5S)",
-        "Outside": "พื้นที่รอบโรงงาน (5S)",
-        "แผนก Print": "แผนก PRINT (5S)",
-        "แผนก Laminate": "แผนก LAMINATE (5S)",
-        "แผนก Rewinder / Slitter / Packing": "แผนก REWINDER / SLITTER / PACKING (5S)",
-        "แผนก BAG MAKING": "แผนก BAG MAKING (5S)",
-        "แผนก Warehouse": "แผนก WAREHOUSE (5S)",
-        
-        // Safety Areas
-        "แผนก Print": "แผนก PRINT",
-        "แผนก Laminate": "แผนก LAMINATE",
-        "แผนก Solvent": "แผนก SOLVENT",
-        "แผนก Rewinder / Slitter / Packing": "แผนก REWINDER / SLITTER / PACKING",
-        "แผนก BAG MAKING": "แผนก BAG MAKING",
-        "แผนก QA & QC": "แผนก QA & QC",
-        "แผนก Warehouse": "แผนก WAREHOUSE",
-        "Office": "OFFICE",
-        "พื้นที่รอบบริเวณโรงงาน": "พื้นที่รอบบริเวณโรงงาน"
-      }
+     // ในทั้ง DashNew.html และ reportnew.html
+AREA_DISPLAY_MAP: {
+  "PRINT": "PRINT",
+  "LAMINATE": "LAMINATE",
+  "SOLVENT": "SOLVENT",
+  "REWINDER/SLITTER/PACKING": "REWINDER/SLITTER/PACKING",
+  "BAG MAKING": "BAG MAKING",
+  "QA&QC": "QA&QC",
+  "WAREHOUSE": "WAREHOUSE",
+  "OFFICE": "OFFICE",
+  "CANTEEN": "CANTEEN",
+  "FACTORY": "FACTORY",
+  "ENGINEERING": "ENGINEERING",
+  "OUTSIDE": "OUTSIDE"
+}
     };
 
     // ===================================================================
@@ -744,14 +735,18 @@
       if (currentTypeFilter !== 'all') {
         filtered = filtered.filter(item => item.inspectionType === currentTypeFilter);
       }
-      if (areaVal !== "") {
-        filtered = filtered.filter(item => {
-          if (areaVal === "OFFICE_ALL") return item.area === "Office" || item.area === "OFFICE";
-          if (areaVal === "QA_ALL") return item.area === "แผนก QA & QC" || item.area === "QA&QC";
-          if (areaVal === "OUTSIDE_ALL") return item.area === "พื้นที่รอบบริเวณโรงงาน" || item.area === "Outside";
-          return item.area === areaVal;
-        });
-      }
+ // ใช้ตรรกะนี้ใน DashNew.html และ reportnew.html
+if (areaVal !== "") {
+    filtered = filtered.filter(item => {
+        // เงื่อนไขรวมพื้นที่ (Grouping)
+        if (areaVal === "OFFICE_ALL") return item.area === "OFFICE";
+        if (areaVal === "QA_ALL") return item.area === "QA&QC";
+        if (areaVal === "OUTSIDE_ALL") return item.area === "OUTSIDE";
+        
+        // กรองแบบปกติ
+        return item.area === areaVal;
+    });
+}
       if (statusVal !== "") {
         filtered = filtered.filter(item => item.status === statusVal);
       }
