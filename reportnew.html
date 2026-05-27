@@ -468,15 +468,19 @@
       SAFETY_TYPES: ["จป.ว", "คปอ.", "Foreman/Mgr.", "Audit", "Accident/Fire"],
       TYPE_5S: "5S",
       
-      // Area mapping for display normalization
+    // Area mapping for display normalization
       AREA_DISPLAY_MAP: {
         // 5S Areas
         "OFFICE": "OFFICE (5S)",
         "Canteen": "CANTEEN (5S)",
         "QA&QC": "QA&QC (5S)",
-        "Factory": "FACTORY (5S)",
         "EN": "ENGINEERING (5S)",
         "Outside": "พื้นที่รอบโรงงาน (5S)",
+        "แผนก Print": "แผนก PRINT (5S)",
+        "แผนก Laminate": "แผนก LAMINATE (5S)",
+        "แผนก Rewinder / Slitter / Packing": "แผนก REWINDER / SLITTER / PACKING (5S)",
+        "แผนก BAG MAKING": "แผนก BAG MAKING (5S)",
+        "แผนก Warehouse": "แผนก WAREHOUSE (5S)",
         
         // Safety Areas
         "แผนก Print": "แผนก PRINT",
@@ -494,25 +498,19 @@
     // ===================================================================
     // AREA DATA FOR DROPDOWN
     // ===================================================================
-    const AREA_DATA = {
+  const AREA_DATA = {
       all: [
         { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
-        // พื้นที่ที่ทับซ้อนกัน (รวมให้ค้นหาทีเดียวเจอทั้ง 5S และ Safety)
         { value: "OFFICE_ALL", label: "🏢 OFFICE (รวม)", icon: "fas fa-building" },
         { value: "QA_ALL", label: "🔬 QA & QC (รวม)", icon: "fas fa-vial" },
         { value: "OUTSIDE_ALL", label: "🌳 พื้นที่รอบโรงงาน (รวม)", icon: "fas fa-tree" },
-        
-        // พื้นที่เฉพาะของ Safety
         { value: "แผนก Print", label: "🖨️ แผนก PRINT", icon: "fas fa-print" },
         { value: "แผนก Laminate", label: "📦 แผนก LAMINATE", icon: "fas fa-layer-group" },
         { value: "แผนก Solvent", label: "🧪 แผนก SOLVENT", icon: "fas fa-flask" },
         { value: "แผนก Rewinder / Slitter / Packing", label: "🔄 แผนก REWINDER / SLITTER / PACKING", icon: "fas fa-box-open" },
         { value: "แผนก BAG MAKING", label: "🛍️ แผนก BAG MAKING", icon: "fas fa-shopping-bag" },
         { value: "แผนก Warehouse", label: "🏭 แผนก WAREHOUSE", icon: "fas fa-warehouse" },
-
-        // พื้นที่เฉพาะของ 5S
         { value: "Canteen", label: "🍽️ CANTEEN", icon: "fas fa-utensils" },
-        { value: "Factory", label: "🏭 FACTORY", icon: "fas fa-industry" },
         { value: "EN", label: "🔧 ENGINEERING", icon: "fas fa-tools" }
       ],
       safety: [
@@ -532,9 +530,14 @@
         { value: "OFFICE", label: "🖥️ OFFICE", icon: "fas fa-desktop" },
         { value: "Canteen", label: "🍽️ CANTEEN", icon: "fas fa-utensils" },
         { value: "QA&QC", label: "🔬 QA&QC", icon: "fas fa-microscope" },
-        { value: "Factory", label: "🏭 FACTORY", icon: "fas fa-industry" },
         { value: "EN", label: "🔧 ENGINEERING", icon: "fas fa-tools" },
-        { value: "Outside", label: "🌳 พื้นที่รอบโรงงาน", icon: "fas fa-tree" }
+        { value: "Outside", label: "🌳 พื้นที่รอบโรงงาน", icon: "fas fa-tree" },
+        // 🌟 เพิ่มแผนกที่แยกจาก Factory ลงใน Dropdown ของ 5S
+        { value: "แผนก Print", label: "🖨️ แผนก PRINT", icon: "fas fa-print" },
+        { value: "แผนก Laminate", label: "📦 แผนก LAMINATE", icon: "fas fa-layer-group" },
+        { value: "แผนก Rewinder / Slitter / Packing", label: "🔄 แผนก REWINDER / SLITTER / PACKING", icon: "fas fa-box-open" },
+        { value: "แผนก BAG MAKING", label: "🛍️ แผนก BAG MAKING", icon: "fas fa-shopping-bag" },
+        { value: "แผนก Warehouse", label: "🏭 แผนก WAREHOUSE", icon: "fas fa-warehouse" }
       ]
     };
 
