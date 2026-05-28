@@ -637,7 +637,24 @@
         </div>
       `).join('');
     }
-
+// ✅ คำนวณคะแนนรวม 5S สำหรับแสดงในตารางหลัก
+function calculate5SScoreSummary(fullChecklist, areaKey) {
+  const sections = CHECKLIST_5S[areaKey]?.sections || CHECKLIST_5S["Factory"].sections;
+  let total = 0, max = 0;
+  
+  sections.forEach((sec, sIdx) => {
+    sec.questions.forEach((_, qIdx) => {
+      const val = fullChecklist?.[`5s_s${sIdx}_q${qIdx}`];
+      max += 2; // Max 2 คะแนนต่อข้อ
+      if (val === "ดี") total += 2;
+      else if (val === "พอใช้") total += 1;
+      // "ปรับปรุง" = 0
+    });
+  });
+  
+  const percent = max > 0 ? Math.round((total / max) * 100) : 0;
+  return { total, max, percent };
+}
     function toggleAreaDropdown() {
       const dropdown = document.getElementById('areaOptions');
       const display = document.getElementById('areaDisplay');
@@ -750,9 +767,19 @@
         
         const displayArea = normalizeAreaDisplay(d.area);
         const typeBadge = getTypeBadge(d.inspectionType);
-        const statusBadge = d.hasBad 
-          ? `<span class="badge badge-bad"><i class="fas fa-exclamation-triangle"></i> พบปัญหา</span>`
-          : `<span class="badge badge-good"><i class="fas fa-check-circle"></i> ปกติ</span>`;
+        // ✅ ใน renderTable() แทนที่บรรทัดสร้าง statusBadge
+const statusBadge = d.inspectionType === CONFIG.TYPE_5S 
+  ? (() => {
+      const score = calculate5SScoreSummary(d.fullChecklist, d.area);
+      const color = score.percent >= 80 ? 'var(--success)' : score.percent >= 50 ? 'var(--warning)' : 'var(--danger)';
+      return `<span style="background:${color}20;color:${color};padding:4px 10px;border-radius:18px;font-size:0.75rem;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+        <i class="fas fa-chart-pie"></i> ${score.percent}%
+      </span>`;
+    })()
+  : (d.hasBad 
+      ? `<span class="badge badge-bad"><i class="fas fa-exclamation-triangle"></i> พบปัญหา</span>`
+      : `<span class="badge badge-good"><i class="fas fa-check-circle"></i> ปกติ</span>`);
+
         
         return `
           <tr>
