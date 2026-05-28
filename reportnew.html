@@ -30,6 +30,12 @@
     .btn-clear { background: var(--text-muted); color: white; border: none; padding: 7px 14px; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; }
     .btn-clear:hover { background: #6d7a87; transform: translateY(-1px); }
 
+    /* Active Filter Tags */
+    .active-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
+    .filter-tag { background: var(--primary); color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 5px; }
+    .filter-tag i { cursor: pointer; opacity: 0.8; transition: opacity 0.2s; }
+    .filter-tag i:hover { opacity: 1; }
+
     /* Type Selector */
     .type-selector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 15px; }
     .type-btn { padding: 10px 5px; border-radius: 10px; border: 2px solid var(--border); background: #f8f9fa; text-align: center; cursor: pointer; font-family: 'Sarabun'; font-size: 0.68rem; font-weight: 600; color: #666; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 65px; user-select: none; }
@@ -51,6 +57,11 @@
     .filter-box label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
     .filter-input { padding: 9px 12px; border-radius: 9px; border: 1.5px solid var(--border); font-family: 'Sarabun'; font-size: 13px; outline: none; width: 100%; background: #fdfdfd; transition: all 0.2s; color: var(--text); }
     .filter-input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15); }
+
+    /* Search Box */
+    .search-box { position: relative; }
+    .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+    .search-box input { padding-left: 35px; }
 
     /* Area Dropdown */
     .area-selector-wrapper { position: relative; }
@@ -90,7 +101,9 @@
 
     /* Main Table */
     .main-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1500px; }
-    .main-table th { background: linear-gradient(135deg, var(--dark), #34495e); color: white; border: 1px solid var(--dark); padding: 12px 8px; text-align: center; white-space: nowrap; position: sticky; top: 0; z-index: 20; font-weight: 600; font-size: 12px; }
+    .main-table th { background: linear-gradient(135deg, var(--dark), #34495e); color: white; border: 1px solid var(--dark); padding: 12px 8px; text-align: center; white-space: nowrap; position: sticky; top: 0; z-index: 20; font-weight: 600; font-size: 12px; cursor: pointer; user-select: none; }
+    .main-table th:hover { background: linear-gradient(135deg, #34495e, #2c3e50); }
+    .main-table th i { margin-left: 4px; font-size: 10px; opacity: 0.7; }
     .main-table td { border: 1px solid var(--border); padding: 10px 7px; vertical-align: middle; text-align: center; transition: background 0.15s; }
     .main-table tr:hover td { background: #fffdf9; }
     .main-table tr:nth-child(even) { background-color: #fcfcfc; }
@@ -121,11 +134,12 @@
     .empty-state i { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; color: var(--border); }
 
     /* Pagination */
-    .pagination { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; margin: 15px 0; }
+    .pagination { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; margin: 15px 0; align-items: center; }
     .pagination button { padding: 5px 10px; border: 1px solid var(--border); background: var(--card-bg); border-radius: 5px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
     .pagination button:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary-dark); }
     .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
     .pagination button.active { background: var(--primary); color: white; border-color: var(--primary-dark); font-weight: 600; }
+    .pagination-info { font-size: 11px; color: var(--text-muted); margin: 0 10px; }
 
     /* Toast */
     .toast { position: fixed; bottom: 20px; right: 20px; padding: 10px 18px; border-radius: 9px; background: var(--card-bg); border-left: 4px solid var(--info); box-shadow: var(--shadow-hover); z-index: 9999; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; animation: slideIn 0.3s ease; }
@@ -163,6 +177,7 @@
     @media (max-width: 480px) {
       .type-selector { grid-template-columns: repeat(2, 1fr); }
       .stats-summary { grid-template-columns: 1fr; }
+      .pagination { flex-direction: column; gap: 8px; }
     }
     @media print {
       .top-nav, .filter-card, .export-actions, .pagination { display: none !important; }
@@ -214,6 +229,13 @@
       <i class="fas fa-filter" style="color: var(--primary);"></i> 2. กำหนดเงื่อนไขเพิ่มเติม
     </div>
     <div class="filters-grid">
+      <!-- ✅ Search Box (ใหม่) -->
+      <div class="filter-box search-box">
+        <label><i class="fas fa-search"></i> ค้นหา</label>
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchFilter" class="filter-input" placeholder="Job ID / ปัญหา / ผู้ตรวจ..." oninput="debouncedRender()">
+      </div>
+      
       <div class="filter-box">
         <label><i class="fas fa-calendar-alt"></i> ประจำเดือน</label>
         <input type="month" id="monthFilter" onchange="loadReport()" class="filter-input">
@@ -235,6 +257,9 @@
         </select>
       </div>
     </div>
+    
+    <!-- ✅ Active Filter Tags (ใหม่) -->
+    <div class="active-filters" id="activeFilters"></div>
   </div>
 
   <div class="report-container">
@@ -266,10 +291,19 @@
     <table class="main-table">
       <thead>
         <tr>
-          <th>ลำดับ</th><th>ประเภท</th><th>รูปภาพ<br><small style="font-weight:normal;opacity:0.9">(ก่อน)</small></th>
-          <th>รูปภาพ<br><small style="font-weight:normal;opacity:0.9">(หลัง)</small></th><th>พื้นที่</th><th>JOB NO.</th>
-          <th>ปัญหาที่พบ</th><th>แนวทางแก้ไข</th><th>ผู้รับผิดชอบ</th><th>วันที่พบ</th>
-          <th>ครบกำหนด</th><th>เสร็จสิ้น</th><th>หมายเหตุ</th>
+          <th onclick="sortTable('jobId')">ลำดับ <i class="fas fa-sort"></i></th>
+          <th>ประเภท</th>
+          <th>รูปภาพ<br><small style="font-weight:normal;opacity:0.9">(ก่อน)</small></th>
+          <th>รูปภาพ<br><small style="font-weight:normal;opacity:0.9">(หลัง)</small></th>
+          <th onclick="sortTable('area')">พื้นที่ <i class="fas fa-sort"></i></th>
+          <th onclick="sortTable('jobId')">JOB NO. <i class="fas fa-sort"></i></th>
+          <th>ปัญหาที่พบ</th>
+          <th>แนวทางแก้ไข</th>
+          <th>ผู้รับผิดชอบ</th>
+          <th onclick="sortTable('dateFound')">วันที่พบ <i class="fas fa-sort"></i></th>
+          <th onclick="sortTable('dueDate')">ครบกำหนด <i class="fas fa-sort"></i></th>
+          <th>เสร็จสิ้น</th>
+          <th>หมายเหตุ</th>
         </tr>
       </thead>
       <tbody id="reportContent"></tbody>
@@ -350,6 +384,8 @@
     let currentPage = 1;
     const itemsPerPage = 50;
     let isLoading = false;
+    let currentSort = { key: 'dateFound', dir: 'desc' }; // ✅ Default: Latest first
+    let searchTimeout = null;
 
     // ===================================================================
     // INIT
@@ -386,6 +422,7 @@
       document.querySelectorAll('.area-option').forEach(opt => opt.classList.remove('selected'));
       currentPage = 1;
       renderTable();
+      updateActiveFilterTags();
     }
 
     function updateAreaOptions(type) {
@@ -419,6 +456,7 @@
       document.getElementById('areaDisplay').classList.remove('active');
       currentPage = 1;
       renderTable();
+      updateActiveFilterTags();
     }
 
     function clearFilters() {
@@ -430,9 +468,59 @@
       document.querySelectorAll('.area-option').forEach(opt => opt.classList.remove('selected'));
       updateAreaOptions('all');
       document.getElementById('statusFilter').value = "";
+      document.getElementById('searchFilter').value = "";
       document.getElementById('monthFilter').value = new Date().toISOString().slice(0, 7);
+      currentSort = { key: 'dateFound', dir: 'desc' };
       currentPage = 1;
-      renderTable();
+      loadReport();
+      updateActiveFilterTags();
+    }
+
+    // ✅ Debounced search for better performance
+    function debouncedRender() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        currentPage = 1;
+        renderTable();
+        updateActiveFilterTags();
+      }, 300);
+    }
+
+    // ✅ Show active filter tags
+    function updateActiveFilterTags() {
+      const container = document.getElementById('activeFilters');
+      const tags = [];
+      
+      if (currentTypeFilter !== 'all') {
+        tags.push(`<span class="filter-tag">ประเภท: ${currentTypeFilter} <i class="fas fa-times" onclick="clearTypeFilter()"></i></span>`);
+      }
+      if (document.getElementById('areaFilter').value) {
+        tags.push(`<span class="filter-tag">พื้นที่: ${document.getElementById('areaDisplayText').textContent} <i class="fas fa-times" onclick="clearAreaFilter()"></i></span>`);
+      }
+      if (document.getElementById('statusFilter').value) {
+        tags.push(`<span class="filter-tag">สถานะ: ${document.getElementById('statusFilter').options[document.getElementById('statusFilter').selectedIndex].text} <i class="fas fa-times" onclick="clearStatusFilter()"></i></span>`);
+      }
+      if (document.getElementById('searchFilter').value.trim()) {
+        tags.push(`<span class="filter-tag">ค้นหา: "${document.getElementById('searchFilter').value}" <i class="fas fa-times" onclick="clearSearchFilter()"></i></span>`);
+      }
+      
+      container.innerHTML = tags.length > 0 ? tags.join('') : '<span style="color:var(--text-muted);font-size:0.8rem">ไม่มีตัวกรองที่ใช้งาน</span>';
+    }
+
+    function clearTypeFilter() { selectTypeFilter('all', document.querySelector('.type-btn[data-type="all"]')); }
+    function clearAreaFilter() { 
+      document.getElementById('areaFilter').value = "";
+      document.getElementById('areaDisplayText').textContent = "-- ทั้งหมด --";
+      document.querySelectorAll('.area-option').forEach(opt => opt.classList.remove('selected'));
+      renderTable(); updateActiveFilterTags();
+    }
+    function clearStatusFilter() {
+      document.getElementById('statusFilter').value = "";
+      renderTable(); updateActiveFilterTags();
+    }
+    function clearSearchFilter() {
+      document.getElementById('searchFilter').value = "";
+      renderTable(); updateActiveFilterTags();
     }
 
     // ===================================================================
@@ -464,6 +552,7 @@
         updateStats(allReportData);
         currentPage = 1;
         renderTable();
+        updateActiveFilterTags();
       } catch (err) {
         console.error("Load error:", err);
         reportContent.innerHTML = `<tr><td colspan="13" class="empty-state"><i class="fas fa-triangle-exclamation"></i><p><b>ไม่สามารถโหลดข้อมูลได้</b></p><small style="color:var(--danger)">${err.message}</small><br><br><button class="btn-clear" onclick="loadReport()" style="background:var(--primary)"><i class="fas fa-rotate-right"></i> ลองใหม่</button></td></tr>`;
@@ -482,15 +571,20 @@
     }
 
     // ===================================================================
-    // TABLE RENDERING
+    // TABLE RENDERING & SORTING
     // ===================================================================
     function renderTable() {
       const areaVal = document.getElementById('areaFilter').value;
       const statusVal = document.getElementById('statusFilter').value;
+      const searchVal = document.getElementById('searchFilter').value.trim().toLowerCase();
       const reportContent = document.getElementById('reportContent');
       
       let filtered = [...allReportData];
+      
+      // Filter by type
       if (currentTypeFilter !== 'all') filtered = filtered.filter(item => item.inspectionType === currentTypeFilter);
+      
+      // Filter by area
       if (areaVal !== "") {
         filtered = filtered.filter(item => {
           const norm = normalizeAreaForFilter(item.area);
@@ -500,7 +594,27 @@
           return norm === areaVal;
         });
       }
+      
+      // Filter by status
       if (statusVal !== "") filtered = filtered.filter(item => item.status === statusVal);
+      
+      // ✅ Filter by search (Job ID / Problem / Inspector)
+      if (searchVal) {
+        filtered = filtered.filter(item => 
+          (item.jobId && item.jobId.toLowerCase().includes(searchVal)) ||
+          (item.problem && item.problem.toLowerCase().includes(searchVal)) ||
+          (item.remark && item.remark.toLowerCase().includes(searchVal)) ||
+          (item.inspector && item.inspector.toLowerCase().includes(searchVal)) ||
+          (item.picName && item.picName.toLowerCase().includes(searchVal))
+        );
+      }
+
+      // ✅ Sort: Latest first by default (dateFound descending)
+      filtered.sort((a, b) => {
+        const aDate = new Date(a.dateFound || 0);
+        const bDate = new Date(b.dateFound || 0);
+        return currentSort.dir === 'desc' ? bDate - aDate : aDate - bDate;
+      });
 
       if (filtered.length === 0) {
         reportContent.innerHTML = `<tr><td colspan="13" class="empty-state"><i class="fas fa-search"></i><p><b>ไม่พบข้อมูล</b></p><small>ลองปรับเงื่อนไขการกรองหรือเลือกเดือนอื่น</small></td></tr>`;
@@ -550,8 +664,19 @@
         `;
       }).join('');
 
-      // Render pagination
       renderPagination(totalPages);
+    }
+
+    // ✅ Sort function for table headers
+    function sortTable(key) {
+      if (currentSort.key === key) {
+        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSort.key = key;
+        currentSort.dir = key === 'dateFound' || key === 'dueDate' ? 'desc' : 'asc';
+      }
+      currentPage = 1;
+      renderTable();
     }
 
     function renderPagination(totalPages) {
@@ -570,7 +695,7 @@
       
       html += `<button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>ถัดไป ›</button>`;
       html += `<button onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>สุดท้าย »</button>`;
-      html += `<span style="margin-left:8px;font-size:11px;color:var(--text-muted)">หน้า ${currentPage} จาก ${totalPages}</span>`;
+      html += `<span class="pagination-info">หน้า ${currentPage} จาก ${totalPages} • ${allReportData.length} รายการ</span>`;
       container.innerHTML = html;
     }
 
