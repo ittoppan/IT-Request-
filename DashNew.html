@@ -830,11 +830,11 @@ const statusBadge = d.inspectionType === CONFIG.TYPE_5S
         // ✅ แปลงค่าเป็นแสดงผล 3 ระดับ
         let statusText = '-', statusClass = '', scoreBadge = '';
         if (res === "ดี") {
-          statusText = '✅ ดี'; statusClass = 'status-5s-good'; scoreBadge = '<span class="score-badge good">+2</span>';
+          statusText = '✔ ดี'; statusClass = 'status-5s-good'; scoreBadge = '<span class="score-badge good">+2</span>';
         } else if (res === "พอใช้") {
           statusText = '🔶 พอใช้'; statusClass = 'status-5s-fair'; scoreBadge = '<span class="score-badge fair">+1</span>';
         } else if (res === "ปรับปรุง") {
-          statusText = '❌ ปรับปรุง'; statusClass = 'status-5s-improve'; scoreBadge = '<span class="score-badge improve">0</span>';
+          statusText = '✘ ปรับปรุง'; statusClass = 'status-5s-improve'; scoreBadge = '<span class="score-badge improve">0</span>';
         }
         
         html += `<div class="sub-item">
