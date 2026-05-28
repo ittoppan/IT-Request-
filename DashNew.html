@@ -347,42 +347,40 @@
     }
 
     /* ✅ 5S Status Pills - 3 Levels */
-.status-5s-good { 
-  background: linear-gradient(145deg, #e8f5e9, #c8e6c9); 
-  color: #2e7d32; 
-  border: 1px solid #2e7d32; 
-}
-.status-5s-fair { 
-  background: linear-gradient(145deg, #fff3e0, #ffe0b2); 
-  color: #e65100; 
-  border: 1px solid #e65100; 
-}
-.status-5s-improve { 
-  background: linear-gradient(145deg, #ffebee, #ffcdd2); 
-  color: #c62828; 
-  border: 1px solid #c62828; 
-}
+    .status-5s-good { 
+      background: linear-gradient(145deg, #e8f5e9, #c8e6c9); 
+      color: #2e7d32; 
+      border: 1px solid #2e7d32; 
+    }
+    .status-5s-fair { 
+      background: linear-gradient(145deg, #fff3e0, #ffe0b2); 
+      color: #e65100; 
+      border: 1px solid #e65100; 
+    }
+    .status-5s-improve { 
+      background: linear-gradient(145deg, #ffebee, #ffcdd2); 
+      color: #c62828; 
+      border: 1px solid #c62828; 
+    }
 
-/* ✅ Score Badge (แสดงคะแนน) */
-.score-badge {
-  font-size: 0.7rem; font-weight: 700; padding: 2px 6px;
-  border-radius: 4px; margin-left: 4px; display: inline-flex;
-  align-items: center; gap: 2px;
-}
-.score-badge.good { background: #2e7d32; color: white; }
-.score-badge.fair { background: #e65100; color: white; }
-.score-badge.improve { background: #c62828; color: white; }
+    /* ✅ Score Badge (แสดงคะแนน) */
+    .score-badge {
+      font-size: 0.7rem; font-weight: 700; padding: 2px 6px;
+      border-radius: 4px; margin-left: 4px; display: inline-flex;
+      align-items: center; gap: 2px;
+    }
+    .score-badge.good { background: #2e7d32; color: white; }
+    .score-badge.fair { background: #e65100; color: white; }
+    .score-badge.improve { background: #c62828; color: white; }
   </style>
 </head>
 <body>
 
-  <!-- Loader -->
   <div id="loader" class="loader">
     <i class="fas fa-circle-notch"></i>
     <p>กำลังโหลดข้อมูล...</p>
   </div>
 
-  <!-- Navigation -->
   <nav class="nav">
     <h2><i class="fas fa-shield-halved"></i> SAFETY DASHBOARD</h2>
     <div class="nav-actions">
@@ -393,13 +391,11 @@
 
   <div class="container">
     
-    <!-- Date Filter -->
     <div class="filter-box">
       <i class="fas fa-calendar-alt"></i>
       <input type="date" id="dateFilter" onchange="loadData()">
     </div>
     
-    <!-- Type Selector -->
     <div class="filter-box" style="flex-direction: column; align-items: stretch;">
       <div style="font-weight: 600; color: var(--dark); font-size: 0.9rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
         <i class="fas fa-filter" style="color: var(--primary);"></i> กรองตามประเภทการตรวจสอบ
@@ -429,7 +425,6 @@
       </div>
     </div>
     
-    <!-- Area Filter -->
     <div class="filter-box" style="margin-bottom: 15px;">
       <i class="fas fa-map-marker-alt" style="color: var(--primary);"></i>
       <div class="area-selector-wrapper">
@@ -442,7 +437,6 @@
       </div>
     </div>
     
-    <!-- Export Actions -->
     <div class="export-actions">
       <button class="btn-export" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
       <button class="btn-export" onclick="window.print()"><i class="fas fa-print"></i> พิมพ์</button>
@@ -451,7 +445,6 @@
       </button>
     </div>
     
-    <!-- Stats Cards -->
     <div class="stats">
       <div class="stat-card" id="card-all" onclick="updateStatusFilter('all')">
         <small><i class="fas fa-list"></i> ทั้งหมดวันนี้</small>
@@ -467,7 +460,6 @@
       </div>
     </div>
     
-    <!-- Table -->
     <div class="table-box">
       <table>
         <thead>
@@ -477,8 +469,7 @@
           </tr>
         </thead>
         <tbody id="tableBody">
-          <!-- Data rendered here -->
-        </tbody>
+          </tbody>
       </table>
     </div>
   </div>
@@ -637,24 +628,26 @@
         </div>
       `).join('');
     }
-// ✅ คำนวณคะแนนรวม 5S สำหรับแสดงในตารางหลัก
-function calculate5SScoreSummary(fullChecklist, areaKey) {
-  const sections = CHECKLIST_5S[areaKey]?.sections || CHECKLIST_5S["Factory"].sections;
-  let total = 0, max = 0;
-  
-  sections.forEach((sec, sIdx) => {
-    sec.questions.forEach((_, qIdx) => {
-      const val = fullChecklist?.[`5s_s${sIdx}_q${qIdx}`];
-      max += 2; // Max 2 คะแนนต่อข้อ
-      if (val === "ดี") total += 2;
-      else if (val === "พอใช้") total += 1;
-      // "ปรับปรุง" = 0
-    });
-  });
-  
-  const percent = max > 0 ? Math.round((total / max) * 100) : 0;
-  return { total, max, percent };
-}
+
+    // คำนวณคะแนนรวม 5S สำหรับแสดงในตารางหลัก
+    function calculate5SScoreSummary(fullChecklist, areaKey) {
+      const sections = CHECKLIST_5S[areaKey]?.sections || CHECKLIST_5S["Factory"].sections;
+      let total = 0, max = 0;
+      
+      sections.forEach((sec, sIdx) => {
+        sec.questions.forEach((_, qIdx) => {
+          const val = fullChecklist?.[`5s_s${sIdx}_q${qIdx}`];
+          max += 2; // Max 2 คะแนนต่อข้อ
+          if (val === "ดี") total += 2;
+          else if (val === "พอใช้") total += 1;
+          // "ปรับปรุง" = 0
+        });
+      });
+      
+      const percent = max > 0 ? Math.round((total / max) * 100) : 0;
+      return { total, max, percent };
+    }
+
     function toggleAreaDropdown() {
       const dropdown = document.getElementById('areaOptions');
       const display = document.getElementById('areaDisplay');
@@ -767,19 +760,18 @@ function calculate5SScoreSummary(fullChecklist, areaKey) {
         
         const displayArea = normalizeAreaDisplay(d.area);
         const typeBadge = getTypeBadge(d.inspectionType);
-        // ✅ ใน renderTable() แทนที่บรรทัดสร้าง statusBadge
-const statusBadge = d.inspectionType === CONFIG.TYPE_5S 
-  ? (() => {
-      const score = calculate5SScoreSummary(d.fullChecklist, d.area);
-      const color = score.percent >= 80 ? 'var(--success)' : score.percent >= 50 ? 'var(--warning)' : 'var(--danger)';
-      return `<span style="background:${color}20;color:${color};padding:4px 10px;border-radius:18px;font-size:0.75rem;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
-        <i class="fas fa-chart-pie"></i> ${score.percent}%
-      </span>`;
-    })()
-  : (d.hasBad 
-      ? `<span class="badge badge-bad"><i class="fas fa-exclamation-triangle"></i> พบปัญหา</span>`
-      : `<span class="badge badge-good"><i class="fas fa-check-circle"></i> ปกติ</span>`);
-
+        
+        const statusBadge = d.inspectionType === CONFIG.TYPE_5S 
+          ? (() => {
+              const score = calculate5SScoreSummary(d.fullChecklist, d.area);
+              const color = score.percent >= 80 ? 'var(--success)' : score.percent >= 50 ? 'var(--warning)' : 'var(--danger)';
+              return `<span style="background:${color}20;color:${color};padding:4px 10px;border-radius:18px;font-size:0.75rem;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+                <i class="fas fa-chart-pie"></i> ${score.percent}%
+              </span>`;
+            })()
+          : (d.hasBad 
+              ? `<span class="badge badge-bad"><i class="fas fa-exclamation-triangle"></i> พบปัญหา</span>`
+              : `<span class="badge badge-good"><i class="fas fa-check-circle"></i> ปกติ</span>`);
         
         return `
           <tr>
@@ -801,85 +793,83 @@ const statusBadge = d.inspectionType === CONFIG.TYPE_5S
     }
 
     function renderDetailRow(d) {
-  const is5S = d.inspectionType === CONFIG.TYPE_5S;
-  const areaKey = is5S ? (d.area || 'OFFICE') : null;
-  
-  let html = `<tr class="detail-row" id="detail-${d.id}"><td colspan="7" style="padding:0;"><div class="inner-detail">
-    <div class="detail-header">
-      <h4><i class="fas fa-clipboard-list"></i> รายละเอียดผลการตรวจสอบ</h4>
-      <div class="detail-meta">
-        <span><i class="fas fa-tag"></i> ${escapeHtml(d.inspectionType)}</span>
-        <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(normalizeAreaDisplay(d.area))}</span>
-        <span><i class="fas fa-user"></i> ${escapeHtml(d.inspector)}</span>
-        <span><i class="fas fa-clock"></i> ${escapeHtml(d.timestamp)}</span>
-      </div>
-    </div>`;
-  
-  // ✅ 5S: แสดง 3 ระดับคะแนน + คะแนนในวงเล็บ
-  if (is5S) {
-    const sections = CHECKLIST_5S[areaKey]?.sections || CHECKLIST_5S["Factory"].sections;
-    
-    sections.forEach((sec, sIdx) => {
-      html += `<div class="section-group"><div class="section-head"><span><i class="${sec.icon || 'fas fa-circle'}"></i> ${escapeHtml(sec.title)}</span></div>`;
+      const is5S = d.inspectionType === CONFIG.TYPE_5S;
+      const areaKey = is5S ? (d.area || 'OFFICE') : null;
       
-      sec.questions.forEach((qText, qIdx) => {
-        const detailKey = `5s_s${sIdx}_q${qIdx}`;
-        const res = d.fullChecklist?.[detailKey];
-        const remark = d.fullChecklist?.[`5s_remark_s${sIdx}_q${qIdx}`];
-        
-        // ✅ แปลงค่าเป็นแสดงผล 3 ระดับ
-        let statusText = '-', statusClass = '', scoreBadge = '';
-        if (res === "ดี") {
-          statusText = '✔ ดี'; statusClass = 'status-5s-good'; scoreBadge = '<span class="score-badge good">+2</span>';
-        } else if (res === "พอใช้") {
-          statusText = '🔶 พอใช้'; statusClass = 'status-5s-fair'; scoreBadge = '<span class="score-badge fair">+1</span>';
-        } else if (res === "ปรับปรุง") {
-          statusText = '✘ ปรับปรุง'; statusClass = 'status-5s-improve'; scoreBadge = '<span class="score-badge improve">0</span>';
-        }
-        
-        html += `<div class="sub-item">
-          <div class="sub-item-text">• ${escapeHtml(qText)}${scoreBadge}${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''}</div>
-          <div class="status-pill ${statusClass}">${statusText}</div>
-        </div>`;
-      });
-      html += `</div>`;
-    });
-  } 
-  // ✅ Safety Types: แสดง 2 ระดับตามเดิม (ดี/ไม่ดี)
-  else {
-    for (let secKey in CHECKLIST_SAFETY) {
-      const section = CHECKLIST_SAFETY[secKey];
-      const sNum = secKey.replace('s', '');
-      html += `<div class="section-group"><div class="section-head"><span><i class="${section.icon}"></i> ${escapeHtml(section.title)}</span></div>`;
-      
-      section.questions.forEach((qText, qIdx) => {
-        const res = d.fullChecklist?.[`section${sNum}_q${qIdx}`];
-        const remark = d.fullChecklist?.[`section${sNum}_remark${qIdx}`];
-        const isBad = res === "ไม่ดี";
-        
-        html += `<div class="sub-item">
-          <div class="sub-item-text">• ${escapeHtml(qText)}${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''}</div>
-          <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">
-            ${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}
+      let html = `<tr class="detail-row" id="detail-${d.id}"><td colspan="7" style="padding:0;"><div class="inner-detail">
+        <div class="detail-header">
+          <h4><i class="fas fa-clipboard-list"></i> รายละเอียดผลการตรวจสอบ</h4>
+          <div class="detail-meta">
+            <span><i class="fas fa-tag"></i> ${escapeHtml(d.inspectionType)}</span>
+            <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(normalizeAreaDisplay(d.area))}</span>
+            <span><i class="fas fa-user"></i> ${escapeHtml(d.inspector)}</span>
+            <span><i class="fas fa-clock"></i> ${escapeHtml(d.timestamp)}</span>
           </div>
         </div>`;
-      });
-      html += `</div>`;
+      
+      if (is5S) {
+        const sections = CHECKLIST_5S[areaKey]?.sections || CHECKLIST_5S["Factory"].sections;
+        
+        sections.forEach((sec, sIdx) => {
+          html += `<div class="section-group"><div class="section-head"><span><i class="${sec.icon || 'fas fa-circle'}"></i> ${escapeHtml(sec.title)}</span></div>`;
+          
+          sec.questions.forEach((qText, qIdx) => {
+            const detailKey = `5s_s${sIdx}_q${qIdx}`;
+            const res = d.fullChecklist?.[detailKey];
+            const remark = d.fullChecklist?.[`5s_remark_s${sIdx}_q${qIdx}`];
+            
+            let statusText = '-', statusClass = '', scoreBadge = '';
+            if (res === "ดี") {
+              statusText = '✔ ดี'; statusClass = 'status-5s-good'; scoreBadge = '<span class="score-badge good">+2</span>';
+            } else if (res === "พอใช้") {
+              statusText = '🔶 พอใช้'; statusClass = 'status-5s-fair'; scoreBadge = '<span class="score-badge fair">+1</span>';
+            } else if (res === "ปรับปรุง") {
+              statusText = '✘ ปรับปรุง'; statusClass = 'status-5s-improve'; scoreBadge = '<span class="score-badge improve">0</span>';
+            }
+            
+            html += `<div class="sub-item">
+              <div class="sub-item-text">• ${escapeHtml(qText)}${scoreBadge}${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''}</div>
+              <div class="status-pill ${statusClass}">${statusText}</div>
+            </div>`;
+          });
+          html += `</div>`;
+        });
+      } 
+      else {
+        for (let secKey in CHECKLIST_SAFETY) {
+          const section = CHECKLIST_SAFETY[secKey];
+          const sNum = secKey.replace('s', '');
+          html += `<div class="section-group"><div class="section-head"><span><i class="${section.icon}"></i> ${escapeHtml(section.title)}</span></div>`;
+          
+          section.questions.forEach((qText, qIdx) => {
+            const res = d.fullChecklist?.[`section${sNum}_q${qIdx}`];
+            const remark = d.fullChecklist?.[`section${sNum}_remark${qIdx}`];
+            const isBad = res === "ไม่ดี";
+            
+            html += `<div class="sub-item">
+              <div class="sub-item-text">• ${escapeHtml(qText)}${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''}</div>
+              <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">
+                ${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}
+              </div>
+            </div>`;
+          });
+          html += `</div>`;
+        }
+      }
+      
+      html += `</div></td></tr>`;
+      return html;
     }
-  }
-  
-  html += `</div></td></tr>`;
-  return html;
-}
 
     function toggleDetail(id) {
       const row = document.getElementById(`detail-${id}`);
       const icon = document.getElementById(`icon-${id}`);
-      if (row.style.display === 'table-row') {
+      if (row.style.display === 'table-row' || row.style.display === 'block') {
         row.style.display = 'none';
         icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
       } else {
-        row.style.display = 'table-row';
+        // Handle table-row for desktop, block for mobile fallback
+        row.style.display = window.innerWidth <= 768 ? 'block' : 'table-row';
         icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
       }
     }
@@ -949,17 +939,6 @@ const statusBadge = d.inspectionType === CONFIG.TYPE_5S
       t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'}"></i><span>${escapeHtml(msg)}</span>`;
       document.body.appendChild(t);
       setTimeout(() => { t.style.animation = 'slideOut 0.3s ease'; setTimeout(() => t.remove(), 300); }, dur);
-    }
-
-    // Add CSS for toast animations
-    const style = document.createElement('style');
-    style.textContent = `@keyframes slideIn{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}@keyframes slideOut{from{transform:translate(-50%,0);opacity:1}to{transform:translate(-50%,20px);opacity:0}}`;
-    document.head.appendChild(style);
-
-    // Apply saved dark mode
-    if (localStorage.getItem('darkMode') === 'true') {
-      document.documentElement.classList.add('dark');
-      document.getElementById('toggleDarkMode').innerHTML = '<i class="fas fa-sun"></i> โหมดสว่าง';
     }
   </script>
 </body>
