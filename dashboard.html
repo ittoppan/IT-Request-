@@ -191,8 +191,8 @@
     </div>
   </div>
 
-  <script>
-    // ✅ CONFIG & STATE
+   <script>
+    // ✅ 1. CONFIG & GLOBAL STATE
     const CONFIG = { API_URL: "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec", TZ: "GMT+7", TYPE_5S: "5S" };
     const DEPARTMENTS_5S = ["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","ENGINEERING","OUTSIDE"];
     const DEPARTMENTS_SAFETY = ["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","OUTSIDE"];
@@ -203,14 +203,127 @@
     let charts = {};
     let isLoading = false;
 
-    // ✅ INIT
-    document.addEventListener('DOMContentLoaded', () => {
-      setupTabs();
-      setupFilters();
-      if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
-      loadData();
-    });
+    // ✅ 2. UTILITY FUNCTIONS (Defined First)
+    function normalizeArea(a) { 
+      const m={"แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Solvent":"SOLVENT","แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING","แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC","แผนก Warehouse":"WAREHOUSE","Office":"OFFICE","พื้นที่รอบบริเวณโรงงาน":"OUTSIDE","Canteen":"CANTEEN","EN":"ENGINEERING","Outside":"OUTSIDE","Factory":"PRINT"}; 
+      return m[a]||a; 
+    }
+    function parseThaiDate(s) { 
+      if(!s||s==='-')return 0; 
+      const p=s.split('/'); 
+      return p.length===3?new Date(p[2],p[1]-1,p[0]).getTime():0; 
+    }
+    function parseTS(ts) {
+      if (!ts) return 0;
+      try { return new Date(ts.includes('T') ? ts : ts.replace(' ', 'T')).getTime(); } catch { return 0; }
+    }
+    function updateChart(id, cfg) {
+      if(charts[id]) charts[id].destroy();
+      charts[id] = new Chart(document.getElementById(id).getContext('2d'), cfg);
+    }
+    function showToast(msg, type='info') { 
+      const t=document.createElement('div'); 
+      t.className=`toast ${type}`; 
+      t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`; 
+      document.body.appendChild(t); 
+      setTimeout(()=>t.remove(), 3000); 
+    }
+    function exportCSV() {
+      const rows = Array.from(document.querySelectorAll('#table5SBody tr')).map(tr=>Array.from(tr.querySelectorAll('td')).map(td=>td.textContent.trim()));
+      const headers = ['แผนก','จำนวนตรวจ','คะแนนเฉลี่ย','ดี','พอใช้','ปรับปรุง','สถานะ'];
+      const csv = [headers.join(','),...rows.map(r=>r.map(c=>`"${c.replace(/"/g,'""')}"`).join(','))].join('\n');
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'})); a.download=`5S_Report_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+      showToast('📥 Export CSV เรียบร้อย', 'success');
+    }
+    function toggleDarkMode() { const is = document.documentElement.classList.toggle('dark'); localStorage.setItem('darkMode', is); showToast(is?'🌙 โหมดมืด':'☀️ โหมดสว่าง', 'info'); }
 
+    // ✅ 3. FILTER & RENDER FUNCTIONS
+    function applyFilters() {
+      const range = document.getElementById('timeRange').value;
+      const dept = document.getElementById('deptFilter').value;
+      const now = new Date();
+      let start, end;
+      
+      if (range === 'today') { start = new Date(now.setHours(0,0,0,0)); end = new Date(now.setHours(23,59,59,999)); }
+      else if (range === 'week') { start = new Date(now.getTime() - 7*86400000); end = now; }
+      else if (range === 'month') { start = new Date(now.getFullYear(), now.getMonth(), 1); end = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59); }
+      else if (range === 'quarter') { const q = Math.floor(now.getMonth()/3); start = new Date(now.getFullYear(), q*3, 1); end = new Date(now.getFullYear(), q*3+3, 0, 23,59,59); }
+      else { start = new Date(now.getFullYear(), 0, 1); end = new Date(now.getFullYear(), 11, 31, 23,59,59); }
+
+      filteredData.inspections = allData.inspections.filter(i => {
+        const d = parseTS(i.timestamp);
+        return d >= start.getTime() && d <= end.getTime() && (dept === 'all' || normalizeArea(i.area) === dept);
+      });
+      filteredData.jobs = allData.jobs.filter(j => {
+        const d = j.dateFound ? parseThaiDate(j.dateFound) : 0;
+        return d >= start.getTime() && d <= end.getTime() && (dept === 'all' || normalizeArea(j.area) === dept);
+      });
+
+      if (activeTab === '5s') render5S(); else renderSafety();
+    }
+
+    function resetFilters() {
+      document.getElementById('timeRange').value = 'month';
+      document.getElementById('deptFilter').value = 'all';
+      applyFilters();
+    }
+
+    function updateDeptOptions() {
+      const deptFilter = document.getElementById('deptFilter');
+      const list = activeTab === '5s' ? DEPARTMENTS_5S : DEPARTMENTS_SAFETY;
+      deptFilter.innerHTML = '<option value="all">ทั้งหมด</option>' + list.map(d => `<option value="${d}">${d}</option>`).join('');
+    }
+
+    function render5S() {
+      const ins5S = filteredData.inspections.filter(i => i.inspectionType === CONFIG.TYPE_5S);
+      document.getElementById('stat5SCount').textContent = ins5S.length;
+      
+      const getScore = (i) => {
+        if (i.score?.percent) return Number(i.score.percent);
+        let earned=0, max=0;
+        Object.values(i.fullChecklist||{}).forEach(v => { max += 2; if(v==='ดี'||v==='ผ่าน') earned+=2; else if(v==='พอใช้') earned+=1; });
+        return max > 0 ? (earned / max * 100) : 0;
+      };
+
+      const avg = ins5S.length ? Math.round(ins5S.reduce((s,i) => s + getScore(i), 0) / ins5S.length) : 0;
+      document.getElementById('statAvgScore').textContent = avg + '%';
+
+      let good=0, fair=0, imp=0;
+      ins5S.forEach(i => Object.values(i.fullChecklist||{}).forEach(v => { if(v==='ดี'||v==='ผ่าน')good++; else if(v==='พอใช้')fair++; else if(v==='ปรับปรุง'||v==='ไม่ดี')imp++; }));
+      document.getElementById('stat5SDist').textContent = `ดี ${good} | พอใช้ ${fair} | ปรับปรุง ${imp}`;
+      document.getElementById('stat5SIssues').textContent = imp;
+
+      const daily = {}; ins5S.forEach(i => { const d = i.timestamp?.split(' ')[0]; if(d){ if(!daily[d])daily[d]=[]; daily[d].push(getScore(i)); }});
+      const labels = Object.keys(daily).sort();
+      const data = labels.map(k => Math.round(daily[k].reduce((a,b)=>a+b,0)/daily[k].length));
+      updateChart('scoreTrendChart', { type:'line', data:{ labels, datasets:[{ label:'คะแนนเฉลี่ย', data, borderColor:'#27ae60', backgroundColor:'rgba(39,174,96,0.1)', tension:0.4, fill:true, pointRadius:4 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}} }});
+
+      const deptStats = {}; ins5S.forEach(i => { const d = normalizeArea(i.area) || 'อื่นๆ'; if(!deptStats[d]) deptStats[d]={count:0,scores:[],good:0,fair:0,imp:0}; deptStats[d].count++; deptStats[d].scores.push(getScore(i)); Object.values(i.fullChecklist||{}).forEach(v => { if(v==='ดี'||v==='ผ่าน')deptStats[d].good++; else if(v==='พอใช้')deptStats[d].fair++; else if(v==='ปรับปรุง'||v==='ไม่ดี')deptStats[d].imp++; }); });
+      const sorted = Object.entries(deptStats).map(([k,v])=>({dept:k, avg:Math.round(v.scores.reduce((a,b)=>a+b,0)/v.scores.length||0), count:v.count, ...v})).sort((a,b)=>b.avg-a.avg);
+      updateChart('deptRankChart', { type:'bar', data:{ labels:sorted.map(s=>s.dept), datasets:[{ label:'คะแนนเฉลี่ย', data:sorted.map(s=>s.avg), backgroundColor:sorted.map(s=>s.avg>=80?'#27ae60':s.avg>=50?'#f39c12':'#e74c3c'), borderRadius:6 }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}} }});
+
+      const tbody = document.getElementById('table5SBody');
+      tbody.innerHTML = sorted.length ? sorted.map(s=>`<tr><td><strong>${s.dept}</strong></td><td>${s.count}</td><td>${s.avg}% <div class="progress-mini"><div class="progress-fill ${s.avg>=80?'good':s.avg>=50?'fair':'improve'}" style="width:${s.avg}%"></div></div></td><td><span class="badge badge-good">${s.good}</span></td><td><span class="badge badge-fair">${s.fair}</span></td><td><span class="badge badge-improve">${s.imp}</span></td><td>${s.imp===0?'✅ ปกติ':'⚠️ ต้องปรับปรุง'}</td></tr>`).join('') : '<tr><td colspan="7" class="empty-state"><i class="fas fa-info-circle"></i> ไม่มีข้อมูล 5S</td></tr>';
+    }
+
+    function renderSafety() {
+      document.getElementById('statSafetyCount').textContent = filteredData.inspections.filter(i => i.inspectionType !== CONFIG.TYPE_5S).length;
+      document.getElementById('statJobCount').textContent = filteredData.jobs.length;
+      document.getElementById('statOpenCount').textContent = filteredData.jobs.filter(j=>j.status==='Open').length;
+      document.getElementById('statClosedCount').textContent = filteredData.jobs.filter(j=>j.status==='Closed').length;
+
+      const types = {}; filteredData.jobs.forEach(j=>{ const t=j.inspectionType||'อื่นๆ'; types[t]=(types[t]||0)+1; });
+      updateChart('jobsTypeChart', { type:'bar', data:{ labels:Object.keys(types), datasets:[{ label:'จำนวนงาน', data:Object.values(types), backgroundColor:'#2980b9', borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,ticks:{stepSize:1}}} }});
+
+      const open = filteredData.jobs.filter(j=>j.status==='Open').length; const closed = filteredData.jobs.length - open;
+      updateChart('jobStatusChart', { type:'doughnut', data:{ labels:['Open','Closed'], datasets:[{ data:[open,closed], backgroundColor:['#e74c3c','#27ae60'], borderWidth:2,borderColor:'#fff' }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{legend:{position:'bottom'}} }});
+
+      const now = Date.now(); const dueSoon = filteredData.jobs.filter(j=>j.status==='Open' && j.dueDate && parseThaiDate(j.dueDate) <= now + 7*86400000).sort((a,b)=>parseThaiDate(a.dueDate)-parseThaiDate(b.dueDate)).slice(0,10);
+      const tbody = document.getElementById('tableDueBody');
+      tbody.innerHTML = dueSoon.length ? dueSoon.map(j=>{ const d=parseThaiDate(j.dueDate)-now; const days=Math.ceil(d/86400000); return `<tr><td><strong style="color:var(--info)">${j.jobId}</strong></td><td>${j.inspectionType}</td><td>${normalizeArea(j.area)}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${j.problem||'-'}</td><td>${j.dateFound||'-'}</td><td style="color:var(--danger);font-weight:600;">${j.dueDate||'-'} ${days<=0?'(เกินกำหนด)':days===0?'(วันนี้)':`(อีก ${days} วัน)`}</td><td><span class="badge badge-improve">Open</span></td></tr>`; }).join('') : '<tr><td colspan="7" class="empty-state"><i class="fas fa-check-circle"></i> ไม่มีงานใกล้ครบกำหนด</td></tr>';
+    }
+
+    // ✅ 4. INITIALIZATION
     function setupTabs() {
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -231,13 +344,6 @@
       document.getElementById('btnReset').addEventListener('click', resetFilters);
     }
 
-    function updateDeptOptions() {
-      const deptFilter = document.getElementById('deptFilter');
-      const list = activeTab === '5s' ? DEPARTMENTS_5S : DEPARTMENTS_SAFETY;
-      deptFilter.innerHTML = '<option value="all">ทั้งหมด</option>' + list.map(d => `<option value="${d}">${d}</option>`).join('');
-    }
-
-    // ✅ DATA LOADING
     async function loadData() {
       if (isLoading) return;
       isLoading = true;
@@ -255,138 +361,12 @@
       finally { isLoading = false; document.getElementById('loader').classList.remove('show'); }
     }
 
-       // ✅ FILTERING (แก้ Date Parsing ให้ยืดหยุ่น)
-    function applyFilters() {
-      const range = document.getElementById('timeRange').value;
-      const dept = document.getElementById('deptFilter').value;
-      const now = new Date();
-      let start, end;
-      
-      if (range === 'today') { start = new Date(now.setHours(0,0,0,0)); end = new Date(now.setHours(23,59,59,999)); }
-      else if (range === 'week') { start = new Date(now.getTime() - 7*86400000); end = now; }
-      else if (range === 'month') { start = new Date(now.getFullYear(), now.getMonth(), 1); end = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59); }
-      else if (range === 'quarter') { const q = Math.floor(now.getMonth()/3); start = new Date(now.getFullYear(), q*3, 1); end = new Date(now.getFullYear(), q*3+3, 0, 23,59,59); }
-      else { start = new Date(now.getFullYear(), 0, 1); end = new Date(now.getFullYear(), 11, 31, 23,59,59); }
-
-      // ✅ Helper แปลง Timestamp แบบปลอดภัย
-      const parseTS = (ts) => {
-        if (!ts) return 0;
-        try { return new Date(ts.includes('T') ? ts : ts.replace(' ', 'T')).getTime(); } catch { return 0; }
-      };
-
-      filteredData.inspections = allData.inspections.filter(i => {
-        const d = parseTS(i.timestamp);
-        return d >= start.getTime() && d <= end.getTime() && (dept === 'all' || normalizeArea(i.area) === dept);
-      });
-      
-      filteredData.jobs = allData.jobs.filter(j => {
-        const d = j.dateFound ? parseThaiDate(j.dateFound) : 0;
-        return d >= start.getTime() && d <= end.getTime() && (dept === 'all' || normalizeArea(j.area) === dept);
-      });
-
-      if (activeTab === '5s') render5S(); else renderSafety();
-    }
-
-    // ✅ RENDER 5S TAB (มี Fallback คำนวณคะแนนเอง)
-    function render5S() {
-      const ins5S = filteredData.inspections.filter(i => i.inspectionType === CONFIG.TYPE_5S);
-      document.getElementById('stat5SCount').textContent = ins5S.length;
-      
-      // ✅ คำนวณคะแนนเฉลี่ย (รองรับทั้ง score.percent และคำนวณจาก fullChecklist เอง)
-      const getScore = (i) => {
-        if (i.score?.percent) return Number(i.score.percent);
-        // Fallback: คำนวณจาก fullChecklist (ดี=2, พอใช้=1, ปรับปรุง=0)
-        let earned=0, max=0;
-        Object.values(i.fullChecklist||{}).forEach(v => {
-          max += 2;
-          if (v === 'ดี' || v === 'ผ่าน') earned += 2;
-          else if (v === 'พอใช้') earned += 1;
-        });
-        return max > 0 ? (earned / max * 100) : 0;
-      };
-
-      const avg = ins5S.length ? Math.round(ins5S.reduce((s,i) => s + getScore(i), 0) / ins5S.length) : 0;
-      document.getElementById('statAvgScore').textContent = avg + '%';
-
-      let good=0, fair=0, imp=0;
-      ins5S.forEach(i => Object.values(i.fullChecklist||{}).forEach(v => { 
-        if(v==='ดี'||v==='ผ่าน') good++; 
-        else if(v==='พอใช้') fair++; 
-        else if(v==='ปรับปรุง'||v==='ไม่ดี') imp++; 
-      }));
-      document.getElementById('stat5SDist').textContent = `ดี ${good} | พอใช้ ${fair} | ปรับปรุง ${imp}`;
-      document.getElementById('stat5SIssues').textContent = imp;
-
-      // Chart: Trend
-      const daily = {};
-      ins5S.forEach(i => { 
-        const d = i.timestamp?.split(' ')[0]; 
-        if(d){ 
-          if(!daily[d]) daily[d]=[]; 
-          daily[d].push(getScore(i)); 
-        }
-      });
-      const labels = Object.keys(daily).sort();
-      const data = labels.map(k => Math.round(daily[k].reduce((a,b)=>a+b,0)/daily[k].length));
-      updateChart('scoreTrendChart', { type:'line', data:{ labels, datasets:[{ label:'คะแนนเฉลี่ย', data, borderColor:'#27ae60', backgroundColor:'rgba(39,174,96,0.1)', tension:0.4, fill:true, pointRadius:4 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}} }});
-
-      // Chart & Table: Dept Rank
-      const deptStats = {};
-      ins5S.forEach(i => {
-        const d = normalizeArea(i.area) || 'อื่นๆ';
-        if(!deptStats[d]) deptStats[d] = { count:0, scores:[], good:0, fair:0, imp:0 };
-        deptStats[d].count++;
-        deptStats[d].scores.push(getScore(i));
-        Object.values(i.fullChecklist||{}).forEach(v => { 
-          if(v==='ดี'||v==='ผ่าน') deptStats[d].good++; 
-          else if(v==='พอใช้') deptStats[d].fair++; 
-          else if(v==='ปรับปรุง'||v==='ไม่ดี') deptStats[d].imp++; 
-        });
-      });
-      const sorted = Object.entries(deptStats).map(([k,v])=>({dept:k, avg:Math.round(v.scores.reduce((a,b)=>a+b,0)/v.scores.length||0), count:v.count, good:v.good, fair:v.fair, imp:v.imp})).sort((a,b)=>b.avg-a.avg);
-      
-      updateChart('deptRankChart', { type:'bar', data:{ labels:sorted.map(s=>s.dept), datasets:[{ label:'คะแนนเฉลี่ย', data:sorted.map(s=>s.avg), backgroundColor:sorted.map(s=>s.avg>=80?'#27ae60':s.avg>=50?'#f39c12':'#e74c3c'), borderRadius:6 }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}} }});
-
-      const tbody = document.getElementById('table5SBody');
-      tbody.innerHTML = sorted.length ? sorted.map(s=>`<tr><td><strong>${s.dept}</strong></td><td>${s.count}</td><td>${s.avg}% <div class="progress-mini"><div class="progress-fill ${s.avg>=80?'good':s.avg>=50?'fair':'improve'}" style="width:${s.avg}%"></div></div></td><td><span class="badge badge-good">${s.good}</span></td><td><span class="badge badge-fair">${s.fair}</span></td><td><span class="badge badge-improve">${s.imp}</span></td><td>${s.imp===0?'✅ ปกติ':'⚠️ ต้องปรับปรุง'}</td></tr>`).join('') : '<tr><td colspan="7" class="empty-state"><i class="fas fa-info-circle"></i> ไม่มีข้อมูล 5S ในระยะเวลาที่เลือก</td></tr>';
-    }
-
-    // ✅ RENDER SAFETY TAB
-    function renderSafety() {
-      const safetyIns = filteredData.inspections.filter(i => i.inspectionType !== CONFIG.TYPE_5S);
-      document.getElementById('statSafetyCount').textContent = safetyIns.length;
-      document.getElementById('statJobCount').textContent = filteredData.jobs.length;
-      document.getElementById('statOpenCount').textContent = filteredData.jobs.filter(j=>j.status==='Open').length;
-      document.getElementById('statClosedCount').textContent = filteredData.jobs.filter(j=>j.status==='Closed').length;
-
-      const types = {}; filteredData.jobs.forEach(j=>{ const t=j.inspectionType||'อื่นๆ'; types[t]=(types[t]||0)+1; });
-      updateChart('jobsTypeChart', { type:'bar', data:{ labels:Object.keys(types), datasets:[{ label:'จำนวนงาน', data:Object.values(types), backgroundColor:'#2980b9', borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,ticks:{stepSize:1}}} }});
-
-      const open = filteredData.jobs.filter(j=>j.status==='Open').length;
-      const closed = filteredData.jobs.length - open;
-      updateChart('jobStatusChart', { type:'doughnut', data:{ labels:['Open','Closed'], datasets:[{ data:[open,closed], backgroundColor:['#e74c3c','#27ae60'], borderWidth:2,borderColor:'#fff' }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{legend:{position:'bottom'}} }});
-
-      const now = Date.now(); const dueSoon = filteredData.jobs.filter(j=>j.status==='Open' && j.dueDate && parseThaiDate(j.dueDate) <= now + 7*86400000).sort((a,b)=>parseThaiDate(a.dueDate)-parseThaiDate(b.dueDate)).slice(0,10);
-      const tbody = document.getElementById('tableDueBody');
-      tbody.innerHTML = dueSoon.length ? dueSoon.map(j=>{ const d=parseThaiDate(j.dueDate)-now; const days=Math.ceil(d/86400000); return `<tr><td><strong style="color:var(--info)">${j.jobId}</strong></td><td>${j.inspectionType}</td><td>${normalizeArea(j.area)}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${j.problem||'-'}</td><td>${j.dateFound||'-'}</td><td style="color:var(--danger);font-weight:600;">${j.dueDate||'-'} ${days<=0?'(เกินกำหนด)':days===0?'(วันนี้)':`(อีก ${days} วัน)`}</td><td><span class="badge badge-improve">Open</span></td></tr>`; }).join('') : '<tr><td colspan="7" class="empty-state"><i class="fas fa-check-circle"></i> ไม่มีงานใกล้ครบกำหนด</td></tr>';
-    }
-
-    // ✅ UTILS
-    function updateChart(id, cfg) {
-      if(charts[id]) charts[id].destroy();
-      charts[id] = new Chart(document.getElementById(id).getContext('2d'), cfg);
-    }
-    function normalizeArea(a) { const m={"แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Solvent":"SOLVENT","แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING","แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC","แผนก Warehouse":"WAREHOUSE","Office":"OFFICE","พื้นที่รอบบริเวณโรงงาน":"OUTSIDE","Canteen":"CANTEEN","EN":"ENGINEERING","Outside":"OUTSIDE","Factory":"PRINT"}; return m[a]||a; }
-    function parseThaiDate(s) { if(!s||s==='-')return 0; const p=s.split('/'); return p.length===3?new Date(p[2],p[1]-1,p[0]).getTime():0; }
-    function exportCSV() {
-      const rows = Array.from(document.querySelectorAll('#table5SBody tr')).map(tr=>Array.from(tr.querySelectorAll('td')).map(td=>td.textContent.trim()));
-      const headers = ['แผนก','จำนวนตรวจ','คะแนนเฉลี่ย','ดี','พอใช้','ปรับปรุง','สถานะ'];
-      const csv = [headers.join(','),...rows.map(r=>r.map(c=>`"${c.replace(/"/g,'""')}"`).join(','))].join('\n');
-      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'})); a.download=`5S_Report_${new Date().toISOString().slice(0,10)}.csv`; a.click();
-      showToast('📥 Export CSV เรียบร้อย', 'success');
-    }
-    function toggleDarkMode() { const is = document.documentElement.classList.toggle('dark'); localStorage.setItem('darkMode', is); showToast(is?'🌙 โหมดมืด':'☀️ โหมดสว่าง', 'info'); }
-    function showToast(msg, type='info') { const t=document.createElement('div'); t.className=`toast ${type}`; t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`; document.body.appendChild(t); setTimeout(()=>t.remove(), 3000); }
+    document.addEventListener('DOMContentLoaded', () => {
+      setupTabs();
+      setupFilters();
+      if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
+      loadData();
+    });
   </script>
 </body>
 </html>
