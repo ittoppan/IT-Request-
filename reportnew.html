@@ -7,8 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-  
-}
     :root {
       --primary: #f39c12; --primary-dark: #e67e22; --dark: #2c3e50;
       --success: #27ae60; --danger: #e74c3c; --warning: #f39c12; --info: #2980b9;
@@ -270,6 +268,11 @@
       </tr>
     </table>
 
+    <div class="stats-summary">
+      <div class="stat-mini"><div class="value" id="statTotal">0</div><div class="label">รวม</div></div>
+      <div class="stat-mini danger"><div class="value" id="statOpen">0</div><div class="label">Open</div></div>
+      <div class="stat-mini success"><div class="value" id="statClosed">0</div><div class="label">Closed</div></div>
+    </div>
 
     <div class="export-actions">
       <button class="btn-export" onclick="exportCSV()"><i class="fas fa-file-csv"></i> CSV</button>
