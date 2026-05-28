@@ -285,23 +285,23 @@
     </div>
 
     <table class="main-table">
-      <thead>
-        <tr>
-          <th onclick="sortTable('jobId')">ลำดับ <i class="fas fa-sort"></i></th>
-          <th>ประเภท</th>
-          <th>รูปภาพ<br><small style="font-weight:normal;opacity:0.9">(ก่อน)</small></th>
-          <th>รูปภาพ<br><small style="font-weight:normal;opacity:0.9">(หลัง)</small></th>
-          <th onclick="sortTable('area')">พื้นที่ <i class="fas fa-sort"></i></th>
-          <th onclick="sortTable('jobId')">JOB NO. <i class="fas fa-sort"></i></th>
-          <th>ปัญหาที่พบ</th>
-          <th>แนวทางแก้ไข</th>
-          <th>ผู้รับผิดชอบ</th>
-          <th onclick="sortTable('dateFound')">วันที่พบ <i class="fas fa-sort"></i></th>
-          <th onclick="sortTable('dueDate')">ครบกำหนด <i class="fas fa-sort"></i></th>
-          <th>เสร็จสิ้น</th>
-          <th>หมายเหตุ</th>
-        </tr>
-      </thead>
+     <thead>
+  <tr>
+    <th onclick="sortTable('jobId')">ลำดับ <i class="fas fa-sort"></i></th>
+    <th>ประเภท</th>
+    <th>รูปภาพ<br><small style="font-weight:normal;opacity:0.9">(ก่อน)</small></th>
+    <th>รูปภาพ<br><small style="font-weight:normal;opacity:0.9">(หลัง)</small></th>
+    <th onclick="sortTable('area')">พื้นที่ <i class="fas fa-sort"></i></th>
+    <th onclick="sortTable('jobId')">JOB NO. <i class="fas fa-sort"></i></th>
+    <th>ปัญหาที่พบ</th>
+    <th>แนวทางแก้ไข</th>
+    <th>ผู้รับผิดชอบ</th>
+    <th onclick="sortTable('dateFound')">วันที่พบ <i class="fas fa-sort"></i></th>
+    <th onclick="sortTable('dueDate')">ครบกำหนด <i class="fas fa-sort"></i></th>
+    <th onclick="sortTable('finishDate')">เสร็จสิ้น <i class="fas fa-sort"></i></th>
+    <th>หมายเหตุ</th>
+  </tr>
+</thead>
       <tbody id="reportContent"></tbody>
     </table>
     <div id="pagination" class="pagination"></div>
@@ -569,59 +569,54 @@
     // ===================================================================
     // TABLE RENDERING & SORTING
     // ===================================================================
-    function renderTable() {
-      const areaVal = document.getElementById('areaFilter').value;
-      const statusVal = document.getElementById('statusFilter').value;
-      const searchVal = document.getElementById('searchFilter').value.trim().toLowerCase();
-      const reportContent = document.getElementById('reportContent');
-      
-      let filtered = [...allReportData];
-      
-      // Filter by type
-      if (currentTypeFilter !== 'all') filtered = filtered.filter(item => item.inspectionType === currentTypeFilter);
-      
-      // Filter by area
-      if (areaVal !== "") {
-        filtered = filtered.filter(item => {
-          const norm = normalizeAreaForFilter(item.area);
-          if (areaVal === "OFFICE_ALL") return norm === "OFFICE";
-          if (areaVal === "QA_ALL") return norm === "QA&QC";
-          if (areaVal === "OUTSIDE_ALL") return norm === "OUTSIDE";
-          return norm === areaVal;
-        });
-      }
-      
-      // Filter by status
-      if (statusVal !== "") filtered = filtered.filter(item => item.status === statusVal);
-      
-      // ✅ Filter by search (Job ID / Problem / Inspector)
-      if (searchVal) {
-        filtered = filtered.filter(item => 
-          (item.jobId && item.jobId.toLowerCase().includes(searchVal)) ||
-          (item.problem && item.problem.toLowerCase().includes(searchVal)) ||
-          (item.remark && item.remark.toLowerCase().includes(searchVal)) ||
-          (item.inspector && item.inspector.toLowerCase().includes(searchVal)) ||
-          (item.picName && item.picName.toLowerCase().includes(searchVal))
-        );
-      }
+   // ✅ แปลงวันที่รูปแบบไทย "dd/MM/yyyy" หรือ "ทั้งหมด" → Timestamp สำหรับเรียงลำดับ
+function parseThaiDate(dateStr) {
+  if (!dateStr || dateStr === "-" || dateStr === "ทั้งหมด") return 0;
+  
+  // กรณีเป็น timestamp จาก backend (ตัวเลข)
+  if (typeof dateStr === 'number') return dateStr;
+  
+  // กรณีเป็น string "dd/MM/yyyy"
+  const parts = dateStr.split('/');
+  if (parts.length === 3) {
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // JS month 0-11
+    const year = parseInt(parts[2], 10);
+    return new Date(year, month, day).getTime();
+  }
+  
+  // กรณีเป็น ISO string หรืออื่นๆ
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? 0 : d.getTime();
+}
 
-      // ✅ Sort: Latest first by default (dateFound descending)
-      filtered.sort((a, b) => {
-        const aDate = new Date(a.dateFound || 0);
-        const bDate = new Date(b.dateFound || 0);
-        return currentSort.dir === 'desc' ? bDate - aDate : aDate - bDate;
-      });
-
-      if (filtered.length === 0) {
-        reportContent.innerHTML = `<tr><td colspan="13" class="empty-state"><i class="fas fa-search"></i><p><b>ไม่พบข้อมูล</b></p><small>ลองปรับเงื่อนไขการกรองหรือเลือกเดือนอื่น</small></td></tr>`;
-        document.getElementById('pagination').innerHTML = '';
-        return;
-      }
-
-      // Pagination
-      const totalPages = Math.ceil(filtered.length / itemsPerPage);
-      const start = (currentPage - 1) * itemsPerPage;
-      const pageData = filtered.slice(start, start + itemsPerPage);
+// ✅ ฟังก์ชันเปรียบเทียบค่าสำหรับเรียงตาราง (รองรับหลายประเภท)
+function compareValues(a, b, key, dir) {
+  let valA, valB;
+  
+  // ดึงค่าตาม key
+  if (key === 'dateFound' || key === 'dueDate' || key === 'finishDate') {
+    valA = parseThaiDate(a[key]);
+    valB = parseThaiDate(b[key]);
+  } else if (key === 'jobId') {
+    // เรียงเลขท้าย Job ID เช่น SF-240515-001
+    valA = parseInt((a.jobId || '').split('-').pop()) || 0;
+    valB = parseInt((b.jobId || '').split('-').pop()) || 0;
+  } else if (key === 'area') {
+    valA = (a.area || '').toLowerCase();
+    valB = (b.area || '').toLowerCase();
+  } else {
+    valA = (a[key] || '').toString().toLowerCase();
+    valB = (b[key] || '').toString().toLowerCase();
+  }
+  
+  // เปรียบเทียบ
+  let comparison = 0;
+  if (valA > valB) comparison = 1;
+  else if (valA < valB) comparison = -1;
+  
+  return dir === 'desc' ? -comparison : comparison;
+}
 
       reportContent.innerHTML = pageData.map((item, index) => {
         const rowBg = item.status === 'Open' ? '#fff5f5' : '#f0fbf0';
@@ -663,17 +658,42 @@
       renderPagination(totalPages);
     }
 
-    // ✅ Sort function for table headers
-    function sortTable(key) {
-      if (currentSort.key === key) {
-        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
-      } else {
-        currentSort.key = key;
-        currentSort.dir = key === 'dateFound' || key === 'dueDate' ? 'desc' : 'asc';
-      }
-      currentPage = 1;
-      renderTable();
+   // ✅ Sort function with visual feedback
+function sortTable(key) {
+  if (currentSort.key === key) {
+    currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSort.key = key;
+    // Default direction: dates desc, others asc
+    currentSort.dir = (key === 'dateFound' || key === 'dueDate' || key === 'finishDate') ? 'desc' : 'asc';
+  }
+  currentPage = 1;
+  renderTable();
+    renderPagination(totalPages);
+  updateSortIcons(); // ✅ แสดงลูกศรเรียงลำดับ
+}
+}
+
+// ✅ แสดงลูกศรเรียงลำดับในหัวตาราง
+function updateSortIcons() {
+  document.querySelectorAll('.main-table th i').forEach(icon => {
+    icon.className = 'fas fa-sort'; // รีเซ็ตทั้งหมด
+  });
+  
+  const activeTh = Array.from(document.querySelectorAll('.main-table th'))
+    .find(th => th.getAttribute('onclick')?.includes(`sortTable('${currentSort.key}')`));
+  
+  if (activeTh) {
+    const icon = activeTh.querySelector('i');
+    if (icon) {
+      icon.className = currentSort.dir === 'desc' 
+        ? 'fas fa-sort-down' 
+        : 'fas fa-sort-up';
+      icon.style.opacity = '1';
+      icon.style.color = 'var(--primary)';
     }
+  }
+}
 
     function renderPagination(totalPages) {
       const container = document.getElementById('pagination');
@@ -808,6 +828,54 @@
     const style = document.createElement('style');
     style.textContent = `@keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100px);opacity:0}}`;
     document.head.appendChild(style);
+ // ✅ แปลงวันที่รูปแบบไทย "dd/MM/yyyy" หรือ "ทั้งหมด" → Timestamp สำหรับเรียงลำดับ
+function parseThaiDate(dateStr) {
+  if (!dateStr || dateStr === "-" || dateStr === "ทั้งหมด") return 0;
+  
+  // กรณีเป็น timestamp จาก backend (ตัวเลข)
+  if (typeof dateStr === 'number') return dateStr;
+  
+  // กรณีเป็น string "dd/MM/yyyy"
+  const parts = dateStr.split('/');
+  if (parts.length === 3) {
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // JS month 0-11
+    const year = parseInt(parts[2], 10);
+    return new Date(year, month, day).getTime();
+  }
+  
+  // กรณีเป็น ISO string หรืออื่นๆ
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? 0 : d.getTime();
+}
+
+// ✅ ฟังก์ชันเปรียบเทียบค่าสำหรับเรียงตาราง (รองรับหลายประเภท)
+function compareValues(a, b, key, dir) {
+  let valA, valB;
+  
+  // ดึงค่าตาม key
+  if (key === 'dateFound' || key === 'dueDate' || key === 'finishDate') {
+    valA = parseThaiDate(a[key]);
+    valB = parseThaiDate(b[key]);
+  } else if (key === 'jobId') {
+    // เรียงเลขท้าย Job ID เช่น SF-240515-001
+    valA = parseInt((a.jobId || '').split('-').pop()) || 0;
+    valB = parseInt((b.jobId || '').split('-').pop()) || 0;
+  } else if (key === 'area') {
+    valA = (a.area || '').toLowerCase();
+    valB = (b.area || '').toLowerCase();
+  } else {
+    valA = (a[key] || '').toString().toLowerCase();
+    valB = (b[key] || '').toString().toLowerCase();
+  }
+  
+  // เปรียบเทียบ
+  let comparison = 0;
+  if (valA > valB) comparison = 1;
+  else if (valA < valB) comparison = -1;
+  
+  return dir === 'desc' ? -comparison : comparison;
+}
   </script>
 </body>
 </html>
