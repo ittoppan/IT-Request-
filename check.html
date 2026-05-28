@@ -790,20 +790,25 @@ function handleStatusChange(qKey, status) {
     if (resp.waterValue !== undefined) details.water_val = resp.waterValue;
   });
   
-      Object.entries(state.images).forEach(([qKey, imgs]) => imgs.forEach((img, idx) => {
-        images[`${qKey}_${idx}`] = img.b64;
-        if (img.caption.trim()) details[`caption_${qKey}_${idx}`] = img.caption;
-      }));
-      const secRes = {};
-      if (is5S) ['s1','s2','s3','s4','s5','s6','s7'].forEach(s => secRes[`${s}_res`] = 'ดี');
-      else {
-        Object.keys(CHECKLIST_SAFETY).forEach(sKey => {
-          let hasBad = false;
-          CHECKLIST_SAFETY[sKey].qs.forEach((_, i) => { if (details[`section${sKey.replace('s','')}_q${i}`] === 'ไม่ดี') hasBad = true; });
-          if (sKey === 's1' && (area === 'PRINT' || area === 'LAMINATE') && parseFloat(details.water_val) < 50) hasBad = true;
-          secRes[`${sKey}_res`] = hasBad ? 'ไม่ดี' : 'ดี';
-        });
+ // ✅ ในฟังก์ชัน buildPayload() ของ Check.html
+Object.entries(state.images).forEach(([qKey, imgs]) => {
+  imgs.forEach((img, idx) => {
+    // ✅ แปลงคีย์ให้ตรงกับ Backend
+    let backendKey = qKey;
+    
+    // 5S: "5s_s0_q0" → "5s_0_0"
+    if (qKey.startsWith('5s_s')) {
+      const match = qKey.match(/5s_s(\d+)_q(\d+)/);
+      if (match) {
+        backendKey = `5s_${match[1]}_${match[2]}`;
       }
+    }
+    // Safety: "s1_q0" → ใช้เดิมได้เลย
+    
+    images[`${backendKey}_${idx}`] = img.b64;
+    if (img.caption.trim()) details[`caption_${backendKey}_${idx}`] = img.caption;
+  });
+});
       return { 
     inspector: document.getElementById('inspectorName').value.trim(), 
     area, 
