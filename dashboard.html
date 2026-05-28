@@ -173,9 +173,8 @@
         <option value="today">วันนี้</option>
         <option value="week">7 วัน</option>
         <option value="month" selected>เดือนนี้</option>
-        <option value="quarter">ไตรมาส</option>
         <option value="year">ปีนี้</option>
-        <option value="all">ทั้งหมด</option>
+        <option value="all">ทั้งหมด (ไม่กรองวันที่)</option>
       </select>
     </div>
     <div class="fg">
@@ -393,7 +392,7 @@ function applyFilters() {
 }
 
 function resetFilters() {
-  document.getElementById("timeRange").value = "year";
+  document.getElementById("timeRange").value = "all";
   document.getElementById("deptFilter").value = "all";
   applyFilters();
 }
