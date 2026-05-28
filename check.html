@@ -768,57 +768,62 @@ function handleStatusChange(qKey, status) {
       finally { document.getElementById('loader').classList.remove('show'); document.getElementById('submitBtn').disabled = false; }
     }
 
- function buildPayload() {
-  const details = {}, images = {};
-  const is5S = state.type === '5S';
-  const area = is5S ? state.area5S : state.area;
-  
-  Object.entries(state.responses).forEach(([qKey, resp]) => {
-    if (!resp.status) return;
-    
-    // ✅ 5S ใช้ key เดิม แต่ค่าเป็น "ดี"/"พอใช้"/"ปรับปรุง"
-    // ✅ Safety ใช้ key แบบ sectionX_qY และค่าเป็น "ดี"/"ไม่ดี"
-    const prefix = qKey.startsWith('5s_') ? qKey : qKey.replace('s', 'section');
-    details[qKey] = resp.status;
-    
-    // เฉพาะ "ปรับปรุง" (5S) หรือ "ไม่ดี" (Safety) ที่ต้องการหมายเหตุ + Due Date
-    if ((is5S && resp.status === 'ปรับปรุง') || (!is5S && resp.status === 'ไม่ดี')) {
-      details[`${prefix}_remark`] = document.querySelector(`#item_${qKey} textarea`).value;
-      details[`${prefix}_duedate`] = document.querySelector(`#item_${qKey} input[type="date"]`).value;
-    }
-    
-    if (resp.waterValue !== undefined) details.water_val = resp.waterValue;
-  });
-  
- // ✅ ในฟังก์ชัน buildPayload() ของ Check.html
-Object.entries(state.images).forEach(([qKey, imgs]) => {
-  imgs.forEach((img, idx) => {
-    // ✅ แปลงคีย์ให้ตรงกับ Backend
-    let backendKey = qKey;
-    
-    // 5S: "5s_s0_q0" → "5s_0_0"
-    if (qKey.startsWith('5s_s')) {
-      const match = qKey.match(/5s_s(\d+)_q(\d+)/);
-      if (match) {
-        backendKey = `5s_${match[1]}_${match[2]}`;
+    function buildPayload() {
+      const details = {}, images = {}, is5S = state.type === '5S', area = is5S ? state.area5S : state.area;
+      
+      // 1. รวบรวมคำตอบ & หมายเหตุ
+      Object.entries(state.responses).forEach(([qKey, resp]) => {
+        if (!resp.status) return;
+        const prefix = qKey.startsWith('5s_') ? qKey : qKey.replace('s', 'section');
+        details[qKey] = resp.status;
+        
+        // เฉพาะ "ปรับปรุง" (5S) หรือ "ไม่ดี" (Safety) ที่ต้องการหมายเหตุ + Due Date
+        if ((is5S && resp.status === 'ปรับปรุง') || (!is5S && resp.status === 'ไม่ดี')) {
+          details[`${prefix}_remark`] = document.querySelector(`#item_${qKey} textarea`).value;
+          details[`${prefix}_duedate`] = document.querySelector(`#item_${qKey} input[type="date"]`).value;
+        }
+        
+        if (resp.waterValue !== undefined) details.water_val = resp.waterValue;
+      });
+      
+      // 2. รวบรวมรูปภาพ
+      Object.entries(state.images).forEach(([qKey, imgs]) => imgs.forEach((img, idx) => {
+        // แปลงคีย์ให้ตรงกับ Backend คาดหวัง
+        let backendKey = qKey;
+        if (qKey.startsWith('5s_s')) {
+          const match = qKey.match(/5s_s(\d+)_q(\d+)/);
+          if (match) backendKey = `5s_${match[1]}_${match[2]}`;
+        }
+        images[`${backendKey}_${idx}`] = img.b64;
+        if (img.caption.trim()) details[`caption_${backendKey}_${idx}`] = img.caption;
+      }));
+      
+      // 3. ✅ FIX: ประกาศตัวแปร secRes ก่อนใช้งาน
+      const secRes = {};
+      if (is5S) {
+        ['s1','s2','s3','s4','s5','s6','s7'].forEach(s => secRes[`${s}_res`] = 'ดี');
+      } else {
+        Object.keys(CHECKLIST_SAFETY).forEach(sKey => {
+          let hasBad = false;
+          CHECKLIST_SAFETY[sKey].qs.forEach((_, i) => { 
+            if (details[`section${sKey.replace('s','')}_q${i}`] === 'ไม่ดี') hasBad = true; 
+          });
+          if (sKey === 's1' && (area === 'PRINT' || area === 'LAMINATE') && parseFloat(details.water_val) < 50) hasBad = true;
+          secRes[`${sKey}_res`] = hasBad ? 'ไม่ดี' : 'ดี';
+        });
       }
-    }
-    // Safety: "s1_q0" → ใช้เดิมได้เลย
-    
-    images[`${backendKey}_${idx}`] = img.b64;
-    if (img.caption.trim()) details[`caption_${backendKey}_${idx}`] = img.caption;
-  });
-});
+      
+      // 4. ส่ง payload
       return { 
-    inspector: document.getElementById('inspectorName').value.trim(), 
-    area, 
-    inspectionType: state.type, 
-    area5S: is5S ? area : null, 
-    images, 
-    details, 
-    ...secRes 
-  };
-}
+        inspector: document.getElementById('inspectorName').value.trim(), 
+        area, 
+        inspectionType: state.type, 
+        area5S: is5S ? area : null, 
+        images, 
+        details, 
+        ...secRes 
+      };
+    }
 
     async function fetchWithRetry(url, options, retries = 3) {
       for (let i=0; i<retries; i++) { try { const res = await fetch(url, options); return await res.json(); } catch(e) { if(i===retries-1) throw e; await new Promise(r=>setTimeout(r, 1000*(i+1))); } }
