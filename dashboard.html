@@ -344,28 +344,48 @@
       document.getElementById('btnReset').addEventListener('click', resetFilters);
     }
 
-    async function loadData() {
+       async function loadData() {
       if (isLoading) return;
       isLoading = true;
       document.getElementById('loader').classList.add('show');
+      
       try {
+        console.log('🚀 กำลังดึงข้อมูลจาก API...');
+        
+        // ดึงข้อมูลทั้ง Inspection และ Jobs
         const [insRes, jobsRes] = await Promise.all([
           fetch(`${CONFIG.API_URL}?action=getDashboardData`),
           fetch(`${CONFIG.API_URL}?action=getReport`)
         ]);
+        
+        if (!insRes.ok || !jobsRes.ok) throw new Error('Network response was not ok');
+        
         const insData = await insRes.json();
         const jobsData = await jobsRes.json();
-        allData = { inspections: Array.isArray(insData?.details) ? insData.details : [], jobs: Array.isArray(jobsData) ? jobsData : [] };
+        
+        // ตรวจสอบโครงสร้างข้อมูล
+        const inspections = Array.isArray(insData?.details) ? insData.details : [];
+        const jobs = Array.isArray(jobsData) ? jobsData : [];
+        
+        // ✅ DEBUG: พิมพ์ข้อมูลดิบลงใน Console เพื่อดูว่ามีข้อมูล 5S หรือไม่
+        console.table(inspections.filter(i => i.inspectionType === '5S').slice(0, 5));
+        
+        allData = { inspections, jobs };
+        
+        // บังคับใช้ตัวกรอง "ปีนี้" ครั้งแรก เพื่อป้องกันปัญหาวันที่ไม่ตรง
+        document.getElementById('timeRange').value = 'year';
         applyFilters();
-      } catch (e) { console.error('Load failed:', e); showToast('โหลดข้อมูลไม่สำเร็จ', 'error'); }
-      finally { isLoading = false; document.getElementById('loader').classList.remove('show'); }
+        
+        console.log(`✅ โหลดสำเร็จ: ${inspections.length} รายการ, ${jobs.length} Jobs`);
+        
+      } catch (e) {
+        console.error('❌ Load failed:', e);
+        showToast('โหลดข้อมูลไม่สำเร็จ: ' + e.message, 'error');
+      } finally {
+        isLoading = false;
+        document.getElementById('loader').classList.remove('show');
+      }
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      setupTabs();
-      setupFilters();
-      if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
-      loadData();
     });
   </script>
 </body>
