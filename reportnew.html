@@ -643,7 +643,7 @@
         const rowBg = item.status === 'Open' ? '#fff5f5' : '#f0fbf0';
         const borderColor = item.status === 'Open' ? 'var(--danger)' : 'var(--success)';
         const actionBtn = item.status === 'Open' 
-          ? `<a href="resolve.html?jobid=${encodeURIComponent(item.jobId)}" class="btn-action"><i class="fas fa-wrench"></i> แก้ไข</a>`
+          ? `<a href="resolveNew.html?jobid=${encodeURIComponent(item.jobId)}" class="btn-action"><i class="fas fa-wrench"></i> แก้ไข</a>`
           : `<span class="status-closed"><i class="fas fa-check"></i> เสร็จสิ้น</span>`;
         
         const imgBefore = item.picBefore && item.picBefore !== "-" 
