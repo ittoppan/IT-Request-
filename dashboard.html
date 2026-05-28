@@ -612,7 +612,7 @@
     // ===================================================================
     // STATS & METRICS
     // ===================================================================
-    function updateStats() {
+       function updateStats() {
       const inspections = filteredData.inspections;
       const jobs = filteredData.jobs;
       
@@ -620,10 +620,10 @@
       const total = inspections.length;
       document.getElementById('statTotal').textContent = total;
       
-      // Average 5S score
-      const 5sInspections = inspections.filter(i => i.inspectionType === CONFIG.TYPE_5S && i.score);
-      const avgScore = 5sInspections.length > 0 
-        ? Math.round(5sInspections.reduce((sum, i) => sum + (i.score?.percent || 0), 0) / 5sInspections.length)
+      // ✅ แก้ไข: เปลี่ยนชื่อตัวแปรจาก 5sInspections เป็น inspections5S
+      const inspections5S = inspections.filter(i => i.inspectionType === CONFIG.TYPE_5S && i.score);
+      const avgScore = inspections5S.length > 0 
+        ? Math.round(inspections5S.reduce((sum, i) => sum + (i.score?.percent || 0), 0) / inspections5S.length)
         : 0;
       document.getElementById('statAvgScore').textContent = avgScore + '%';
       
@@ -631,7 +631,7 @@
       const openJobs = jobs.filter(j => j.status === 'Open').length;
       document.getElementById('statOpenJobs').textContent = openJobs;
       
-      // Issues (items marked as "ปรับปรุง" or "ไม่ดี")
+      // Issues
       const issues = inspections.reduce((count, item) => {
         if (item.inspectionType === CONFIG.TYPE_5S) {
           return count + Object.values(item.fullChecklist || {}).filter(v => v === 'ปรับปรุง').length;
@@ -641,7 +641,7 @@
       }, 0);
       document.getElementById('statIssues').textContent = issues;
       
-      // Trends (mock data - replace with real comparison logic)
+      // Trends (ค่าตัวอย่าง)
       document.getElementById('trendTotal').textContent = '+12%';
       document.getElementById('trendScore').textContent = '+5%';
       document.getElementById('trendOpen').textContent = '-8%';
