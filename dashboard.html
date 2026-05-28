@@ -257,7 +257,7 @@ function normalizeArea(a) {
     "BAG MAKING":"BAG MAKING","QA&QC":"QA&QC","WAREHOUSE":"WAREHOUSE",
     "OFFICE":"OFFICE","CANTEEN":"CANTEEN","ENGINEERING":"ENGINEERING","OUTSIDE":"OUTSIDE"
   };
-  return M[a] || String(a).toUpperCase();
+  return M[a] || String(a).toUpperCase().trim();
 }
 
 // ═══════════════════════════════════════
@@ -286,15 +286,20 @@ function parseDate(v) {
 // fallback: คำนวณจาก fullChecklist
 // ═══════════════════════════════════════
 function getScore(item) {
-  if (item.score != null) {
+  // ✅ พยายามอ่านจาก score.percent ที่ Backend ส่งมา
+  if (item.score && typeof item.score === 'object') {
     const p = parseFloat(item.score.percent);
-    if (!isNaN(p) && p > 0) return p;
+    if (!isNaN(p) && p >= 0) return p; // ✅ อนุญาตให้คะแนนเป็น 0 ได้
   }
-  // fallback
+  // ✅ Fallback: คำนวณจาก fullChecklist (ดี=2, พอใช้=1, ปรับปรุง=0)
   let earned = 0, max = 0;
   const SCORE = {"ดี":2,"พอใช้":1,"ปรับปรุง":0};
   Object.entries(item.fullChecklist || {}).forEach(([k,v]) => {
-    if (/^5s_s\d+_q\d+$/.test(k)) { max += 2; earned += (SCORE[v] ?? 0); }
+    // ✅ เฉพาะคีย์ที่เป็นคำถาม 5S จริงๆ
+    if (/^5s_s\d+_q\d+$/.test(k)) { 
+      max += 2; 
+      earned += (SCORE[v] ?? 0); 
+    }
   });
   return max > 0 ? (earned / max * 100) : 0;
 }
@@ -333,7 +338,8 @@ async function loadAll() {
     raw.ins = details.map(d => ({
       ...d,
       area: normalizeArea(d.area),
-      inspectionType: String(d.inspectionType || "").trim()
+      // ✅ แปลง inspectionType เป็นตัวใหญ่ + ตัดช่องว่าง
+      inspectionType: String(d.inspectionType || "").trim().toUpperCase()
     }));
 
     // ── Action Plan Jobs ──
@@ -406,8 +412,11 @@ function render() {
 }
 
 function render5S() {
-  // กรองเฉพาะ 5S (case-insensitive safety)
-  const ins = filtered.ins.filter(i => i.inspectionType.toUpperCase() === "5S");
+  // ✅ กรองเฉพาะ 5S: เปรียบเทียบแบบปลอดภัย (ตัดช่องว่าง + ตัวใหญ่)
+  const ins = filtered.ins.filter(i => {
+    const t = String(i.inspectionType || "").trim().toUpperCase();
+    return t === "5S";
+  });
 
   const scores = ins.map(i => getScore(i));
   const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0) / scores.length) : 0;
@@ -475,7 +484,10 @@ function render5S() {
 }
 
 function renderSafety() {
-  const ins  = filtered.ins.filter(i => i.inspectionType.toUpperCase() !== "5S");
+  const ins  = filtered.ins.filter(i => {
+    const t = String(i.inspectionType || "").trim().toUpperCase();
+    return t !== "5S";
+  });
   const jobs = filtered.jobs;
   const open   = jobs.filter(j=>(j.status||"").toLowerCase()==="open");
   const closed = jobs.filter(j=>(j.status||"").toLowerCase()==="closed");
@@ -557,7 +569,10 @@ function toggleDebug() {
   if (dbgMode) updateDbg();
 }
 function updateDbg() {
-  const ins5s = raw.ins.filter(i=>i.inspectionType.toUpperCase()==="5S");
+  const ins5s = raw.ins.filter(i=>{
+    const t = String(i.inspectionType||"").trim().toUpperCase();
+    return t === "5S";
+  });
   const smp = ins5s.slice(0,2).map(i=>({
     id:i.id, area:i.area, ts:i.timestamp,
     ts_parsed: new Date(parseDate(i.timestamp)).toISOString(),
@@ -569,7 +584,7 @@ function updateDbg() {
     `Raw ins total   : ${raw.ins.length}\n` +
     `Raw 5S items    : ${ins5s.length}\n` +
     `Raw jobs        : ${raw.jobs.length}\n` +
-    `Filtered 5S     : ${filtered.ins.filter(i=>i.inspectionType.toUpperCase()==="5S").length}\n` +
+    `Filtered 5S     : ${filtered.ins.filter(i=>{const t=String(i.inspectionType||"").trim().toUpperCase();return t==="5S";}).length}\n` +
     `Filtered jobs   : ${filtered.jobs.length}\n\n` +
     `Sample 5S:\n${JSON.stringify(smp,null,2)}`;
 }
@@ -588,5 +603,6 @@ function showToast(msg, type="i") {
   setTimeout(()=>t.remove(), 3000);
 }
 </script>
+
 </body>
 </html>
