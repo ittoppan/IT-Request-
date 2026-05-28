@@ -345,6 +345,33 @@
     @media (prefers-reduced-motion: reduce) {
       * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
+
+    /* ✅ 5S Status Pills - 3 Levels */
+.status-5s-good { 
+  background: linear-gradient(145deg, #e8f5e9, #c8e6c9); 
+  color: #2e7d32; 
+  border: 1px solid #2e7d32; 
+}
+.status-5s-fair { 
+  background: linear-gradient(145deg, #fff3e0, #ffe0b2); 
+  color: #e65100; 
+  border: 1px solid #e65100; 
+}
+.status-5s-improve { 
+  background: linear-gradient(145deg, #ffebee, #ffcdd2); 
+  color: #c62828; 
+  border: 1px solid #c62828; 
+}
+
+/* ✅ Score Badge (แสดงคะแนน) */
+.score-badge {
+  font-size: 0.7rem; font-weight: 700; padding: 2px 6px;
+  border-radius: 4px; margin-left: 4px; display: inline-flex;
+  align-items: center; gap: 2px;
+}
+.score-badge.good { background: #2e7d32; color: white; }
+.score-badge.fair { background: #e65100; color: white; }
+.score-badge.improve { background: #c62828; color: white; }
   </style>
 </head>
 <body>
@@ -747,61 +774,76 @@
     }
 
     function renderDetailRow(d) {
-      const is5S = d.inspectionType === CONFIG.TYPE_5S;
-      const areaKey = is5S ? (d.area || 'OFFICE') : null;
+  const is5S = d.inspectionType === CONFIG.TYPE_5S;
+  const areaKey = is5S ? (d.area || 'OFFICE') : null;
+  
+  let html = `<tr class="detail-row" id="detail-${d.id}"><td colspan="7" style="padding:0;"><div class="inner-detail">
+    <div class="detail-header">
+      <h4><i class="fas fa-clipboard-list"></i> รายละเอียดผลการตรวจสอบ</h4>
+      <div class="detail-meta">
+        <span><i class="fas fa-tag"></i> ${escapeHtml(d.inspectionType)}</span>
+        <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(normalizeAreaDisplay(d.area))}</span>
+        <span><i class="fas fa-user"></i> ${escapeHtml(d.inspector)}</span>
+        <span><i class="fas fa-clock"></i> ${escapeHtml(d.timestamp)}</span>
+      </div>
+    </div>`;
+  
+  // ✅ 5S: แสดง 3 ระดับคะแนน + คะแนนในวงเล็บ
+  if (is5S) {
+    const sections = CHECKLIST_5S[areaKey]?.sections || CHECKLIST_5S["Factory"].sections;
+    
+    sections.forEach((sec, sIdx) => {
+      html += `<div class="section-group"><div class="section-head"><span><i class="${sec.icon || 'fas fa-circle'}"></i> ${escapeHtml(sec.title)}</span></div>`;
       
-      let html = `<tr class="detail-row" id="detail-${d.id}"><td colspan="7" style="padding:0;"><div class="inner-detail">
-        <div class="detail-header">
-          <h4><i class="fas fa-clipboard-list"></i> รายละเอียดผลการตรวจสอบ</h4>
-          <div class="detail-meta">
-            <span><i class="fas fa-tag"></i> ${escapeHtml(d.inspectionType)}</span>
-            <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(normalizeAreaDisplay(d.area))}</span>
-            <span><i class="fas fa-user"></i> ${escapeHtml(d.inspector)}</span>
-            <span><i class="fas fa-clock"></i> ${escapeHtml(d.timestamp)}</span>
+      sec.questions.forEach((qText, qIdx) => {
+        const detailKey = `5s_s${sIdx}_q${qIdx}`;
+        const res = d.fullChecklist?.[detailKey];
+        const remark = d.fullChecklist?.[`5s_remark_s${sIdx}_q${qIdx}`];
+        
+        // ✅ แปลงค่าเป็นแสดงผล 3 ระดับ
+        let statusText = '-', statusClass = '', scoreBadge = '';
+        if (res === "ดี") {
+          statusText = '✅ ดี'; statusClass = 'status-5s-good'; scoreBadge = '<span class="score-badge good">+2</span>';
+        } else if (res === "พอใช้") {
+          statusText = '🔶 พอใช้'; statusClass = 'status-5s-fair'; scoreBadge = '<span class="score-badge fair">+1</span>';
+        } else if (res === "ปรับปรุง") {
+          statusText = '❌ ปรับปรุง'; statusClass = 'status-5s-improve'; scoreBadge = '<span class="score-badge improve">0</span>';
+        }
+        
+        html += `<div class="sub-item">
+          <div class="sub-item-text">• ${escapeHtml(qText)}${scoreBadge}${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''}</div>
+          <div class="status-pill ${statusClass}">${statusText}</div>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+  } 
+  // ✅ Safety Types: แสดง 2 ระดับตามเดิม (ดี/ไม่ดี)
+  else {
+    for (let secKey in CHECKLIST_SAFETY) {
+      const section = CHECKLIST_SAFETY[secKey];
+      const sNum = secKey.replace('s', '');
+      html += `<div class="section-group"><div class="section-head"><span><i class="${section.icon}"></i> ${escapeHtml(section.title)}</span></div>`;
+      
+      section.questions.forEach((qText, qIdx) => {
+        const res = d.fullChecklist?.[`section${sNum}_q${qIdx}`];
+        const remark = d.fullChecklist?.[`section${sNum}_remark${qIdx}`];
+        const isBad = res === "ไม่ดี";
+        
+        html += `<div class="sub-item">
+          <div class="sub-item-text">• ${escapeHtml(qText)}${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''}</div>
+          <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">
+            ${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}
           </div>
         </div>`;
-      
-      if (is5S) {
-        const sections = CHECKLIST_5S[areaKey]?.sections || CHECKLIST_5S["Factory"].sections;
-        sections.forEach((sec, sIdx) => {
-          html += `<div class="section-group"><div class="section-head"><span><i class="${sec.icon}"></i> ${escapeHtml(sec.title)}</span></div>`;
-          sec.questions.forEach((qText, qIdx) => {
-            const detailKey = `5s_s${sIdx}_q${qIdx}`;
-            const res = d.fullChecklist?.[detailKey];
-            const remark = d.fullChecklist?.[`5s_remark_s${sIdx}_q${qIdx}`];
-            const isBad = res === "ไม่ดี";
-            html += `<div class="sub-item">
-              <div class="sub-item-text">• ${escapeHtml(qText)}${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''}</div>
-              <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">
-                ${isBad ? '✘ ไม่ผ่าน' : (res === "ดี" ? '✔ ผ่าน' : '-')}
-              </div>
-            </div>`;
-          });
-          html += `</div>`;
-        });
-      } else {
-        for (let secKey in CHECKLIST_SAFETY) {
-          const section = CHECKLIST_SAFETY[secKey];
-          const sNum = secKey.replace('s', '');
-          html += `<div class="section-group"><div class="section-head"><span><i class="${section.icon}"></i> ${escapeHtml(section.title)}</span></div>`;
-          section.questions.forEach((qText, qIdx) => {
-            const res = d.fullChecklist?.[`section${sNum}_q${qIdx}`];
-            const remark = d.fullChecklist?.[`section${sNum}_remark${qIdx}`];
-            const isBad = res === "ไม่ดี";
-            html += `<div class="sub-item">
-              <div class="sub-item-text">• ${escapeHtml(qText)}${remark ? `<div class="remark-box"><i class="fas fa-comment"></i> ${escapeHtml(remark)}</div>` : ''}</div>
-              <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">
-                ${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}
-              </div>
-            </div>`;
-          });
-          html += `</div>`;
-        }
-      }
-      
-      html += `</div></td></tr>`;
-      return html;
+      });
+      html += `</div>`;
     }
+  }
+  
+  html += `</div></td></tr>`;
+  return html;
+}
 
     function toggleDetail(id) {
       const row = document.getElementById(`detail-${id}`);
