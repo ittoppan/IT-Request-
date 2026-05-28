@@ -275,9 +275,32 @@ async function loadAll() {
 // ═══════════════════════════════════════
 function applyFilters() {
   const dept = document.getElementById("deptFilter").value;
-  filtered.ins = raw.ins.filter(i => dept === "all" || i.area === dept);
+  const timeRange = document.getElementById("timeRange").value;
+  
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
+
+  // กรอง Data ทั้งพื้นที่และเวลา
+  filtered.ins = raw.ins.filter(i => {
+    if (dept !== "all" && i.area !== dept) return false;
+    if (timeRange === "all") return true;
+    
+    const d = new Date(i.timestamp);
+    if (isNaN(d.getTime())) return true; // ถ้าวันที่พัง ปล่อยผ่าน
+    
+    if (timeRange === "today") return d >= today;
+    if (timeRange === "week") return d >= weekAgo;
+    if (timeRange === "month") return d >= firstDayOfMonth;
+    if (timeRange === "year") return d >= firstDayOfYear;
+    return true;
+  });
+
   filtered.jobs = raw.jobs.filter(j => dept === "all" || normalizeArea(j.area) === dept);
-  render(); // ✅ ฟังก์ชันนี้เคยหายไป ตอนนี้กลับมาแล้ว
+  
+  render();
 }
 
 function resetFilters() { document.getElementById("deptFilter").value = "all"; applyFilters(); }
@@ -290,12 +313,12 @@ function updateDepts() {
 function render() {
   if (activeTab === "5s") render5S(); else renderSafety();
 }
-
 function render5S() {
   const ins = filtered.ins.filter(i => i.inspectionType === "5S");
   set("s5cnt", ins.length);
   
-  const scores = ins.map(i => { const p = i.score?.percent; return (typeof p === 'number' && !isNaN(p)) ? p : 0; });
+  // ✅ แก้ไข: ใช้ parseFloat ห้ามใช้ typeof เพื่อป้องกันบั๊กเวลาส่งข้อมูลมาเป็น Text
+  const scores = ins.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
   const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0) / scores.length) : 0;
   set("s5avg", avg + "%");
   
@@ -307,7 +330,15 @@ function render5S() {
   set("s5iss", imp);
 
   // Chart
-  const daily = {}; ins.forEach(i => { const d=(i.timestamp||"").slice(0,10); if(d){ if(!daily[d])daily[d]=[]; const p=i.score?.percent; if(typeof p==='number'&&!isNaN(p)) daily[d].push(p); }});
+  const daily = {}; 
+  ins.forEach(i => { 
+    const d=(i.timestamp||"").slice(0,10); 
+    if(d){ 
+      if(!daily[d]) daily[d]=[]; 
+      const p = parseFloat(i.score?.percent); // ✅ แก้ไขการเช็คชนิดข้อมูล
+      if(!isNaN(p)) daily[d].push(p); 
+    }
+  });
   const labels = Object.keys(daily).sort(); 
   const data = labels.map(k => Math.round(daily[k].reduce((a,b)=>a+b,0)/daily[k].length));
   mkChart("chTrend", {type:"line", data:{labels, datasets:[{label:"คะแนน",data, borderColor:"#27ae60",backgroundColor:"rgba(39,174,96,.1)",tension:.4,fill:true,pointRadius:4}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+"%"}}}}});
@@ -315,14 +346,32 @@ function render5S() {
   // Table
   const byDept = {}; 
   ins.forEach(i => { 
-    const d=i.area||"อื่นๆ"; if(!byDept[d])byDept[d]={count:0,scores:[],good:0,fair:0,imp:0}; 
-    byDept[d].count++; const p=i.score?.percent; if(typeof p==='number'&&!isNaN(p)) byDept[d].scores.push(p); 
-    Object.entries(i.fullChecklist||{}).forEach(([k,v])=>{if(/^5s_s\d+_q\d+$/.test(k)){if(v==="ดี")byDept[d].good++; else if(v==="พอใช้")byDept[d].fair++; else if(v==="ปรับปรุง")byDept[d].imp++;}}); 
+    const d=i.area||"อื่นๆ"; 
+    if(!byDept[d]) byDept[d]={count:0,scores:[],good:0,fair:0,imp:0}; 
+    byDept[d].count++; 
+    
+    const p = parseFloat(i.score?.percent); // ✅ แก้ไขการเช็คชนิดข้อมูล
+    if(!isNaN(p)) byDept[d].scores.push(p); 
+    
+    Object.entries(i.fullChecklist||{}).forEach(([k,v])=>{
+      if(/^5s_s\d+_q\d+$/.test(k)){
+        if(v==="ดี") byDept[d].good++; else if(v==="พอใช้") byDept[d].fair++; else if(v==="ปรับปรุง") byDept[d].imp++;
+      }
+    }); 
   });
-  const sorted = Object.entries(byDept).map(([dept,v])=>({dept,count:v.count,avg:v.scores.length?Math.round(v.scores.reduce((a,b)=>a+b,0)/v.scores.length):0,good:v.good,fair:v.fair,imp:v.imp})).sort((a,b)=>b.avg-a.avg);
+  
+  const sorted = Object.entries(byDept).map(([dept,v])=>({
+    dept,
+    count:v.count,
+    avg:v.scores.length?Math.round(v.scores.reduce((a,b)=>a+b,0)/v.scores.length):0,
+    good:v.good,
+    fair:v.fair,
+    imp:v.imp
+  })).sort((a,b)=>b.avg-a.avg);
   
   const tbody = document.getElementById("t5s");
   if(!sorted.length) { tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:30px;color:#999">ไม่มีข้อมูล 5S</td></tr>`; return; }
+  
   tbody.innerHTML = sorted.map(s => {
     const color = s.avg>=80?"#27ae60":s.avg>=50?"#f39c12":"#e74c3c";
     return `<tr><td><strong>${esc(s.dept)}</strong></td><td>${s.count}</td>
