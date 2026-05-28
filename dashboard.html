@@ -232,76 +232,10 @@
 
 <script>
 // ═══════════════════════════════════════
-// CONFIG
+// CONFIG — ✅ ใช้ค่าของคุณ
 // ═══════════════════════════════════════
 const API = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
-const TYPE_5S = "5S";
-const DEPTS_5S = ["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","ENGINEERING","OUTSIDE"];
-const DEPTS_SF = ["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","OUTSIDE"];
-
-// ═══════════════════════════════════════
-// normalizeArea — แปลงทุกรูปแบบ → code มาตรฐาน
-// ═══════════════════════════════════════
-function normalizeArea(a) {
-  if (!a) return "OFFICE";
-  const M = {
-    "แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Solvent":"SOLVENT",
-    "แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING",
-    "แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC",
-    "แผนก Warehouse":"WAREHOUSE","Office":"OFFICE",
-    "พื้นที่รอบบริเวณโรงงาน":"OUTSIDE",
-    "Factory":"PRINT","Canteen":"CANTEEN","EN":"ENGINEERING","Outside":"OUTSIDE",
-    "PRINT":"PRINT","LAMINATE":"LAMINATE","SOLVENT":"SOLVENT",
-    "REWINDER/SLITTER/PACKING":"REWINDER/SLITTER/PACKING",
-    "BAG MAKING":"BAG MAKING","QA&QC":"QA&QC","WAREHOUSE":"WAREHOUSE",
-    "OFFICE":"OFFICE","CANTEEN":"CANTEEN","ENGINEERING":"ENGINEERING","OUTSIDE":"OUTSIDE"
-  };
-  return M[a] || String(a).toUpperCase().trim();
-}
-
-// ═══════════════════════════════════════
-// parseDate — รองรับทุก format จาก GAS
-// ═══════════════════════════════════════
-function parseDate(v) {
-  if (!v) return 0;
-  if (typeof v === "number") return v;
-  if (v instanceof Date) return isNaN(v) ? 0 : v.getTime();
-  const s = String(v).trim();
-  // ISO: "2026-05-28T10:25:57" หรือ "2026-05-28 10:25:57"
-  const m1 = s.match(/^(\d{4})-(\d{2})-(\d{2})[\sT](\d{2}):(\d{2}):(\d{2})/);
-  if (m1) return new Date(+m1[1],+m1[2]-1,+m1[3],+m1[4],+m1[5],+m1[6]).getTime();
-  // GAS: "M/d/yyyy H:mm:ss"
-  const m2 = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}):(\d{2}))?/);
-  if (m2) return new Date(+m2[3],+m2[1]-1,+m2[2],+(m2[4]||0),+(m2[5]||0),+(m2[6]||0)).getTime();
-  // dd/MM/yyyy
-  const m3 = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (m3) return new Date(+m3[3],+m3[2]-1,+m3[1]).getTime();
-  const d = new Date(s);
-  return isNaN(d.getTime()) ? 0 : d.getTime();
-}
-
-// ═══════════════════════════════════════
-// getScore — อ่านคะแนนจาก score.percent (Backend v3.2)
-// fallback: คำนวณจาก fullChecklist
-// ═══════════════════════════════════════
-function getScore(item) {
-  // ✅ พยายามอ่านจาก score.percent ที่ Backend ส่งมา
-  if (item.score && typeof item.score === 'object') {
-    const p = parseFloat(item.score.percent);
-    if (!isNaN(p) && p >= 0) return p; // ✅ อนุญาตให้คะแนนเป็น 0 ได้
-  }
-  // ✅ Fallback: คำนวณจาก fullChecklist (ดี=2, พอใช้=1, ปรับปรุง=0)
-  let earned = 0, max = 0;
-  const SCORE = {"ดี":2,"พอใช้":1,"ปรับปรุง":0};
-  Object.entries(item.fullChecklist || {}).forEach(([k,v]) => {
-    // ✅ เฉพาะคีย์ที่เป็นคำถาม 5S จริงๆ
-    if (/^5s_s\d+_q\d+$/.test(k)) { 
-      max += 2; 
-      earned += (SCORE[v] ?? 0); 
-    }
-  });
-  return max > 0 ? (earned / max * 100) : 0;
-}
+const DEPTS = ["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","ENGINEERING","OUTSIDE"];
 
 // ═══════════════════════════════════════
 // STATE
@@ -310,7 +244,6 @@ let raw = { ins: [], jobs: [] };
 let filtered = { ins: [], jobs: [] };
 let activeTab = "5s";
 let charts = {};
-let dbgMode = false;
 
 // ═══════════════════════════════════════
 // INIT
@@ -321,285 +254,232 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // ═══════════════════════════════════════
-// LOAD — เรียก 2 endpoint แยกกัน
+// LOAD — ✅ เรียกข้อมูลทั้งหมด ไม่กรองวันที่
 // ═══════════════════════════════════════
 async function loadAll() {
   showLoader(true);
   try {
-    // ✅ เรียก getDashboardData โดยไม่ส่ง date → Backend return ทั้งหมด
-    const [dashRes, jobsRes] = await Promise.all([
+    // ✅ เรียกโดยไม่มีพารามิเตอร์ → Backend ส่งข้อมูลทั้งหมด
+    const [dash, jobs] = await Promise.all([
       fetch(`${API}?action=getDashboardData`).then(r => r.json()),
       fetch(`${API}?action=getReport`).then(r => r.json())
     ]);
 
-    // ── Inspections (Data + DATA_5S) ──
-    const details = dashRes.details || [];
-    raw.ins = details.map(d => ({
+    // ✅ ข้อมูล 5S มาจาก backend แล้ว ไม่ต้องกรองเพิ่ม
+    raw.ins = (dash.details || []).map(d => ({
       ...d,
       area: normalizeArea(d.area),
-      // ✅ แปลง inspectionType เป็นตัวใหญ่ + ตัดช่องว่าง
       inspectionType: String(d.inspectionType || "").trim().toUpperCase()
     }));
+    raw.jobs = Array.isArray(jobs) ? jobs : [];
 
-    // ── Action Plan Jobs ──
-    raw.jobs = Array.isArray(jobsRes) ? jobsRes : [];
-
-    if (dbgMode) updateDbg();
-    applyFilters();
+    applyFilters();  // กรองเฉพาะแผนก (ไม่กรองวันที่)
   } catch(err) {
-    console.error("loadAll:", err);
-    showToast("โหลดข้อมูลไม่สำเร็จ: " + err.message, "e");
+    console.error("Load failed:", err);
+    showToast("โหลดข้อมูลไม่สำเร็จ", "e");
   } finally {
     showLoader(false);
   }
 }
 
 // ═══════════════════════════════════════
-// FILTER — กรองด้วย range + dept
+// FILTER — ✅ กรองเฉพาะแผนก (ไม่กรองวันที่!)
 // ═══════════════════════════════════════
 function applyFilters() {
-  const range = document.getElementById("timeRange").value;
-  const dept  = document.getElementById("deptFilter").value;
-  const now   = new Date();
-  const yy = now.getFullYear(), mo = now.getMonth();
-  let start = 0, end = Infinity;
-
-  if (range !== "all") {
-    const q = Math.floor(mo / 3);
-    if      (range === "today")   { start = new Date(yy,mo,now.getDate(),0,0,0).getTime();  end = new Date(yy,mo,now.getDate(),23,59,59).getTime(); }
-    else if (range === "week")    { end = now.getTime(); start = end - 7*86400000; }
-    else if (range === "month")   { start = new Date(yy,mo,1).getTime(); end = new Date(yy,mo+1,0,23,59,59).getTime(); }
-    else if (range === "quarter") { start = new Date(yy,q*3,1).getTime(); end = new Date(yy,q*3+3,0,23,59,59).getTime(); }
-    else if (range === "year")    { start = new Date(yy,0,1).getTime(); end = new Date(yy,11,31,23,59,59).getTime(); }
-  }
-
-  filtered.ins = raw.ins.filter(i => {
-    const ts = parseDate(i.timestamp);
-    const inRange = (ts === 0) || (ts >= start && ts <= end);
-    const inDept  = dept === "all" || i.area === dept;
-    return inRange && inDept;
-  });
-
-  filtered.jobs = raw.jobs.filter(j => {
-    const ts = parseDate(j.dateFound);
-    const inRange = (ts === 0) || (ts >= start && ts <= end);
-    const inDept  = dept === "all" || normalizeArea(j.area) === dept;
-    return inRange && inDept;
-  });
-
+  const dept = document.getElementById("deptFilter").value;
+  
+  // ✅ ไม่กรองวันที่ → แสดงข้อมูลทั้งหมด
+  filtered.ins = raw.ins.filter(i => 
+    dept === "all" || i.area === dept
+  );
+  filtered.jobs = raw.jobs.filter(j => 
+    dept === "all" || normalizeArea(j.area) === dept
+  );
+  
   render();
-  if (dbgMode) updateDbg();
 }
 
 function resetFilters() {
-  document.getElementById("timeRange").value = "all";
   document.getElementById("deptFilter").value = "all";
   applyFilters();
 }
 
 function updateDepts() {
-  const list = activeTab === "5s" ? DEPTS_5S : DEPTS_SF;
-  document.getElementById("deptFilter").innerHTML =
-    '<option value="all">ทั้งหมด</option>' + list.map(d=>`<option value="${d}">${d}</option>`).join("");
+  document.getElementById("deptFilter").innerHTML = 
+    '<option value="all">ทั้งหมด</option>' + 
+    DEPTS.map(d => `<option value="${d}">${d}</option>`).join("");
 }
 
 // ═══════════════════════════════════════
-// RENDER
+// RENDER 5S — ✅ ใช้ score.percent จาก backend โดยตรง
 // ═══════════════════════════════════════
-function render() {
-  if (activeTab === "5s") render5S(); else renderSafety();
-}
-
 function render5S() {
-  // ✅ กรองเฉพาะ 5S: เปรียบเทียบแบบปลอดภัย (ตัดช่องว่าง + ตัวใหญ่)
-  const ins = filtered.ins.filter(i => {
-    const t = String(i.inspectionType || "").trim().toUpperCase();
-    return t === "5S";
+  // ✅ กรองเฉพาะ 5S
+  const ins = filtered.ins.filter(i => i.inspectionType === "5S");
+  
+  // ✅ แสดงสถิติ
+  set("s5cnt", ins.length);
+  
+  // ✅ คำนวณคะแนนเฉลี่ยจาก score.percent ที่ backend ส่งมา
+  const scores = ins.map(i => {
+    const p = i.score?.percent;
+    return (typeof p === 'number' && !isNaN(p)) ? p : 0;
   });
-
-  const scores = ins.map(i => getScore(i));
   const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0) / scores.length) : 0;
   set("s5avg", avg + "%");
-  set("s5cnt", ins.length);
-
+  
+  // ✅ นับ ดี/พอใช้/ปรับปรุง จาก fullChecklist
   let good=0, fair=0, imp=0;
   ins.forEach(i => {
-    Object.entries(i.fullChecklist||{}).forEach(([k,v]) => {
-      if (!/^5s_s\d+_q\d+$/.test(k)) return;
-      if (v==="ดี") good++; else if (v==="พอใช้") fair++; else if (v==="ปรับปรุง") imp++;
+    Object.entries(i.fullChecklist || {}).forEach(([k,v]) => {
+      // ✅ นับเฉพาะคีย์ที่เป็นคำถามจริง (ไม่รวม _remark, _duedate)
+      if (/^5s_s\d+_q\d+$/.test(k)) {
+        if (v === "ดี") good++;
+        else if (v === "พอใช้") fair++;
+        else if (v === "ปรับปรุง") imp++;
+      }
     });
   });
   set("s5dist", `ดี ${good} | พอใช้ ${fair} | ปรับปรุง ${imp}`);
   set("s5iss", imp);
-
-  // Trend chart
-  const daily = {};
-  ins.forEach(i => {
-    const d = (i.timestamp||"").slice(0,10);
-    if (d) { if (!daily[d]) daily[d]=[]; daily[d].push(getScore(i)); }
-  });
-  const labels = Object.keys(daily).sort();
-  mkChart("chTrend", {type:"line", data:{labels, datasets:[{label:"คะแนน",data:labels.map(k=>Math.round(daily[k].reduce((a,b)=>a+b,0)/daily[k].length)), borderColor:"#27ae60",backgroundColor:"rgba(39,174,96,.1)",tension:.4,fill:true,pointRadius:4,pointBackgroundColor:"#27ae60"}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+"%"}}}}});
-
-  // Dept chart + table
-  const dSt = {};
+  
+  // ✅ กราฟแนวโน้ม (ถ้ามีข้อมูล)
+  if (ins.length > 0) {
+    const daily = {};
+    ins.forEach(i => {
+      const d = (i.timestamp || "").slice(0, 10);
+      if (d) {
+        if (!daily[d]) daily[d] = [];
+        const p = i.score?.percent;
+        if (typeof p === 'number' && !isNaN(p)) daily[d].push(p);
+      }
+    });
+    const labels = Object.keys(daily).sort();
+    const data = labels.map(k => Math.round(daily[k].reduce((a,b)=>a+b,0)/daily[k].length));
+    mkChart("chTrend", {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: "คะแนน",
+          data,
+          borderColor: "#27ae60",
+          backgroundColor: "rgba(39,174,96,0.1)",
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, max: 100, ticks: { callback: v => v + "%" } }
+        }
+      }
+    });
+  }
+  
+  // ✅ ตารางอันดับแผนก
+  const byDept = {};
   ins.forEach(i => {
     const d = i.area || "อื่นๆ";
-    if (!dSt[d]) dSt[d] = {count:0,scores:[],good:0,fair:0,imp:0};
-    dSt[d].count++;
-    dSt[d].scores.push(getScore(i));
-    Object.entries(i.fullChecklist||{}).forEach(([k,v]) => {
-      if (!/^5s_s\d+_q\d+$/.test(k)) return;
-      if (v==="ดี") dSt[d].good++; else if (v==="พอใช้") dSt[d].fair++; else if (v==="ปรับปรุง") dSt[d].imp++;
+    if (!byDept[d]) byDept[d] = { count: 0, scores: [], good: 0, fair: 0, imp: 0 };
+    byDept[d].count++;
+    const p = i.score?.percent;
+    if (typeof p === 'number' && !isNaN(p)) byDept[d].scores.push(p);
+    Object.entries(i.fullChecklist || {}).forEach(([k,v]) => {
+      if (/^5s_s\d+_q\d+$/.test(k)) {
+        if (v === "ดี") byDept[d].good++;
+        else if (v === "พอใช้") byDept[d].fair++;
+        else if (v === "ปรับปรุง") byDept[d].imp++;
+      }
     });
   });
-  const sorted = Object.entries(dSt).map(([dept,v]) => ({
-    dept, count:v.count,
-    avg: Math.round(v.scores.reduce((a,b)=>a+b,0)/v.scores.length||0),
-    good:v.good, fair:v.fair, imp:v.imp
-  })).sort((a,b)=>b.avg-a.avg);
-
-  const bColors = sorted.map(s => s.avg>=80?"#27ae60":s.avg>=50?"#f39c12":"#e74c3c");
-  mkChart("chDept", {type:"bar", data:{labels:sorted.map(s=>s.dept), datasets:[{label:"คะแนน",data:sorted.map(s=>s.avg),backgroundColor:bColors,borderRadius:6}]}, options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+"%"}}}}});
-
+  
+  const sorted = Object.entries(byDept)
+    .map(([dept, v]) => ({
+      dept,
+      count: v.count,
+      avg: v.scores.length ? Math.round(v.scores.reduce((a,b)=>a+b,0)/v.scores.length) : 0,
+      good: v.good, fair: v.fair, imp: v.imp
+    }))
+    .sort((a,b) => b.avg - a.avg);
+  
   const tbody = document.getElementById("t5s");
   if (!sorted.length) {
-    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><i class="fas fa-info-circle"></i>ไม่มีข้อมูล 5S ในช่วงเวลาที่เลือก<br><small style="color:#aaa">รองรับข้อมูลจากชีต DATA_5S</small></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999">ไม่มีข้อมูล 5S</td></tr>`;
     return;
   }
+  
   tbody.innerHTML = sorted.map(s => {
-    const cl = s.avg>=80?"g":s.avg>=50?"f":"i";
-    const color = s.avg>=80?"var(--success)":s.avg>=50?"var(--warning)":"var(--danger)";
+    const cl = s.avg >= 80 ? "g" : s.avg >= 50 ? "f" : "i";
+    const color = s.avg >= 80 ? "#27ae60" : s.avg >= 50 ? "#f39c12" : "#e74c3c";
     return `<tr>
       <td><strong>${esc(s.dept)}</strong></td>
       <td>${s.count}</td>
-      <td><div class="pw"><div class="pb"><div class="pf pf${cl}" style="width:${s.avg}%"></div></div><span class="pp" style="color:${color}">${s.avg}%</span></div></td>
-      <td><span class="badge bg">${s.good}</span></td>
-      <td><span class="badge bf">${s.fair}</span></td>
-      <td><span class="badge bi">${s.imp}</span></td>
-      <td>${s.imp===0?'<span class="badge bg">✅ ปกติ</span>':'<span class="badge bi">⚠️ ต้องปรับปรุง</span>'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:${s.avg}%;background:${color};border-radius:3px"></div>
+          </div>
+          <span style="font-weight:700;color:${color};min-width:40px;text-align:right">${s.avg}%</span>
+        </div>
+      </td>
+      <td><span style="background:#d4edda;color:#155724;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600">${s.good}</span></td>
+      <td><span style="background:#fff3cd;color:#856404;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600">${s.fair}</span></td>
+      <td><span style="background:#f8d7da;color:#721c24;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600">${s.imp}</span></td>
+      <td>${s.imp === 0 ? '<span style="background:#d4edda;color:#155724;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600">✅ ปกติ</span>' : '<span style="background:#f8d7da;color:#721c24;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600">⚠️ ปรับปรุง</span>'}</td>
     </tr>`;
   }).join("");
 }
 
+// ═══════════════════════════════════════
+// RENDER SAFETY (ย่อ)
+// ═══════════════════════════════════════
 function renderSafety() {
-  const ins  = filtered.ins.filter(i => {
-    const t = String(i.inspectionType || "").trim().toUpperCase();
-    return t !== "5S";
-  });
+  const ins = filtered.ins.filter(i => i.inspectionType !== "5S");
   const jobs = filtered.jobs;
-  const open   = jobs.filter(j=>(j.status||"").toLowerCase()==="open");
-  const closed = jobs.filter(j=>(j.status||"").toLowerCase()==="closed");
-
-  set("ssCnt",   ins.length);
-  set("ssJob",   jobs.length);
-  set("ssOpen",  open.length);
-  set("ssClosed",closed.length);
-
-  const byType = {};
-  jobs.forEach(j => { const t=j.inspectionType||"อื่นๆ"; byType[t]=(byType[t]||0)+1; });
-  mkChart("chJobType", {type:"bar", data:{labels:Object.keys(byType), datasets:[{label:"จำนวน Job",data:Object.values(byType),backgroundColor:["#f39c12","#27ae60","#2980b9","#e74c3c","#8e44ad","#16a085"],borderRadius:6}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
-  mkChart("chJobStatus", {type:"doughnut", data:{labels:["Open","Closed"], datasets:[{data:[open.length,closed.length],backgroundColor:["#f39c12","#27ae60"],borderWidth:0}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},cutout:"65%"}});
-
-  const now7 = Date.now() + 7*86400000;
-  const due = jobs.filter(j => {
-    if ((j.status||"").toLowerCase()==="closed") return false;
-    const dd = parseDate(j.dueDate);
-    return dd > 0 && dd <= now7;
-  }).sort((a,b)=>parseDate(a.dueDate)-parseDate(b.dueDate));
-
-  const tbody = document.getElementById("tDue");
-  if (!due.length) { tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><i class="fas fa-check-double"></i>ไม่มีงานใกล้ครบกำหนด</div></td></tr>`; return; }
-  tbody.innerHTML = due.map(j=>`<tr>
-    <td><code style="font-size:.77rem;background:#f0f2f5;padding:2px 6px;border-radius:4px">${esc(j.jobId)}</code></td>
-    <td><span style="font-size:.77rem;font-weight:600">${esc(j.inspectionType||"-")}</span></td>
-    <td>${esc(normalizeArea(j.area))}</td>
-    <td style="max-width:200px;white-space:normal;font-size:.81rem">${esc(j.problem||"-")}</td>
-    <td style="white-space:nowrap">${esc(j.dateFound||"-")}</td>
-    <td style="white-space:nowrap;color:var(--danger);font-weight:600">${esc(j.dueDate||"-")}</td>
-    <td><span class="badge bo"><i class="fas fa-clock"></i> Open</span></td>
-  </tr>`).join("");
-}
-
-// ═══════════════════════════════════════
-// CHART HELPER
-// ═══════════════════════════════════════
-function mkChart(id, cfg) {
-  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
-  const c = document.getElementById(id);
-  if (c) charts[id] = new Chart(c.getContext("2d"), cfg);
-}
-
-// ═══════════════════════════════════════
-// TAB SWITCH
-// ═══════════════════════════════════════
-function switchTab(tab, btn) {
-  activeTab = tab;
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));
-  document.getElementById("tab-"+tab).classList.add("active");
-  updateDepts();
-  document.getElementById("deptFilter").value = "all";
-  applyFilters();
-}
-
-// ═══════════════════════════════════════
-// EXPORT
-// ═══════════════════════════════════════
-function exportCSV() {
-  const rows = Array.from(document.querySelectorAll("#t5s tr")).map(tr=>Array.from(tr.querySelectorAll("td")).map(td=>td.textContent.replace(/\s+/g," ").trim())).filter(r=>r.length>1);
-  if (!rows.length) { showToast("ไม่มีข้อมูล","e"); return; }
-  const hdr = ["แผนก","จำนวนตรวจ","คะแนนเฉลี่ย","ดี","พอใช้","ปรับปรุง","สถานะ"];
-  const csv = [hdr,...rows].map(r=>r.map(c=>`"${c.replace(/"/g,'""')}"`).join(",")).join("\n");
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"}));
-  a.download = `5S_Report_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  showToast("📥 Export CSV เรียบร้อย","s");
-}
-
-// ═══════════════════════════════════════
-// DEBUG
-// ═══════════════════════════════════════
-function toggleDebug() {
-  dbgMode = !dbgMode;
-  document.getElementById("dbgPanel").classList.toggle("show", dbgMode);
-  if (dbgMode) updateDbg();
-}
-function updateDbg() {
-  const ins5s = raw.ins.filter(i=>{
-    const t = String(i.inspectionType||"").trim().toUpperCase();
-    return t === "5S";
-  });
-  const smp = ins5s.slice(0,2).map(i=>({
-    id:i.id, area:i.area, ts:i.timestamp,
-    ts_parsed: new Date(parseDate(i.timestamp)).toISOString(),
-    score_obj: i.score,
-    score_calc: getScore(i).toFixed(1)+"%",
-    cl_keys: Object.keys(i.fullChecklist||{}).filter(k=>/^5s_s\d+_q\d+$/.test(k)).length+" keys"
-  }));
-  document.getElementById("dbgContent").textContent =
-    `Raw ins total   : ${raw.ins.length}\n` +
-    `Raw 5S items    : ${ins5s.length}\n` +
-    `Raw jobs        : ${raw.jobs.length}\n` +
-    `Filtered 5S     : ${filtered.ins.filter(i=>{const t=String(i.inspectionType||"").trim().toUpperCase();return t==="5S";}).length}\n` +
-    `Filtered jobs   : ${filtered.jobs.length}\n\n` +
-    `Sample 5S:\n${JSON.stringify(smp,null,2)}`;
+  set("ssCnt", ins.length);
+  set("ssJob", jobs.length);
+  set("ssOpen", jobs.filter(j=>j.status==="Open").length);
+  set("ssClosed", jobs.filter(j=>j.status==="Closed").length);
 }
 
 // ═══════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════
-function set(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
-function showLoader(v) { document.getElementById("loader").classList.toggle("show",v); }
-function esc(s) { if(!s)return""; return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
+function normalizeArea(a) {
+  if (!a) return "OFFICE";
+  const M = {
+    "แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Solvent":"SOLVENT",
+    "แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING",
+    "แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC",
+    "แผนก Warehouse":"WAREHOUSE","Office":"OFFICE",
+    "พื้นที่รอบบริเวณโรงงาน":"OUTSIDE","Canteen":"CANTEEN","EN":"ENGINEERING",
+    "PRINT":"PRINT","LAMINATE":"LAMINATE","SOLVENT":"SOLVENT",
+    "REWINDER/SLITTER/PACKING":"REWINDER/SLITTER/PACKING",
+    "BAG MAKING":"BAG MAKING","QA&QC":"QA&QC","WAREHOUSE":"WAREHOUSE",
+    "OFFICE":"OFFICE","CANTEEN":"CANTEEN","ENGINEERING":"ENGINEERING","OUTSIDE":"OUTSIDE"
+  };
+  return M[a] || String(a).toUpperCase().trim();
+}
+function mkChart(id, cfg) {
+  if (charts[id]) charts[id].destroy();
+  const c = document.getElementById(id);
+  if (c) charts[id] = new Chart(c.getContext("2d"), cfg);
+}
+function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function showLoader(v) { document.getElementById("loader").classList.toggle("show", v); }
+function esc(s) { return String(s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
 function showToast(msg, type="i") {
   const t = document.createElement("div");
   t.className = `toast t${type}`;
+  t.style.cssText = "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 16px;background:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:9999;display:flex;align-items:center;gap:8px;font-weight:600;font-size:.85rem;animation:slideIn .3s ease;border-left:4px solid " + (type==="s"?"#27ae60":type==="e"?"#e74c3c":"#2980b9");
   t.innerHTML = `<i class="fas fa-${type==="s"?"check-circle":type==="e"?"exclamation-circle":"info-circle"}"></i> ${esc(msg)}`;
   document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 3000);
+  setTimeout(() => t.remove(), 3000);
 }
 </script>
 
