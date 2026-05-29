@@ -3,25 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>5S & Safety Ultimate Analytics Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>5S & Safety Enterprise Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 /* ─── TOKENS & RESET ─── */
 :root {
-  --bg-body: #f1f5f9;
-  --bg-surface: #ffffff;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --primary: #2563eb;
-  --primary-light: #eff6ff;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
+  --bg-body: #f1f5f9; --bg-surface: #ffffff;
+  --text-main: #0f172a; --text-muted: #64748b;
+  --primary: #2563eb; --primary-light: #eff6ff;
+  --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
   --border: #e2e8f0;
-  --radius-lg: 12px;
-  --radius-md: 8px;
+  --radius-lg: 12px; --radius-md: 8px;
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
@@ -41,28 +35,26 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 .filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .filters select { height: 40px; padding: 0 32px 0 12px; border-radius: var(--radius-md); border: 1px solid var(--border); font-family: inherit; font-size: 14px; outline: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 8px center/16px; -webkit-appearance: none; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow-sm); }
 .filters select:hover { border-color: var(--primary); }
-.filters select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
 
-/* ─── LAYOUT ─── */
+/* ─── LAYOUT & CARDS ─── */
 .content { max-width: 1440px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 32px; }
 .section-header { font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; color: var(--text-main); padding-bottom: 8px; border-bottom: 2px solid var(--border); }
-
-/* ─── GRIDS & CARDS ─── */
 .grid-cols-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
 .grid-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .grid-cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
-.card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; }
+.card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
 .card:hover { box-shadow: var(--shadow-md); }
-.card-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.card-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; }
 .card-desc { font-size: 12px; color: var(--text-muted); font-weight: 400; display: block; margin-top: 4px; }
-.chart-wrap { position: relative; width: 100%; height: 280px; }
+.chart-wrap { position: relative; width: 100%; height: 280px; flex: 1;}
 .chart-wrap.short { height: 220px; }
 
-/* Gauge Specific */
+/* ─── COMPONENTS ─── */
+/* Gauge */
 .gauge-container { position: relative; height: 200px; display: flex; justify-content: center; }
 .gauge-text { position: absolute; bottom: 0; text-align: center; }
-.gauge-val { font-size: 42px; font-weight: 700; line-height: 1; color: var(--text-main); transition: color 0.3s; }
+.gauge-val { font-size: 42px; font-weight: 700; line-height: 1; color: var(--text-main); }
 .gauge-sub { font-size: 14px; font-weight: 600; color: var(--text-muted); }
 
 /* KPI Cards */
@@ -72,33 +64,51 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 .kpi-label { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
 .kpi-value { font-size: 24px; font-weight: 700; line-height: 1; color: var(--text-main); }
 
-.icon-blue { background: #eff6ff; color: #3b82f6; }
-.icon-red { background: #fee2e2; color: #ef4444; }
-.icon-green { background: #d1fae5; color: #10b981; }
-.icon-amber { background: #fef3c7; color: #f59e0b; }
+/* Leaderboard */
+.lb-list { display: flex; flex-direction: column; gap: 12px; }
+.lb-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-body); border-radius: var(--radius-md); border: 1px solid var(--border); }
+.lb-rank { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Inter', sans-serif; font-size: 14px; color: white; }
+.lb-rank.r1 { background: #f59e0b; box-shadow: 0 0 10px rgba(245,158,11,0.4); }
+.lb-rank.r2 { background: #94a3b8; }
+.lb-rank.r3 { background: #b45309; }
+.lb-name { flex: 1; font-weight: 600; font-size: 14px; }
+.lb-score { font-weight: 700; font-size: 16px; color: var(--primary); }
 
-@media (max-width: 1024px) { 
-  .grid-cols-2, .grid-cols-3 { grid-template-columns: 1fr; } 
-}
-@media (max-width: 640px) { 
-  .filters { width: 100%; } .filters select { flex: 1; min-width: 120px; } 
-  .content { padding: 16px; }
-}
+/* Heatmap */
+.heatmap-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.heatmap-table th { font-weight: 600; color: var(--text-muted); padding: 8px; text-align: center; border-bottom: 1px solid var(--border); }
+.heatmap-table th:first-child { text-align: left; }
+.heatmap-table td { padding: 8px; text-align: center; font-weight: 600; color: #fff; border: 1px solid var(--bg-surface); transition: filter 0.2s; cursor: default; }
+.heatmap-table td:hover { filter: brightness(0.85); }
+.heatmap-table td:first-child { text-align: left; color: var(--text-main); font-weight: 500; background: transparent !important; }
+
+/* Pyramid */
+.pyramid-wrap { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; padding-top: 20px;}
+.pyr-tier { width: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; font-weight: 600; font-size: 13px; transition: all 0.3s; position: relative;}
+.pyr-tier:hover { transform: scale(1.02); }
+.pyr-val { font-size: 24px; font-weight: 800; font-family: 'Inter', sans-serif; line-height: 1; margin-bottom: 2px;}
+.pyr-top { background: var(--danger); border-radius: 8px 8px 0 0; padding: 20px 10px; width: 60%; }
+.pyr-mid { background: var(--warning); padding: 20px 10px; width: 80%; }
+.pyr-bot { background: var(--success); border-radius: 0 0 8px 8px; padding: 20px 10px; width: 100%; }
+
+@media (max-width: 1024px) { .grid-cols-2, .grid-cols-3 { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .filters { width: 100%; } .filters select { flex: 1; } }
 </style>
 </head>
 <body>
 
-<div id="loader"><div class="spinner"></div><div style="font-weight:500; color:var(--text-muted); margin-top:10px;">กำลังโหลดข้อมูลตั้งต้น...</div></div>
+<div id="loader"><div class="spinner"></div><div style="font-weight:500; color:var(--text-muted); margin-top:10px;">กำลังวิเคราะห์ข้อมูลเชิงลึก...</div></div>
 
 <header class="topbar">
-  <div class="brand"><i class="fas fa-layer-group"></i> Ultimate Dashboard</div>
+  <div class="brand"><i class="fas fa-satellite-dish"></i> Command Center</div>
   <div class="filters">
     <select id="timeRange" onchange="applyFilters()">
       <option value="today">วันนี้</option>
       <option value="week">สัปดาห์นี้</option>
       <option value="month">เดือนนี้</option>
       <option value="year">ปีนี้</option>
-      <option value="all" selected>ทั้งหมด (All Time)</option> </select>
+      <option value="all" selected>ทั้งหมด (All Time)</option>
+    </select>
     <select id="deptFilter" onchange="applyFilters()"><option value="all">ทุกแผนก (All Areas)</option></select>
   </div>
 </header>
@@ -109,7 +119,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
     <div class="section-header"><i class="fas fa-star" style="color:var(--warning)"></i> 5S Performance & Deep Analytics</div>
     
     <div class="grid-cols-3" style="margin-bottom:16px;">
-      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+      <div class="card">
         <div class="card-title">ภาพรวมคะแนน 5S (Gauge) <span class="card-desc">เป้าหมายองค์กร 85%</span></div>
         <div class="gauge-container">
           <canvas id="chGauge"></canvas>
@@ -120,76 +130,92 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
         </div>
       </div>
 
-      <div class="card" style="grid-column: span 2;">
-        <div class="card-title">วิเคราะห์ 5 ส. รายหมวด (Radar Chart) <span class="card-desc">สมดุลของ สะสาง, สะดวก, สะอาด, สุขลักษณะ, สร้างนิสัย</span></div>
+      <div class="card">
+        <div class="card-title">วิเคราะห์ 5 ส. รายหมวด (Radar) <span class="card-desc">ความสมดุลของแต่ละพื้นที่</span></div>
         <div class="chart-wrap"><canvas id="chRadar"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Hall of Fame (Top 3) <span class="card-desc">แผนกที่ทำคะแนนสูงสุด</span></div>
+        <div class="lb-list" id="lbList">
+          </div>
       </div>
     </div>
 
     <div class="grid-cols-2" style="margin-bottom:16px;">
       <div class="card" style="grid-column: span 2;">
-        <div class="card-title">แนวโน้มคะแนน 5S รายเดือน (Monthly Trend) <span class="card-desc">เปรียบเทียบพัฒนาการของโรงงานในแต่ละเดือน</span></div>
-        <div class="chart-wrap"><canvas id="chMonthly"></canvas></div>
+        <div class="card-title">แผนภูมิควบคุมกระบวนการ (Process Control Chart) <span class="card-desc">ดูเสถียรภาพรายเดือน พร้อมขีดจำกัดบน-ล่าง (UCL / LCL)</span></div>
+        <div class="chart-wrap"><canvas id="chControl"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-cols-2" style="margin-bottom:16px;">
+      <div class="card" style="grid-column: span 2; overflow-x: auto;">
+        <div class="card-title">ตารางสแกนจุดบอด 5S (Heatmap Matrix) <span class="card-desc">สีแดง = ต้องเร่งปรับปรุง | สีเขียว = ได้มาตรฐานดีเยี่ยม</span></div>
+        <table class="heatmap-table" id="tbHeatmap">
+          </table>
       </div>
     </div>
 
     <div class="grid-cols-2">
       <div class="card">
-        <div class="card-title">คุณภาพ 5S แยกรายแผนก (Stacked Bar) <span class="card-desc">สัดส่วน ดี (เขียว) / พอใช้ (เหลือง) / ปรับปรุง (แดง)</span></div>
+        <div class="card-title">คุณภาพคะแนนรายแผนก (Stacked Bar) <span class="card-desc">สัดส่วน ดี / พอใช้ / ปรับปรุง</span></div>
         <div class="chart-wrap"><canvas id="chStacked"></canvas></div>
       </div>
 
       <div class="card">
-        <div class="card-title">Top 5 ปัญหาที่ต้องปรับปรุง (Pareto) <span class="card-desc">หัวข้อที่ถูกหักคะแนนบ่อยที่สุด (กฎ 80/20)</span></div>
+        <div class="card-title">Top 5 ปัญหาที่พบ (Pareto) <span class="card-desc">กฎ 80/20 แก้จุดนี้เห็นผลมากที่สุด</span></div>
         <div class="chart-wrap"><canvas id="chPareto"></canvas></div>
       </div>
     </div>
   </section>
 
-  <section>
-    <div class="section-header"><i class="fas fa-shield-alt" style="color:var(--success)"></i> Safety & Action Plan Summary</div>
+  <section style="margin-top: 24px;">
+    <div class="section-header"><i class="fas fa-hard-hat" style="color:var(--success)"></i> Safety & Maintenance Analytics</div>
     
     <div class="grid-cols-4" style="margin-bottom:16px;">
-      <div class="kpi-card">
-        <div class="kpi-icon icon-blue"><i class="fas fa-clipboard-list"></i></div>
-        <div class="kpi-info"><span class="kpi-label">งานทั้งหมด (Total Jobs)</span><span class="kpi-value" id="sfTotal">0</span></div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon icon-red"><i class="fas fa-spinner"></i></div>
-        <div class="kpi-info"><span class="kpi-label">รอแก้ไข (Open)</span><span class="kpi-value" id="sfOpen">0</span></div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon icon-green"><i class="fas fa-check-double"></i></div>
-        <div class="kpi-info"><span class="kpi-label">แก้ไขแล้ว (Closed)</span><span class="kpi-value" id="sfClosed">0</span></div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon icon-amber"><i class="fas fa-chart-line"></i></div>
-        <div class="kpi-info"><span class="kpi-label">อัตราปิดงานสำเร็จ</span><span class="kpi-value" id="sfRate">0%</span></div>
-      </div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:#eff6ff;color:#3b82f6"><i class="fas fa-clipboard-list"></i></div><div class="kpi-info"><span class="kpi-label">ความเสี่ยงที่พบ</span><span class="kpi-value" id="sfTotal">0</span></div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:#fee2e2;color:#ef4444"><i class="fas fa-spinner"></i></div><div class="kpi-info"><span class="kpi-label">รอแก้ไข (Open)</span><span class="kpi-value" id="sfOpen">0</span></div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:#d1fae5;color:#10b981"><i class="fas fa-check-double"></i></div><div class="kpi-info"><span class="kpi-label">ปิดงานแล้ว (Closed)</span><span class="kpi-value" id="sfClosed">0</span></div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:#fef3c7;color:#f59e0b"><i class="fas fa-bolt"></i></div><div class="kpi-info"><span class="kpi-label">อัตราสำเร็จ</span><span class="kpi-value" id="sfRate">0%</span></div></div>
     </div>
 
     <div class="grid-cols-3" style="margin-bottom:16px;">
       <div class="card">
-        <div class="card-title">สัดส่วนสถานะงาน (Status)</div>
-        <div class="chart-wrap short"><canvas id="chSafeStatus"></canvas></div>
+        <div class="card-title">โครงสร้างความเสี่ยง (Safety Pyramid) <span class="card-desc">สถานะความวิกฤตของงาน</span></div>
+        <div class="pyramid-wrap">
+          <div class="pyr-tier pyr-top">
+            <div class="pyr-val" id="pyrTop">0</div>
+            <div>วิกฤต (Overdue)</div>
+          </div>
+          <div class="pyr-tier pyr-mid">
+            <div class="pyr-val" id="pyrMid">0</div>
+            <div>เฝ้าระวัง (Open)</div>
+          </div>
+          <div class="pyr-tier pyr-bot">
+            <div class="pyr-val" id="pyrBot">0</div>
+            <div>ปลอดภัย (Closed)</div>
+          </div>
+        </div>
       </div>
+
       <div class="card" style="grid-column: span 2;">
-        <div class="card-title">ปริมาณงานแยกตามแผนก (Issues by Dept) <span class="card-desc">สีแดง = ค้างอยู่ (Open), สีเขียว = เสร็จแล้ว (Closed)</span></div>
-        <div class="chart-wrap short"><canvas id="chSafeDept"></canvas></div>
+        <div class="card-title">ระยะเวลาเฉลี่ยในการปิดงาน (MTTR Trend) <span class="card-desc">ความรวดเร็วในการแก้ปัญหาของทีมงาน (วัน) / เดือน</span></div>
+        <div class="chart-wrap"><canvas id="chMTTR"></canvas></div>
       </div>
     </div>
 
     <div class="grid-cols-3">
       <div class="card">
-        <div class="card-title">ประเภทความเสี่ยง (By Category)</div>
-        <div class="chart-wrap"><canvas id="chSafeType"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">ความล่าช้างานค้าง (Aging Report) <span class="card-desc">เฉพาะงานที่สถานะ Open</span></div>
+        <div class="card-title">ความล่าช้างานค้าง (Aging)</div>
         <div class="chart-wrap"><canvas id="chAging"></canvas></div>
       </div>
       <div class="card">
-        <div class="card-title">5S vs Safety (Scatter Plot) <span class="card-desc">ประสิทธิภาพการประเมินและการแก้ปัญหา</span></div>
+        <div class="card-title">งานสะสมรายแผนก (By Dept)</div>
+        <div class="chart-wrap"><canvas id="chSafeDept"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">5S vs Safety (Scatter)</div>
         <div class="chart-wrap"><canvas id="chScatter"></canvas></div>
       </div>
     </div>
@@ -204,6 +230,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 // ==========================================
 const API = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
 const TARGET = 85;
+const S_CATS = ["ส1. สะสาง", "ส2. สะดวก", "ส3. สะอาด", "ส4. สุขลักษณะ", "ส5. สร้างนิสัย"];
 
 const DEPTS = ["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","ENGINEERING","OUTSIDE"];
 const AREA_MAP = {"แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Solvent":"SOLVENT","แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING","แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC","แผนก Warehouse":"WAREHOUSE","Office":"OFFICE","พื้นที่รอบบริเวณโรงงาน":"OUTSIDE","Canteen":"CANTEEN","EN":"ENGINEERING"};
@@ -293,9 +320,7 @@ function get5SCat(area, sIndex) {
   return "ส1. สะสาง"; 
 }
 function getQuestionText(area, sIndex, qIndex) {
-  if (CHECKLIST_5S[area] && CHECKLIST_5S[area].sections[sIndex] && CHECKLIST_5S[area].sections[sIndex].qs[qIndex]) {
-    return CHECKLIST_5S[area].sections[sIndex].qs[qIndex];
-  }
+  if (CHECKLIST_5S[area] && CHECKLIST_5S[area].sections[sIndex] && CHECKLIST_5S[area].sections[sIndex].qs[qIndex]) return CHECKLIST_5S[area].sections[sIndex].qs[qIndex];
   return `หมวด ${sIndex} ข้อ ${qIndex}`;
 }
 function mkChart(id, cfg) {
@@ -305,29 +330,34 @@ function mkChart(id, cfg) {
 }
 
 // ==========================================
-// 3. RENDER CHARTS (5S & SAFETY)
+// 3. RENDER ADVANCED CHARTS
 // ==========================================
 function processCharts(ins, jobs) {
-  // --------- 5S LOGIC ---------
   const data5S = ins.filter(i => String(i.inspectionType).toUpperCase() === "5S");
   const scores = data5S.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
   const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
   
+  // 1. Gauge
   document.getElementById("gVal").textContent = avg + "%";
   document.getElementById("gVal").style.color = avg >= TARGET ? "var(--success)" : "var(--danger)";
   document.getElementById("gSub").textContent = avg >= TARGET ? "ผ่านเกณฑ์มาตรฐาน" : "ต้องเร่งปรับปรุง";
-
   mkChart("chGauge", {
-    type: "doughnut", data: { labels: ["ต้องปรับปรุง", "พอใช้", "ดีเยี่ยม"], datasets: [{ data: [70, 15, 15], backgroundColor: ["#ef4444", "#f59e0b", "#10b981"], borderWidth: 0 }] },
+    type: "doughnut", data: { labels: ["ปรับปรุง", "พอใช้", "ดี"], datasets: [{ data: [70, 15, 15], backgroundColor: ["#ef4444", "#f59e0b", "#10b981"], borderWidth: 0 }] },
     options: { responsive: true, maintainAspectRatio: false, circumference: 180, rotation: 270, cutout: "80%", plugins: { legend: { display: false }, tooltip: { enabled: false } } }
   });
 
   const sCats = { "ส1. สะสาง": { s: 0, m: 0 }, "ส2. สะดวก": { s: 0, m: 0 }, "ส3. สะอาด": { s: 0, m: 0 }, "ส4. สุขลักษณะ": { s: 0, m: 0 }, "ส5. สร้างนิสัย": { s: 0, m: 0 } };
   const paretoCount = {}; const deptQuality = {}; 
-  const monthlyData = {}; // สำหรับเก็บคะแนนรายเดือน
+  const monthlyData = {}; 
   
+  // Heatmap Data Prep
+  const deptHeatmap = {}; 
+  DEPTS.forEach(d => { deptHeatmap[d] = {}; S_CATS.forEach(c => deptHeatmap[d][c] = {s:0, m:0}); });
+
+  const dScore = {}; // For Leaderboard & Scatter
+
   data5S.forEach(i => {
-    // --- Monthly Trend Data ---
+    // Trend Data
     const dateStr = i.timestamp || "";
     let d = new Date(dateStr.replace(" ", "T"));
     if(!isNaN(d)) {
@@ -339,18 +369,29 @@ function processCharts(ins, jobs) {
       }
     }
 
-    // --- Radar & Pareto Data ---
     const area = i.area;
     if(!deptQuality[area]) deptQuality[area] = { g: 0, f: 0, b: 0 }; 
+    if(!dScore[area]) dScore[area] = [];
+    const p = parseFloat(i.score?.percent);
+    if(!isNaN(p)) dScore[area].push(p);
+
     Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
       const match = k.match(/^5s_s(\d+)_q(\d+)/); 
       if (match) {
         const cat = get5SCat(area, parseInt(match[1]));
+        let val = v === "ดี" ? 1 : v === "พอใช้" ? 0.5 : 0;
+        
+        // Accumulate Radar
         if (cat && sCats[cat]) {
-          sCats[cat].m += 1;
-          if (v === "ดี") sCats[cat].s += 1; else if (v === "พอใช้") sCats[cat].s += 0.5;
+          sCats[cat].m += 1; sCats[cat].s += val;
         }
+        // Accumulate Heatmap
+        if (deptHeatmap[area] && cat) {
+          deptHeatmap[area][cat].m += 1; deptHeatmap[area][cat].s += val;
+        }
+        // Accumulate Stacked
         if(v === "ดี") deptQuality[area].g++; else if(v === "พอใช้") deptQuality[area].f++; else if(v === "ปรับปรุง") deptQuality[area].b++;
+        // Accumulate Pareto
         if (v === "ปรับปรุง") {
           const qText = getQuestionText(area, parseInt(match[1]), parseInt(match[2]));
           paretoCount[qText] = (paretoCount[qText] || 0) + 1;
@@ -359,42 +400,79 @@ function processCharts(ins, jobs) {
     });
   });
 
-  // Render Radar
+  // 2. Leaderboard (Top 3)
+  const lbData = [];
+  Object.keys(dScore).forEach(d => {
+    if(dScore[d].length > 0) {
+      lbData.push({ name: d, score: Math.round(dScore[d].reduce((a,b)=>a+b,0)/dScore[d].length) });
+    }
+  });
+  lbData.sort((a,b) => b.score - a.score);
+  const lbHtml = lbData.slice(0,3).map((item, idx) => {
+    return `<div class="lb-item">
+      <div class="lb-rank r${idx+1}">${idx+1}</div>
+      <div class="lb-name">${item.name}</div>
+      <div class="lb-score">${item.score}%</div>
+    </div>`;
+  }).join("");
+  document.getElementById("lbList").innerHTML = lbHtml || '<div class="lb-item"><div class="lb-name">ไม่มีข้อมูล</div></div>';
+
+  // 3. Radar
   const radarData = Object.values(sCats).map(c => c.m > 0 ? Math.round((c.s / c.m) * 100) : 0);
   mkChart("chRadar", {
     type: "radar", data: { labels: Object.keys(sCats), datasets: [{ label: "คะแนน (%)", data: radarData, backgroundColor: "rgba(37, 99, 235, 0.2)", borderColor: "#2563eb", borderWidth: 2 }] },
     options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100 } } }
   });
 
-  // Render Monthly Trend
-  const monthsKeys = Object.keys(monthlyData).sort();
-  const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-  const monthLabels = monthsKeys.map(m => {
-    const [y, mm] = m.split('-');
-    return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`;
-  });
-  const monthScores = monthsKeys.map(m => {
-    const arr = monthlyData[m];
-    return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
-  });
-
-  mkChart("chMonthly", {
-    type: "line",
-    data: {
-      labels: monthLabels.length ? monthLabels : ["ยังไม่มีข้อมูล"],
-      datasets: [
-        { label: "คะแนนเฉลี่ย (%)", data: monthScores, borderColor: "#2563eb", backgroundColor: "rgba(37, 99, 235, 0.1)", fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2 },
-        { label: "เป้าหมาย (85%)", data: Array(monthLabels.length || 1).fill(TARGET), borderColor: "#ef4444", borderDash: [5, 5], borderWidth: 1.5, pointRadius: 0, fill: false }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: { y: { min: 0, max: 100 } },
-      plugins: { legend: { display: false } }
+  // 4. Heatmap Matrix
+  // Generate HTML Table
+  let hmHtml = `<tr><th>แผนก</th>${S_CATS.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  DEPTS.forEach(d => {
+    // Only show depts that have data
+    if(dScore[d] && dScore[d].length > 0) {
+      hmHtml += `<tr><td>${d.substring(0,10)}</td>`;
+      S_CATS.forEach(c => {
+        const cell = deptHeatmap[d][c];
+        const pct = cell.m > 0 ? Math.round((cell.s / cell.m) * 100) : null;
+        if(pct === null) {
+          hmHtml += `<td style="background:#f1f5f9; color:#94a3b8">-</td>`;
+        } else {
+          // Color scale: 0 = Red (0 hue), 50 = Yellow (60 hue), 100 = Green (120 hue)
+          const hue = Math.max(0, Math.min(120, (pct - 50) * 2.4)); // Start shifting at 50%
+          hmHtml += `<td style="background:hsl(${hue}, 80%, 45%)">${pct}%</td>`;
+        }
+      });
+      hmHtml += `</tr>`;
     }
   });
+  document.getElementById("tbHeatmap").innerHTML = hmHtml || "<tr><td>ไม่พบข้อมูล</td></tr>";
 
-  // Render Stacked Bar
+  // 5. Control Chart (SPC)
+  const monthsKeys = Object.keys(monthlyData).sort();
+  const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+  const monthLabels = monthsKeys.map(m => { const [y, mm] = m.split('-'); return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; });
+  const monthScores = monthsKeys.map(m => { const arr = monthlyData[m]; return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length); });
+  
+  // Calculate UCL/LCL (Simplified as +/- 10% from Target for stability control)
+  const uclData = Array(monthLabels.length || 1).fill(95); 
+  const lclData = Array(monthLabels.length || 1).fill(75);
+  const targetData = Array(monthLabels.length || 1).fill(85);
+
+  mkChart("chControl", {
+    type: "line",
+    data: {
+      labels: monthLabels.length ? monthLabels : ["-"],
+      datasets: [
+        { label: "คะแนนเฉลี่ย (%)", data: monthScores, borderColor: "#2563eb", backgroundColor: "rgba(37, 99, 235, 0.1)", fill: true, tension: 0.2, pointRadius: 5, borderWidth: 3 },
+        { label: "UCL (95%)", data: uclData, borderColor: "#ef4444", borderDash: [3, 3], borderWidth: 1, pointRadius: 0, fill: false },
+        { label: "Target (85%)", data: targetData, borderColor: "#10b981", borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false },
+        { label: "LCL (75%)", data: lclData, borderColor: "#f59e0b", borderDash: [3, 3], borderWidth: 1, pointRadius: 0, fill: false }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 40, max: 100 } }, plugins: { legend: { position: 'bottom' } } }
+  });
+
+  // 6. Stacked Bar & Pareto (Same as before)
   const deptLabels = Object.keys(deptQuality);
   const pGood = [], pFair = [], pBad = [];
   deptLabels.forEach(d => {
@@ -402,24 +480,18 @@ function processCharts(ins, jobs) {
     if(total > 0) { pGood.push((deptQuality[d].g / total) * 100); pFair.push((deptQuality[d].f / total) * 100); pBad.push((deptQuality[d].b / total) * 100); } 
     else { pGood.push(0); pFair.push(0); pBad.push(0); }
   });
-
   mkChart("chStacked", {
-    type: "bar",
-    data: { labels: deptLabels.map(l => l.substring(0,8)), datasets: [ { label: "ดี", data: pGood, backgroundColor: "#10b981" }, { label: "พอใช้", data: pFair, backgroundColor: "#f59e0b" }, { label: "ปรับปรุง", data: pBad, backgroundColor: "#ef4444" } ] },
-    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, max: 100 } }, plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${Math.round(c.raw)}%` } } } }
+    type: "bar", data: { labels: deptLabels.map(l => l.substring(0,8)), datasets: [ { label: "ดี", data: pGood, backgroundColor: "#10b981" }, { label: "พอใช้", data: pFair, backgroundColor: "#f59e0b" }, { label: "ปรับปรุง", data: pBad, backgroundColor: "#ef4444" } ] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, max: 100 } } }
   });
 
-  // Render Pareto
   const sortedIssues = Object.entries(paretoCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const pLabels = sortedIssues.map(i => i[0].substring(0, 20) + "...");
   const pData = sortedIssues.map(i => i[1]);
-  let totalIssues = pData.reduce((a, b) => a + b, 0);
-  let cumSum = 0;
+  let totalIssues = pData.reduce((a, b) => a + b, 0); let cumSum = 0;
   const pLine = pData.map(val => { cumSum += val; return totalIssues > 0 ? (cumSum / totalIssues) * 100 : 0; });
-
   mkChart("chPareto", {
-    type: "bar",
-    data: { labels: pLabels.length ? pLabels : ["-"], datasets: [ { type: "line", label: "% สะสม", data: pLine, borderColor: "#ef4444", yAxisID: "y1", tension: 0.1, fill: false }, { type: "bar", label: "จำนวนครั้งที่พบ", data: pData, backgroundColor: "#64748b", yAxisID: "y", borderRadius: 4 } ] },
+    type: "bar", data: { labels: pLabels.length ? pLabels : ["-"], datasets: [ { type: "line", label: "% สะสม", data: pLine, borderColor: "#ef4444", yAxisID: "y1", tension: 0.1, fill: false }, { type: "bar", label: "จำนวนครั้งที่พบ", data: pData, backgroundColor: "#64748b", yAxisID: "y", borderRadius: 4 } ] },
     options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: "linear", position: "left", title: { display: true, text: 'ครั้ง' } }, y1: { type: "linear", position: "right", min: 0, max: 100, grid: { drawOnChartArea: false } } } }
   });
 
@@ -433,45 +505,8 @@ function processCharts(ins, jobs) {
   document.getElementById("sfOpen").textContent = openSafe;
   document.getElementById("sfClosed").textContent = closedSafe;
   document.getElementById("sfRate").textContent = rateSafe + "%";
-  document.getElementById("sfRate").style.color = rateSafe >= 80 ? "var(--success)" : (rateSafe >= 50 ? "var(--warning)" : "var(--danger)");
 
-  // Status Doughnut
-  mkChart("chSafeStatus", {
-    type: "doughnut",
-    data: { labels: ["รอแก้ไข (Open)", "เสร็จสิ้น (Closed)"], datasets: [{ data: [openSafe, closedSafe], backgroundColor: ["#ef4444", "#10b981"], borderWidth: 0 }] },
-    options: { responsive: true, maintainAspectRatio: false, cutout: "65%", plugins: { legend: { position: "bottom" } } }
-  });
-
-  // Issues by Dept
-  const dSafe = {};
-  jobs.forEach(j => {
-    const area = AREA_MAP[j.area] || String(j.area).toUpperCase();
-    if(!dSafe[area]) dSafe[area] = { open: 0, closed: 0 };
-    if(j.status === "Open") dSafe[area].open++; else dSafe[area].closed++;
-  });
-  
-  const safeDeptLabels = Object.keys(dSafe);
-  const safeOpenData = safeDeptLabels.map(d => dSafe[d].open);
-  const safeClosedData = safeDeptLabels.map(d => dSafe[d].closed);
-
-  mkChart("chSafeDept", {
-    type: "bar",
-    data: { labels: safeDeptLabels.map(l => l.substring(0,8)), datasets: [ { label: "เสร็จแล้ว (Closed)", data: safeClosedData, backgroundColor: "#10b981" }, { label: "ค้างอยู่ (Open)", data: safeOpenData, backgroundColor: "#ef4444" } ] },
-    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
-  });
-
-  // Issues by Category
-  const safeTypes = {};
-  jobs.forEach(j => { const t = j.inspectionType || "อื่นๆ"; safeTypes[t] = (safeTypes[t] || 0) + 1; });
-  const sortedTypes = Object.entries(safeTypes).sort((a,b) => b[1] - a[1]);
-
-  mkChart("chSafeType", {
-    type: "bar",
-    data: { labels: sortedTypes.map(t => t[0]), datasets: [{ label: "จำนวน", data: sortedTypes.map(t => t[1]), backgroundColor: "#3b82f6", borderRadius: 4 }] },
-    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
-  });
-
-  // Aging Report
+  // 7. Safety Pyramid
   const aging = { "ในกำหนด": 0, "เลย 1-7 วัน": 0, "เลย >7 วัน": 0 };
   const today = new Date(); today.setHours(0,0,0,0);
   jobs.filter(j => j.status === "Open").forEach(j => {
@@ -482,36 +517,68 @@ function processCharts(ins, jobs) {
     if (diff <= 0) aging["ในกำหนด"]++; else if (diff <= 7) aging["เลย 1-7 วัน"]++; else aging["เลย >7 วัน"]++;
   });
 
-  mkChart("chAging", {
+  // Map to Pyramid
+  document.getElementById("pyrTop").textContent = aging["เลย >7 วัน"];
+  document.getElementById("pyrMid").textContent = aging["ในกำหนด"] + aging["เลย 1-7 วัน"];
+  document.getElementById("pyrBot").textContent = closedSafe;
+
+  // 8. MTTR Trend (Mean Time to Resolution) - Simulated from dateFound to Today (Average Days Open)
+  const mttrData = {};
+  jobs.forEach(j => {
+    if(j.dateFound) {
+      let d = new Date(j.dateFound);
+      if(!isNaN(d)) {
+        let ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        // Calculate days open (or assumed close if we had close date)
+        const diff = Math.floor((today - d) / (1000 * 60 * 60 * 24));
+        if(!mttrData[ym]) mttrData[ym] = [];
+        mttrData[ym].push(diff > 0 ? diff : 1); // Minimum 1 day
+      }
+    }
+  });
+  
+  const mttrKeys = Object.keys(mttrData).sort();
+  const mttrLabels = mttrKeys.map(m => { const [y, mm] = m.split('-'); return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; });
+  const mttrScores = mttrKeys.map(m => { const arr = mttrData[m]; return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length); });
+
+  mkChart("chMTTR", {
     type: "bar",
-    data: { labels: Object.keys(aging), datasets: [{ data: Object.values(aging), backgroundColor: ["#10b981", "#f59e0b", "#ef4444"], borderRadius: 6 }] },
+    data: {
+      labels: mttrLabels.length ? mttrLabels : ["-"],
+      datasets: [ { label: "จำนวนวันเฉลี่ย (วัน)", data: mttrScores, backgroundColor: "#8b5cf6", borderRadius: 4 } ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  // Other Safety Charts (Dept, Scatter, Aging)
+  mkChart("chAging", {
+    type: "bar", data: { labels: Object.keys(aging), datasets: [{ data: Object.values(aging), backgroundColor: ["#10b981", "#f59e0b", "#ef4444"], borderRadius: 6 }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
   });
 
-  // Scatter Plot
-  const crossData = [];
-  const dScore = {};
-  data5S.forEach(i => {
-    if(!dScore[i.area]) dScore[i.area] = [];
-    const p = parseFloat(i.score?.percent);
-    if(!isNaN(p)) dScore[i.area].push(p);
+  const dSafe = {};
+  jobs.forEach(j => {
+    const area = AREA_MAP[j.area] || String(j.area).toUpperCase();
+    if(!dSafe[area]) dSafe[area] = { open: 0, closed: 0 };
+    if(j.status === "Open") dSafe[area].open++; else dSafe[area].closed++;
+  });
+  const safeDeptLabels = Object.keys(dSafe);
+  mkChart("chSafeDept", {
+    type: "bar",
+    data: { labels: safeDeptLabels.map(l => l.substring(0,8)), datasets: [ { label: "เสร็จ", data: safeDeptLabels.map(d => dSafe[d].closed), backgroundColor: "#10b981" }, { label: "ค้าง", data: safeDeptLabels.map(d => dSafe[d].open), backgroundColor: "#ef4444" } ] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
   });
 
+  const crossData = [];
   DEPTS.forEach(d => {
     const s5_avg = dScore[d] && dScore[d].length > 0 ? (dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length) : null;
     const sArea = dSafe[d];
     const safe_rate = sArea && (sArea.open + sArea.closed > 0) ? (sArea.closed / (sArea.open + sArea.closed)) * 100 : null;
     if(s5_avg !== null && safe_rate !== null) crossData.push({ x: s5_avg, y: safe_rate, dept: d });
   });
-
   mkChart("chScatter", {
-    type: "scatter",
-    data: { datasets: [{ label: "แผนก", data: crossData, backgroundColor: "#2563eb", pointRadius: 6, pointHoverRadius: 8 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: { x: { min: 0, max: 100, title: { display: true, text: 'คะแนน 5S (%)' } }, y: { min: 0, max: 100, title: { display: true, text: 'ปิดงาน Safety (%)' } } },
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw.dept}: 5S = ${Math.round(c.raw.x)}%, Safety = ${Math.round(c.raw.y)}%` } } }
-    }
+    type: "scatter", data: { datasets: [{ label: "แผนก", data: crossData, backgroundColor: "#2563eb", pointRadius: 6, pointHoverRadius: 8 }] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 100, title: { display: true, text: '5S (%)' } }, y: { min: 0, max: 100, title: { display: true, text: 'Safety Closed (%)' } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw.dept}: 5S=${Math.round(c.raw.x)}%, Safe=${Math.round(c.raw.y)}%` } } } }
   });
 }
 </script>
