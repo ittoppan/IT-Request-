@@ -255,19 +255,28 @@
       return url;
     }
 
-    function calculate5SScore(checklist, areaStr) {
-      const isOffice = areaStr && areaStr.toUpperCase() === "OFFICE";
-      const sections = (CHECKLIST_5S[areaStr] || CHECKLIST_5S["OFFICE"])?.sections || [];
-      let total = 0, max = 0;
-      sections.forEach((sec, sIdx) => {
-        sec.questions.forEach((_, qIdx) => {
-          const val = checklist?.[`5s_s${sIdx}_q${qIdx}`];
-          max += 2;
-          if (val === "ดี") total += 2; else if (val === "พอใช้") total += 1;
-        });
-      });
-      return max > 0 ? Math.round((total / max) * 100) : 0;
-    }
+   /**
+ * คำนวณคะแนน 5S แบบไดนามิก (รองรับจำนวนข้อที่เปลี่ยนแปลง)
+ */
+function calculate5SScore(checklist, areaStr) {
+  const areaData = CHECKLIST_5S[areaStr] || CHECKLIST_5S["OFFICE"];
+  const sections = areaData?.sections || [];
+  
+  let total = 0, max = 0;
+  
+  sections.forEach((sec, sIdx) => {
+    const questions = sec.questions || sec.qs || [];
+    questions.forEach((_, qIdx) => {
+      const val = checklist?.[`5s_s${sIdx}_q${qIdx}`];
+      max += 2; // Max 2 คะแนนต่อข้อ
+      if (val === "ดี") total += 2;
+      else if (val === "พอใช้") total += 1;
+      // "ปรับปรุง" = 0 คะแนน
+    });
+  });
+  
+  return max > 0 ? Math.round((total / max) * 100) : 0;
+}
 
     function loadData() {
       const loader = document.getElementById('loader'); loader.classList.add('show');
@@ -313,13 +322,30 @@
         }
 
         let statusHtml = '';
-        if (is5S) {
-           const percent = calculate5SScore(d.fullChecklist, d.area);
-           const color = percent >= 80 ? 'var(--success)' : percent >= 50 ? '#f39c12' : 'var(--danger)';
-           statusHtml = `<span style="background:${color}20;color:${color};padding:5px 12px;border-radius:18px;font-size:0.8rem;font-weight:600;white-space:nowrap;"><i class="fas fa-chart-pie"></i> ${percent}%</span>`;
-        } else {
-           statusHtml = `<span class="badge" style="background:${d.hasBad? 'var(--danger)':'var(--success)'}">${d.hasBad?'พบปัญหา':'ปกติ'}</span>`;
-        }
+if (is5S) {
+   // ✅ 5S: แสดงคะแนน %
+   const percent = calculate5SScore(d.fullChecklist, d.area);
+   const color = percent >= 80 ? 'var(--success)' : percent >= 50 ? '#f39c12' : 'var(--danger)';
+   statusHtml = `<span style="background:${color}20;color:${color};padding:5px 12px;border-radius:18px;font-size:0.8rem;font-weight:600;white-space:nowrap;"><i class="fas fa-chart-pie"></i> ${percent}%</span>`;
+} else {
+   // ✅ Safety: แสดงคะแนน % + สถานะ
+   const checklist = getSafetyChecklist(d.area);
+   const scoreInfo = calculateSafetyScore(d.fullChecklist, checklist, d.area);
+   
+   // แสดงคะแนน %
+   const color = scoreInfo.percent >= 80 ? 'var(--success)' : scoreInfo.percent >= 50 ? '#f39c12' : 'var(--danger)';
+   const statusText = d.hasBad ? 'พบปัญหา' : 'ปกติ';
+   statusHtml = `
+     <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+       <span style="background:${color}20;color:${color};padding:3px 10px;border-radius:12px;font-size:0.75rem;font-weight:600;">
+         ${scoreInfo.percent}%
+       </span>
+       <span class="badge" style="background:${d.hasBad? 'var(--danger)':'var(--success)'};font-size:0.7rem;">
+         ${statusText}
+       </span>
+     </div>
+   `;
+}
 
         let typeBadgeCls = is5S ? 'badge-5s' : '';
         let typeIcon = is5S ? 'fa-broom' : 'fa-hard-hat';
