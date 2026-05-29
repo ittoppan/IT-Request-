@@ -3,446 +3,188 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>5S & Safety Unified Dashboard</title>
+<title>5S & Safety Analytics Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-/* ─── TOKENS & RESET ─── */
 :root {
   --bg-body: #f3f4f6;
   --bg-surface: #ffffff;
-  --bg-sidebar: #111827;
-  
   --text-main: #111827;
   --text-muted: #6b7280;
-  --text-light: #9ca3af;
-  --text-inverse: #ffffff;
-  
   --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --primary-light: #eff6ff;
-  
   --success: #10b981;
-  --success-bg: #d1fae5;
-  --success-text: #065f46;
-  
   --warning: #f59e0b;
-  --warning-bg: #fef3c7;
-  --warning-text: #92400e;
-  
   --danger: #ef4444;
-  --danger-bg: #fee2e2;
-  --danger-text: #991b1b;
-  
   --border: #e5e7eb;
-  --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 16px;
-  
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  
-  --sidebar-w: 240px;
   --topbar-h: 72px;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { scroll-behavior: smooth; }
-body { 
-  font-family: 'Sarabun', 'Inter', sans-serif; 
-  background: var(--bg-body); 
-  color: var(--text-main); 
-  line-height: 1.5; 
-  -webkit-font-smoothing: antialiased; 
-}
+body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: var(--text-main); line-height: 1.5; }
 
-/* ─── LOADER ─── */
+/* Loader */
 #loader { position: fixed; inset: 0; background: var(--bg-surface); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; gap: 16px; transition: opacity 0.3s; }
 #loader.hide { opacity: 0; pointer-events: none; }
 .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ─── LAYOUT ─── */
-.app-container { display: flex; min-height: 100vh; }
+/* Topbar */
+.topbar { background: var(--bg-surface); border-bottom: 1px solid var(--border); padding: 16px 24px; position: sticky; top: 0; z-index: 90; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.brand { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--primary); }
+.filters { display: flex; gap: 12px; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
+.filters select { height: 36px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit; font-size: 13px; outline: none; }
+.btn-apply { height: 36px; padding: 0 16px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; }
 
-/* ─── SIDEBAR ─── */
-.sidebar { width: var(--sidebar-w); background: var(--bg-sidebar); color: var(--text-inverse); position: fixed; top: 0; bottom: 0; left: 0; display: flex; flex-direction: column; z-index: 100; transition: transform 0.3s; }
-.brand { height: var(--topbar-h); display: flex; align-items: center; padding: 0 24px; font-weight: 700; font-size: 18px; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); gap: 12px; }
-.brand i { color: var(--primary); font-size: 20px; }
-.nav-menu { flex: 1; padding: 24px 16px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
-.nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-light); text-decoration: none; border-radius: var(--radius-md); font-weight: 500; font-size: 14px; transition: all 0.2s; }
-.nav-item i { width: 20px; text-align: center; font-size: 16px; }
-.nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: var(--text-inverse); }
-.nav-item.active { color: var(--primary); }
-
-/* ─── MAIN CONTENT ─── */
-.main-area { flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-width: 0; }
-
-/* ─── TOPBAR (FILTERS) ─── */
-.topbar { height: auto; min-height: var(--topbar-h); background: var(--bg-surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; padding: 12px 24px; gap: 16px; box-shadow: var(--shadow-sm); }
-.filter-group { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; flex: 1; }
-.filter-item { display: flex; flex-direction: column; gap: 4px; }
-.filter-item label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.filter-item select { height: 36px; padding: 0 32px 0 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; color: var(--text-main); background: var(--bg-body) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 8px center/16px; -webkit-appearance: none; outline: none; cursor: pointer; transition: border 0.2s; }
-.filter-item select:focus { border-color: var(--primary); }
-.action-group { display: flex; gap: 8px; align-items: flex-end; height: 100%; }
-.btn { height: 36px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 13px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; transition: all 0.2s; text-decoration: none; }
-.btn-primary { background: var(--primary); color: white; }
-.btn-primary:hover { background: var(--primary-hover); }
-.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
-.btn-outline:hover { background: var(--bg-body); }
-.mobile-toggle { display: none; background: transparent; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
-
-/* ─── DASHBOARD CONTENT ─── */
-.content-wrapper { padding: 24px; display: flex; flex-direction: column; gap: 32px; max-width: 1400px; margin: 0 auto; width: 100%; }
-
-/* Sections */
-.section-header { margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
-.section-header h2 { font-size: 20px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
-.section-header h2 i { color: var(--primary); }
-
-/* Alert */
-.alert-box { background: var(--danger-bg); border: 1px solid var(--danger); border-radius: var(--radius-md); padding: 16px; display: none; align-items: flex-start; gap: 12px; }
-.alert-box.show { display: flex; }
-.alert-box i { color: var(--danger); font-size: 18px; margin-top: 2px; }
-.alert-content h4 { color: var(--danger-text); font-size: 14px; font-weight: 700; margin-bottom: 6px; }
-.alert-content ul { padding-left: 20px; font-size: 13px; color: var(--danger-text); }
+/* Layout */
+.content { max-width: 1400px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 32px; }
+.section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--border); padding-bottom: 8px;}
 
 /* Grid Systems */
 .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-.kpi-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow-sm); }
-.kpi-title { font-size: 13px; font-weight: 600; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
-.kpi-title i { font-size: 16px; opacity: 0.5; }
-.kpi-val { font-size: 28px; font-weight: 700; color: var(--text-main); line-height: 1; font-family: 'Inter', sans-serif; }
-.kpi-sub { font-size: 12px; color: var(--text-light); }
+.kpi-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+.kpi-title { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+.kpi-val { font-size: 28px; font-weight: 700; line-height: 1; }
 
 .chart-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.chart-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); }
-.chart-header { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; }
-.chart-wrap { height: 260px; position: relative; width: 100%; }
+.chart-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; }
+.chart-header { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+.chart-wrap { height: 280px; position: relative; width: 100%; }
 
-/* Tables */
-.table-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; }
-.table-responsive { overflow-x: auto; }
-.data-table { width: 100%; border-collapse: collapse; min-width: 800px; text-align: left; }
-.data-table th { background: var(--bg-body); padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
-.data-table td { padding: 14px 16px; font-size: 13px; color: var(--text-main); border-bottom: 1px solid var(--border); vertical-align: middle; }
-.data-table tbody tr:last-child td { border-bottom: none; }
-.data-table tbody tr:hover { background: #f9fafb; }
+/* Table */
+.table-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+.data-table th { background: var(--bg-body); padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: left; border-bottom: 1px solid var(--border); }
+.data-table td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.badge { padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.bg-red { background: #fee2e2; color: #991b1b; }
+.bg-yellow { background: #fef3c7; color: #92400e; }
+.bg-green { background: #d1fae5; color: #065f46; }
 
-/* Components */
-.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
-.bg-green { background: var(--success-bg); color: var(--success-text); }
-.bg-yellow { background: var(--warning-bg); color: var(--warning-text); }
-.bg-red { background: var(--danger-bg); color: var(--danger-text); }
-.bg-gray { background: var(--bg-body); color: var(--text-muted); border: 1px solid var(--border); }
-
-.progress-bar { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 6px; }
-.progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
-
-/* Utilities */
-.text-right { text-align: right; }
-.flex-between { display: flex; justify-content: space-between; align-items: center; }
-.empty-state { text-align: center; padding: 40px; color: var(--text-light); }
-.empty-state i { font-size: 32px; margin-bottom: 12px; }
-
-/* Toast */
-.toast { position: fixed; bottom: 24px; right: 24px; background: var(--text-main); color: white; padding: 12px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; z-index: 9999; transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-md); }
-.toast.show { transform: translateY(0); opacity: 1; }
-
-/* ─── RESPONSIVE ─── */
-@media (max-width: 1024px) {
-  .chart-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 768px) {
-  :root { --sidebar-w: 0px; }
-  .sidebar { transform: translateX(-100%); width: 260px; }
-  .sidebar.open { transform: translateX(0); }
-  .mobile-toggle { display: block; }
-  .topbar { padding: 12px 16px; flex-direction: column; align-items: stretch; }
-  .filter-group { flex-direction: column; align-items: stretch; }
-  .action-group { justify-content: flex-end; margin-top: 8px; }
-  .content-wrapper { padding: 16px; }
-}
-@media print {
-  .sidebar, .topbar, .toast { display: none !important; }
-  .main-area { margin-left: 0; }
-  body { background: white; }
-  .kpi-card, .chart-card, .table-card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; margin-bottom: 16px; }
-}
+@media (max-width: 1024px) { .chart-grid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .filters { justify-content: flex-start; width: 100%; } .filters select, .btn-apply { flex: 1; } }
 </style>
 </head>
 <body>
 
-<div id="loader">
-  <div class="spinner"></div>
-  <div style="font-weight: 500; color: var(--text-muted);">กำลังโหลดข้อมูลทั้งหมด...</div>
-</div>
+<div id="loader"><div class="spinner"></div><div style="font-weight:500; color:var(--text-muted)">กำลังประมวลผลข้อมูล...</div></div>
 
-<div class="app-container">
-  
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <i class="fas fa-shield-halved"></i>
-      <span>Pro Dashboard</span>
-    </div>
-    <nav class="nav-menu">
-      <a href="#overview" class="nav-item active" onclick="setActiveNav(this)"><i class="fas fa-layer-group"></i> ภาพรวม (Overview)</a>
-      <a href="#section-5s" class="nav-item" onclick="setActiveNav(this)"><i class="fas fa-broom"></i> ระบบ 5S</a>
-      <a href="#section-safety" class="nav-item" onclick="setActiveNav(this)"><i class="fas fa-hard-hat"></i> แผนความปลอดภัย</a>
-      <div style="flex: 1;"></div>
-      <a href="reportnew.html" class="nav-item"><i class="fas fa-file-alt"></i> รายงานฉบับเต็ม</a>
-    </nav>
-  </aside>
+<header class="topbar">
+  <div class="brand"><i class="fas fa-chart-line"></i> Analytics Dashboard</div>
+  <div class="filters">
+    <select id="timeRange">
+      <option value="month" selected>เดือนนี้</option>
+      <option value="year">ปีนี้</option>
+      <option value="all">ทั้งหมด</option>
+    </select>
+    <select id="deptFilter"><option value="all">ทุกแผนก</option></select>
+    <button class="btn-apply" onclick="applyFilters()">วิเคราะห์ข้อมูล</button>
+  </div>
+</header>
 
-  <!-- MAIN AREA -->
-  <main class="main-area">
+<div class="content">
+
+  <section>
+    <div class="section-title"><i class="fas fa-broom" style="color:var(--primary)"></i> 5S Performance & Insights</div>
     
-    <!-- TOPBAR (FILTERS) -->
-    <header class="topbar">
-      <div style="display: flex; align-items: center; gap: 16px; width: 100%; justify-content: space-between;">
-        <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-        <div class="filter-group" style="width: 100%;">
-          <div class="filter-item">
-            <label>ช่วงเวลา</label>
-            <select id="timeRange">
-              <option value="today">วันนี้</option>
-              <option value="week">7 วันที่ผ่านมา</option>
-              <option value="month" selected>เดือนนี้</option>
-              <option value="year">ปีนี้</option>
-              <option value="all">ทั้งหมด</option>
-            </select>
-          </div>
-          <div class="filter-item">
-            <label>แผนก / พื้นที่</label>
-            <select id="deptFilter"><option value="all">ทุกแผนกรวมกัน</option></select>
-          </div>
-          <div class="filter-item">
-            <label>เป้าหมาย 5S (85%)</label>
-            <select id="targetFilter">
-              <option value="all">แสดงทั้งหมด</option>
-              <option value="ok">เฉพาะที่ผ่านเป้า</option>
-              <option value="low">เฉพาะที่ต้องปรับปรุง</option>
-            </select>
-          </div>
-          <div class="action-group" style="flex: 1; justify-content: flex-end;">
-            <button class="btn btn-primary" onclick="applyFilters()"><i class="fas fa-sync-alt"></i> อัปเดต</button>
-            <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i></button>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- CONTENT -->
-    <div class="content-wrapper" id="overview">
-      
-      <!-- ALERT -->
-      <div id="alertBox" class="alert-box">
-        <i class="fas fa-exclamation-triangle"></i>
-        <div class="alert-content">
-          <h4>พบพื้นที่ 5S ต่ำกว่ามาตรฐาน (85%)</h4>
-          <ul id="alertList"></ul>
-        </div>
-      </div>
-
-      <!-- ── SECTION: 5S DASHBOARD ── -->
-      <section id="section-5s">
-        <div class="section-header">
-          <h2><i class="fas fa-broom"></i> สรุปผลประเมิน 5S</h2>
-          <button class="btn btn-outline" style="height: 30px; font-size: 11px;" onclick="exportCSV('5s')"><i class="fas fa-download"></i> CSV</button>
-        </div>
-        
-        <div class="kpi-grid" style="margin-bottom: 24px;">
-          <div class="kpi-card">
-            <div class="kpi-title">คะแนนเฉลี่ยรวม <i class="fas fa-star" style="color:var(--warning)"></i></div>
-            <div class="kpi-val" id="s5avg">0%</div>
-            <div class="kpi-sub">เป้าหมายองค์กร: 85%</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">จำนวนรอบตรวจ <i class="fas fa-clipboard-check"></i></div>
-            <div class="kpi-val" id="s5cnt">0</div>
-            <div class="kpi-sub">ครั้งในช่วงเวลาที่เลือก</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">จุดที่ต้องปรับปรุง <i class="fas fa-wrench" style="color:var(--danger)"></i></div>
-            <div class="kpi-val" id="s5iss">0</div>
-            <div class="kpi-sub">รายการจาก Checklist</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">สัดส่วน (ดี/พอใช้/ปรับ) <i class="fas fa-chart-pie"></i></div>
-            <div class="kpi-val" id="s5dist" style="font-size: 22px;">0 / 0 / 0</div>
-            <div class="kpi-sub">คุณภาพการจัดการพื้นที่</div>
-          </div>
-        </div>
-
-        <div class="chart-grid" style="margin-bottom: 24px;">
-          <div class="chart-card">
-            <div class="chart-header">แนวโน้มคะแนน 5S เทียบเป้าหมาย</div>
-            <div class="chart-wrap"><canvas id="chTrend"></canvas></div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-header">คะแนนเฉลี่ยรายแผนก (Top 8)</div>
-            <div class="chart-wrap"><canvas id="chDept"></canvas></div>
-          </div>
-        </div>
-
-        <div class="table-card">
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>แผนก/พื้นที่</th>
-                  <th>รอบตรวจ</th>
-                  <th>คะแนนเฉลี่ย</th>
-                  <th>ความคืบหน้า</th>
-                  <th>สถานะ</th>
-                  <th class="text-right">อัปเดตล่าสุด</th>
-                </tr>
-              </thead>
-              <tbody id="t5s">
-                <tr><td colspan="6" class="empty-state"><i class="fas fa-inbox"></i><br>ไม่มีข้อมูล 5S</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── SECTION: SAFETY DASHBOARD ── -->
-      <section id="section-safety" style="padding-top: 24px;">
-        <div class="section-header">
-          <h2><i class="fas fa-hard-hat"></i> สรุปแผนความปลอดภัย (Safety)</h2>
-          <button class="btn btn-outline" style="height: 30px; font-size: 11px;" onclick="exportCSV('safety')"><i class="fas fa-download"></i> CSV</button>
-        </div>
-
-        <div class="kpi-grid" style="margin-bottom: 24px;">
-          <div class="kpi-card">
-            <div class="kpi-title">งานที่ตรวจพบทั้งหมด <i class="fas fa-clipboard-list"></i></div>
-            <div class="kpi-val" id="ssJob">0</div>
-            <div class="kpi-sub">รายการ (สะสม)</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">รอแก้ไข (Open) <i class="fas fa-exclamation-circle" style="color:var(--warning)"></i></div>
-            <div class="kpi-val" id="ssOpen">0</div>
-            <div class="kpi-sub">ต้องดำเนินการด่วน</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">แก้ไขแล้ว (Closed) <i class="fas fa-check-circle" style="color:var(--success)"></i></div>
-            <div class="kpi-val" id="ssClosed">0</div>
-            <div class="kpi-sub">ดำเนินการเสร็จสิ้น</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">ประวัติเข้าประเมิน <i class="fas fa-user-shield"></i></div>
-            <div class="kpi-val" id="ssCnt">0</div>
-            <div class="kpi-sub">ครั้ง</div>
-          </div>
-        </div>
-
-        <div class="chart-grid" style="margin-bottom: 24px;">
-          <div class="chart-card">
-            <div class="chart-header">ประเภทความเสี่ยงที่พบ</div>
-            <div class="chart-wrap"><canvas id="chJobType"></canvas></div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-header">สถานะการแก้ไขปัญหา</div>
-            <div class="chart-wrap"><canvas id="chJobStatus"></canvas></div>
-          </div>
-        </div>
-
-        <div class="table-card">
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>รหัสอ้างอิง</th>
-                  <th>ประเภท</th>
-                  <th>แผนก/พื้นที่</th>
-                  <th>ปัญหาที่พบ</th>
-                  <th>กำหนดเสร็จ</th>
-                  <th class="text-right">สถานะ</th>
-                </tr>
-              </thead>
-              <tbody id="tSafety">
-                <tr><td colspan="6" class="empty-state"><i class="fas fa-shield-check" style="color:var(--success)"></i><br>ไม่มีความเสี่ยงคงค้าง</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-title">คะแนนเฉลี่ยรวม 5S</div><div class="kpi-val" id="s5avg">0%</div></div>
+      <div class="kpi-card"><div class="kpi-title">รอบการตรวจทั้งหมด</div><div class="kpi-val" id="s5cnt">0</div></div>
+      <div class="kpi-card"><div class="kpi-title">จุดแข็ง (ส. ที่คะแนนสูงสุด)</div><div class="kpi-val" id="s5strong" style="font-size:20px; color:var(--success)">-</div></div>
+      <div class="kpi-card"><div class="kpi-title">จุดอ่อน (ส. ที่ต้องเร่งแก้)</div><div class="kpi-val" id="s5weak" style="font-size:20px; color:var(--danger)">-</div></div>
     </div>
-  </main>
-</div>
 
-<div id="toastBox" class="toast"></div>
+    <div class="chart-grid" style="margin-top:16px;">
+      <div class="chart-card">
+        <div class="chart-header">Radar Chart: การประเมินแยกรายหมวด (5 ส.)</div>
+        <div class="chart-wrap"><canvas id="chRadar"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">แนวโน้มคะแนนเฉลี่ยรายวัน</div>
+        <div class="chart-wrap"><canvas id="chTrend"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><i class="fas fa-hard-hat" style="color:var(--warning)"></i> Safety & Action Plan Insights</div>
+    
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-title">งานแก้ไขทั้งหมด (สะสม)</div><div class="kpi-val" id="ssJob">0</div></div>
+      <div class="kpi-card"><div class="kpi-title">งานที่แก้ไขสำเร็จ (Closed)</div><div class="kpi-val" id="ssClosed" style="color:var(--success)">0</div></div>
+      <div class="kpi-card"><div class="kpi-title">งานที่ล่าช้าเกินกำหนด (Overdue)</div><div class="kpi-val" id="ssOverdue" style="color:var(--danger)">0</div></div>
+    </div>
+
+    <div class="chart-grid" style="margin-top:16px;">
+      <div class="chart-card">
+        <div class="chart-header">Aging Report: สถานะอายุงานค้าง (Open)</div>
+        <div class="chart-wrap"><canvas id="chAging"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">สัดส่วนประเภทความเสี่ยงที่พบ</div>
+        <div class="chart-wrap"><canvas id="chRisk"></canvas></div>
+      </div>
+    </div>
+
+    <div class="table-card" style="margin-top:16px;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>รหัสอ้างอิง</th>
+            <th>ประเภท</th>
+            <th>แผนก/พื้นที่</th>
+            <th>ปัญหาที่พบ</th>
+            <th>กำหนดเสร็จ</th>
+            <th>สถานะความล่าช้า</th>
+          </tr>
+        </thead>
+        <tbody id="tSafety">
+          <tr><td colspan="6" style="text-align:center; padding:24px;">กำลังโหลดข้อมูล...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
 
 <script>
-// ── CONFIG ──
 const API = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
-const TARGET = 85;
 const DEPTS = ["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","ENGINEERING","OUTSIDE"];
 const AREA_MAP = {"แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Solvent":"SOLVENT","แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING","แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC","แผนก Warehouse":"WAREHOUSE","Office":"OFFICE","พื้นที่รอบบริเวณโรงงาน":"OUTSIDE","Canteen":"CANTEEN","EN":"ENGINEERING"};
 
-Chart.defaults.font.family = "'Inter', 'Sarabun', sans-serif";
-Chart.defaults.color = "#6b7280";
-Chart.defaults.scale.grid.color = "#f3f4f6";
-
+Chart.defaults.font.family = "'Sarabun', sans-serif";
 let raw = { ins: [], jobs: [] };
 let charts = {};
 
 document.addEventListener("DOMContentLoaded", () => {
-  populateDepts();
+  const el = document.getElementById("deptFilter");
+  DEPTS.forEach(d => el.add(new Option(d, d)));
   loadAll();
 });
 
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-}
-
-function setActiveNav(el) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  el.classList.add('active');
-  if(window.innerWidth <= 768) toggleSidebar();
-}
-
 async function loadAll() {
-  const loader = document.getElementById("loader");
-  loader.classList.remove("hide");
+  document.getElementById("loader").classList.remove("hide");
   try {
     const [dash, jobs] = await Promise.all([
       fetch(`${API}?action=getDashboardData`).then(r => r.json()),
       fetch(`${API}?action=getReport`).then(r => r.json())
     ]);
-    if (dash.status === "error") { showToast("API Error: " + dash.message, "e"); return; }
-    raw.ins = (dash.details || []).map(d => ({ ...d, area: normArea(d.area), inspectionType: String(d.inspectionType || "").trim().toUpperCase() }));
+    raw.ins = (dash.details || []).map(d => ({ ...d, area: AREA_MAP[d.area] || String(d.area||"OFFICE").toUpperCase() }));
     raw.jobs = Array.isArray(jobs) ? jobs : [];
     applyFilters();
   } catch (err) {
-    showToast("โหลดข้อมูลล้มเหลว", "e");
-    document.getElementById("t5s").innerHTML = `<tr><td colspan="6" class="empty-state">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
+    alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
   } finally {
-    loader.classList.add("hide");
+    document.getElementById("loader").classList.add("hide");
   }
 }
-
-function populateDepts() {
-  const el = document.getElementById("deptFilter");
-  DEPTS.forEach(d => {
-    const o = document.createElement("option");
-    o.value = d; o.textContent = d; el.appendChild(o);
-  });
-}
-
-function normArea(a) { return AREA_MAP[a] || String(a || "OFFICE").toUpperCase().trim(); }
 
 function applyFilters() {
   const dept = document.getElementById("deptFilter").value;
   const tr = document.getElementById("timeRange").value;
-  const tf = document.getElementById("targetFilter").value;
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const weekAgo = new Date(today - 7 * 864e5);
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const yearStart = new Date(now.getFullYear(), 0, 1);
 
@@ -451,84 +193,80 @@ function applyFilters() {
     if (tr === "all") return true;
     const d = new Date((i.timestamp || "").replace(" ", "T"));
     if (isNaN(d)) return true;
-    if (tr === "today") return d >= today;
-    if (tr === "week") return d >= weekAgo;
-    if (tr === "month") return d >= monthStart;
-    if (tr === "year") return d >= yearStart;
-    return true;
+    return tr === "month" ? d >= monthStart : d >= yearStart;
   });
 
-  // Target Filter applied to 5S records
-  if (tf !== "all") {
-    const ds = {};
-    ins.filter(i => i.inspectionType === "5S").forEach(i => {
-      const d = i.area || "อื่นๆ";
-      if (!ds[d]) ds[d] = [];
-      const p = parseFloat(i.score?.percent);
-      if (!isNaN(p)) ds[d].push(p);
-    });
-    const valid = {};
-    Object.entries(ds).forEach(([d, sc]) => {
-      if (!sc.length) return;
-      const avg = sc.reduce((a, b) => a + b, 0) / sc.length;
-      if (tf === "ok" && avg >= TARGET) valid[d] = 1;
-      else if (tf === "low" && avg < TARGET) valid[d] = 1;
-    });
-    ins = ins.filter(i => i.inspectionType !== "5S" || valid[i.area || "อื่นๆ"]);
-  }
+  const jobs = raw.jobs.filter(j => dept === "all" || (AREA_MAP[j.area] || String(j.area).toUpperCase()) === dept);
 
-  const jobs = raw.jobs.filter(j => dept === "all" || normArea(j.area) === dept);
-
-  // Render both sections simultaneously
-  render5S(ins);
-  renderSafety(ins, jobs);
-  showToast("อัปเดตข้อมูลเรียบร้อย");
+  process5S(ins);
+  processSafety(jobs);
 }
 
-function render5S(ins) {
-  const data = ins.filter(i => i.inspectionType === "5S");
+// ─── LOGIC 1: แกะข้อมูล 5S ทำ Radar Chart ───
+function process5S(ins) {
+  const data = ins.filter(i => String(i.inspectionType).toUpperCase() === "5S");
+  
+  // KPI
   const scores = data.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
-  const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
-
-  document.getElementById("s5avg").textContent = avg + "%";
+  document.getElementById("s5avg").textContent = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) + "%" : "0%";
   document.getElementById("s5cnt").textContent = data.length;
 
-  let good = 0, fair = 0, imp = 0;
-  data.forEach(i => Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
-    if (/^5s_s\d+_q\d+$/.test(k)) { if (v === "ดี") good++; else if (v === "พอใช้") fair++; else if (v === "ปรับปรุง") imp++; }
-  }));
-  
-  document.getElementById("s5iss").textContent = imp;
-  document.getElementById("s5dist").innerHTML = `<span style="color:var(--success)">${good}</span> <span style="font-size:16px;color:var(--text-light)">/</span> <span style="color:var(--warning)">${fair}</span> <span style="font-size:16px;color:var(--text-light)">/</span> <span style="color:var(--danger)">${imp}</span>`;
+  // Radar Logic: แกะ s1 ถึง s5
+  const sCats = {
+    1: { name: "สะสาง (Seiri)", score: 0, max: 0 },
+    2: { name: "สะดวก (Seiton)", score: 0, max: 0 },
+    3: { name: "สะอาด (Seiso)", score: 0, max: 0 },
+    4: { name: "สุขลักษณะ (Seiketsu)", score: 0, max: 0 },
+    5: { name: "สร้างนิสัย (Shitsuke)", score: 0, max: 0 }
+  };
 
-  const byDept = {};
   data.forEach(i => {
-    const d = i.area || "อื่นๆ";
-    if (!byDept[d]) byDept[d] = { count: 0, scores: [], imp: 0, last: null };
-    byDept[d].count++;
-    const p = parseFloat(i.score?.percent);
-    if (!isNaN(p)) byDept[d].scores.push(p);
-    const dt = (i.timestamp || "").slice(0, 10);
-    if (dt && (!byDept[d].last || dt > byDept[d].last)) byDept[d].last = dt;
     Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
-      if (/^5s_s\d+_q\d+$/.test(k) && v === "ปรับปรุง") byDept[d].imp++;
+      const match = k.match(/^5s_s(\d)_/); // ค้นหา Pattern ข้อ เช่น 5s_s1_q1
+      if (match && sCats[match[1]]) {
+        sCats[match[1]].max += 1;
+        if (v === "ดี") sCats[match[1]].score += 1;
+        else if (v === "พอใช้") sCats[match[1]].score += 0.5;
+        // ถ้า "ปรับปรุง" ได้ 0
+      }
     });
   });
 
-  const deptList = Object.entries(byDept).map(([dept, v]) => {
-    const a = v.scores.length ? Math.round(v.scores.reduce((x, y) => x + y, 0) / v.scores.length) : 0;
-    return { dept, count: v.count, avg: a, imp: v.imp, last: v.last, status: a >= TARGET ? 'ok' : 'low' };
-  }).sort((a, b) => b.avg - a.avg);
+  const radarLabels = [];
+  const radarData = [];
+  let highestS = { name: "-", pct: -1 };
+  let lowestS = { name: "-", pct: 101 };
 
-  // Alerts
-  const low = deptList.filter(d => d.status === "low");
-  const alertEl = document.getElementById("alertBox");
-  if (low.length) {
-    alertEl.classList.add("show");
-    document.getElementById("alertList").innerHTML = low.map(d => `<li><strong>${esc(d.dept)}</strong> ได้คะแนนเฉลี่ย ${d.avg}% (ขาดอีก ${TARGET - d.avg}%)</li>`).join("");
-  } else alertEl.classList.remove("show");
+  Object.values(sCats).forEach(cat => {
+    radarLabels.push(cat.name);
+    const pct = cat.max > 0 ? Math.round((cat.score / cat.max) * 100) : 0;
+    radarData.push(pct);
+    if(cat.max > 0) {
+      if(pct > highestS.pct) highestS = { name: cat.name, pct: pct };
+      if(pct < lowestS.pct) lowestS = { name: cat.name, pct: pct };
+    }
+  });
 
-  // Charts
+  document.getElementById("s5strong").textContent = highestS.name !== "-" ? `${highestS.name} (${highestS.pct}%)` : "-";
+  document.getElementById("s5weak").textContent = lowestS.name !== "-" ? `${lowestS.name} (${lowestS.pct}%)` : "-";
+
+  mkChart("chRadar", {
+    type: "radar",
+    data: {
+      labels: radarLabels,
+      datasets: [{
+        label: "คะแนนเฉลี่ย (%)",
+        data: radarData,
+        backgroundColor: "rgba(59, 130, 246, 0.2)",
+        borderColor: "#3b82f6",
+        pointBackgroundColor: "#3b82f6",
+        borderWidth: 2
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20 } } } }
+  });
+
+  // Trend Chart
   const daily = {};
   data.forEach(i => {
     const d = (i.timestamp || "").slice(0, 10);
@@ -536,92 +274,105 @@ function render5S(ins) {
   });
   const labels = Object.keys(daily).sort();
   const vals = labels.map(k => Math.round(daily[k].reduce((a, b) => a + b, 0) / daily[k].length));
-
-  mkChart("chTrend", { type: "line", data: { labels, datasets: [
-    { label: "คะแนนเฉลี่ย (%)", data: vals, borderColor: "#3b82f6", backgroundColor: "rgba(59, 130, 246, 0.1)", borderWidth: 2, fill: true, tension: 0.3, pointRadius: 4 },
-    { label: "เป้าหมาย (85%)", data: Array(labels.length).fill(TARGET), borderColor: "#ef4444", borderDash: [5, 5], borderWidth: 1.5, pointRadius: 0, fill: false }
-  ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } } });
-
-  const top = deptList.slice(0, 8);
-  mkChart("chDept", { type: "bar", data: { labels: top.map(d => d.dept.substring(0,12)), datasets: [
-    { label: "คะแนน", data: top.map(d => d.avg), backgroundColor: top.map(d => d.status === 'ok' ? '#10b981' : '#f59e0b'), borderRadius: 4, maxBarThickness: 32 }
-  ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } } });
-
-  // Table
-  const tbody = document.getElementById("t5s");
-  if (!deptList.length) { tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-folder-open"></i><br>ไม่มีข้อมูล 5S</td></tr>`; return; }
-  tbody.innerHTML = deptList.map(s => {
-    const color = s.status === 'ok' ? 'var(--success)' : 'var(--warning)';
-    return `<tr>
-      <td style="font-weight:600;">${esc(s.dept)}</td>
-      <td>${s.count} ครั้ง</td>
-      <td><strong style="font-size:15px; color:${color}">${s.avg}%</strong></td>
-      <td>
-        <div class="progress-bar"><div class="progress-fill" style="width:${s.avg}%; background:${color}"></div></div>
-      </td>
-      <td>${s.imp === 0 ? '<span class="badge bg-green">ยอดเยี่ยม</span>' : `<span class="badge bg-yellow">${s.imp} จุดต้องปรับ</span>`}</td>
-      <td class="text-right" style="color:var(--text-light); font-size:12px;">${s.last ? new Date(s.last).toLocaleDateString("th-TH") : "-"}</td>
-    </tr>`;
-  }).join("");
+  
+  mkChart("chTrend", {
+    type: "line",
+    data: { labels, datasets: [{ label: "คะแนนเฉลี่ย", data: vals, borderColor: "#10b981", tension: 0.3, fill: true, backgroundColor: "rgba(16, 185, 129, 0.1)" }] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
+  });
 }
 
-function renderSafety(ins, jobs) {
-  const safeIns = ins.filter(i => i.inspectionType !== "5S");
-  document.getElementById("ssCnt").textContent = safeIns.length;
+// ─── LOGIC 2: คำนวณ Aging (อายุงานค้าง) ───
+function processSafety(jobs) {
   document.getElementById("ssJob").textContent = jobs.length;
-  
-  const openC = jobs.filter(j => j.status === "Open").length;
-  const closedC = jobs.filter(j => j.status === "Closed").length;
-  document.getElementById("ssOpen").textContent = openC;
-  document.getElementById("ssClosed").textContent = closedC;
+  document.getElementById("ssClosed").textContent = jobs.filter(j => j.status === "Closed").length;
 
+  let aging = { "อยู่ในกำหนด": 0, "เลยกำหนด 1-7 วัน": 0, "เลยกำหนด >7 วัน": 0 };
+  let overdueCount = 0;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const openJobs = jobs.filter(j => j.status === "Open");
+  
+  openJobs.forEach(j => {
+    if(!j.dueDate) { aging["อยู่ในกำหนด"]++; return; }
+    
+    // แปลง dueDate เป็น Date object (รองรับ Format ทั่วไป)
+    // หมายเหตุ: หาก format ในชีตเป็นแบบแปลกๆ (เช่น DD/MM/YYYY) อาจต้องเขียน split แยก
+    let dDate = new Date(j.dueDate); 
+    if(isNaN(dDate)) { aging["อยู่ในกำหนด"]++; return; }
+    
+    dDate.setHours(0,0,0,0);
+    const diffTime = today - dDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 0) {
+      aging["อยู่ในกำหนด"]++;
+    } else if (diffDays <= 7) {
+      aging["เลยกำหนด 1-7 วัน"]++;
+      overdueCount++;
+    } else {
+      aging["เลยกำหนด >7 วัน"]++;
+      overdueCount++;
+    }
+  });
+
+  document.getElementById("ssOverdue").textContent = overdueCount;
+
+  // Aging Chart
+  mkChart("chAging", {
+    type: "bar",
+    data: {
+      labels: Object.keys(aging),
+      datasets: [{
+        data: Object.values(aging),
+        backgroundColor: ["#10b981", "#f59e0b", "#ef4444"],
+        borderRadius: 4
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+  });
+
+  // Risk Type Doughnut
   const byType = {};
   jobs.forEach(j => { const t = j.inspectionType || "อื่นๆ"; byType[t] = (byType[t] || 0) + 1; });
-  
-  mkChart("chJobType", { type: "bar", data: { labels: Object.keys(byType), datasets: [{ label: "รายการ", data: Object.values(byType), backgroundColor: "#6366f1", borderRadius: 4, maxBarThickness: 40 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } } });
-  mkChart("chJobStatus", { type: "doughnut", data: { labels: ["รอแก้ไข (Open)", "เสร็จสิ้น (Closed)"], datasets: [{ data: [openC, closedC], backgroundColor: ["#f59e0b", "#10b981"], borderWidth: 0, hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: "70%", plugins: { legend: { position: "bottom" } } } });
+  mkChart("chRisk", {
+    type: "doughnut",
+    data: {
+      labels: Object.keys(byType),
+      datasets: [{ data: Object.values(byType), backgroundColor: ["#3b82f6", "#6366f1", "#8b5cf6", "#ec4899", "#f43f5e"] }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, cutout: "65%", plugins: { legend: { position: "right" } } }
+  });
 
+  // Table (เรียงเอา Overdue ขึ้นก่อน)
   const tbody = document.getElementById("tSafety");
-  if (!jobs.length) { tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-check-circle" style="color:var(--success)"></i><br>ไม่มีงานความปลอดภัยคงค้าง</td></tr>`; return; }
+  if (!openJobs.length) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">ยอดเยี่ยม! ไม่มีงานความเสี่ยงคงค้าง</td></tr>`; return; }
   
-  const sorted = [...jobs].sort((a, b) => (a.status === "Open" ? -1 : 1));
-  tbody.innerHTML = sorted.map(j => `<tr>
-    <td style="font-family:'Inter',monospace; font-size:12px; color:var(--primary); font-weight:500;">${esc(j.jobId)}</td>
-    <td><span class="badge bg-gray">${esc(j.inspectionType || "-")}</span></td>
-    <td style="font-weight:500;">${esc(normArea(j.area))}</td>
-    <td style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${esc(j.problem)}">${esc(j.problem)}</td>
-    <td style="color:${j.status === 'Open' ? 'var(--danger)' : 'inherit'}">${j.dueDate || "-"}</td>
-    <td class="text-right"><span class="badge ${j.status === 'Open' ? 'bg-yellow' : 'bg-green'}">${j.status === 'Open' ? 'รอดำเนินการ' : 'ปิดงานแล้ว'}</span></td>
-  </tr>`).join("");
+  tbody.innerHTML = openJobs.map(j => {
+    let statusHtml = '<span class="badge bg-green">ในกำหนด</span>';
+    if(j.dueDate) {
+      let dDate = new Date(j.dueDate);
+      if(!isNaN(dDate) && today > dDate) {
+        const d = Math.floor((today - dDate) / (1000 * 60 * 60 * 24));
+        statusHtml = `<span class="badge ${d > 7 ? 'bg-red' : 'bg-yellow'}">ล่าช้า ${d} วัน</span>`;
+      }
+    }
+    return `<tr>
+      <td style="color:var(--primary); font-family:monospace;">${j.jobId || "-"}</td>
+      <td>${j.inspectionType || "-"}</td>
+      <td><b>${AREA_MAP[j.area] || j.area || "-"}</b></td>
+      <td>${j.problem || "-"}</td>
+      <td>${j.dueDate || "-"}</td>
+      <td>${statusHtml}</td>
+    </tr>`;
+  }).join("");
 }
 
 function mkChart(id, cfg) {
   if (charts[id]) charts[id].destroy();
   const c = document.getElementById(id);
   if (c) charts[id] = new Chart(c.getContext("2d"), cfg);
-}
-
-function esc(s) { return String(s || "").replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m])); }
-
-function showToast(msg, type = "i") {
-  const box = document.getElementById("toastBox");
-  box.innerHTML = type === "e" ? `<i class="fas fa-times-circle" style="color:#ef4444"></i> ${msg}` : `<i class="fas fa-check-circle" style="color:#10b981"></i> ${msg}`;
-  box.classList.add("show");
-  setTimeout(() => box.classList.remove("show"), 3000);
-}
-
-function exportCSV(type) {
-  const tblId = type === "5s" ? "t5s" : "tSafety";
-  const rows = Array.from(document.querySelectorAll(`#${tblId} tr`))
-    .map(tr => Array.from(tr.querySelectorAll("th, td")).map(td => td.textContent.trim()))
-    .filter(r => r.length > 1 && r[0]);
-  if (!rows.length) { showToast("ไม่มีข้อมูลสำหรับส่งออก", "e"); return; }
-  
-  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" }));
-  a.download = `${type}_Report_${new Date().toISOString().slice(0, 10)}.csv`;
-  a.click();
 }
 </script>
 </body>
