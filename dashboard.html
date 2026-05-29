@@ -39,9 +39,9 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 .brand { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--text-main); letter-spacing: -0.5px; }
 .brand i { color: var(--primary); }
 .filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-.filters select { height: 40px; padding: 0 32px 0 12px; border-radius: var(--radius-md); border: 1px solid var(--border); font-family: inherit; font-size: 14px; outline: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 8px center/16px; -webkit-appearance: none; cursor: pointer; }
-.btn-apply { height: 40px; padding: 0 20px; background: var(--text-main); color: white; border: none; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-family: inherit; transition: 0.2s; }
-.btn-apply:hover { background: #334155; }
+.filters select { height: 40px; padding: 0 32px 0 12px; border-radius: var(--radius-md); border: 1px solid var(--border); font-family: inherit; font-size: 14px; outline: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 8px center/16px; -webkit-appearance: none; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow-sm); }
+.filters select:hover { border-color: var(--primary); }
+.filters select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
 
 /* ─── LAYOUT ─── */
 .content { max-width: 1440px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 32px; }
@@ -52,57 +52,62 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 .grid-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .grid-cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
-.card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); }
+.card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; }
+.card:hover { box-shadow: var(--shadow-md); }
 .card-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
 .card-desc { font-size: 12px; color: var(--text-muted); font-weight: 400; display: block; margin-top: 4px; }
 .chart-wrap { position: relative; width: 100%; height: 280px; }
+.chart-wrap.short { height: 220px; }
 
 /* Gauge Specific */
 .gauge-container { position: relative; height: 200px; display: flex; justify-content: center; }
 .gauge-text { position: absolute; bottom: 0; text-align: center; }
-.gauge-val { font-size: 42px; font-weight: 700; line-height: 1; color: var(--text-main); }
+.gauge-val { font-size: 42px; font-weight: 700; line-height: 1; color: var(--text-main); transition: color 0.3s; }
 .gauge-sub { font-size: 14px; font-weight: 600; color: var(--text-muted); }
 
-/* Utilities */
-.badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
-.b-green { background: #d1fae5; color: #065f46; }
-.b-yellow { background: #fef3c7; color: #92400e; }
-.b-red { background: #fee2e2; color: #991b1b; }
+/* KPI Cards */
+.kpi-card { display: flex; align-items: center; gap: 16px; padding: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.kpi-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.kpi-info { display: flex; flex-direction: column; }
+.kpi-label { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+.kpi-value { font-size: 24px; font-weight: 700; line-height: 1; color: var(--text-main); }
+
+.icon-blue { background: #eff6ff; color: #3b82f6; }
+.icon-red { background: #fee2e2; color: #ef4444; }
+.icon-green { background: #d1fae5; color: #10b981; }
+.icon-amber { background: #fef3c7; color: #f59e0b; }
 
 @media (max-width: 1024px) { 
   .grid-cols-2, .grid-cols-3 { grid-template-columns: 1fr; } 
 }
 @media (max-width: 640px) { 
-  .filters { width: 100%; } .filters select, .btn-apply { flex: 1; min-width: 120px; } 
+  .filters { width: 100%; } .filters select { flex: 1; min-width: 120px; } 
   .content { padding: 16px; }
 }
 </style>
 </head>
 <body>
 
-<div id="loader"><div class="spinner"></div><div style="font-weight:500; color:var(--text-muted); margin-top:10px;">กำลังวิเคราะห์ข้อมูลเชิงลึก...</div></div>
+<div id="loader"><div class="spinner"></div><div style="font-weight:500; color:var(--text-muted); margin-top:10px;">กำลังโหลดข้อมูลตั้งต้น...</div></div>
 
 <header class="topbar">
   <div class="brand"><i class="fas fa-layer-group"></i> Ultimate Dashboard</div>
   <div class="filters">
-    <select id="timeRange">
+    <select id="timeRange" onchange="applyFilters()">
       <option value="month" selected>เดือนนี้</option>
       <option value="year">ปีนี้</option>
       <option value="all">ทั้งหมด</option>
     </select>
-    <select id="deptFilter"><option value="all">ทุกแผนก (All Areas)</option></select>
-    <button class="btn-apply" onclick="applyFilters()"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูล</button>
+    <select id="deptFilter" onchange="applyFilters()"><option value="all">ทุกแผนก (All Areas)</option></select>
   </div>
 </header>
 
 <div class="content">
 
-  <!-- ── 1. 5S EXECUTIVE INSIGHTS ── -->
   <section>
     <div class="section-header"><i class="fas fa-star" style="color:var(--warning)"></i> 5S Performance & Deep Analytics</div>
     
     <div class="grid-cols-3" style="margin-bottom:16px;">
-      <!-- Gauge Chart -->
       <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
         <div class="card-title">ภาพรวมคะแนน 5S (Gauge) <span class="card-desc">เป้าหมายองค์กร 85%</span></div>
         <div class="gauge-container">
@@ -114,7 +119,6 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
         </div>
       </div>
 
-      <!-- Radar Chart -->
       <div class="card" style="grid-column: span 2;">
         <div class="card-title">วิเคราะห์ 5 ส. รายหมวด (Radar Chart) <span class="card-desc">สมดุลของ สะสาง, สะดวก, สะอาด, สุขลักษณะ, สร้างนิสัย</span></div>
         <div class="chart-wrap"><canvas id="chRadar"></canvas></div>
@@ -122,13 +126,11 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
     </div>
 
     <div class="grid-cols-2">
-      <!-- 100% Stacked Bar -->
       <div class="card">
         <div class="card-title">คุณภาพ 5S แยกรายแผนก (Stacked Bar) <span class="card-desc">สัดส่วน ดี (เขียว) / พอใช้ (เหลือง) / ปรับปรุง (แดง)</span></div>
         <div class="chart-wrap"><canvas id="chStacked"></canvas></div>
       </div>
 
-      <!-- Pareto Chart -->
       <div class="card">
         <div class="card-title">Top 5 ปัญหาที่ต้องปรับปรุง (Pareto) <span class="card-desc">หัวข้อที่ถูกหักคะแนนบ่อยที่สุด (กฎ 80/20)</span></div>
         <div class="chart-wrap"><canvas id="chPareto"></canvas></div>
@@ -136,30 +138,61 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
     </div>
   </section>
 
-  <!-- ── 2. SAFETY & CROSS ANALYSIS ── -->
   <section>
-    <div class="section-header"><i class="fas fa-shield-alt" style="color:var(--success)"></i> Safety & Executive Cross-Analysis</div>
+    <div class="section-header"><i class="fas fa-shield-alt" style="color:var(--success)"></i> Safety & Action Plan Summary</div>
     
-    <div class="grid-cols-2">
-      <!-- Scatter Plot (Cross Analysis) -->
-      <div class="card">
-        <div class="card-title">ความเชื่อมโยง 5S และ Safety (Scatter Plot) <span class="card-desc">แกน X: คะแนน 5S (%) | แกน Y: อัตราปิดงาน Safety (%)</span></div>
-        <div class="chart-wrap"><canvas id="chScatter"></canvas></div>
+    <div class="grid-cols-4" style="margin-bottom:16px;">
+      <div class="kpi-card">
+        <div class="kpi-icon icon-blue"><i class="fas fa-clipboard-list"></i></div>
+        <div class="kpi-info"><span class="kpi-label">งานทั้งหมด (Total Jobs)</span><span class="kpi-value" id="sfTotal">0</span></div>
       </div>
-
-      <!-- Aging Report -->
-      <div class="card">
-        <div class="card-title">สถานะความล่าช้างาน Safety (Aging) <span class="card-desc">อายุงานค้างที่ยังไม่ได้รับการแก้ไข (Open)</span></div>
-        <div class="chart-wrap"><canvas id="chAging"></canvas></div>
+      <div class="kpi-card">
+        <div class="kpi-icon icon-red"><i class="fas fa-spinner"></i></div>
+        <div class="kpi-info"><span class="kpi-label">รอแก้ไข (Open)</span><span class="kpi-value" id="sfOpen">0</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon icon-green"><i class="fas fa-check-double"></i></div>
+        <div class="kpi-info"><span class="kpi-label">แก้ไขแล้ว (Closed)</span><span class="kpi-value" id="sfClosed">0</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon icon-amber"><i class="fas fa-chart-line"></i></div>
+        <div class="kpi-info"><span class="kpi-label">อัตราปิดงานสำเร็จ</span><span class="kpi-value" id="sfRate">0%</span></div>
       </div>
     </div>
+
+    <div class="grid-cols-3" style="margin-bottom:16px;">
+      <div class="card">
+        <div class="card-title">สัดส่วนสถานะงาน (Status)</div>
+        <div class="chart-wrap short"><canvas id="chSafeStatus"></canvas></div>
+      </div>
+      <div class="card" style="grid-column: span 2;">
+        <div class="card-title">ปริมาณงานแยกตามแผนก (Issues by Dept) <span class="card-desc">สีแดง = ค้างอยู่ (Open), สีเขียว = เสร็จแล้ว (Closed)</span></div>
+        <div class="chart-wrap short"><canvas id="chSafeDept"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-cols-3">
+      <div class="card">
+        <div class="card-title">ประเภทความเสี่ยง (By Category)</div>
+        <div class="chart-wrap"><canvas id="chSafeType"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">ความล่าช้างานค้าง (Aging Report) <span class="card-desc">เฉพาะงานที่สถานะ Open</span></div>
+        <div class="chart-wrap"><canvas id="chAging"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">5S vs Safety (Scatter Plot) <span class="card-desc">ประสิทธิภาพการประเมินและการแก้ปัญหา</span></div>
+        <div class="chart-wrap"><canvas id="chScatter"></canvas></div>
+      </div>
+    </div>
+
   </section>
 
 </div>
 
 <script>
 // ==========================================
-// 1. DATA & CHECKLIST CONFIGURATION
+// 1. DATA & CONFIGURATION
 // ==========================================
 const API = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
 const TARGET = 85;
@@ -194,7 +227,7 @@ let raw = { ins: [], jobs: [] };
 let charts = {};
 
 // ==========================================
-// 2. INITIALIZATION & DATA FETCHING
+// 2. INITIALIZATION
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById("deptFilter");
@@ -231,11 +264,10 @@ function applyFilters() {
   });
 
   const jobs = raw.jobs.filter(j => dept === "all" || (AREA_MAP[j.area] || String(j.area).toUpperCase()) === dept);
-
   processCharts(ins, jobs);
 }
 
-// Helper: แปลงชื่อหัวข้อเป็น S1-S5
+// Helpers
 function get5SCat(area, sIndex) {
   if (!CHECKLIST_5S[area] || !CHECKLIST_5S[area].sections[sIndex]) return null;
   const t = CHECKLIST_5S[area].sections[sIndex].title;
@@ -244,26 +276,26 @@ function get5SCat(area, sIndex) {
   if (t.includes("เครื่องจักร") || t.includes("พื้น") || t.includes("อาหาร") || t.includes("LOCKER") || t.includes("สุขา") || t.includes("ทางเข้า") || t.includes("กาแฟ")) return "ส3. สะอาด";
   if (t.includes("สุขลักษณะ")) return "ส4. สุขลักษณะ";
   if (t.includes("ตระหนัก")) return "ส5. สร้างนิสัย";
-  return "ส1. สะสาง"; // Default
+  return "ส1. สะสาง"; 
 }
-
-// Helper: หาข้อความคำถามจาก Key (เช่น 5s_s1_q2)
 function getQuestionText(area, sIndex, qIndex) {
   if (CHECKLIST_5S[area] && CHECKLIST_5S[area].sections[sIndex] && CHECKLIST_5S[area].sections[sIndex].qs[qIndex]) {
     return CHECKLIST_5S[area].sections[sIndex].qs[qIndex];
   }
   return `หมวด ${sIndex} ข้อ ${qIndex}`;
 }
+function mkChart(id, cfg) {
+  if (charts[id]) charts[id].destroy();
+  const c = document.getElementById(id);
+  if (c) charts[id] = new Chart(c.getContext("2d"), cfg);
+}
 
 // ==========================================
-// 3. MAIN LOGIC: RENDER ALL 4 NEW CHARTS
+// 3. RENDER CHARTS (5S & SAFETY)
 // ==========================================
 function processCharts(ins, jobs) {
+  // --------- 5S LOGIC ---------
   const data5S = ins.filter(i => String(i.inspectionType).toUpperCase() === "5S");
-  
-  // ----------------------------------------------------
-  // CHART 1: GAUGE CHART (ภาพรวมคะแนน)
-  // ----------------------------------------------------
   const scores = data5S.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
   const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
   
@@ -271,49 +303,26 @@ function processCharts(ins, jobs) {
   document.getElementById("gVal").style.color = avg >= TARGET ? "var(--success)" : "var(--danger)";
   document.getElementById("gSub").textContent = avg >= TARGET ? "ผ่านเกณฑ์มาตรฐาน" : "ต้องเร่งปรับปรุง";
 
-  // แบ่งสัดส่วน Gauge (ต่ำกว่าเป้า vs ผ่านเป้า)
   mkChart("chGauge", {
-    type: "doughnut",
-    data: {
-      labels: ["ต้องปรับปรุง", "พอใช้", "ดีเยี่ยม"],
-      datasets: [{ data: [70, 15, 15], backgroundColor: ["#ef4444", "#f59e0b", "#10b981"], borderWidth: 0 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      circumference: 180, rotation: 270, cutout: "80%",
-      plugins: { legend: { display: false }, tooltip: { enabled: false } }
-    }
+    type: "doughnut", data: { labels: ["ต้องปรับปรุง", "พอใช้", "ดีเยี่ยม"], datasets: [{ data: [70, 15, 15], backgroundColor: ["#ef4444", "#f59e0b", "#10b981"], borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, circumference: 180, rotation: 270, cutout: "80%", plugins: { legend: { display: false }, tooltip: { enabled: false } } }
   });
 
-  // ----------------------------------------------------
-  // CHART 2: RADAR CHART (5 ส.)
-  // ----------------------------------------------------
   const sCats = { "ส1. สะสาง": { s: 0, m: 0 }, "ส2. สะดวก": { s: 0, m: 0 }, "ส3. สะอาด": { s: 0, m: 0 }, "ส4. สุขลักษณะ": { s: 0, m: 0 }, "ส5. สร้างนิสัย": { s: 0, m: 0 } };
-  const paretoCount = {}; // สำหรับ Chart 4
-
-  const deptQuality = {}; // สำหรับ Chart 3
+  const paretoCount = {}; const deptQuality = {}; 
   
   data5S.forEach(i => {
     const area = i.area;
-    if(!deptQuality[area]) deptQuality[area] = { g: 0, f: 0, b: 0 }; // Good, Fair, Bad
-
+    if(!deptQuality[area]) deptQuality[area] = { g: 0, f: 0, b: 0 }; 
     Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
       const match = k.match(/^5s_s(\d+)_q(\d+)/); 
       if (match) {
-        // สำหรับ Radar
         const cat = get5SCat(area, parseInt(match[1]));
         if (cat && sCats[cat]) {
           sCats[cat].m += 1;
-          if (v === "ดี") sCats[cat].s += 1;
-          else if (v === "พอใช้") sCats[cat].s += 0.5;
+          if (v === "ดี") sCats[cat].s += 1; else if (v === "พอใช้") sCats[cat].s += 0.5;
         }
-
-        // สำหรับ Stacked Bar
-        if(v === "ดี") deptQuality[area].g++;
-        else if(v === "พอใช้") deptQuality[area].f++;
-        else if(v === "ปรับปรุง") deptQuality[area].b++;
-
-        // สำหรับ Pareto
+        if(v === "ดี") deptQuality[area].g++; else if(v === "พอใช้") deptQuality[area].f++; else if(v === "ปรับปรุง") deptQuality[area].b++;
         if (v === "ปรับปรุง") {
           const qText = getQuestionText(area, parseInt(match[1]), parseInt(match[2]));
           paretoCount[qText] = (paretoCount[qText] || 0) + 1;
@@ -324,82 +333,88 @@ function processCharts(ins, jobs) {
 
   const radarData = Object.values(sCats).map(c => c.m > 0 ? Math.round((c.s / c.m) * 100) : 0);
   mkChart("chRadar", {
-    type: "radar",
-    data: { labels: Object.keys(sCats), datasets: [{ label: "คะแนน (%)", data: radarData, backgroundColor: "rgba(37, 99, 235, 0.2)", borderColor: "#2563eb", borderWidth: 2 }] },
+    type: "radar", data: { labels: Object.keys(sCats), datasets: [{ label: "คะแนน (%)", data: radarData, backgroundColor: "rgba(37, 99, 235, 0.2)", borderColor: "#2563eb", borderWidth: 2 }] },
     options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100 } } }
   });
 
-  // ----------------------------------------------------
-  // CHART 3: 100% STACKED BAR (คุณภาพคะแนนรายแผนก)
-  // ----------------------------------------------------
   const deptLabels = Object.keys(deptQuality);
   const pGood = [], pFair = [], pBad = [];
-  
   deptLabels.forEach(d => {
     const total = deptQuality[d].g + deptQuality[d].f + deptQuality[d].b;
-    if(total > 0) {
-      pGood.push((deptQuality[d].g / total) * 100);
-      pFair.push((deptQuality[d].f / total) * 100);
-      pBad.push((deptQuality[d].b / total) * 100);
-    } else { pGood.push(0); pFair.push(0); pBad.push(0); }
+    if(total > 0) { pGood.push((deptQuality[d].g / total) * 100); pFair.push((deptQuality[d].f / total) * 100); pBad.push((deptQuality[d].b / total) * 100); } 
+    else { pGood.push(0); pFair.push(0); pBad.push(0); }
   });
 
   mkChart("chStacked", {
     type: "bar",
-    data: {
-      labels: deptLabels.map(l => l.substring(0,8)),
-      datasets: [
-        { label: "ดี", data: pGood, backgroundColor: "#10b981" },
-        { label: "พอใช้", data: pFair, backgroundColor: "#f59e0b" },
-        { label: "ปรับปรุง", data: pBad, backgroundColor: "#ef4444" }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: { x: { stacked: true }, y: { stacked: true, max: 100 } },
-      plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${Math.round(c.raw)}%` } } }
-    }
+    data: { labels: deptLabels.map(l => l.substring(0,8)), datasets: [ { label: "ดี", data: pGood, backgroundColor: "#10b981" }, { label: "พอใช้", data: pFair, backgroundColor: "#f59e0b" }, { label: "ปรับปรุง", data: pBad, backgroundColor: "#ef4444" } ] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, max: 100 } }, plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${Math.round(c.raw)}%` } } } }
   });
 
-  // ----------------------------------------------------
-  // CHART 4: PARETO CHART (กฎ 80/20 ปัญหาพบบ่อยสุด)
-  // ----------------------------------------------------
-  // เรียงลำดับปัญหาจากมากไปน้อย (เอาแค่ Top 5)
   const sortedIssues = Object.entries(paretoCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const pLabels = sortedIssues.map(i => i[0].substring(0, 20) + "...");
   const pData = sortedIssues.map(i => i[1]);
-  
   let totalIssues = pData.reduce((a, b) => a + b, 0);
   let cumSum = 0;
-  const pLine = pData.map(val => {
-    cumSum += val;
-    return totalIssues > 0 ? (cumSum / totalIssues) * 100 : 0;
-  });
+  const pLine = pData.map(val => { cumSum += val; return totalIssues > 0 ? (cumSum / totalIssues) * 100 : 0; });
 
   mkChart("chPareto", {
     type: "bar",
-    data: {
-      labels: pLabels,
-      datasets: [
-        { type: "line", label: "% สะสม", data: pLine, borderColor: "#ef4444", yAxisID: "y1", tension: 0.1, fill: false },
-        { type: "bar", label: "จำนวนครั้งที่พบ", data: pData, backgroundColor: "#64748b", yAxisID: "y", borderRadius: 4 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: {
-        y: { type: "linear", position: "left", title: { display: true, text: 'จำนวนครั้ง' } },
-        y1: { type: "linear", position: "right", min: 0, max: 100, grid: { drawOnChartArea: false }, title: { display: true, text: 'เปอร์เซ็นต์สะสม (%)' } }
-      }
-    }
+    data: { labels: pLabels, datasets: [ { type: "line", label: "% สะสม", data: pLine, borderColor: "#ef4444", yAxisID: "y1", tension: 0.1, fill: false }, { type: "bar", label: "จำนวนครั้งที่พบ", data: pData, backgroundColor: "#64748b", yAxisID: "y", borderRadius: 4 } ] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: "linear", position: "left", title: { display: true, text: 'ครั้ง' } }, y1: { type: "linear", position: "right", min: 0, max: 100, grid: { drawOnChartArea: false } } } }
   });
 
-  // ----------------------------------------------------
-  // CHART 5: AGING REPORT (งานค้าง Safety)
-  // ----------------------------------------------------
+  // --------- SAFETY LOGIC ---------
+  const totalSafe = jobs.length;
+  const openSafe = jobs.filter(j => j.status === "Open").length;
+  const closedSafe = totalSafe - openSafe;
+  const rateSafe = totalSafe > 0 ? Math.round((closedSafe / totalSafe) * 100) : 0;
+
+  document.getElementById("sfTotal").textContent = totalSafe;
+  document.getElementById("sfOpen").textContent = openSafe;
+  document.getElementById("sfClosed").textContent = closedSafe;
+  document.getElementById("sfRate").textContent = rateSafe + "%";
+  document.getElementById("sfRate").style.color = rateSafe >= 80 ? "var(--success)" : (rateSafe >= 50 ? "var(--warning)" : "var(--danger)");
+
+  // Status Doughnut
+  mkChart("chSafeStatus", {
+    type: "doughnut",
+    data: { labels: ["รอแก้ไข (Open)", "เสร็จสิ้น (Closed)"], datasets: [{ data: [openSafe, closedSafe], backgroundColor: ["#ef4444", "#10b981"], borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, cutout: "65%", plugins: { legend: { position: "bottom" } } }
+  });
+
+  // Issues by Dept (Stacked Bar)
+  const dSafe = {};
+  jobs.forEach(j => {
+    const area = AREA_MAP[j.area] || String(j.area).toUpperCase();
+    if(!dSafe[area]) dSafe[area] = { open: 0, closed: 0 };
+    if(j.status === "Open") dSafe[area].open++; else dSafe[area].closed++;
+  });
+  
+  const safeDeptLabels = Object.keys(dSafe);
+  const safeOpenData = safeDeptLabels.map(d => dSafe[d].open);
+  const safeClosedData = safeDeptLabels.map(d => dSafe[d].closed);
+
+  mkChart("chSafeDept", {
+    type: "bar",
+    data: { labels: safeDeptLabels.map(l => l.substring(0,8)), datasets: [ { label: "เสร็จแล้ว (Closed)", data: safeClosedData, backgroundColor: "#10b981" }, { label: "ค้างอยู่ (Open)", data: safeOpenData, backgroundColor: "#ef4444" } ] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+  });
+
+  // Issues by Category (Horizontal Bar)
+  const safeTypes = {};
+  jobs.forEach(j => { const t = j.inspectionType || "อื่นๆ"; safeTypes[t] = (safeTypes[t] || 0) + 1; });
+  const sortedTypes = Object.entries(safeTypes).sort((a,b) => b[1] - a[1]);
+
+  mkChart("chSafeType", {
+    type: "bar",
+    data: { labels: sortedTypes.map(t => t[0]), datasets: [{ label: "จำนวน", data: sortedTypes.map(t => t[1]), backgroundColor: "#3b82f6", borderRadius: 4 }] },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
+  });
+
+  // Aging Report
   const aging = { "ในกำหนด": 0, "เลย 1-7 วัน": 0, "เลย >7 วัน": 0 };
   const today = new Date(); today.setHours(0,0,0,0);
-  
   jobs.filter(j => j.status === "Open").forEach(j => {
     if(!j.dueDate) { aging["ในกำหนด"]++; return; }
     let d = new Date(j.dueDate); d.setHours(0,0,0,0);
@@ -414,12 +429,8 @@ function processCharts(ins, jobs) {
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
   });
 
-  // ----------------------------------------------------
-  // CHART 6: SCATTER PLOT (Cross Analysis 5S vs Safety)
-  // ----------------------------------------------------
+  // Scatter Plot (Cross Analysis)
   const crossData = [];
-  
-  // คำนวณคะแนน 5S รายแผนก
   const dScore = {};
   data5S.forEach(i => {
     if(!dScore[i.area]) dScore[i.area] = [];
@@ -427,57 +438,22 @@ function processCharts(ins, jobs) {
     if(!isNaN(p)) dScore[i.area].push(p);
   });
 
-  // คำนวณ % การปิดงาน Safety รายแผนก
-  const dSafety = {};
-  jobs.forEach(j => {
-    const area = AREA_MAP[j.area] || String(j.area).toUpperCase();
-    if(!dSafety[area]) dSafety[area] = { total: 0, closed: 0 };
-    dSafety[area].total++;
-    if(j.status === "Closed") dSafety[area].closed++;
-  });
-
   DEPTS.forEach(d => {
     const s5_avg = dScore[d] && dScore[d].length > 0 ? (dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length) : null;
-    const safe_rate = dSafety[d] && dSafety[d].total > 0 ? (dSafety[d].closed / dSafety[d].total) * 100 : null;
-    
-    // พล็อตเฉพาะแผนกที่มีข้อมูลทั้ง 2 อย่าง
-    if(s5_avg !== null && safe_rate !== null) {
-      crossData.push({ x: s5_avg, y: safe_rate, dept: d });
-    }
+    const sArea = dSafe[d];
+    const safe_rate = sArea && (sArea.open + sArea.closed > 0) ? (sArea.closed / (sArea.open + sArea.closed)) * 100 : null;
+    if(s5_avg !== null && safe_rate !== null) crossData.push({ x: s5_avg, y: safe_rate, dept: d });
   });
 
   mkChart("chScatter", {
     type: "scatter",
-    data: {
-      datasets: [{
-        label: "แผนก",
-        data: crossData,
-        backgroundColor: "#2563eb",
-        pointRadius: 6,
-        pointHoverRadius: 8
-      }]
-    },
+    data: { datasets: [{ label: "แผนก", data: crossData, backgroundColor: "#2563eb", pointRadius: 6, pointHoverRadius: 8 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
-      scales: {
-        x: { min: 0, max: 100, title: { display: true, text: 'คะแนนเฉลี่ย 5S (%)' } },
-        y: { min: 0, max: 100, title: { display: true, text: 'อัตราการปิดงาน Safety สำเร็จ (%)' } }
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: { label: (c) => `${c.raw.dept}: 5S = ${Math.round(c.raw.x)}%, Safety = ${Math.round(c.raw.y)}%` }
-        }
-      }
+      scales: { x: { min: 0, max: 100, title: { display: true, text: 'คะแนน 5S (%)' } }, y: { min: 0, max: 100, title: { display: true, text: 'ปิดงาน Safety (%)' } } },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw.dept}: 5S = ${Math.round(c.raw.x)}%, Safety = ${Math.round(c.raw.y)}%` } } }
     }
   });
-}
-
-// สร้างกราฟและทำลายกราฟเก่าทิ้ง (กันกราฟซ้อน)
-function mkChart(id, cfg) {
-  if (charts[id]) charts[id].destroy();
-  const c = document.getElementById(id);
-  if (c) charts[id] = new Chart(c.getContext("2d"), cfg);
 }
 </script>
 </body>
