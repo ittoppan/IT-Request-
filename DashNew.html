@@ -328,18 +328,11 @@ if (is5S) {
    const color = percent >= 80 ? 'var(--success)' : percent >= 50 ? '#f39c12' : 'var(--danger)';
    statusHtml = `<span style="background:${color}20;color:${color};padding:5px 12px;border-radius:18px;font-size:0.8rem;font-weight:600;white-space:nowrap;"><i class="fas fa-chart-pie"></i> ${percent}%</span>`;
 } else {
-   // ✅ Safety: แสดงคะแนน % + สถานะ
-   const checklist = getSafetyChecklist(d.area);
-   
-   
-// ❌ ลบหรือคอมเมนต์บรรทัดนี้ใน renderTable():
-// const scoreInfo = calculateSafetyScore(d.fullChecklist, checklist, d.area);
-
-// ✅ ใช้แค่แสดงสถานะปกติ/พบปัญหาแทน:
-const statusText = d.hasBad ? 'พบปัญหา' : 'ปกติ';
-const statusColor = d.hasBad ? 'var(--danger)' : 'var(--success)';
-statusHtml = `<span class="badge" style="background:${statusColor}">${statusText}</span>`;
-     </div>
+   // ✅ Safety: แสดงแค่สถานะ "ปกติ/พบปัญหา" (ไม่มีคะแนน %)
+   const statusText = d.hasBad ? 'พบปัญหา' : 'ปกติ';
+   const statusColor = d.hasBad ? 'var(--danger)' : 'var(--success)';
+   statusHtml = `<span class="badge" style="background:${statusColor}">${statusText}</span>`;
+}
   
 
 
