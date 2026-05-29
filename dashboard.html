@@ -94,10 +94,11 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
   <div class="brand"><i class="fas fa-layer-group"></i> Ultimate Dashboard</div>
   <div class="filters">
     <select id="timeRange" onchange="applyFilters()">
-      <option value="month" selected>เดือนนี้</option>
+      <option value="today">วันนี้</option>
+      <option value="week">สัปดาห์นี้</option>
+      <option value="month">เดือนนี้</option>
       <option value="year">ปีนี้</option>
-      <option value="all">ทั้งหมด</option>
-    </select>
+      <option value="all" selected>ทั้งหมด (All Time)</option> </select>
     <select id="deptFilter" onchange="applyFilters()"><option value="all">ทุกแผนก (All Areas)</option></select>
   </div>
 </header>
@@ -122,6 +123,13 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
       <div class="card" style="grid-column: span 2;">
         <div class="card-title">วิเคราะห์ 5 ส. รายหมวด (Radar Chart) <span class="card-desc">สมดุลของ สะสาง, สะดวก, สะอาด, สุขลักษณะ, สร้างนิสัย</span></div>
         <div class="chart-wrap"><canvas id="chRadar"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-cols-2" style="margin-bottom:16px;">
+      <div class="card" style="grid-column: span 2;">
+        <div class="card-title">แนวโน้มคะแนน 5S รายเดือน (Monthly Trend) <span class="card-desc">เปรียบเทียบพัฒนาการของโรงงานในแต่ละเดือน</span></div>
+        <div class="chart-wrap"><canvas id="chMonthly"></canvas></div>
       </div>
     </div>
 
@@ -252,6 +260,8 @@ function applyFilters() {
   const dept = document.getElementById("deptFilter").value;
   const tr = document.getElementById("timeRange").value;
   const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekAgo = new Date(today - 7 * 864e5);
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const yearStart = new Date(now.getFullYear(), 0, 1);
 
@@ -260,7 +270,11 @@ function applyFilters() {
     if (tr === "all") return true;
     const d = new Date((i.timestamp || "").replace(" ", "T"));
     if (isNaN(d)) return true;
-    return tr === "month" ? d >= monthStart : d >= yearStart;
+    if (tr === "today") return d >= today;
+    if (tr === "week") return d >= weekAgo;
+    if (tr === "month") return d >= monthStart;
+    if (tr === "year") return d >= yearStart;
+    return true;
   });
 
   const jobs = raw.jobs.filter(j => dept === "all" || (AREA_MAP[j.area] || String(j.area).toUpperCase()) === dept);
@@ -310,8 +324,22 @@ function processCharts(ins, jobs) {
 
   const sCats = { "ส1. สะสาง": { s: 0, m: 0 }, "ส2. สะดวก": { s: 0, m: 0 }, "ส3. สะอาด": { s: 0, m: 0 }, "ส4. สุขลักษณะ": { s: 0, m: 0 }, "ส5. สร้างนิสัย": { s: 0, m: 0 } };
   const paretoCount = {}; const deptQuality = {}; 
+  const monthlyData = {}; // สำหรับเก็บคะแนนรายเดือน
   
   data5S.forEach(i => {
+    // --- Monthly Trend Data ---
+    const dateStr = i.timestamp || "";
+    let d = new Date(dateStr.replace(" ", "T"));
+    if(!isNaN(d)) {
+      let ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const p = parseFloat(i.score?.percent);
+      if(!isNaN(p)) {
+        if(!monthlyData[ym]) monthlyData[ym] = [];
+        monthlyData[ym].push(p);
+      }
+    }
+
+    // --- Radar & Pareto Data ---
     const area = i.area;
     if(!deptQuality[area]) deptQuality[area] = { g: 0, f: 0, b: 0 }; 
     Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
@@ -331,12 +359,42 @@ function processCharts(ins, jobs) {
     });
   });
 
+  // Render Radar
   const radarData = Object.values(sCats).map(c => c.m > 0 ? Math.round((c.s / c.m) * 100) : 0);
   mkChart("chRadar", {
     type: "radar", data: { labels: Object.keys(sCats), datasets: [{ label: "คะแนน (%)", data: radarData, backgroundColor: "rgba(37, 99, 235, 0.2)", borderColor: "#2563eb", borderWidth: 2 }] },
     options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100 } } }
   });
 
+  // Render Monthly Trend
+  const monthsKeys = Object.keys(monthlyData).sort();
+  const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+  const monthLabels = monthsKeys.map(m => {
+    const [y, mm] = m.split('-');
+    return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`;
+  });
+  const monthScores = monthsKeys.map(m => {
+    const arr = monthlyData[m];
+    return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
+  });
+
+  mkChart("chMonthly", {
+    type: "line",
+    data: {
+      labels: monthLabels.length ? monthLabels : ["ยังไม่มีข้อมูล"],
+      datasets: [
+        { label: "คะแนนเฉลี่ย (%)", data: monthScores, borderColor: "#2563eb", backgroundColor: "rgba(37, 99, 235, 0.1)", fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2 },
+        { label: "เป้าหมาย (85%)", data: Array(monthLabels.length || 1).fill(TARGET), borderColor: "#ef4444", borderDash: [5, 5], borderWidth: 1.5, pointRadius: 0, fill: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { y: { min: 0, max: 100 } },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // Render Stacked Bar
   const deptLabels = Object.keys(deptQuality);
   const pGood = [], pFair = [], pBad = [];
   deptLabels.forEach(d => {
@@ -351,6 +409,7 @@ function processCharts(ins, jobs) {
     options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, max: 100 } }, plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${Math.round(c.raw)}%` } } } }
   });
 
+  // Render Pareto
   const sortedIssues = Object.entries(paretoCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const pLabels = sortedIssues.map(i => i[0].substring(0, 20) + "...");
   const pData = sortedIssues.map(i => i[1]);
@@ -360,7 +419,7 @@ function processCharts(ins, jobs) {
 
   mkChart("chPareto", {
     type: "bar",
-    data: { labels: pLabels, datasets: [ { type: "line", label: "% สะสม", data: pLine, borderColor: "#ef4444", yAxisID: "y1", tension: 0.1, fill: false }, { type: "bar", label: "จำนวนครั้งที่พบ", data: pData, backgroundColor: "#64748b", yAxisID: "y", borderRadius: 4 } ] },
+    data: { labels: pLabels.length ? pLabels : ["-"], datasets: [ { type: "line", label: "% สะสม", data: pLine, borderColor: "#ef4444", yAxisID: "y1", tension: 0.1, fill: false }, { type: "bar", label: "จำนวนครั้งที่พบ", data: pData, backgroundColor: "#64748b", yAxisID: "y", borderRadius: 4 } ] },
     options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: "linear", position: "left", title: { display: true, text: 'ครั้ง' } }, y1: { type: "linear", position: "right", min: 0, max: 100, grid: { drawOnChartArea: false } } } }
   });
 
@@ -383,7 +442,7 @@ function processCharts(ins, jobs) {
     options: { responsive: true, maintainAspectRatio: false, cutout: "65%", plugins: { legend: { position: "bottom" } } }
   });
 
-  // Issues by Dept (Stacked Bar)
+  // Issues by Dept
   const dSafe = {};
   jobs.forEach(j => {
     const area = AREA_MAP[j.area] || String(j.area).toUpperCase();
@@ -401,7 +460,7 @@ function processCharts(ins, jobs) {
     options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
   });
 
-  // Issues by Category (Horizontal Bar)
+  // Issues by Category
   const safeTypes = {};
   jobs.forEach(j => { const t = j.inspectionType || "อื่นๆ"; safeTypes[t] = (safeTypes[t] || 0) + 1; });
   const sortedTypes = Object.entries(safeTypes).sort((a,b) => b[1] - a[1]);
@@ -429,7 +488,7 @@ function processCharts(ins, jobs) {
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
   });
 
-  // Scatter Plot (Cross Analysis)
+  // Scatter Plot
   const crossData = [];
   const dScore = {};
   data5S.forEach(i => {
