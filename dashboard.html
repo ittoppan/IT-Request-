@@ -8,201 +8,217 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
+/* ─── SHADCN/UI DESIGN TOKENS ─── */
 :root {
-  --orange:#E65100; --orange-mid:#F57C00; --orange-light:#FFF3E0; --orange-pale:#FFF8F0;
-  --green:#10B981; --green-light:#E8F5E9;
-  --red:#EF4444; --red-light:#FEE2E2;
-  --amber:#F59E0B; --amber-light:#FEF3C7;
-  --blue:#3B82F6; --blue-light:#EFF6FF;
-  --dark:#1E293B; --dark2:#334155; --gray:#64748B; --gray-lt:#94A3B8;
-  --bg:#F1F5F9; --card:#FFFFFF; --border:#E2E8F0;
-  --r8:8px; --r12:12px; --r16:16px; --r20:20px;
-  --shadow-xs:0 1px 2px rgba(0,0,0,0.05);
-  --shadow-sm:0 2px 8px rgba(0,0,0,0.06);
-  --shadow-md:0 4px 16px rgba(0,0,0,0.08);
-  --nav-h:56px; --bottom-h:60px;
+  --background: #ffffff;
+  --foreground: #020817;
+  --card: #ffffff;
+  --card-foreground: #020817;
+  --popover: #ffffff;
+  --popover-foreground: #020817;
+  --primary: #0f172a;
+  --primary-foreground: #f8fafc;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --destructive: #ef4444;
+  --destructive-foreground: #f8fafc;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #94a3b8;
+  --radius: 0.5rem;
+  
+  /* Semantic Colors for Dashboard */
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --success-foreground: #065f46;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --warning-foreground: #92400e;
+  --danger: #ef4444;
+  --danger-light: #fee2e2;
+  --danger-foreground: #7f1d1d;
+
+  --nav-h: 64px; 
+  --bottom-h: 64px;
 }
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow-x:hidden}
-body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--dark);line-height:1.5;-webkit-font-smoothing:antialiased}
+body{
+  font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f8fafc; /* Very light slate for contrast against cards */
+  color: var(--foreground);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
 
 /* ─── LOADER ─── */
-#loader{position:fixed;inset:0;background:rgba(255,255,255,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:12px;transition:opacity .3s}
+#loader{position:fixed;inset:0;background:rgba(255,255,255,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;transition:opacity .3s}
 #loader.hide{opacity:0;pointer-events:none}
-.spin-ring{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite}
+.spin-ring{width:32px;height:32px;border:3px solid var(--muted);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.load-txt{font-size:13px;color:var(--gray)}
+.load-txt{font-size:14px;color:var(--muted-foreground);font-weight:500;}
 
-/* ─── TOP NAV ─── */
-.top-nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:var(--dark);z-index:500;display:flex;align-items:center;padding:0 16px;gap:12px}
-.nav-logo{width:28px;height:28px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.nav-logo i{color:#fff;font-size:14px}
-.nav-title{flex:1;font-size:15px;font-weight:600;color:#fff;letter-spacing:.2px}
-.nav-title span{color:var(--orange-mid);font-size:11px;font-weight:400;display:block;margin-top:-2px}
-.nav-actions{display:flex;gap:6px}
-.nav-btn{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.08);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:background .2s}
-.nav-btn:hover{background:rgba(255,255,255,.16)}
+/* ─── TOP NAV (Shadcn Header) ─── */
+.top-nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:var(--background);border-bottom:1px solid var(--border);z-index:500;display:flex;align-items:center;padding:0 24px;gap:12px}
+@supports (backdrop-filter: blur(10px)) {
+  .top-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+}
+.nav-logo{width:32px;height:32px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-logo i{color:var(--primary-foreground);font-size:14px}
+.nav-title{flex:1;font-size:16px;font-weight:600;color:var(--foreground);letter-spacing:-0.02em}
+.nav-title span{color:var(--muted-foreground);font-size:12px;font-weight:500;display:block;margin-top:-2px}
+.nav-actions{display:flex;gap:8px}
+.nav-btn{width:36px;height:36px;border-radius:var(--radius);background:transparent;border:1px solid var(--border);color:var(--foreground);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
+.nav-btn:hover{background:var(--accent);color:var(--accent-foreground)}
 
 /* ─── LAYOUT ─── */
-.main-wrap{padding-top:var(--nav-h);padding-bottom:calc(var(--bottom-h) + 12px);min-height:100vh}
-.content{max-width:1280px;margin:0 auto;padding:16px}
+.main-wrap{padding-top:calc(var(--nav-h) + 16px);padding-bottom:calc(var(--bottom-h) + 24px);min-height:100vh}
+.content{max-width:1280px;margin:0 auto;padding:0 24px; display:flex; flex-direction:column; gap:24px;}
 
-/* ─── TABS (desktop top bar, mobile scroll) ─── */
-.tab-bar{display:flex;gap:4px;background:var(--card);border-radius:var(--r12);padding:5px;box-shadow:var(--shadow-xs);border:1px solid var(--border);overflow-x:auto;scrollbar-width:none;margin-bottom:16px}
+/* ─── TABS (Shadcn TabsList) ─── */
+.tab-container { display: flex; align-items: center; justify-content: flex-start; }
+.tab-bar{display:inline-flex;align-items:center;justify-content:center;gap:4px;background:var(--muted);border-radius:var(--radius);padding:4px;overflow-x:auto;scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none}
-.tab-btn{flex-shrink:0;padding:8px 18px;border:none;background:transparent;color:var(--gray);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-radius:var(--r8);transition:all .2s;display:flex;align-items:center;gap:7px;white-space:nowrap}
-.tab-btn i{font-size:13px}
-.tab-btn:hover{color:var(--dark);background:var(--bg)}
-.tab-btn.active{background:var(--orange-light);color:var(--orange)}
-.tab-pane{display:none}
+.tab-btn{flex-shrink:0;padding:6px 16px;border:none;background:transparent;color:var(--muted-foreground);font-family:'Sarabun',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border-radius:calc(var(--radius) - 2px);transition:all .2s;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tab-btn:hover{color:var(--foreground);}
+.tab-btn.active{background:var(--background);color:var(--foreground);box-shadow:0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);}
+.tab-pane{display:none; animation: fadeIn 0.3s ease-in-out;}
 .tab-pane.active{display:block}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ─── FILTER BAR ─── */
-.filter-bar{background:var(--card);border-radius:var(--r12);padding:12px 14px;border:1px solid var(--border);box-shadow:var(--shadow-xs);margin-bottom:16px}
-.filter-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
-.fg{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px}
-.fg label{font-size:11px;font-weight:600;color:var(--gray-lt);text-transform:uppercase;letter-spacing:.5px}
-.fg select,.fg input{padding:8px 12px;border-radius:var(--r8);border:1.5px solid var(--border);font-family:'Sarabun',sans-serif;font-size:13px;color:var(--dark);background:var(--bg);outline:none;transition:border-color .2s,box-shadow .2s;cursor:pointer}
-.fg select:focus,.fg input:focus{border-color:var(--orange);background:#fff;box-shadow:0 0 0 3px rgba(230,81,0,.1)}
+.filter-bar{background:var(--card);border-radius:var(--radius);padding:16px;border:1px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,0.05);}
+.filter-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end}
+.fg{display:flex;flex-direction:column;gap:6px;flex:1;min-width:160px}
+.fg label{font-size:13px;font-weight:500;color:var(--foreground);}
+.fg select,.fg input{height:40px;padding:0 12px;border-radius:var(--radius);border:1px solid var(--input);font-family:'Sarabun',sans-serif;font-size:14px;color:var(--foreground);background:transparent;outline:none;transition:all .2s;cursor:pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 10px auto;}
+.fg select:focus,.fg input:focus{border-color:var(--ring);box-shadow:0 0 0 2px rgba(148, 163, 184, 0.2);}
 .filter-actions{display:flex;gap:8px;align-items:flex-end}
-.btn-apply{padding:8px 18px;background:var(--orange);color:#fff;border:none;border-radius:var(--r8);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s;white-space:nowrap}
-.btn-apply:hover{background:var(--orange-mid)}
-.btn-reset{padding:8px 14px;background:var(--card);color:var(--gray);border:1.5px solid var(--border);border-radius:var(--r8);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
-.btn-reset:hover{border-color:var(--dark);color:var(--dark)}
+.btn-apply{height:40px;padding:0 16px;background:var(--primary);color:var(--primary-foreground);border:none;border-radius:var(--radius);font-family:'Sarabun',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .2s;white-space:nowrap; box-shadow:0 1px 2px rgba(0,0,0,0.05);}
+.btn-apply:hover{background:hsl(222.2 47.4% 11.2% / 90%);}
+.btn-reset{height:40px;padding:0 16px;background:transparent;color:var(--foreground);border:1px solid var(--border);border-radius:var(--radius);font-family:'Sarabun',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s; display:flex; align-items:center; justify-content:center;}
+.btn-reset:hover{background:var(--accent);color:var(--accent-foreground)}
 
-/* ─── ALERT STRIP ─── */
-.alert-strip{background:var(--red-light);border:1px solid #FECACA;border-radius:var(--r12);padding:10px 14px;margin-bottom:16px;display:none}
-.alert-strip.show{display:flex;gap:10px;align-items:flex-start}
-.alert-strip i{color:var(--red);font-size:14px;margin-top:2px;flex-shrink:0}
-.alert-strip-body h4{font-size:12px;font-weight:600;color:#7F1D1D;margin-bottom:3px}
-.alert-strip-body ul{padding-left:14px;font-size:12px;color:#991B1B;list-style:disc}
+/* ─── ALERT STRIP (Shadcn Alert) ─── */
+.alert-strip{background:var(--destructive-foreground);border:1px solid var(--destructive);border-radius:var(--radius);padding:16px;display:none; color:var(--destructive)}
+.alert-strip.show{display:flex;gap:12px;align-items:flex-start}
+.alert-strip i{font-size:16px;margin-top:2px;flex-shrink:0}
+.alert-strip-body h4{font-size:14px;font-weight:600;margin-bottom:6px;letter-spacing:-0.02em}
+.alert-strip-body ul{padding-left:18px;font-size:13px;list-style:disc;line-height:1.6}
 
-/* ─── STAT GRID ─── */
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-.stat-card{background:var(--card);border-radius:var(--r12);padding:16px;border:1px solid var(--border);box-shadow:var(--shadow-xs);display:flex;align-items:center;gap:12px;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
-.stat-card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 2px 2px 0}
-.stat-card.sc-green::after{background:var(--green)}
-.stat-card.sc-orange::after{background:var(--orange)}
-.stat-card.sc-red::after{background:var(--red)}
-.stat-card.sc-blue::after{background:var(--blue)}
-.stat-card.sc-amber::after{background:var(--amber)}
-.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.stat-icon{width:44px;height:44px;border-radius:var(--r12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.si-green{background:var(--green-light);color:var(--green)}
-.si-orange{background:var(--orange-light);color:var(--orange)}
-.si-red{background:var(--red-light);color:var(--red)}
-.si-blue{background:var(--blue-light);color:var(--blue)}
-.si-amber{background:var(--amber-light);color:var(--amber)}
-.stat-info .label{font-size:11px;color:var(--gray);font-weight:500;margin-bottom:2px}
-.stat-info .value{font-size:22px;font-weight:700;color:var(--dark);line-height:1}
-.stat-info .sub{font-size:11px;color:var(--gray-lt);margin-top:2px}
+/* ─── STAT GRID (Shadcn Cards) ─── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:20px;border:1px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,0.05);display:flex;flex-direction:column;gap:8px;transition:box-shadow .2s;}
+.stat-card:hover{box-shadow:0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);}
+.stat-header {display:flex; justify-content:space-between; align-items:center;}
+.stat-title {font-size:14px; font-weight:500; color:var(--muted-foreground);}
+.stat-icon {color:var(--muted-foreground); font-size:16px;}
+.stat-value {font-size:28px; font-weight:700; color:var(--foreground); line-height:1; letter-spacing:-0.02em;}
+.stat-sub {font-size:12px; color:var(--muted-foreground); margin-top:2px;}
 
 /* ─── CHART GRID ─── */
-.chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:16px}
-.chart-card{background:var(--card);border-radius:var(--r12);padding:18px;border:1px solid var(--border);box-shadow:var(--shadow-xs)}
+.chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.chart-card{background:var(--card);border-radius:var(--radius);padding:20px;border:1px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,0.05);}
 .chart-card.full{grid-column:1/-1}
-.cc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.cc-title{font-size:13px;font-weight:600;color:var(--dark);display:flex;align-items:center;gap:7px}
-.cc-title .icon{width:28px;height:28px;background:var(--orange-light);color:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px}
-.chart-wrap{position:relative;height:240px;width:100%}
-.chart-wrap.short{height:180px}
+.cc-head{display:flex;flex-direction:column;gap:4px;margin-bottom:20px}
+.cc-title{font-size:16px;font-weight:600;color:var(--foreground);letter-spacing:-0.02em}
+.cc-desc{font-size:13px; color:var(--muted-foreground);}
+.chart-wrap{position:relative;height:260px;width:100%}
+.chart-wrap.short{height:220px}
 
-/* ─── DEPT TABLE ─── */
-.table-card{background:var(--card);border-radius:var(--r12);border:1px solid var(--border);box-shadow:var(--shadow-xs);overflow:hidden;margin-bottom:16px}
-.table-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border)}
-.table-head h3{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
-.table-head h3 .icon{width:28px;height:28px;background:var(--orange-light);color:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px}
+/* ─── DEPT TABLE (Shadcn Table) ─── */
+.table-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,0.05);overflow:hidden;}
+.table-head{display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid var(--border)}
+.table-head h3{font-size:16px;font-weight:600; color:var(--foreground); letter-spacing:-0.02em}
+.table-head h3 span {font-size:13px; color:var(--muted-foreground); font-weight:400; margin-left:8px;}
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.data-tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
-.data-tbl th{background:var(--bg);color:var(--gray);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:10px 16px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
-.data-tbl td{padding:11px 16px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--dark)}
+.data-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:700px}
+.data-tbl th{background:transparent;color:var(--muted-foreground);font-weight:500;padding:12px 20px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.data-tbl td{padding:12px 20px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--foreground)}
 .data-tbl tbody tr:last-child td{border-bottom:none}
-.data-tbl tbody tr:hover td{background:#FAFBFD}
+.data-tbl tbody tr:hover td{background:var(--muted)}
 
 /* progress bar */
-.prog-wrap{display:flex;align-items:center;gap:8px;min-width:140px}
-.prog-track{flex:1;height:7px;background:var(--border);border-radius:4px;position:relative;overflow:hidden}
-.prog-fill{height:100%;border-radius:4px;transition:width .6s ease}
-.prog-pct{font-size:12px;font-weight:700;min-width:36px;text-align:right}
+.prog-wrap{display:flex;align-items:center;gap:12px;min-width:140px}
+.prog-track{flex:1;height:8px;background:var(--secondary);border-radius:999px;position:relative;overflow:hidden}
+.prog-fill{height:100%;border-radius:999px;transition:width .6s cubic-bezier(0.4, 0, 0.2, 1)}
+.prog-pct{font-size:13px;font-weight:600;min-width:36px;text-align:right; font-variant-numeric: tabular-nums;}
 
-/* target line overlay */
-.prog-track-outer{flex:1;position:relative}
-.target-pin{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--red);z-index:2;border-radius:1px}
-.target-pin-label{position:absolute;top:-14px;left:-10px;font-size:9px;color:var(--red);white-space:nowrap;font-weight:700}
-
-/* badges */
-.badge{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:4px}
-.b-ok{background:var(--green-light);color:#065F46}
-.b-near{background:var(--amber-light);color:#92400E}
-.b-low{background:var(--red-light);color:#7F1D1D}
-.b-open{background:var(--red-light);color:#7F1D1D}
-.b-closed{background:var(--green-light);color:#065F46}
-.b-type{background:var(--orange-light);color:var(--orange)}
+/* badges (Shadcn Badges) */
+.badge{padding:2px 10px;border-radius:999px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:6px; white-space:nowrap;}
+.b-ok{background:var(--success-light);color:var(--success-foreground)}
+.b-near{background:var(--warning-light);color:var(--warning-foreground)}
+.b-low{background:var(--danger-light);color:var(--danger-foreground)}
+.b-outline{background:transparent; border:1px solid var(--border); color:var(--foreground)}
 
 /* mom badge */
-.mom-up{color:var(--green);font-size:11px;font-weight:600;display:flex;align-items:center;gap:3px}
-.mom-dn{color:var(--red);font-size:11px;font-weight:600;display:flex;align-items:center;gap:3px}
-.mom-eq{color:var(--gray);font-size:11px;font-weight:600}
+.mom-up{color:var(--success);font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px}
+.mom-dn{color:var(--danger);font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px}
+.mom-eq{color:var(--muted-foreground);font-size:12px;font-weight:500}
 
 /* ─── QUICK STATS BAR ─── */
-.qs-bar{background:var(--card);border-radius:var(--r12);padding:12px 16px;border:1px solid var(--border);box-shadow:var(--shadow-xs);margin-bottom:16px;display:flex;flex-wrap:wrap;gap:16px;align-items:center}
-.qs-item{display:flex;align-items:center;gap:6px;font-size:12px}
-.qs-item strong{font-weight:700;font-size:13px}
-.qs-item.ok strong{color:var(--green)}
-.qs-item.near strong{color:var(--amber)}
-.qs-item.low strong{color:var(--red)}
-.qs-actions{margin-left:auto;display:flex;gap:6px}
-.btn-sm{padding:5px 12px;border-radius:var(--r8);border:1.5px solid var(--border);background:var(--card);color:var(--gray);font-family:'Sarabun',sans-serif;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s}
-.btn-sm:hover{border-color:var(--orange);color:var(--orange)}
+.qs-bar{background:transparent; margin-bottom:0; display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;}
+.qs-group { display:flex; gap:16px; align-items:center; }
+.qs-item{display:flex;align-items:center;gap:6px;font-size:13px; color:var(--muted-foreground)}
+.qs-item strong{font-weight:600;font-size:14px; color:var(--foreground)}
+.qs-actions{display:flex;gap:8px}
+.btn-sm{height:32px;padding:0 12px;border-radius:calc(var(--radius) - 2px);border:1px solid var(--border);background:var(--background);color:var(--foreground);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s; box-shadow:0 1px 2px rgba(0,0,0,0.05);}
+.btn-sm:hover{background:var(--accent);color:var(--accent-foreground)}
 
 /* ─── EMPTY & SKELETON ─── */
-.empty{text-align:center;padding:40px 20px;color:var(--gray)}
-.empty i{font-size:28px;opacity:.25;display:block;margin-bottom:10px}
+.empty{text-align:center;padding:48px 24px;color:var(--muted-foreground)}
+.empty i{font-size:32px;opacity:.5;display:block;margin-bottom:12px}
 
-/* ─── BOTTOM NAV ─── */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--bottom-h);background:var(--dark);border-top:1px solid rgba(255,255,255,.07);display:flex;z-index:500;padding-bottom:env(safe-area-inset-bottom)}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:9px;color:rgba(255,255,255,.5);cursor:pointer;transition:color .2s;text-decoration:none;padding:8px 0;border:none;background:transparent;font-family:'Sarabun',sans-serif}
+/* ─── BOTTOM NAV (Mobile) ─── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--bottom-h);background:var(--background);border-top:1px solid var(--border);display:flex;z-index:500;padding-bottom:env(safe-area-inset-bottom)}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:500;color:var(--muted-foreground);cursor:pointer;transition:all .2s;text-decoration:none;padding:8px 0;border:none;background:transparent;font-family:'Sarabun',sans-serif}
 .bnav-item i{font-size:18px;transition:transform .2s}
-.bnav-item.active{color:var(--orange-mid)}
-.bnav-item.active i{transform:scale(1.1)}
-.bnav-item:hover{color:rgba(255,255,255,.8)}
+.bnav-item.active{color:var(--primary)}
+.bnav-item:hover{color:var(--foreground)}
 
 /* ─── TOAST ─── */
-.toast-box{position:fixed;bottom:calc(var(--bottom-h) + 16px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark2);color:#fff;padding:10px 18px;border-radius:24px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;z-index:9000;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
-.toast-box.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-box{position:fixed;bottom:calc(var(--bottom-h) + 24px);right:24px;background:var(--foreground);color:var(--background);padding:12px 20px;border-radius:var(--radius);font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;z-index:9000;opacity:0;transform:translateY(10px);transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);pointer-events:none;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);}
+.toast-box.show{opacity:1;transform:translateY(0)}
 
 /* ─── RESPONSIVE ─── */
 @media(max-width:1024px){
   .stat-grid{grid-template-columns:repeat(2,1fr)}
   .chart-grid{grid-template-columns:1fr}
   .chart-card.full{grid-column:1}
+  .qs-bar { flex-direction:column; align-items:flex-start; }
+  .qs-actions { width:100%; justify-content:flex-end; }
 }
 @media(max-width:640px){
-  .content{padding:12px}
-  .filter-row{flex-direction:column}
-  .fg{min-width:0}
-  .filter-actions{width:100%}
+  .top-nav { padding: 0 16px; }
+  .content{padding: 0 16px; gap: 16px;}
+  .filter-row{flex-direction:column; gap:12px;}
+  .fg{min-width:100%; width:100%;}
+  .filter-actions{width:100%;}
   .btn-apply,.btn-reset{flex:1;justify-content:center}
-  .stat-grid{grid-template-columns:1fr 1fr;gap:8px}
-  .stat-card{padding:12px;gap:8px}
-  .stat-icon{width:36px;height:36px;font-size:15px}
-  .stat-info .value{font-size:18px}
-  .chart-wrap{height:200px}
-  .chart-card.full .chart-wrap{height:200px}
-  .qs-bar{gap:10px}
-  .qs-actions{width:100%;margin-left:0;justify-content:flex-end}
-  .tab-btn{padding:8px 12px;font-size:12px}
+  .stat-grid{grid-template-columns:1fr 1fr; gap:12px;}
+  .stat-card{padding:16px;}
+  .stat-value{font-size:24px}
+  .chart-wrap{height:220px}
+  .chart-card.full .chart-wrap{height:220px}
+  .qs-group { flex-wrap:wrap; gap:8px;}
+  .toast-box { left:16px; right:16px; bottom:calc(var(--bottom-h) + 16px); justify-content:center; }
 }
 @media(min-width:1024px){
   .bottom-nav{display:none}
-  .main-wrap{padding-bottom:24px}
-  .top-nav{padding:0 32px}
-  .content{padding:24px 32px}
+  .main-wrap{padding-bottom:40px}
+  .toast-box { transform:translateX(0) translateY(10px); }
+  .toast-box.show { transform:translateX(0) translateY(0); }
 }
 @media print{
-  .top-nav,.bottom-nav,.filter-bar,.toast-box{display:none!important}
+  .top-nav,.bottom-nav,.filter-bar,.toast-box,.tab-bar,.qs-actions{display:none!important}
   .main-wrap{padding:0}
   body{background:#fff}
+  .stat-card, .chart-card, .table-card { border:1px solid #ddd; box-shadow:none; break-inside: avoid; }
 }
 </style>
 </head>
@@ -213,10 +229,9 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--dark);lin
   <div class="load-txt">กำลังโหลดข้อมูล...</div>
 </div>
 
-<!-- TOP NAV -->
 <nav class="top-nav">
   <div class="nav-logo"><i class="fas fa-shield-halved"></i></div>
-  <div class="nav-title">5S & Safety Pro<span>Dashboard</span></div>
+  <div class="nav-title">5S & Safety <span>Dashboard Pro</span></div>
   <div class="nav-actions">
     <button class="nav-btn" onclick="toggleDebug()" title="Debug"><i class="fas fa-bug"></i></button>
     <button class="nav-btn" onclick="window.print()" title="พิมพ์"><i class="fas fa-print"></i></button>
@@ -226,17 +241,17 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--dark);lin
 <div class="main-wrap">
 <div class="content">
 
-  <!-- TABS -->
-  <div class="tab-bar">
-    <button class="tab-btn active" id="tab-btn-5s" onclick="switchTab('5s',this)"><i class="fas fa-broom"></i> 5S Summary</button>
-    <button class="tab-btn" id="tab-btn-safety" onclick="switchTab('safety',this)"><i class="fas fa-shield-halved"></i> Safety Plan</button>
+  <div class="tab-container">
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-btn-5s" onclick="switchTab('5s',this)"><i class="fas fa-broom"></i> 5S Summary</button>
+      <button class="tab-btn" id="tab-btn-safety" onclick="switchTab('safety',this)"><i class="fas fa-shield-halved"></i> Safety Plan</button>
+    </div>
   </div>
 
-  <!-- FILTER -->
   <div class="filter-bar">
     <div class="filter-row">
       <div class="fg">
-        <label><i class="fas fa-calendar"></i> ช่วงเวลา</label>
+        <label>ช่วงเวลา</label>
         <select id="timeRange">
           <option value="today">วันนี้</option>
           <option value="week">7 วันที่ผ่านมา</option>
@@ -246,11 +261,11 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--dark);lin
         </select>
       </div>
       <div class="fg">
-        <label><i class="fas fa-layer-group"></i> แผนก</label>
+        <label>แผนก</label>
         <select id="deptFilter"><option value="all">ทุกแผนก</option></select>
       </div>
-      <div class="fg">
-        <label><i class="fas fa-bullseye"></i> เป้าหมาย 5S</label>
+      <div class="fg" id="fg-target">
+        <label>สถานะเป้าหมาย (5S)</label>
         <select id="targetFilter">
           <option value="all">ทั้งหมด</option>
           <option value="ok">≥85% ผ่านเป้า</option>
@@ -259,66 +274,96 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--dark);lin
         </select>
       </div>
       <div class="filter-actions">
-        <button class="btn-apply" onclick="applyFilters()"><i class="fas fa-bolt"></i> อัปเดต</button>
-        <button class="btn-reset" onclick="resetFilters()"><i class="fas fa-rotate-left"></i></button>
+        <button class="btn-apply" onclick="applyFilters()">อัปเดตข้อมูล</button>
+        <button class="btn-reset" onclick="resetFilters()" title="รีเซ็ต"><i class="fas fa-rotate-left"></i></button>
       </div>
     </div>
   </div>
 
-  <!-- ALERT -->
   <div id="alertStrip" class="alert-strip">
     <i class="fas fa-triangle-exclamation"></i>
     <div class="alert-strip-body">
-      <h4>⚠️ พื้นที่ที่ต้องเร่งปรับปรุง (ต่ำกว่า 85%)</h4>
+      <h4>พื้นที่ที่ต้องเร่งปรับปรุง (ต่ำกว่า 85%)</h4>
       <ul id="alertList"></ul>
     </div>
   </div>
 
-  <!-- ── 5S TAB ── -->
   <div id="pane-5s" class="tab-pane active">
-    <!-- stat cards -->
-    <div class="stat-grid">
-      <div class="stat-card sc-green"><div class="stat-icon si-green"><i class="fas fa-star"></i></div><div class="stat-info"><div class="label">คะแนนเฉลี่ย 5S</div><div class="value" id="s5avg">—</div><div class="sub">ค่าเฉลี่ยทุกแผนก</div></div></div>
-      <div class="stat-card sc-orange"><div class="stat-icon si-orange"><i class="fas fa-clipboard-check"></i></div><div class="stat-info"><div class="label">รอบการตรวจ</div><div class="value" id="s5cnt">—</div><div class="sub">ครั้ง</div></div></div>
-      <div class="stat-card sc-red"><div class="stat-icon si-red"><i class="fas fa-triangle-exclamation"></i></div><div class="stat-info"><div class="label">จุดต้องปรับ</div><div class="value" id="s5iss">—</div><div class="sub">รายการ</div></div></div>
-      <div class="stat-card sc-blue"><div class="stat-icon si-blue"><i class="fas fa-chart-pie"></i></div><div class="stat-info"><div class="label">ดี / พอใช้ / ปรับ</div><div class="value" id="s5dist" style="font-size:15px;padding-top:2px">—</div><div class="sub">สัดส่วน</div></div></div>
-    </div>
-
-    <!-- quick stats -->
-    <div class="qs-bar">
-      <div class="qs-item"><span style="color:var(--gray)">🎯 เป้าหมาย:</span><strong style="color:var(--orange)">85%</strong></div>
-      <div class="qs-item ok"><span>🟢 ผ่าน:</span><strong id="qsOk">0</strong><span style="color:var(--gray)">แผนก</span></div>
-      <div class="qs-item near"><span>🟡 ใกล้:</span><strong id="qsNear">0</strong><span style="color:var(--gray)">แผนก</span></div>
-      <div class="qs-item low"><span>🔴 ต้องปรับ:</span><strong id="qsLow">0</strong><span style="color:var(--gray)">แผนก</span></div>
+    
+    <div class="qs-bar" style="margin-bottom: 24px;">
+      <div class="qs-group">
+        <div class="qs-item">เป้าหมาย: <strong>85%</strong></div>
+        <div class="qs-item" style="color:var(--success)">ผ่าน: <strong id="qsOk">0</strong> แผนก</div>
+        <div class="qs-item" style="color:var(--warning)">ใกล้เป้า: <strong id="qsNear">0</strong> แผนก</div>
+        <div class="qs-item" style="color:var(--danger)">ต้องปรับ: <strong id="qsLow">0</strong> แผนก</div>
+      </div>
       <div class="qs-actions">
-        <button class="btn-sm" onclick="exportCSV('5s')"><i class="fas fa-file-csv"></i> CSV</button>
-        <button class="btn-sm" onclick="window.print()"><i class="fas fa-print"></i></button>
+        <button class="btn-sm" onclick="exportCSV('5s')"><i class="fas fa-download"></i> ส่งออก CSV</button>
       </div>
     </div>
 
-    <!-- charts -->
-    <div class="chart-grid">
+    <div class="stat-grid" style="margin-bottom: 24px;">
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">คะแนนเฉลี่ย 5S</div>
+          <i class="fas fa-star stat-icon"></i>
+        </div>
+        <div class="stat-value" id="s5avg">—</div>
+        <div class="stat-sub">ค่าเฉลี่ยทุกแผนก</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">รอบการตรวจ</div>
+          <i class="fas fa-clipboard-check stat-icon"></i>
+        </div>
+        <div class="stat-value" id="s5cnt">—</div>
+        <div class="stat-sub">ครั้งในรอบบิล</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">จุดต้องปรับปรุง</div>
+          <i class="fas fa-wrench stat-icon"></i>
+        </div>
+        <div class="stat-value" id="s5iss">—</div>
+        <div class="stat-sub">รายการที่พบ</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">ดี / พอใช้ / ปรับ</div>
+          <i class="fas fa-chart-pie stat-icon"></i>
+        </div>
+        <div class="stat-value" id="s5dist" style="font-size:22px;">—</div>
+        <div class="stat-sub">สัดส่วนคุณภาพ</div>
+      </div>
+    </div>
+
+    <div class="chart-grid" style="margin-bottom: 24px;">
       <div class="chart-card">
-        <div class="cc-head"><div class="cc-title"><div class="icon"><i class="fas fa-chart-area"></i></div>แนวโน้มรายวัน</div></div>
+        <div class="cc-head">
+          <div class="cc-title">แนวโน้มคะแนนรายวัน</div>
+          <div class="cc-desc">เปรียบเทียบกับเป้าหมาย 85%</div>
+        </div>
         <div class="chart-wrap"><canvas id="chTrend"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="cc-head"><div class="cc-title"><div class="icon"><i class="fas fa-ranking-star"></i></div>คะแนนรายแผนก</div></div>
+        <div class="cc-head">
+          <div class="cc-title">คะแนนเฉลี่ยรายแผนก</div>
+          <div class="cc-desc">8 อันดับแรก</div>
+        </div>
         <div class="chart-wrap"><canvas id="chDept"></canvas></div>
       </div>
     </div>
 
-    <!-- table -->
     <div class="table-card">
       <div class="table-head">
-        <h3><div class="icon"><i class="fas fa-table-list"></i></div>สรุปผลประเมิน 5S รายแผนก</h3>
+        <h3>สรุปผลประเมิน 5S <span>ภาพรวมรายแผนก</span></h3>
       </div>
       <div class="tbl-wrap">
         <table class="data-tbl">
           <thead><tr>
-            <th>แผนก</th><th>ตรวจ</th><th>คะแนน</th>
-            <th>เทียบเป้า 85%</th><th>เทียบเดือนก่อน</th>
-            <th>ดี/พอใช้/ปรับ</th><th>สถานะ</th><th>ล่าสุด</th>
+            <th>แผนก</th><th>รอบตรวจ</th><th>คะแนนเฉลี่ย</th>
+            <th>เทียบเป้า 85%</th><th>MoM</th>
+            <th>ดี/พอใช้/ปรับ</th><th>สถานะความเรียบร้อย</th><th style="text-align:right">อัปเดตล่าสุด</th>
           </tr></thead>
           <tbody id="t5s"><tr><td colspan="8" class="empty"><i class="fas fa-circle-notch fa-spin"></i>กำลังโหลด...</td></tr></tbody>
         </table>
@@ -326,36 +371,74 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--dark);lin
     </div>
   </div>
 
-  <!-- ── SAFETY TAB ── -->
   <div id="pane-safety" class="tab-pane">
-    <div class="stat-grid">
-      <div class="stat-card sc-blue"><div class="stat-icon si-blue"><i class="fas fa-user-shield"></i></div><div class="stat-info"><div class="label">ประวัติการตรวจ</div><div class="value" id="ssCnt">—</div><div class="sub">ครั้ง</div></div></div>
-      <div class="stat-card sc-orange"><div class="stat-icon si-orange"><i class="fas fa-fire-extinguisher"></i></div><div class="stat-info"><div class="label">งานแก้ไขทั้งหมด</div><div class="value" id="ssJob">—</div><div class="sub">รายการ</div></div></div>
-      <div class="stat-card sc-red"><div class="stat-icon si-red"><i class="fas fa-spinner"></i></div><div class="stat-info"><div class="label">รอแก้ไข (Open)</div><div class="value" id="ssOpen">—</div><div class="sub">รายการ</div></div></div>
-      <div class="stat-card sc-green"><div class="stat-icon si-green"><i class="fas fa-check-double"></i></div><div class="stat-info"><div class="label">เสร็จสิ้น (Closed)</div><div class="value" id="ssClosed">—</div><div class="sub">รายการ</div></div></div>
+    
+    <div class="qs-bar" style="margin-bottom: 24px; justify-content: flex-end;">
+      <div class="qs-actions">
+        <button class="btn-sm" onclick="exportCSV('safety')"><i class="fas fa-download"></i> ส่งออก CSV</button>
+      </div>
     </div>
 
-    <div class="chart-grid">
+    <div class="stat-grid" style="margin-bottom: 24px;">
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">ประวัติการตรวจ</div>
+          <i class="fas fa-user-shield stat-icon"></i>
+        </div>
+        <div class="stat-value" id="ssCnt">—</div>
+        <div class="stat-sub">ครั้ง</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">งานแก้ไขทั้งหมด</div>
+          <i class="fas fa-clipboard-list stat-icon"></i>
+        </div>
+        <div class="stat-value" id="ssJob">—</div>
+        <div class="stat-sub">รายการสะสม</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">รอแก้ไข (Open)</div>
+          <i class="fas fa-spinner stat-icon" style="color:var(--danger)"></i>
+        </div>
+        <div class="stat-value" id="ssOpen">—</div>
+        <div class="stat-sub">รายการค้างท่อ</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">เสร็จสิ้น (Closed)</div>
+          <i class="fas fa-check-double stat-icon" style="color:var(--success)"></i>
+        </div>
+        <div class="stat-value" id="ssClosed">—</div>
+        <div class="stat-sub">ปิดงานแล้ว</div>
+      </div>
+    </div>
+
+    <div class="chart-grid" style="margin-bottom: 24px;">
       <div class="chart-card">
-        <div class="cc-head"><div class="cc-title"><div class="icon"><i class="fas fa-chart-column"></i></div>งานแยกประเภท</div></div>
+        <div class="cc-head">
+          <div class="cc-title">สัดส่วนงานแยกประเภท</div>
+        </div>
         <div class="chart-wrap short"><canvas id="chJobType"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="cc-head"><div class="cc-title"><div class="icon"><i class="fas fa-circle-half-stroke"></i></div>สถานะความคืบหน้า</div></div>
+        <div class="cc-head">
+          <div class="cc-title">สถานะความคืบหน้า</div>
+        </div>
         <div class="chart-wrap short"><canvas id="chJobStatus"></canvas></div>
       </div>
     </div>
 
     <div class="table-card">
       <div class="table-head">
-        <h3><div class="icon"><i class="fas fa-list-check"></i></div>Action Plan — งานที่ต้องแก้ไข</h3>
-        <a href="reportnew.html" style="font-size:12px;color:var(--orange);font-weight:600;text-decoration:none">ดูรายงานเต็ม →</a>
+        <h3>Action Plan <span>งานที่ต้องแก้ไข</span></h3>
+        <a href="reportnew.html" class="btn-sm" style="text-decoration:none">ดูรายงานเต็ม</a>
       </div>
       <div class="tbl-wrap">
         <table class="data-tbl">
           <thead><tr>
-            <th>Job No.</th><th>ประเภท</th><th>แผนก</th>
-            <th>ปัญหาที่พบ</th><th>วันที่พบ</th><th>ครบกำหนด</th><th>สถานะ</th>
+            <th>รหัสอ้างอิง</th><th>ประเภท</th><th>แผนก</th>
+            <th>ปัญหาที่พบ</th><th>วันที่พบ</th><th>ครบกำหนด</th><th style="text-align:right">สถานะ</th>
           </tr></thead>
           <tbody id="tSafety"><tr><td colspan="7" class="empty"><i class="fas fa-circle-notch fa-spin"></i>กำลังโหลด...</td></tr></tbody>
         </table>
@@ -363,15 +446,9 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--dark);lin
     </div>
   </div>
 
-</div><!-- /content -->
-</div><!-- /main-wrap -->
-
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <button class="bnav-item active" onclick="location.href='dashnew.html'"><i class="fas fa-house"></i>หน้าหลัก</button>
-  <button class="bnav-item" onclick="location.href='reportnew.html'"><i class="fas fa-clipboard-list"></i>รายงาน</button>
-  <button class="bnav-item" onclick="window.print()"><i class="fas fa-print"></i>พิมพ์</button>
-  <button class="bnav-item" onclick="toggleDebug()"><i class="fas fa-bug"></i>Debug</button>
+</div></div><nav class="bottom-nav">
+  <button class="bnav-item active" onclick="location.href='dashnew.html'"><i class="fas fa-chart-line"></i>แดชบอร์ด</button>
+  <button class="bnav-item" onclick="location.href='reportnew.html'"><i class="fas fa-list-check"></i>รายการ</button>
 </nav>
 
 <div id="toastBox" class="toast-box"></div>
@@ -383,9 +460,11 @@ const TARGET=85;
 const DEPTS=["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","ENGINEERING","OUTSIDE"];
 const AREA_MAP={"แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Solvent":"SOLVENT","แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING","แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC","แผนก Warehouse":"WAREHOUSE","Office":"OFFICE","พื้นที่รอบบริเวณโรงงาน":"OUTSIDE","Canteen":"CANTEEN","EN":"ENGINEERING"};
 
-Chart.defaults.font.family="'Sarabun',sans-serif";
-Chart.defaults.color="#64748B";
-Chart.defaults.scale.grid.color="rgba(226,232,240,0.5)";
+// Shadcn style charts
+Chart.defaults.font.family="'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+Chart.defaults.color="#64748b";
+Chart.defaults.scale.grid.color="#f1f5f9";
+Chart.defaults.scale.grid.borderColor="#e2e8f0";
 
 let raw={ins:[],jobs:[]};
 let activeTab="5s";
@@ -493,7 +572,7 @@ function render5S(ins){
     if(/^5s_s\d+_q\d+$/.test(k)){if(v==="ดี")good++;else if(v==="พอใช้")fair++;else if(v==="ปรับปรุง")imp++;}
   }));
   document.getElementById("s5iss").textContent=imp.toLocaleString();
-  document.getElementById("s5dist").innerHTML=`<span style="color:var(--green)">${good}</span>/<span style="color:var(--amber)">${fair}</span>/<span style="color:var(--red)">${imp}</span>`;
+  document.getElementById("s5dist").innerHTML=`<span style="color:var(--success)">${good}</span> <span style="color:var(--muted-foreground); font-weight:300">/</span> <span style="color:var(--warning)">${fair}</span> <span style="color:var(--muted-foreground); font-weight:300">/</span> <span style="color:var(--danger)">${imp}</span>`;
 
   // Group by dept
   const byDept={};
@@ -513,7 +592,7 @@ function render5S(ins){
   const deptList=Object.entries(byDept).map(([dept,v])=>{
     const a=v.scores.length?Math.round(v.scores.reduce((x,y)=>x+y,0)/v.scores.length):0;
     const st=a>=TARGET?"ok":a>=70?"near":"low";
-    const prev=Math.min(100,Math.max(0,a+Math.floor(Math.random()*11)-5)); // demo; replace with real prev month data
+    const prev=Math.min(100,Math.max(0,a+Math.floor(Math.random()*11)-5)); // demo data
     return{dept,count:v.count,avg:a,good:v.good,fair:v.fair,imp:v.imp,status:st,last:v.last,prev};
   }).sort((a,b)=>b.avg-a.avg);
 
@@ -530,7 +609,7 @@ function render5S(ins){
   setText("qsNear",deptList.filter(d=>d.status==="near").length);
   setText("qsLow",deptList.filter(d=>d.status==="low").length);
 
-  // Trend chart
+  // Trend chart (Shadcn style colors)
   const daily={};
   data.forEach(i=>{
     const d=(i.timestamp||"").slice(0,10);
@@ -540,39 +619,40 @@ function render5S(ins){
   const vals=labels.map(k=>Math.round(daily[k].reduce((a,b)=>a+b,0)/daily[k].length));
 
   mkChart("chTrend",{type:"line",data:{labels,datasets:[
-    {label:"คะแนน %",data:vals,borderColor:"#E65100",backgroundColor:"rgba(230,81,0,.08)",borderWidth:2.5,tension:.4,fill:true,pointBackgroundColor:"#fff",pointBorderColor:"#E65100",pointBorderWidth:2,pointRadius:4,pointHoverRadius:6},
-    {label:"เป้า 85%",data:Array(labels.length).fill(TARGET),borderColor:"#EF4444",borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false}
+    {label:"คะแนน %",data:vals,borderColor:"#0f172a",backgroundColor:"rgba(15, 23, 42, 0.05)",borderWidth:2,tension:.3,fill:true,pointBackgroundColor:"#fff",pointBorderColor:"#0f172a",pointBorderWidth:2,pointRadius:4,pointHoverRadius:6},
+    {label:"เป้า 85%",data:Array(labels.length).fill(TARGET),borderColor:"#94a3b8",borderDash:[4,4],borderWidth:1.5,pointRadius:0,fill:false}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{min:0,max:100,ticks:{callback:v=>v+"%"}}}}});
 
   // Dept chart
   const top=deptList.slice(0,8);
-  mkChart("chDept",{type:"bar",data:{labels:top.map(d=>d.dept.length>10?d.dept.slice(0,10)+"…":d.dept),datasets:[{label:"คะแนน",data:top.map(d=>d.avg),backgroundColor:top.map(d=>d.status==="ok"?"rgba(16,185,129,.8)":d.status==="near"?"rgba(245,158,11,.8)":"rgba(239,68,68,.8)"),borderRadius:6,maxBarThickness:28}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{min:0,max:100}}}});
+  mkChart("chDept",{type:"bar",data:{labels:top.map(d=>d.dept.length>10?d.dept.slice(0,10)+"…":d.dept),datasets:[{label:"คะแนน",data:top.map(d=>d.avg),backgroundColor:top.map(d=>d.status==="ok"?"#0f172a":d.status==="near"?"#64748b":"#94a3b8"),borderRadius:4,maxBarThickness:32}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{min:0,max:100}}}});
 
   // Table
   const tbody=document.getElementById("t5s");
   if(!deptList.length){tbody.innerHTML=`<tr><td colspan="8" class="empty"><i class="fas fa-folder-open"></i>ไม่มีข้อมูล</td></tr>`;return;}
   tbody.innerHTML=deptList.map(s=>{
-    const tc=s.status==="ok"?"var(--green)":s.status==="near"?"var(--amber)":"var(--red)";
+    const isOk=s.status==="ok";
+    const tc=isOk?"var(--success)":s.status==="near"?"var(--warning)":"var(--danger)";
+    const pb=isOk?"var(--primary)":s.status==="near"?"var(--warning)":"var(--danger)";
     const diff=s.avg-s.prev;
     const momHtml=diff>0?`<span class="mom-up"><i class="fas fa-arrow-trend-up"></i>+${diff}%</span>`:diff<0?`<span class="mom-dn"><i class="fas fa-arrow-trend-down"></i>${diff}%</span>`:`<span class="mom-eq">—</span>`;
     const last=s.last?new Date(s.last).toLocaleDateString("th-TH",{day:"numeric",month:"short"}):"-";
     return`<tr>
-      <td><strong>${esc(s.dept)}</strong></td>
+      <td style="font-weight:500;">${esc(s.dept)}</td>
       <td>${s.count}</td>
-      <td><span style="font-size:15px;font-weight:700;color:${tc}">${s.avg}%</span></td>
+      <td><span style="font-size:15px;font-weight:600;color:var(--foreground)">${s.avg}%</span></td>
       <td>
         <div class="prog-wrap">
-          <div class="prog-track-outer">
-            <div class="prog-track"><div class="prog-fill" style="width:${s.avg}%;background:${tc}"></div></div>
-            <div class="target-pin" style="left:${TARGET}%"><span class="target-pin-label">85%</span></div>
+          <div class="prog-track">
+            <div class="prog-fill" style="width:${s.avg}%;background:${pb}"></div>
           </div>
-          <span class="badge ${s.status==="ok"?"b-ok":s.status==="near"?"b-near":"b-low"}">${s.status==="ok"?"✓ ผ่าน":s.status==="near"?"~ ใกล้":"✗ ต้องปรับ"}</span>
+          <span class="prog-pct" style="color:${tc}">${s.avg}%</span>
         </div>
       </td>
       <td>${momHtml}</td>
-      <td><span style="color:var(--green);font-size:11px">${s.good}</span>/<span style="color:var(--amber);font-size:11px">${s.fair}</span>/<span style="color:var(--red);font-size:11px">${s.imp}</span></td>
-      <td>${s.imp===0?'<span class="badge b-ok"><i class="fas fa-shield-check"></i> ยอดเยี่ยม</span>':`<span class="badge b-low"><i class="fas fa-wrench"></i> ${s.imp} จุด</span>`}</td>
-      <td style="color:var(--gray-lt);font-size:11px">${last}</td>
+      <td><span style="color:var(--success);font-weight:500">${s.good}</span> / <span style="color:var(--warning);font-weight:500">${s.fair}</span> / <span style="color:var(--danger);font-weight:500">${s.imp}</span></td>
+      <td>${s.imp===0?'<span class="badge b-ok">ยอดเยี่ยม</span>':`<span class="badge b-low">${s.imp} จุดแก้ไข</span>`}</td>
+      <td style="color:var(--muted-foreground);font-size:12px;text-align:right">${last}</td>
     </tr>`;
   }).join("");
 }
@@ -587,27 +667,28 @@ function renderSafety(ins,jobs){
 
   const byType={};
   jobs.forEach(j=>{const t=j.inspectionType||"อื่นๆ";byType[t]=(byType[t]||0)+1;});
-  mkChart("chJobType",{type:"bar",data:{labels:Object.keys(byType),datasets:[{label:"Issues",data:Object.values(byType),backgroundColor:["#3B82F6","#F59E0B","#10B981","#EF4444","#8B5CF6","#64748B"],borderRadius:6,maxBarThickness:32}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+  // Clean neutral palette for bar chart
+  mkChart("chJobType",{type:"bar",data:{labels:Object.keys(byType),datasets:[{label:"Issues",data:Object.values(byType),backgroundColor:["#0f172a","#334155","#475569","#64748b","#94a3b8","#cbd5e1"],borderRadius:4,maxBarThickness:36}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{stepSize:1}}}}});
 
   const openC=jobs.filter(j=>j.status==="Open").length;
   const closedC=jobs.filter(j=>j.status==="Closed").length;
-  mkChart("chJobStatus",{type:"doughnut",data:{labels:["รอแก้ไข","เสร็จสิ้น"],datasets:[{data:[openC,closedC],backgroundColor:["#F59E0B","#10B981"],borderWidth:3,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},cutout:"68%"}});
+  mkChart("chJobStatus",{type:"doughnut",data:{labels:["รอแก้ไข","เสร็จสิ้น"],datasets:[{data:[openC,closedC],backgroundColor:["#e2e8f0","#0f172a"],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},cutout:"75%"}});
 
   const tbody=document.getElementById("tSafety");
-  if(!jobs.length){tbody.innerHTML=`<tr><td colspan="7" class="empty"><i class="fas fa-shield-check" style="color:var(--green)"></i>ไม่มีงานค้าง</td></tr>`;return;}
+  if(!jobs.length){tbody.innerHTML=`<tr><td colspan="7" class="empty"><i class="fas fa-shield-check" style="color:var(--success)"></i>ไม่มีงานค้าง</td></tr>`;return;}
   const sorted=[...jobs].sort((a,b)=>{
     if(a.status==="Open"&&b.status!=="Open")return -1;
     if(a.status!=="Open"&&b.status==="Open")return 1;
     return 0;
   });
   tbody.innerHTML=sorted.map(j=>`<tr>
-    <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blue);font-weight:500">${esc(j.jobId)}</td>
-    <td><span class="badge b-type">${esc(j.inspectionType||"-")}</span></td>
-    <td><strong>${esc(normArea(j.area))}</strong></td>
-    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(j.problem)}">${esc(j.problem)}</td>
-    <td style="font-size:11px;color:var(--gray)">${j.dateFound||"-"}</td>
-    <td style="font-size:11px;color:${j.status==="Open"?"var(--red)":"var(--gray)"};font-weight:${j.status==="Open"?"600":"400"}">${j.dueDate||"-"}</td>
-    <td><span class="badge ${j.status==="Open"?"b-near":"b-ok"}">${j.status==="Open"?"⏳ Open":"✓ Closed"}</span></td>
+    <td style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted-foreground);">${esc(j.jobId)}</td>
+    <td><span class="badge b-outline">${esc(j.inspectionType||"-")}</span></td>
+    <td style="font-weight:500;">${esc(normArea(j.area))}</td>
+    <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(j.problem)}">${esc(j.problem)}</td>
+    <td style="color:var(--muted-foreground)">${j.dateFound||"-"}</td>
+    <td style="color:${j.status==="Open"?"var(--danger)":"var(--muted-foreground)"};font-weight:${j.status==="Open"?"500":"400"}">${j.dueDate||"-"}</td>
+    <td style="text-align:right"><span class="badge ${j.status==="Open"?"b-near":"b-ok"}">${j.status==="Open"?"กำลังดำเนินงาน":"เสร็จสิ้น"}</span></td>
   </tr>`).join("");
 }
 
@@ -618,6 +699,15 @@ function switchTab(tab,btn){
   btn.classList.add("active");
   document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));
   document.getElementById("pane-"+tab).classList.add("active");
+  
+  // Toggle visibility of 5s specific filter
+  const targetFilter = document.getElementById("fg-target");
+  if(tab === "5s") {
+    targetFilter.style.display = "flex";
+  } else {
+    targetFilter.style.display = "none";
+  }
+  
   applyFilters();
 }
 
@@ -638,19 +728,18 @@ function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 
 function showToast(msg,type="i"){
   const box=document.getElementById("toastBox");
-  const icon=type==="s"?"✓":type==="e"?"✕":"ℹ";
-  box.textContent=icon+" "+msg;
+  box.innerHTML = type==="s" ? `<i class="fas fa-check-circle" style="color:#4ade80"></i> ${msg}` : type==="e" ? `<i class="fas fa-exclamation-circle" style="color:#f87171"></i> ${msg}` : `<i class="fas fa-info-circle"></i> ${msg}`;
   box.classList.add("show");
-  setTimeout(()=>box.classList.remove("show"),2800);
+  setTimeout(()=>box.classList.remove("show"),3000);
 }
 
 function toggleDebug(){
   dbgOn=!dbgOn;
   if(dbgOn){
     const info=`ins:${raw.ins.length} | jobs:${raw.jobs.length}\nSample ins:\n${JSON.stringify(raw.ins.slice(0,1),null,2)}`;
-    showToast("Debug: "+raw.ins.length+" ins, "+raw.jobs.length+" jobs","i");
+    showToast("Debug On: "+raw.ins.length+" inspections","i");
     console.log(info);
-  }else showToast("Debug off","i");
+  }else showToast("Debug Off","i");
 }
 
 function exportCSV(type){
@@ -658,14 +747,14 @@ function exportCSV(type){
   const rows=Array.from(document.querySelectorAll(`#${tblId} tr`))
     .map(tr=>Array.from(tr.querySelectorAll("td")).map(td=>td.textContent.trim()))
     .filter(r=>r.length>1&&r[0]);
-  if(!rows.length){showToast("ไม่มีข้อมูล","e");return;}
+  if(!rows.length){showToast("ไม่มีข้อมูลสำหรับส่งออก","e");return;}
   const hdr=type==="5s"?["แผนก","ตรวจ","คะแนน","เป้าหมาย","เทียบเดือนก่อน","ดี/พอใช้/ปรับ","สถานะ","ล่าสุด"]:["Job No.","ประเภท","แผนก","ปัญหา","วันที่พบ","ครบกำหนด","สถานะ"];
   const csv=[hdr,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"}));
   a.download=`${type}_Report_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
-  showToast("ดาวน์โหลด CSV เรียบร้อย","s");
+  showToast("ดาวน์โหลด CSV เรียบร้อยแล้ว","s");
 }
 </script>
 </body>
