@@ -24,7 +24,7 @@
     
     .container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
 
-    /* Filters (Date + Type Selector) */
+    /* Filters */
     .filter-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
     .date-filter-box { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
     input[type="date"] { padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd; font-family: 'Prompt'; font-size: 1rem; color: var(--dark); outline: none; transition: border 0.3s; }
@@ -32,7 +32,6 @@
     .btn-clear-date { background: #f8f9fa; border: 1px solid #ddd; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: 600; color: #555; transition: 0.2s; }
     .btn-clear-date:hover { background: #e9ecef; }
     
-    /* Type Selector */
     .type-selector-title { font-weight: 600; color: var(--dark); font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
     .type-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
     .type-btn { padding: 10px 5px; border-radius: 8px; border: 2px solid var(--border); background: #f8f9fa; text-align: center; cursor: pointer; font-family: 'Prompt'; font-size: 0.75rem; font-weight: 600; color: #666; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 60px; user-select: none; }
@@ -81,7 +80,6 @@
     .score-badge.improve { background: #c62828; color: white; }
     
     .remark-box { font-size: 0.85rem; color: #d35400; margin-top: 8px; padding: 8px 12px; background: #fff9f0; border-left: 3px solid var(--primary); border-radius: 4px; }
-    
     .btn-view { background: #f4f6f7; border: 1px solid #d5dbdb; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--dark); font-family: 'Prompt'; transition: 0.2s; white-space: nowrap; font-weight: 600; }
     .btn-view:hover { background: #e5e8e8; border-color: var(--primary); }
     
@@ -107,8 +105,6 @@
       .img-preview-large { width: 75px; height: 75px; }
       input[type="date"] { width: 100%; max-width: 200px;}
       .date-filter-box { flex-wrap: wrap; }
-      
-      /* Responsive Table */
       table, thead, tbody, th, td, tr { display: block; }
       thead { display: none; }
       tr { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
@@ -132,14 +128,12 @@
   </nav>
 
   <div class="container">
-    
     <div class="filter-section">
       <div class="date-filter-box">
         <i class="fas fa-calendar-alt" style="color:var(--primary); font-size:1.2rem;"></i>
         <input type="date" id="dateFilter" onchange="renderTable()">
         <button class="btn-clear-date" onclick="clearDateFilter()">ดูทั้งหมด</button>
       </div>
-      
       <div class="type-selector-title"><i class="fas fa-filter" style="color: var(--primary);"></i> กรองตามประเภทการตรวจสอบ</div>
       <div class="type-selector">
         <div class="type-btn active" data-type="all" onclick="selectTypeFilter('all', this)"><i class="fas fa-list"></i>ทั้งหมด</div>
@@ -167,165 +161,149 @@
   </div>
 
   <script>
-    // ⚠️ ลิงก์ API เดิมของคุณ
     const API_URL = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
 
-    // โครงสร้าง Safety
-    const checklistSafety = {
-      s1: { title: "1. สถานที่ทำงาน", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "Water Mist"] },
-      s2: { title: "2. ท่าทางการทำงาน", questions: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์", "การยกของอย่างถูกต้องและปลอดภัย"] },
-      s3: { title: "3. เครื่องจักร", questions: ["สวมใส่อุปกรณ์ป้องกันอันตราย (PPE)", "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย"] },
-      s4: { title: "4. สารเคมี", questions: ["ไม่มีสารเคมีหกรั่วไหล", "ภาชนะปิดสนิท/มีฉลากชัดเจน", "มีอุปกรณ์ Spill Kit พร้อมใช้"] },
-      s5: { title: "5. ไฟฟ้า", questions: ["อุปกรณ์ไฟฟ้า/ปลั๊กไฟไม่ชำรุด", "ไม่มีการต่อพ่วงไฟฟ้าชั่วคราว", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย"] },
-      s6: { title: "6. อุปกรณ์ฉุกเฉิน", questions: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน"] },
-      s7: { title: "7. อื่นๆ", questions: ["ระบุรายการที่ 1", "ระบุรายการที่ 2", "ระบุรายการที่ 3"] }
+    // ===================================================================
+    // ✅ SAFETY CHECKLISTS — อัปเดต 8 หมวดตามรายการใหม่
+    // ===================================================================
+    const SAFETY_CHECKLIST_FACTORY = {
+      s1: { title: "1. สถานที่ทำงาน", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "การจัดเก็บ และกองวัสดุมีการกำหนดสูงไม่เกิน กองวัสดุมีความปลอดภัย", "Water Mist"] },
+      s2: { title: "2. ท่าทางการทำงาน", questions: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์, หรืออุปกรณ์ที่มีล้อในการเคลื่อนย้ายสิ่งของ", "การยกของอย่างถูกต้องและปลอดภัย"] },
+      s3: { title: "3. เครื่องจักร", questions: ["พนักงานสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงานตามที่กำหนด", "การปฏิบัติงานตามวิธีการทำงานหรือมาตรฐานการทำงานที่ปลอดภัย", "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย", "ไม่มีเสียง/สั่นผิดปกติ และไม่มีน้ำมันรั่วไหล"] },
+      s4: { title: "4. สารเคมี", questions: ["การสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงานตามที่กำหนด", "ไม่มีสารเคมีหกรั่วไหล, ไม่มีกลิ่นสารเคมีฟุ้งกระจายในอากาศ", "ภาชนะปิดสนิท, สภาพถังใส่สารเคมีแข็งแรงปลอดภัยและสะอาด, อุปกรณ์ใช้งานกับสารเคมีเช่น Valv/Flange/Pipe อยู่ในสภาพไม่ชำรุด รั่วซึม", "อากาศถ่ายเท", "มีอุปกรณ์ Spill Kit พร้อมใช้งาน", "มีขั้นตอนการปฏิบัติงาน", "บันทึกการตรวจสายกราวด์", "มีฉลากระบุสารเคมี และมี SDS"] },
+      s5: { title: "5. ไฟฟ้า", questions: ["ตรวจสอบอุปกรณ์ไฟฟ้าเช่น สายไฟ ปลั๊กไฟ ต้องไม่ชำรุดเสียหาย", "ปล๊กไฟ/เต้าเสียบไม่หลวม", "ไม่มีการต่ออุปกรณ์พวงไฟฟ้าแบบชั่วคราว", "อุปกรณ์ไฟฟ้าต้องมีการต่อสายดิน", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย, ไม่มีสายไฟโผล่, ไม่มีสิ่งกีดขวางหน้าตู้", "ไม่มีสิ่งของต่างๆหรือฝุ่นละอองสะสมอยู่บนแผงควบคุมไฟฟ้า, ไม่มีกระดาษ,พลาสติกหรืออุปกรณ์ติดไฟง่าย อยู่ในตู้ไฟและติดหน้าตู้ไฟ"] },
+      s6: { title: "6. ระบบป้องกันอัคคีภัย", questions: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT และ Layout ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน (เข็มอยู่ตำแหน่งสีเขียว)", "พื้นที่สะอาด ไม่มีของวางเกะกะ"] },
+      s7: { title: "7. การกำจัดของเสีย", questions: ["มีการแยกประเภทขยะ, การปิดฝาถังขยะ, ถังขยะไม่มีชำรุด แตกหัก"] },
+      s8: { title: "8. Other", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
 
-    // โครงสร้าง 5S
-    const checklist5S = {
-      "OFFICE": { sections: [
-        { title: "1. โต๊ะทำงาน", questions: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้","ความเป็นระเบียบเรียบร้อย","การกำหนดจำนวนอุปกรณ์","ตะกร้าเอกสารระบุป้ายชัดเจน"] },
-        { title: "2. ลิ้นชัก", questions: ["ลิ้นชักที่ 1 อุปกรณ์เครื่องเขียน","ลิ้นชักที่ 2 ของใช้ไม่ประจำ","ลิ้นชักที่ 3 อุปกรณ์ส่วนตัว"] },
-        { title: "3. การจัดเก็บเอกสาร", questions: ["แฟ้มใช้ฟอนต์ Angsana New","เอกสารเรียงเป็นระเบียบ","หน้าตู้ระบุรายชื่อและแผนก"] },
-        { title: "4. เครื่องคอมพิวเตอร์", questions: ["จัดวางในตำแหน่งเหมาะสม","ไม่ติดโน๊ตหน้าคอมพิวเตอร์","จัดเก็บสายไฟเป็นระเบียบ"] },
-        { title: "5. พื้น/ผนัง/เพดาน", questions: ["ไม่มีเศษขยะ/หยากไย่","ไม่วางสิ่งกีดขวาง","กำหนดเวลาทำความสะอาด"] },
-        { title: "6. สภาพแวดล้อมทั่วไป", questions: ["ไม่มีสิ่งของไม่จำเป็น","ถังขยะมีป้ายชี้บ่ง","กำหนดที่วางอุปกรณ์ทำความสะอาด"] },
-        { title: "7. สุขลักษณะส่วนบุคคล", questions: ["แต่งกายถูกต้องตามกฎ","มีสุขลักษณะส่วนบุคคลที่สะอาด","สุขภาพร่างกายแข็งแรง"] },
-        { title: "8. ความตระหนัก", questions: ["ตระหนักทำ 5ส เป็นประจำวัน","นำเสนอความสำเร็จ","นำ 3ส แรกมาใช้เต็มรูปแบบ"] }
-      ]},
-      "Factory": { sections: [
-        { title: "1. เครื่องจักร", questions: ["ทำความสะอาดก่อน-หลังงาน","ติดเส้นกำหนดจุดที่ตั้ง","แต่งกายรัดกุมสวม PPE"] },
-        { title: "2. เครื่องมือ", questions: ["กำหนดตำแหน่งวางเครื่องมือ","เก็บเข้าที่หลังใช้","จัดวางเป็นระเบียบมีป้ายบอก"] },
-        { title: "3. การจัดวางวัตถุดิบ", questions: ["วางในจุดที่กำหนด","ควบคุมตามหลัก FIFO","มีสถานะป้ายชี้บ่ง"] },
-        { title: "4. โต๊ะทำงาน/ลิ้นชัก", questions: ["ความสะอาดโต๊ะ/เก้าอี้","ความเป็นระเบียบอุปกรณ์","ลิ้นชักตามมาตรฐาน"] },
-        { title: "5. การจัดเก็บเอกสาร", questions: ["เรียงเป็นระเบียบไม่วางซ้อน","หน้าตู้ระบุรายชื่อและแผนก"] },
-        { title: "6. พื้น/ผนัง/เพดาน", questions: ["ไม่มีเศษขยะ/หยากไย่","ไม่มีคราบสี/น้ำมัน","กำหนดเวลาทำความสะอาด"] },
-        { title: "7. สภาพแวดล้อมทั่วไป", questions: ["ไม่มีสิ่งของไม่จำเป็น","ถังขยะมีป้ายชี้บ่ง","กำหนดที่วางอุปกรณ์ทำความสะอาด"] },
-        { title: "8. สุขลักษณะส่วนบุคคล", questions: ["แต่งกายถูกต้องตามกฎ","มีสุขลักษณะส่วนบุคคลที่สะอาด","สุขภาพร่างกายแข็งแรง"] },
-        { title: "9. ความตระหนัก", questions: ["ตระหนักทำ 5ส เป็นประจำวัน","นำเสนอความสำเร็จ","นำ 3ส แรกมาใช้เต็มรูปแบบ"] }
-      ]}
+    const SAFETY_CHECKLIST_OFFICE = {
+      s1: { title: "1. สภาพแวดล้อมสำนักงาน", questions: ["พื้นที่ทำงานสะอาด เป็นระเบียบ ไม่มีสิ่งของวางเกะกะ", "แสงสว่างเพียงพอต่อการทำงาน", "ระบบปรับอากาศ/อากาศถ่ายเทสะดวก", "เฟอร์นิเจอร์อยู่ในสภาพปลอดภัยมั่นคง", "ไม่มีการจัดวางของหนักบนที่สูงเกินระดับปลอดภัย"] },
+      s2: { title: "2. ท่านั่งทำงานและ Ergonomics", questions: ["ท่านั่งทำงานถูกต้อง จอคอมพิวเตอร์ระดับสายตา", "มีการพักสายตา/ยืดเหยียดร่างกายตามความเหมาะสม", "การหยิบเอกสารไม่มีการบิดเอี้ยวหรือก้มเงยมากเกินไป"] },
+      s3: { title: "3. ระบบไฟฟ้าและอุปกรณ์ IT", questions: ["สายไฟคอมพิวเตอร์ไม่พันกันหรือวางพาดทางเดิน", "ปลั๊กพ่วงไม่รับโหลดเกินกำหนด และอยู่ในสภาพสมบูรณ์", "อุปกรณ์ไฟฟ้าปิดสวิตช์เมื่อเลิกใช้งาน", "ไม่มีการดัดแปลงสายไฟหรือใช้เทปพันสายไฟที่ชำรุด"] },
+      s4: { title: "4. สารเคมีสำนักงาน", questions: ["น้ำยาทำความสะอาด/หมึกพิมพ์ เก็บในที่มิดชิดและมีฉลาก", "ไม่มีภาชนะเปิดทิ้งไว้หรือวางใกล้แหล่งความร้อน", "มีการใช้ถุงมือ/หน้ากากเมื่อสัมผัสสารทำความสะอาด"] },
+      s5: { title: "5. อุปกรณ์ฉุกเฉินและทางหนีไฟ", questions: ["ทางเดินและทางออกฉุกเฉินโล่ง ไม่มีสิ่งกีดขวาง", "ป้าย EXIT/แผนผังหนีไฟ ติดตั้งชัดเจนและมองเห็นได้", "ถังดับเพลิงอยู่ในตำแหน่งที่เข้าถึงง่าย เข็มวัดอยู่ในสีเขียว"] },
+      s6: { title: "6. การกำจัดขยะ", questions: ["มีการแยกขยะ (ทั่วไป/รีไซเคิล/อันตราย) ถูกต้อง", "ถังขยะมีฝาปิดมิดชิด และอยู่ในสภาพไม่ชำรุด", "ไม่มีการทิ้งขยะเกลื่อนกลาดหรือวางกองไว้เกินกำหนด"] },
+      s7: { title: "7. Other (ไม่บังคับ)", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
 
-    let rawData = [];
-    let currentType = 'all';
-    let currentStatus = 'all';
-
-    window.onload = function() {
-      // ตั้งค่าเริ่มต้นเป็นวันที่ปัจจุบัน
-      document.getElementById('dateFilter').valueAsDate = new Date();
-      loadData();
+    const SAFETY_CHECKLIST_OUTSIDE = {
+      s1: { title: "1. พื้นที่โดยรอบ", questions: ["ไม่มีเศษขยะ/เศษวัสดุตกหล่นตามทางเดินและที่จอดรถ", "หญ้า/พืชพรรณไม่ขึ้นรกสูงเกินไป", "สายยาง/ท่อต่างๆ เก็บเป็นระเบียบเรียบร้อย", "อุปกรณ์กำจัดสัตว์พาหะอยู่ในสภาพพร้อมใช้งาน", "รั้วโรงงานไม่มีรอยชำรุดเสียหาย"] },
+      s2: { title: "2. โรงเก็บขยะ", questions: ["มีการจัดเรียงถังเป็นระเบียบ", "แยกชนิดขยะให้ชัดเจนและมีป้ายชี้บ่ง", "ขยะไม่ล้นออกมา / ปิดฝาสนิท", "ถังเก็บสารเคมีอันตรายไม่ล้นและอยู่ในสภาพปลอดภัย"] },
+      s3: { title: "3. ป้อมยาม", questions: ["จัดเก็บเอกสารเรียบร้อยและทำความสะอาดสม่ำเสมอ", "อุปกรณ์ต่างๆ สามารถหยิบใช้ได้สะดวก", "การกำหนดจำนวนอุปกรณ์บนโต๊ะทำงานให้เหมาะสม"] },
+      s4: { title: "4. ห้องสุขา (ป้อมรปภ.)", questions: ["ทำความสะอาดกระจก/พื้น/โถชักโครก/ผนัง ด้วยน้ำให้สะอาด", "กระดาษชำระ/สบู่/ผ้าเช็ดมือ ดูแลอย่าให้ขาด"] },
+      s5: { title: "5. ถังแก๊ส/ถังก๊าซ", questions: ["ระบุป้ายชี้บ่งให้ชัดเจน", "เก็บถังในลักษณะตั้งตรงและมีเครื่องป้องกันการล้ม", "ไม่วางสิ่งของที่ไม่จำเป็นรอบๆ บริเวณที่เก็บก๊าซ"] },
+      s6: { title: "6. โรงจอดรถ", questions: ["จอดรถเป็นระเบียบไม่มีความเสี่ยงอุบัติเหตุ", "หลังคา/พื้น/ที่กั้น มีสภาพปกติไม่เสียหาย"] },
+      s7: { title: "7. Other (ไม่บังคับ)", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
 
-    function clearDateFilter() {
-      document.getElementById('dateFilter').value = "";
-      renderTable();
+    const SAFETY_CHECKLIST_MAP = {
+      "PRINT": "FACTORY", "LAMINATE": "FACTORY", "SOLVENT": "FACTORY",
+      "REWINDER/SLITTER/PACKING": "FACTORY", "BAG MAKING": "FACTORY",
+      "QA&QC": "FACTORY", "WAREHOUSE": "FACTORY",
+      "OFFICE": "OFFICE", "OUTSIDE": "OUTSIDE", "DEFAULT": "FACTORY"
+    };
+
+    function getSafetyChecklist(area) {
+      const normalized = String(area || "").trim().toUpperCase();
+      const key = SAFETY_CHECKLIST_MAP[normalized] || SAFETY_CHECKLIST_MAP["DEFAULT"];
+      if (key === "OFFICE") return SAFETY_CHECKLIST_OFFICE;
+      if (key === "OUTSIDE") return SAFETY_CHECKLIST_OUTSIDE;
+      return SAFETY_CHECKLIST_FACTORY;
     }
+
+    // ===================================================================
+    // ✅ 5S CHECKLISTS
+    // ===================================================================
+    const FACTORY_5S_SECTIONS = [
+      { title: "1. เครื่องจักร", questions: ["ทำความสะอาดเครื่องจักรทุกครั้งก่อน – หลังเลิกงานพร้อมระบุผู้รับผิดชอบป้ายผู้รับผิดชอบต้องเป็นปัจจุบัน", "ตีเส้นกำหนดจุดที่ตั้ง (ตีเส้นรอบเครื่องจักรด้วยสีเหลือง)", "ก่อนทำงานกับเครื่องจักรต้องแต่งกายให้รัดกุมและต้องสวมอุปกรณ์ป้องกันส่วนบุคคล"] },
+      { title: "2. เครื่องมือ", questions: ["กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน", "หลังจากนำเครื่องมือและอุปกรณ์ไปใช้ให้เก็บเข้าที่เสมอ", "เก็บวางเครื่องมืออย่างเป็นระเบียบในพื้นที่ที่กำหนด", "กำหนดผู้รับผิดชอบให้ชัดเจน"] },
+      { title: "3. การจัดวางวัตถุดิบและผลิตภัณฑ์กึ่งสำเร็จรูป และสำเร็จรูป", questions: ["วางในจุดงานที่กำหนดเท่านั้นไม่ล้นเกินเส้นกำหนด", "ควบคุมตามจัดวางตามหลัก FIFO", "มีสถานะป้ายชี้บ่ง"] },
+      { title: "4. โต๊ะทำงาน /ลิ้นชัก (Production)", questions: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน", "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงาน", "ลิ้นชักใส่เอกสารต้องตรงตามที่มาตรฐานกำหนด"] },
+      { title: "5. การจัดเก็บเอกสาร", questions: ["ในตู้เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน", "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"] },
+      { title: "6. พื้น / ผนังห้อง/ฝ้า/เพดาน", questions: ["ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น", "ไม่มีคราบสี, Solvent / น้ำนองพื้น", "กำหนดเวลาการทำความสะอาดประจำ ตามความเหมาะสม"] },
+      { title: "7. สภาพแวดล้อมทั่วไป", questions: ["มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมในแผนกหรือไม่", "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก", "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดและกำหนดผู้รับผิดชอบ"] },
+      { title: "8. การตรวจสุขลักษณะส่วนบุคคล", questions: ["พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
+      { title: "9. ความตระหนัก ความสำเร็จ ผลงาน", questions: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
+    ];
+
+    const CHECKLIST_5S = {
+      "PRINT": { sections: FACTORY_5S_SECTIONS }, "LAMINATE": { sections: FACTORY_5S_SECTIONS },
+      "REWINDER/SLITTER/PACKING": { sections: FACTORY_5S_SECTIONS }, "BAG MAKING": { sections: FACTORY_5S_SECTIONS },
+      "OFFICE": { sections: [
+        { title: "1. โต๊ะทำงาน", questions: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน", "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงานให้สามารถหยิบใช้ได้อย่างสะดวกและปลอดภัย", "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงานให้เหมาะสมกับมาตรฐานของพื้นที่", "ตะกร้าเอกสารต้องระบุป้ายชี้บ่งให้ชัดเจนและจัดเก็บเอกสารให้เป็นระเบียบ"] },
+        { title: "2. ลิ้นชัก", questions: ["ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน", "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO", "ลิ้นชักที่ 3 ใส่อุปกรณ์ส่วนตัว"] },
+        { title: "3. การจัดเก็บเอกสาร", questions: ["ในตู้เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน", "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"] },
+        { title: "4. เครื่องคอมพิวเตอร์", questions: ["จัดวางคอมพิวเตอร์ เครื่องแฟกซ์ในตำแหน่งที่เหมาะสมและสะดวกต่อการใช้งาน", "ไม่ติดกระดาษโน๊ตต่าง ๆ ไว้หน้าคอมพิวเตอร์", "จัดเก็บสายไฟคอมพิวเตอร์ให้เป็นระเบียบเรียบร้อย"] },
+        { title: "5. พื้น / ผนังห้อง/ฝ้า/เพดาน", questions: ["ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น/ผนังห้องต้องไม่มีหยากไย่", "ไม่วางสิ่งกีดขวางทางเดิน", "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม", "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"] },
+        { title: "6. สภาพแวดล้อมทั่วไป", questions: ["มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมใน Office หรือไม่", "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก", "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดและกำหนดผู้รับผิดชอบ", "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"] },
+        { title: "7. การตรวจสุขลักษณะส่วนบุคคล", questions: ["พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
+        { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", questions: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
+      ]},
+      "CANTEEN": { sections: [] }, "QA&QC": { sections: [] }, "ENGINEERING": { sections: [] }, "OUTSIDE": { sections: [] }
+    };
+
+    let rawData = [], currentType = 'all', currentStatus = 'all';
+
+    window.onload = function() { document.getElementById('dateFilter').valueAsDate = new Date(); loadData(); };
+    function clearDateFilter() { document.getElementById('dateFilter').value = ""; renderTable(); }
 
     function getDriveThumbnailUrl(url) {
       if(!url) return "";
       let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if(match && match[1]) { return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w500`; }
-      return url; 
+      if(match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w500`;
+      return url;
     }
 
     function calculate5SScore(checklist, areaStr) {
-      let areaKey = (areaStr && (areaStr.toUpperCase().includes("OFFICE"))) ? "OFFICE" : "Factory";
-      const sections = checklist5S[areaKey].sections;
+      const isOffice = areaStr && areaStr.toUpperCase() === "OFFICE";
+      const sections = (CHECKLIST_5S[areaStr] || CHECKLIST_5S["OFFICE"])?.sections || [];
       let total = 0, max = 0;
       sections.forEach((sec, sIdx) => {
         sec.questions.forEach((_, qIdx) => {
           const val = checklist?.[`5s_s${sIdx}_q${qIdx}`];
           max += 2;
-          if (val === "ดี") total += 2;
-          else if (val === "พอใช้") total += 1;
+          if (val === "ดี") total += 2; else if (val === "พอใช้") total += 1;
         });
       });
       return max > 0 ? Math.round((total / max) * 100) : 0;
     }
 
     function loadData() {
-      const loader = document.getElementById('loader');
-      loader.classList.add('show');
-
-      // ⚠️ โหลดข้อมูลทั้งหมดมาเก็บไว้ในตัวแปร rawData แค่รอบเดียว
+      const loader = document.getElementById('loader'); loader.classList.add('show');
       fetch(API_URL + "?action=getDashboardData")
-      .then(response => response.json())
-      .then(data => {
+      .then(r => r.json()).then(data => {
         rawData = data.details || [];
-        
-        // คำนวณสถานะ hasBad สำหรับ 5S ไว้ล่วงหน้า
         rawData.forEach(d => {
           if (!d.inspectionType) d.inspectionType = "Safety";
           if (d.inspectionType.toUpperCase() === "5S" && d.fullChecklist) {
             d.hasBad = Object.values(d.fullChecklist).includes("ปรับปรุง") || Object.values(d.fullChecklist).includes("ไม่ดี");
           }
         });
-        
-        // เมื่อดึงข้อมูลเสร็จ ให้วาดตารางและกรองข้อมูลทันที
-        renderTable();
-        loader.classList.remove('show');
-      })
-      .catch(err => {
-        loader.classList.remove('show');
-        console.error("Error:", err);
-      });
+        renderTable(); loader.classList.remove('show');
+      }).catch(err => { loader.classList.remove('show'); console.error("Error:", err); });
     }
 
-    function selectTypeFilter(type, el) {
-      currentType = type;
-      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
-      renderTable();
-    }
-
-    function updateStatusFilter(status) {
-      currentStatus = status;
-      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
-      document.getElementById('card-' + status).classList.add('active');
-      renderTable();
-    }
+    function selectTypeFilter(type, el) { currentType = type; document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); renderTable(); }
+    function updateStatusFilter(status) { currentStatus = status; document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active')); document.getElementById('card-' + status).classList.add('active'); renderTable(); }
 
     function renderTable() {
       let filtered = [...rawData];
-
-      // 1. กรองตามวันที่ (ถ้ามีการเลือกวันที่)
       const dateVal = document.getElementById('dateFilter').value;
-      if (dateVal) {
-        filtered = filtered.filter(d => {
-          if (!d.timestamp) return false;
-          return d.timestamp.startsWith(dateVal); // เช็คว่า timestamp เริ่มต้นด้วย "2026-05-28" หรือไม่
-        });
-      }
-
-      // 2. กรองตามประเภท
-      if (currentType !== 'all') {
-        filtered = filtered.filter(d => d.inspectionType.toUpperCase() === currentType.toUpperCase());
-      }
+      if (dateVal) filtered = filtered.filter(d => d.timestamp?.startsWith(dateVal));
+      if (currentType !== 'all') filtered = filtered.filter(d => d.inspectionType?.toUpperCase() === currentType.toUpperCase());
       
-      // อัปเดตตัวเลขสถิติด้านบน (สะท้อนตาม วันที่ + ประเภท ที่เลือก)
-      const t = filtered.length;
-      const b = filtered.filter(d => d.hasBad).length;
-      const g = t - b;
-      document.getElementById('countTotal').innerText = t;
-      document.getElementById('countGood').innerText = g;
-      document.getElementById('countBad').innerText = b;
-
-      // 3. กรองตามสถานะ (ปกติ / พบปัญหา)
+      const t = filtered.length, b = filtered.filter(d => d.hasBad).length, g = t - b;
+      document.getElementById('countTotal').innerText = t; document.getElementById('countGood').innerText = g; document.getElementById('countBad').innerText = b;
+      
       if (currentStatus === 'good') filtered = filtered.filter(d => !d.hasBad);
       if (currentStatus === 'bad') filtered = filtered.filter(d => d.hasBad);
 
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '';
-
-      if(filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px; color:#95a5a6;"><i class="fas fa-folder-open fa-3x" style="opacity:0.3; margin-bottom:15px; display:block;"></i> ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`;
-        return;
-      }
+      const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
+      if(filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px; color:#95a5a6;"><i class="fas fa-folder-open fa-3x" style="opacity:0.3; margin-bottom:15px; display:block;"></i> ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`; return; }
 
       filtered.forEach(d => {
-        const is5S = d.inspectionType.toUpperCase() === "5S";
-        
-        // จัดการรูปภาพ
+        const is5S = d.inspectionType?.toUpperCase() === "5S";
         let photoDisplay = '-';
         if (typeof d.photo === 'object' && d.photo !== null) {
           let photoCount = Object.values(d.photo).filter(url => url && url !== "ไม่มีรูปถ่าย" && url.trim() !== "").length;
@@ -334,7 +312,6 @@
           photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image fa-lg"></i></a>`;
         }
 
-        // สถานะหลัก
         let statusHtml = '';
         if (is5S) {
            const percent = calculate5SScore(d.fullChecklist, d.area);
@@ -344,105 +321,61 @@
            statusHtml = `<span class="badge" style="background:${d.hasBad? 'var(--danger)':'var(--success)'}">${d.hasBad?'พบปัญหา':'ปกติ'}</span>`;
         }
 
-        // Badge ประเภท
         let typeBadgeCls = is5S ? 'badge-5s' : '';
         let typeIcon = is5S ? 'fa-broom' : 'fa-hard-hat';
         if(d.inspectionType === 'Audit') typeIcon = 'fa-search';
-        if(d.inspectionType.includes('Accident')) typeIcon = 'fa-fire-extinguisher';
+        if(d.inspectionType?.includes('Accident')) typeIcon = 'fa-fire-extinguisher';
 
         const tr = document.createElement('tr');
-        // ✅ แก้บั๊กตรงนี้: ใส่เครื่องหมายคำพูดคล่อม '${d.id}' ป้องกัน Error D105 is not defined
-        tr.innerHTML = `
-          <td data-label="เวลา">${d.timestamp || '-'}</td>
-          <td data-label="ประเภท"><span class="type-badge ${typeBadgeCls}"><i class="fas ${typeIcon}"></i> ${d.inspectionType}</span></td>
-          <td data-label="พื้นที่"><strong>${d.area || '-'}</strong></td>
-          <td data-label="ผู้ตรวจ">${d.inspector || '-'}</td>
-          <td data-label="สถานะรวม">${statusHtml}</td>
-          <td data-label="รูปถ่าย">${photoDisplay}</td>
-          <td data-label="รายละเอียด"><button class="btn-view" onclick="toggleDetail('${d.id}')"><i class="fas fa-chevron-down" id="icon-${d.id}"></i> ดูผลตรวจ</button></td>
-        `;
+        tr.innerHTML = `<td data-label="เวลา">${d.timestamp || '-'}</td><td data-label="ประเภท"><span class="type-badge ${typeBadgeCls}"><i class="fas ${typeIcon}"></i> ${d.inspectionType}</span></td><td data-label="พื้นที่"><strong>${d.area || '-'}</strong></td><td data-label="ผู้ตรวจ">${d.inspector || '-'}</td><td data-label="สถานะรวม">${statusHtml}</td><td data-label="รูปถ่าย">${photoDisplay}</td><td data-label="รายละเอียด"><button class="btn-view" onclick="toggleDetail('${d.id}')"><i class="fas fa-chevron-down" id="icon-${d.id}"></i> ดูผลตรวจ</button></td>`;
         tbody.appendChild(tr);
 
-        // สร้าง Row รายละเอียด
-        const detailTr = document.createElement('tr');
-        detailTr.id = `detail-${d.id}`;
-        detailTr.className = 'detail-row';
-        
+        const detailTr = document.createElement('tr'); detailTr.id = `detail-${d.id}`; detailTr.className = 'detail-row';
         let detailHtml = `<div class="inner-detail"><h4 style="margin:0 0 15px 0; color:var(--dark); border-bottom:3px solid var(--primary); padding-bottom:8px;"><i class="fas fa-clipboard-check"></i> รายละเอียดผลการตรวจสอบ</h4>`;
         
         if (is5S) {
-          // Render 5S Detail
-          let areaKey = (d.area && d.area.toUpperCase().includes("OFFICE")) ? "OFFICE" : "Factory";
-          const sections = checklist5S[areaKey].sections;
+          const sections = (CHECKLIST_5S[d.area] || CHECKLIST_5S["OFFICE"])?.sections || [];
           sections.forEach((sec, sIdx) => {
             detailHtml += `<div class="section-group"><div class="section-head"><span>${sec.title}</span></div>`;
             sec.questions.forEach((qText, qIdx) => {
               const res = d.fullChecklist?.[`5s_s${sIdx}_q${qIdx}`];
               const remark = d.fullChecklist?.[`5s_remark_s${sIdx}_q${qIdx}`] || "";
-              
               let statusText = '-', statusClass = '', scoreBadge = '';
               if (res === "ดี") { statusText = '✔ ดี'; statusClass = 'status-5s-good'; scoreBadge = '<span class="score-badge good">+2</span>'; }
               else if (res === "พอใช้") { statusText = '🔶 พอใช้'; statusClass = 'status-5s-fair'; scoreBadge = '<span class="score-badge fair">+1</span>'; }
               else if (res === "ปรับปรุง") { statusText = '✘ ปรับปรุง'; statusClass = 'status-5s-improve'; scoreBadge = '<span class="score-badge improve">0</span>'; }
-
-              detailHtml += `<div class="sub-item">
-                <div class="sub-item-text">
-                  • ${qText} ${scoreBadge}
-                  ${remark ? `<div class="remark-box"><i class="fas fa-comment-dots"></i> ${remark}</div>` : ''}
-                </div>
-                <div class="status-pill ${statusClass}">${statusText}</div>
-              </div>`;
+              detailHtml += `<div class="sub-item"><div class="sub-item-text">• ${qText} ${scoreBadge} ${remark ? `<div class="remark-box"><i class="fas fa-comment-dots"></i> ${remark}</div>` : ''}</div><div class="status-pill ${statusClass}">${statusText}</div></div>`;
             });
             detailHtml += `</div>`;
           });
         } else {
-          // Render Safety Detail
-          for(let secKey in checklistSafety) {
-            const section = checklistSafety[secKey];
-            const sNum = secKey.replace('s', '');
+          const checklist = getSafetyChecklist(d.area);
+          for(let secKey in checklist) {
+            const section = checklist[secKey]; const sNum = secKey.replace('s', '');
             detailHtml += `<div class="section-group"><div class="section-head"><span>${section.title}</span></div>`;
-            
             section.questions.forEach((qText, idx) => {
               const res = d.fullChecklist?.[`section${sNum}_q${idx}`];
               const remark = d.fullChecklist?.[`section${sNum}_remark${idx}`];
               const isBad = res === "ไม่ดี";
-              
               let displayQText = qText;
-              if(secKey === 's1' && qText === 'Water Mist' && d.fullChecklist['water_val']) {
-                  displayQText += ` <span style="color:#e67e22; font-weight:bold;">(${d.fullChecklist['water_val']}%)</span>`;
-              }
+              if(secKey === 's1' && qText === 'Water Mist' && d.fullChecklist?.['water_val']) displayQText += ` <span style="color:#e67e22; font-weight:bold;">(${d.fullChecklist['water_val']}%)</span>`;
               
-              // หารูปภาพรายข้อ
-              const qPhotoKey = `${secKey}_q${idx}`; 
-              let qPhotoPreviews = ""; 
+              let qPhotoPreviews = "";
               if(typeof d.photo === 'object' && d.photo !== null) {
                  for(let p = 0; p < 3; p++) {
-                    let pKey = `${qPhotoKey}_${p}`;
+                    let pKey = `${secKey}_q${idx}_${p}`;
                     if(d.photo[pKey] && d.photo[pKey] !== "") {
                        let thumbUrl = getDriveThumbnailUrl(d.photo[pKey]);
-                       let imgCaption = d.fullChecklist[`caption_${pKey}`] || ""; 
+                       let imgCaption = d.fullChecklist?.[`caption_${pKey}`] || "";
                        qPhotoPreviews += `<div style="display:flex; flex-direction:column; align-items:center; width:90px; margin-right:10px; margin-top:8px;"><a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large"></a>${imgCaption ? `<span style="font-size:0.7rem; color:#555; text-align:center; margin-top:4px;">${imgCaption}</span>` : ''}</div>`;
                     }
                  }
-                 if(d.photo[qPhotoKey] && d.photo[qPhotoKey] !== "" && qPhotoPreviews === "") {
-                    let thumbUrl = getDriveThumbnailUrl(d.photo[qPhotoKey]);
-                    qPhotoPreviews += `<div style="margin-right:10px; margin-top:8px;"><a href="${d.photo[qPhotoKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large"></a></div>`;
-                 }
               }
-
-              detailHtml += `<div class="sub-item">
-                  <div class="sub-item-text">
-                    - ${displayQText} 
-                    ${remark ? `<div class="remark-box"><b>หมายเหตุ:</b> ${remark}</div>` : ''}
-                    ${qPhotoPreviews !== "" ? `<div style="display:flex; flex-wrap:wrap;">${qPhotoPreviews}</div>` : ''}
-                  </div>
-                  <div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}</div>
-                </div>`;
+              detailHtml += `<div class="sub-item"><div class="sub-item-text">- ${displayQText} ${remark ? `<div class="remark-box"><b>หมายเหตุ:</b> ${remark}</div>` : ''} ${qPhotoPreviews !== "" ? `<div style="display:flex; flex-wrap:wrap;">${qPhotoPreviews}</div>` : ''}</div><div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}</div></div>`;
             });
             detailHtml += `</div>`;
           }
         }
-        
         detailHtml += `</div>`;
         detailTr.innerHTML = `<td colspan="7" style="padding:0;">${detailHtml}</td>`;
         tbody.appendChild(detailTr);
@@ -450,16 +383,9 @@
     }
 
     function toggleDetail(id) {
-      const row = document.getElementById('detail-' + id);
-      const icon = document.getElementById('icon-' + id);
+      const row = document.getElementById('detail-' + id), icon = document.getElementById('icon-' + id);
       const isVisible = row.style.display === 'table-row' || row.style.display === 'block';
-      
-      // รองรับ Responsive Table สำหรับมือถือ
-      if (window.innerWidth <= 768) {
-        row.style.display = isVisible ? 'none' : 'block';
-      } else {
-        row.style.display = isVisible ? 'none' : 'table-row';
-      }
+      if (window.innerWidth <= 768) row.style.display = isVisible ? 'none' : 'block'; else row.style.display = isVisible ? 'none' : 'table-row';
       icon.className = isVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
     }
   </script>
