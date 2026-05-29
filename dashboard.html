@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>5S & Safety Enterprise Command Center</title>
+<title>5S & Safety Master Command Center</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -35,10 +35,13 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 .filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .filters select { height: 40px; padding: 0 32px 0 12px; border-radius: var(--radius-md); border: 1px solid var(--border); font-family: inherit; font-size: 14px; outline: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 8px center/16px; -webkit-appearance: none; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow-sm); }
 .filters select:hover { border-color: var(--primary); }
+.btn-outline { height: 32px; padding: 0 12px; background: transparent; color: var(--primary); border: 1px solid var(--primary); border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-family: inherit; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;}
+.btn-outline:hover { background: var(--primary-light); }
 
 /* ─── LAYOUT & CARDS ─── */
 .content { max-width: 1440px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 32px; }
-.section-header { font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; color: var(--text-main); padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+.section-header { font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; color: var(--text-main); padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+.sh-left { display: flex; align-items: center; gap: 10px; }
 .grid-cols-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
 .grid-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .grid-cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -48,23 +51,36 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 .card-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; }
 .card-desc { font-size: 12px; color: var(--text-muted); font-weight: 400; display: block; margin-top: 4px; }
 .chart-wrap { position: relative; width: 100%; height: 280px; flex: 1;}
-.chart-wrap.short { height: 220px; }
+
+/* ─── MODAL (Logic Explanation) ─── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 9999; backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.active { display: flex; }
+.modal-content { background: var(--bg-surface); width: 100%; max-width: 700px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); display: flex; flex-direction: column; max-height: 90vh; overflow: hidden; animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes modalIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-header h3 { font-size: 18px; font-weight: 700; margin: 0; color: var(--primary); display: flex; align-items: center; gap: 8px;}
+.modal-close { background: transparent; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+.modal-close:hover { color: var(--danger); }
+.modal-body { padding: 24px; overflow-y: auto; font-size: 14px; line-height: 1.6; color: var(--text-main); }
+.logic-box { background: var(--bg-body); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 16px; border-radius: 6px; margin-bottom: 20px; }
+.logic-box h4 { margin: 0 0 8px 0; font-size: 15px; color: var(--text-main); }
+.logic-code { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 6px; font-family: 'Inter', monospace; font-size: 13px; overflow-x: auto; margin-top: 10px; }
+.map-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.map-table th { background: var(--bg-body); padding: 10px; text-align: left; border: 1px solid var(--border); font-weight: 600; }
+.map-table td { padding: 10px; border: 1px solid var(--border); }
 
 /* ─── COMPONENTS ─── */
-/* Gauge */
 .gauge-container { position: relative; height: 200px; display: flex; justify-content: center; }
 .gauge-text { position: absolute; bottom: 0; text-align: center; }
 .gauge-val { font-size: 42px; font-weight: 700; line-height: 1; color: var(--text-main); }
 .gauge-sub { font-size: 14px; font-weight: 600; color: var(--text-muted); }
 
-/* KPI Cards */
 .kpi-card { display: flex; align-items: center; gap: 16px; padding: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
 .kpi-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
 .kpi-info { display: flex; flex-direction: column; }
 .kpi-label { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
 .kpi-value { font-size: 24px; font-weight: 700; line-height: 1; color: var(--text-main); }
 
-/* Leaderboard */
 .lb-list { display: flex; flex-direction: column; gap: 12px; }
 .lb-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-body); border-radius: var(--radius-md); border: 1px solid var(--border); }
 .lb-rank { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Inter', sans-serif; font-size: 14px; color: white; }
@@ -74,18 +90,14 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 .lb-name { flex: 1; font-weight: 600; font-size: 14px; }
 .lb-score { font-weight: 700; font-size: 16px; color: var(--primary); }
 
-/* Heatmap */
 .heatmap-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .heatmap-table th { font-weight: 600; color: var(--text-muted); padding: 8px; text-align: center; border-bottom: 1px solid var(--border); }
 .heatmap-table th:first-child { text-align: left; }
-.heatmap-table td { padding: 8px; text-align: center; font-weight: 600; color: #fff; border: 1px solid var(--bg-surface); transition: filter 0.2s; cursor: default; }
-.heatmap-table td:hover { filter: brightness(0.85); }
+.heatmap-table td { padding: 8px; text-align: center; font-weight: 600; color: #fff; border: 1px solid var(--bg-surface); }
 .heatmap-table td:first-child { text-align: left; color: var(--text-main); font-weight: 500; background: transparent !important; }
 
-/* Pyramid */
 .pyramid-wrap { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; padding-top: 20px;}
-.pyr-tier { width: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; font-weight: 600; font-size: 13px; transition: all 0.3s; position: relative;}
-.pyr-tier:hover { transform: scale(1.02); }
+.pyr-tier { width: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; font-weight: 600; font-size: 13px;}
 .pyr-val { font-size: 24px; font-weight: 800; font-family: 'Inter', sans-serif; line-height: 1; margin-bottom: 2px;}
 .pyr-top { background: var(--danger); border-radius: 8px 8px 0 0; padding: 20px 10px; width: 60%; }
 .pyr-mid { background: var(--warning); padding: 20px 10px; width: 80%; }
@@ -100,7 +112,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 <div id="loader"><div class="spinner"></div><div style="font-weight:500; color:var(--text-muted); margin-top:10px;">กำลังวิเคราะห์ข้อมูลเชิงลึก...</div></div>
 
 <header class="topbar">
-  <div class="brand"><i class="fas fa-satellite-dish"></i> Command Center</div>
+  <div class="brand"><i class="fas fa-satellite-dish"></i> Master Command Center</div>
   <div class="filters">
     <select id="timeRange" onchange="applyFilters()">
       <option value="today">วันนี้</option>
@@ -116,44 +128,37 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 <div class="content">
 
   <section>
-    <div class="section-header"><i class="fas fa-star" style="color:var(--warning)"></i> 5S Performance & Deep Analytics</div>
+    <div class="section-header">
+      <div class="sh-left"><i class="fas fa-star" style="color:var(--warning)"></i> 5S Performance & Deep Analytics</div>
+      <button class="btn-outline" onclick="openLogicModal()"><i class="fas fa-info-circle"></i> ตรรกะการวิเคราะห์ 5ส.</button>
+    </div>
     
     <div class="grid-cols-3" style="margin-bottom:16px;">
       <div class="card">
         <div class="card-title">ภาพรวมคะแนน 5S (Gauge) <span class="card-desc">เป้าหมายองค์กร 85%</span></div>
-        <div class="gauge-container">
-          <canvas id="chGauge"></canvas>
-          <div class="gauge-text">
-            <div class="gauge-val" id="gVal">0%</div>
-            <div class="gauge-sub" id="gSub">รอการประมวลผล</div>
-          </div>
-        </div>
+        <div class="gauge-container"><canvas id="chGauge"></canvas><div class="gauge-text"><div class="gauge-val" id="gVal">0%</div><div class="gauge-sub" id="gSub">-</div></div></div>
       </div>
-
       <div class="card">
         <div class="card-title">วิเคราะห์ 5 ส. รายหมวด (Radar) <span class="card-desc">ความสมดุลของแต่ละพื้นที่</span></div>
         <div class="chart-wrap"><canvas id="chRadar"></canvas></div>
       </div>
-
       <div class="card">
-        <div class="card-title">Hall of Fame (Top 3) <span class="card-desc">แผนกที่ทำคะแนนสูงสุด</span></div>
-        <div class="lb-list" id="lbList">
-          </div>
+        <div class="card-title">Hall of Fame (Top 3) <span class="card-desc">แผนกที่ทำคะแนน 5S สูงสุด</span></div>
+        <div class="lb-list" id="lbList"></div>
       </div>
     </div>
 
     <div class="grid-cols-2" style="margin-bottom:16px;">
       <div class="card" style="grid-column: span 2;">
-        <div class="card-title">แผนภูมิควบคุมกระบวนการ (Process Control Chart) <span class="card-desc">ดูเสถียรภาพรายเดือน พร้อมขีดจำกัดบน-ล่าง (UCL / LCL)</span></div>
+        <div class="card-title">แผนภูมิควบคุมกระบวนการ (Control Chart) <span class="card-desc">ดูเสถียรภาพรายเดือน พร้อมขีดจำกัดบน-ล่าง (UCL / LCL)</span></div>
         <div class="chart-wrap"><canvas id="chControl"></canvas></div>
       </div>
     </div>
 
     <div class="grid-cols-2" style="margin-bottom:16px;">
       <div class="card" style="grid-column: span 2; overflow-x: auto;">
-        <div class="card-title">ตารางสแกนจุดบอด 5S (Heatmap Matrix) <span class="card-desc">สีแดง = ต้องเร่งปรับปรุง | สีเขียว = ได้มาตรฐานดีเยี่ยม</span></div>
-        <table class="heatmap-table" id="tbHeatmap">
-          </table>
+        <div class="card-title">ตารางสแกนจุดบอด 5S (Heatmap Matrix) <span class="card-desc">สีแดง = ต้องเร่งปรับปรุง | สีเขียว = ได้มาตรฐาน</span></div>
+        <table class="heatmap-table" id="tbHeatmap"></table>
       </div>
     </div>
 
@@ -162,7 +167,6 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
         <div class="card-title">คุณภาพคะแนนรายแผนก (Stacked Bar) <span class="card-desc">สัดส่วน ดี / พอใช้ / ปรับปรุง</span></div>
         <div class="chart-wrap"><canvas id="chStacked"></canvas></div>
       </div>
-
       <div class="card">
         <div class="card-title">Top 5 ปัญหาที่พบ (Pareto) <span class="card-desc">กฎ 80/20 แก้จุดนี้เห็นผลมากที่สุด</span></div>
         <div class="chart-wrap"><canvas id="chPareto"></canvas></div>
@@ -171,7 +175,9 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
   </section>
 
   <section style="margin-top: 24px;">
-    <div class="section-header"><i class="fas fa-hard-hat" style="color:var(--success)"></i> Safety & Maintenance Analytics</div>
+    <div class="section-header">
+      <div class="sh-left"><i class="fas fa-hard-hat" style="color:var(--success)"></i> Safety & Maintenance Analytics</div>
+    </div>
     
     <div class="grid-cols-4" style="margin-bottom:16px;">
       <div class="kpi-card"><div class="kpi-icon" style="background:#eff6ff;color:#3b82f6"><i class="fas fa-clipboard-list"></i></div><div class="kpi-info"><span class="kpi-label">ความเสี่ยงที่พบ</span><span class="kpi-value" id="sfTotal">0</span></div></div>
@@ -182,25 +188,15 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 
     <div class="grid-cols-3" style="margin-bottom:16px;">
       <div class="card">
-        <div class="card-title">โครงสร้างความเสี่ยง (Safety Pyramid) <span class="card-desc">สถานะความวิกฤตของงาน</span></div>
+        <div class="card-title">โครงสร้างความเสี่ยง (Pyramid) <span class="card-desc">สถานะความวิกฤตของงาน</span></div>
         <div class="pyramid-wrap">
-          <div class="pyr-tier pyr-top">
-            <div class="pyr-val" id="pyrTop">0</div>
-            <div>วิกฤต (Overdue)</div>
-          </div>
-          <div class="pyr-tier pyr-mid">
-            <div class="pyr-val" id="pyrMid">0</div>
-            <div>เฝ้าระวัง (Open)</div>
-          </div>
-          <div class="pyr-tier pyr-bot">
-            <div class="pyr-val" id="pyrBot">0</div>
-            <div>ปลอดภัย (Closed)</div>
-          </div>
+          <div class="pyr-tier pyr-top"><div class="pyr-val" id="pyrTop">0</div><div>วิกฤต (Overdue)</div></div>
+          <div class="pyr-tier pyr-mid"><div class="pyr-val" id="pyrMid">0</div><div>เฝ้าระวัง (Open)</div></div>
+          <div class="pyr-tier pyr-bot"><div class="pyr-val" id="pyrBot">0</div><div>ปลอดภัย (Closed)</div></div>
         </div>
       </div>
-
       <div class="card" style="grid-column: span 2;">
-        <div class="card-title">ระยะเวลาเฉลี่ยในการปิดงาน (MTTR Trend) <span class="card-desc">ความรวดเร็วในการแก้ปัญหาของทีมงาน (วัน) / เดือน</span></div>
+        <div class="card-title">ระยะเวลาเฉลี่ยในการปิดงาน (MTTR Trend) <span class="card-desc">ความรวดเร็วในการแก้ปัญหา (วัน) / เดือน</span></div>
         <div class="chart-wrap"><canvas id="chMTTR"></canvas></div>
       </div>
     </div>
@@ -219,9 +215,62 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
         <div class="chart-wrap"><canvas id="chScatter"></canvas></div>
       </div>
     </div>
-
   </section>
+</div>
 
+<div id="logicModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-brain"></i> ตรรกะการประมวลผลข้อมูล (Calculation Logic)</h3>
+      <button class="modal-close" onclick="closeLogicModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="logic-box">
+        <h4>1. การปรับฐานคะแนน (Data Normalization)</h4>
+        <p>เนื่องจากแต่ละพื้นที่มีหัวข้อการตรวจไม่เท่ากัน (เช่น ออฟฟิศมี 10 ข้อ, โรงงานมี 30 ข้อ) ระบบจึงไม่ได้ใช้คะแนนดิบมาเทียบกันตรงๆ แต่ใช้หลักการ <b>เปอร์เซ็นต์ความสำเร็จเทียบกับฐานของตัวเอง</b> เพื่อให้เปรียบเทียบข้ามแผนกได้อย่างยุติธรรมบนกราฟ Radar และ Heatmap</p>
+        <div class="logic-code">สูตร: (คะแนนที่ได้รวม / คะแนนเต็มของข้อที่ถูกตรวจ) × 100</div>
+        <ul style="margin-top: 10px; padding-left: 20px; font-size: 13px;">
+          <li>ดี = 1.0 คะแนน</li>
+          <li>พอใช้ = 0.5 คะแนน</li>
+          <li>ปรับปรุง = 0 คะแนน</li>
+        </ul>
+      </div>
+
+      <div class="logic-box">
+        <h4>2. ตรรกะการจัดหมวด 5ส. อัตโนมัติ (Automated Category Mapping)</h4>
+        <p>เนื่องจากแบบฟอร์มออกแบบมาให้เดินตรวจ "ตามพื้นที่" (Area-based เช่น ตรวจโต๊ะ ตรวจพื้น) ระบบ Dashboard จึงทำการเขียน <b>AI Keyword Mapping</b> เพื่อดึงคำถามจากพื้นที่ต่างๆ กลับเข้ามาจัดเรียงเข้าหมวด 5ส. (S1-S5) โดยอัตโนมัติตามหลักการ ดังนี้:</p>
+        
+        <table class="map-table">
+          <tr>
+            <th style="width:120px;">หมวด (Category)</th>
+            <th>Keywords ที่ระบบดักจับจากชื่อหัวข้อการตรวจ</th>
+          </tr>
+          <tr>
+            <td style="color:#2563eb; font-weight:600;">ส1. สะสาง</td>
+            <td>สภาพแวดล้อมทั่วไป, พื้นที่โดยรอบบริษัท, โรงเก็บขยะ</td>
+          </tr>
+          <tr>
+            <td style="color:#f59e0b; font-weight:600;">ส2. สะดวก</td>
+            <td>เครื่องมือ, วัตถุดิบ, โต๊ะทำงาน, ลิ้นชัก, เอกสาร, เครื่องคอมพิวเตอร์, ห้องประชุม, ป้อมยาม, ถังแก๊ส, โรงจอดรถ</td>
+          </tr>
+          <tr>
+            <td style="color:#10b981; font-weight:600;">ส3. สะอาด</td>
+            <td>เครื่องจักร, พื้น / ผนัง, ห้องอาหาร, ล็อกเกอร์, ห้องสุขา, ทางเข้า, ห้องกาแฟ</td>
+          </tr>
+          <tr>
+            <td style="color:#8b5cf6; font-weight:600;">ส4. สุขลักษณะ</td>
+            <td>การตรวจสุขลักษณะส่วนบุคคล</td>
+          </tr>
+          <tr>
+            <td style="color:#ec4899; font-weight:600;">ส5. สร้างนิสัย</td>
+            <td>ความตระหนัก ความสำเร็จ ผลงาน</td>
+          </tr>
+        </table>
+      </div>
+      
+      <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 0;">* หมายเหตุ: หากมีการเพิ่มหัวข้อตรวจใหม่ที่มีคำนอกเหนือจาก Keyword เหล่านี้ ระบบจะจัดให้อยู่ในหมวด "ส1. สะสาง" เป็นค่าเริ่มต้น</p>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -231,30 +280,23 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 const API = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
 const TARGET = 85;
 const S_CATS = ["ส1. สะสาง", "ส2. สะดวก", "ส3. สะอาด", "ส4. สุขลักษณะ", "ส5. สร้างนิสัย"];
-
 const DEPTS = ["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","ENGINEERING","OUTSIDE"];
 const AREA_MAP = {"แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Solvent":"SOLVENT","แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING","แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC","แผนก Warehouse":"WAREHOUSE","Office":"OFFICE","พื้นที่รอบบริเวณโรงงาน":"OUTSIDE","Canteen":"CANTEEN","EN":"ENGINEERING"};
 
-const FACTORY_5S_SECTIONS = [
-  { title: "1. เครื่องจักร", qs: ["ทำความสะอาดเครื่องจักรทุกครั้งก่อน – หลังเลิกงาน", "ตีเส้นกำหนดจุดที่ตั้ง", "แต่งกายรัดกุมและสวมอุปกรณ์ป้องกัน"] },
-  { title: "2. เครื่องมือ", qs: ["กำหนดตำแหน่งวางเพื่อง่ายต่อการหยิบใช้", "เก็บเข้าที่เสมอ", "เก็บวางเป็นระเบียบ", "กำหนดผู้รับผิดชอบชัดเจน"] },
-  { title: "3. การจัดวางวัตถุดิบฯ", qs: ["วางในจุดที่กำหนดไม่ล้นเส้น", "จัดวางตามหลัก FIFO", "มีป้ายชี้บ่ง"] },
-  { title: "4. โต๊ะทำงาน/ลิ้นชัก", qs: ["ความสะอาดโต๊ะ/เก้าอี้", "ความเป็นระเบียบ", "ลิ้นชักตรงตามมาตรฐาน"] },
-  { title: "5. จัดเก็บเอกสาร", qs: ["เอกสารเรียงเป็นระเบียบ", "หน้าตู้ระบุชื่อเอกสารและแผนก"] },
-  { title: "6. พื้น/ผนัง/เพดาน", qs: ["ไม่มีขยะ/หยากไย่", "ไม่มีคราบสี/น้ำนอง", "กำหนดเวลาทำความสะอาด"] },
-  { title: "7. สภาพแวดล้อมทั่วไป", qs: ["ไม่มีของไม่จำเป็น", "ถังขยะเหมาะสมและเพียงพอ", "มีที่วางอุปกรณ์ทำความสะอาด"] },
-  { title: "8. สุขลักษณะส่วนบุคคล", qs: ["แต่งกายถูกต้องตามระเบียบ", "สุขลักษณะสะอาด", "สุขภาพแข็งแรง"] },
-  { title: "9. ความตระหนัก/ผลงาน", qs: ["ตระหนัก 5ส เป็นงานประจำ", "นำเสนอผลงานสำเร็จ", "นำ 3 ส แรกมาใช้", "แสดง KPI"] }
+const F_SEC = [
+  { title: "1. เครื่องจักร", qs: ["คลีนก่อน-หลัง", "เส้นจุดตั้ง", "PPE"] }, { title: "2. เครื่องมือ", qs: ["วางหยิบง่าย", "เก็บเข้าที่", "เป็นระเบียบ", "มีผู้รับผิดชอบ"] },
+  { title: "3. การจัดวางวัตถุดิบฯ", qs: ["ไม่ล้นเส้น", "FIFO", "ป้ายชี้บ่ง"] }, { title: "4. โต๊ะทำงาน/ลิ้นชัก", qs: ["โต๊ะเก้าอี้สะอาด", "เป็นระเบียบ", "ลิ้นชักมาตรฐาน"] },
+  { title: "5. จัดเก็บเอกสาร", qs: ["เอกสารระเบียบ", "ป้ายหน้าตู้"] }, { title: "6. พื้น/ผนัง/เพดาน", qs: ["ไม่มีขยะ", "ไม่มีน้ำนอง", "เวลาทำความสะอาด"] },
+  { title: "7. สภาพแวดล้อมทั่วไป", qs: ["ไม่มีของเกิน", "ถังขยะพอ", "ที่เก็บอุปกรณ์"] }, { title: "8. สุขลักษณะส่วนบุคคล", qs: ["แต่งกาย", "สะอาด", "แข็งแรง"] }, { title: "9. ความตระหนัก/ผลงาน", qs: ["ทำเป็นประจำ", "โชว์ผลงาน", "ใช้ 3 ส", "แสดง KPI"] }
 ];
 
 const CHECKLIST_5S = {
-  "PRINT": { sections: FACTORY_5S_SECTIONS }, "LAMINATE": { sections: FACTORY_5S_SECTIONS }, "SOLVENT": { sections: FACTORY_5S_SECTIONS },
-  "REWINDER/SLITTER/PACKING": { sections: FACTORY_5S_SECTIONS }, "BAG MAKING": { sections: FACTORY_5S_SECTIONS }, "WAREHOUSE": { sections: FACTORY_5S_SECTIONS },
-  "OFFICE": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["ความสะอาดของโต๊ะ", "ความเป็นระเบียบ", "จำนวนอุปกรณ์เหมาะสม", "ตะกร้าเอกสารมีป้าย"] }, { title: "2. ลิ้นชัก", qs: ["ลิ้นชัก 1 เครื่องเขียน", "ลิ้นชัก 2 ของไม่ประจำ", "ลิ้นชัก 3 ของส่วนตัว"] }, { title: "3. จัดเก็บเอกสาร", qs: ["เรียงเป็นระเบียบ", "หน้าตู้ระบุชื่อ"] }, { title: "4. คอมพิวเตอร์", qs: ["จัดวางเหมาะสม", "ไม่ติดโพสต์อิทหน้าจอ", "จัดเก็บสายไฟ"] }, { title: "5. พื้น/เพดาน", qs: ["ไม่มีขยะ/หยากไย่", "ไม่กีดขวางทางเดิน", "กำหนดเวลาทำความสะอาด", "ไม่เปิดประตูค้าง"] }, { title: "6. สภาพแวดล้อม", qs: ["ไม่มีของไม่จำเป็น", "ถังขยะเหมาะสม", "กำหนดที่วางอุปกรณ์", "ควบคุมแมลง"] }, { title: "7. สุขลักษณะ", qs: ["แต่งกายถูกต้อง", "ร่างกายสะอาด", "สุขภาพแข็งแรง"] }, { title: "8. ความตระหนัก", qs: ["ตระหนัก 5ส", "นำเสนอผลงาน", "ใช้ 3 ส แรก", "แสดง KPI"] } ]},
-  "CANTEEN": { sections: [ { title: "1. ห้องอาหาร", qs: ["โต๊ะสะอาดพร้อมใช้", "ชั้นวางอาหารสะอาด", "พื้น/ผนังสะอาด", "ถังขยะเพียงพอ"] }, { title: "2. ห้องประชุม", qs: ["เก็บโต๊ะเก้าอี้เข้าที่", "พื้น/ผนังสะอาด", "พร้อมใช้งาน"] }, { title: "3. ห้องกาแฟ", qs: ["ทำความสะอาดอ่าง", "แยกอุปกรณ์ชัดเจน", "จัดวางสิ่งของแยกชนิด"] }, { title: "4. LOCKER", qs: ["ป้ายชื่อชัดเจน", "หลังตู้สะอาด", "พื้น/ผนังสะอาด"] }, { title: "5. รองเท้า", qs: ["ป้ายชื่อชัดเจน", "ไม่มีอาหารในตู้"] }, { title: "6. ห้องสุขา", qs: ["ทำความสะอาดกระจก/พื้น/โถ", "กระดาษ/สบู่ ไม่ขาด"] }, { title: "7. AIR SHOWER", qs: ["ทำความสะอาดอ่าง", "พื้น/ผนังสะอาด", "วางรองเท้าถูกช่อง"] } ]},
-  "QA&QC": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["ความสะอาด", "ความเป็นระเบียบ", "จำนวนอุปกรณ์เหมาะสม"] }, { title: "2. ลิ้นชัก", qs: ["ลิ้นชัก 1 เครื่องเขียน", "ลิ้นชัก 2 ของไม่ประจำ", "ลิ้นชัก 3 อุปกรณ์ทำงาน", "ลิ้นชักกลางเอกสาร"] }, { title: "3. เอกสาร", qs: ["เรียงเป็นระเบียบ", "หน้าตู้มีป้าย"] }, { title: "4. พื้น/เพดาน", qs: ["ไม่มีขยะ", "ไม่วางกีดขวาง", "กำหนดเวลาทำความสะอาด"] }, { title: "5. คอมพิวเตอร์", qs: ["จัดวางเหมาะสม", "ไม่ติดโพสต์อิท", "เก็บสายไฟ", "ไม่เปิดประตูค้าง"] }, { title: "6. เครื่องมือ", qs: ["กำหนดตำแหน่งวาง", "เก็บเข้าที่", "เก็บในพื้นที่กำหนด", "มีผู้รับผิดชอบ", "ควบคุมแมลง"] }, { title: "7. สุขลักษณะ", qs: ["แต่งกายถูกต้อง", "ร่างกายสะอาด", "สุขภาพแข็งแรง"] }, { title: "8. ความตระหนัก", qs: ["ตระหนัก 5ส", "นำเสนอผลงาน", "ใช้ 3 ส แรก", "แสดง KPI"] } ]},
-  "ENGINEERING": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["ความสะอาด", "ความเป็นระเบียบ", "อุปกรณ์เหมาะสม"] }, { title: "2. ลิ้นชัก", qs: ["เครื่องเขียน", "ไม่ประจำ", "ของส่วนตัว"] }, { title: "3. เอกสาร", qs: ["แฟ้มใช้ Font กำหนด", "เรียงระเบียบ", "มีป้ายตู้"] }, { title: "4. เครื่องมือ", qs: ["กำหนดตำแหน่ง", "เก็บเข้าที่", "วางเป็นระเบียบ", "ชิ้นส่วนเล็กใส่กล่อง"] }, { title: "5. พื้น/เพดาน", qs: ["ไม่มีขยะ", "ไม่กีดขวาง", "กำหนดเวลาคลีน", "ไม่เปิดประตูค้าง"] }, { title: "6. สภาพแวดล้อม", qs: ["ไม่มีของไม่จำเป็น", "ถังขยะเหมาะสม", "กำหนดที่เก็บอุปกรณ์คลีน", "ควบคุมแมลง"] }, { title: "7. สุขลักษณะ", qs: ["แต่งกายถูก", "ร่างกายสะอาด", "สุขภาพแข็งแรง"] }, { title: "8. ความตระหนัก", qs: ["ตระหนัก 5ส", "โชว์ผลงาน", "ใช้ 3 ส", "แสดง KPI"] } ]},
-  "OUTSIDE": { sections: [ { title: "1. รอบบริษัท", qs: ["ไม่มีขยะ", "หญ้าไม่รก", "สายยางเก็บระเบียบ", "อุปกรณ์สัตว์ไม่ชำรุด", "รั้วไม่ชำรุด"] }, { title: "2. โรงเก็บขยะ", qs: ["เรียงถังระเบียบ", "แยกชนิดขยะ", "ขยะไม่ล้น", "สารเคมีไม่ล้น"] }, { title: "3. ป้อมยาม", qs: ["เอกสารเรียบร้อย", "อุปกรณ์หยิบง่าย", "จำนวนอุปกรณ์เหมาะสม"] }, { title: "4. สุขา", qs: ["ทำความสะอาด", "กระดาษสบู่มี"] }, { title: "5. สิ่งแวดล้อม", qs: ["ไม่มีของไม่จำเป็น", "ถังขยะเหมาะสม", "มีที่เก็บอุปกรณ์คลีน"] }, { title: "6. ถังแก๊ส", qs: ["ป้ายชัดเจน", "ตั้งตรงกันล้ม", "ไม่มีของไม่จำเป็นรอบๆ"] }, { title: "7. โรงจอดรถ", qs: ["จอดระเบียบ", "หลังคา/พื้นปกติ"] } ]}
+  "PRINT": { sections: F_SEC }, "LAMINATE": { sections: F_SEC }, "SOLVENT": { sections: F_SEC }, "REWINDER/SLITTER/PACKING": { sections: F_SEC }, "BAG MAKING": { sections: F_SEC }, "WAREHOUSE": { sections: F_SEC },
+  "OFFICE": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["1","2","3","4"] }, { title: "2. ลิ้นชัก", qs: ["1","2","3"] }, { title: "3. จัดเก็บเอกสาร", qs: ["1","2"] }, { title: "4. คอมพิวเตอร์", qs: ["1","2","3"] }, { title: "5. พื้น/เพดาน", qs: ["1","2","3","4"] }, { title: "6. สภาพแวดล้อมทั่วไป", qs: ["1","2","3","4"] }, { title: "7. สุขลักษณะส่วนบุคคล", qs: ["1","2","3"] }, { title: "8. ความตระหนัก", qs: ["1","2","3","4"] } ]},
+  "CANTEEN": { sections: [ { title: "1. ห้องอาหาร", qs: ["1","2","3","4"] }, { title: "2. ห้องประชุม", qs: ["1","2","3"] }, { title: "3. ห้องกาแฟ", qs: ["1","2","3"] }, { title: "4. LOCKER", qs: ["1","2","3"] }, { title: "5. รองเท้า", qs: ["1","2"] }, { title: "6. ห้องสุขา", qs: ["1","2"] }, { title: "7. ทางเข้า", qs: ["1","2","3"] } ]},
+  "QA&QC": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["1","2","3"] }, { title: "2. ลิ้นชัก", qs: ["1","2","3","4"] }, { title: "3. จัดเก็บเอกสาร", qs: ["1","2"] }, { title: "4. พื้น/เพดาน", qs: ["1","2","3"] }, { title: "5. คอมพิวเตอร์", qs: ["1","2","3","4"] }, { title: "6. เครื่องมือ", qs: ["1","2","3","4","5"] }, { title: "7. สุขลักษณะส่วนบุคคล", qs: ["1","2","3"] }, { title: "8. ความตระหนัก", qs: ["1","2","3","4"] } ]},
+  "ENGINEERING": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["1","2","3"] }, { title: "2. ลิ้นชัก", qs: ["1","2","3"] }, { title: "3. จัดเก็บเอกสาร", qs: ["1","2","3"] }, { title: "4. เครื่องมือ", qs: ["1","2","3","4"] }, { title: "5. พื้น/เพดาน", qs: ["1","2","3","4"] }, { title: "6. สภาพแวดล้อมทั่วไป", qs: ["1","2","3","4"] }, { title: "7. สุขลักษณะส่วนบุคคล", qs: ["1","2","3"] }, { title: "8. ความตระหนัก", qs: ["1","2","3","4"] } ]},
+  "OUTSIDE": { sections: [ { title: "1. พื้นที่โดยรอบบริษัท", qs: ["1","2","3","4","5"] }, { title: "2. โรงเก็บขยะ", qs: ["1","2","3","4"] }, { title: "3. ป้อมยาม", qs: ["1","2","3"] }, { title: "4. ห้องสุขา", qs: ["1","2"] }, { title: "5. สภาพแวดล้อมทั่วไป", qs: ["1","2","3"] }, { title: "6. ถังแก๊ส", qs: ["1","2","3"] }, { title: "7. โรงจอดรถ", qs: ["1","2"] } ]}
 };
 
 Chart.defaults.font.family = "'Sarabun', sans-serif";
@@ -262,8 +304,15 @@ let raw = { ins: [], jobs: [] };
 let charts = {};
 
 // ==========================================
-// 2. INITIALIZATION
+// 2. MODAL & INIT
 // ==========================================
+function openLogicModal() { document.getElementById("logicModal").classList.add("active"); }
+function closeLogicModal() { document.getElementById("logicModal").classList.remove("active"); }
+// ปิดเมื่อคลิกพื้นหลัง
+document.getElementById("logicModal").addEventListener('click', function(e) {
+  if (e.target === this) closeLogicModal();
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById("deptFilter");
   DEPTS.forEach(d => el.add(new Option(d, d)));
@@ -303,7 +352,6 @@ function applyFilters() {
     if (tr === "year") return d >= yearStart;
     return true;
   });
-
   const jobs = raw.jobs.filter(j => dept === "all" || (AREA_MAP[j.area] || String(j.area).toUpperCase()) === dept);
   processCharts(ins, jobs);
 }
@@ -319,10 +367,6 @@ function get5SCat(area, sIndex) {
   if (t.includes("ตระหนัก")) return "ส5. สร้างนิสัย";
   return "ส1. สะสาง"; 
 }
-function getQuestionText(area, sIndex, qIndex) {
-  if (CHECKLIST_5S[area] && CHECKLIST_5S[area].sections[sIndex] && CHECKLIST_5S[area].sections[sIndex].qs[qIndex]) return CHECKLIST_5S[area].sections[sIndex].qs[qIndex];
-  return `หมวด ${sIndex} ข้อ ${qIndex}`;
-}
 function mkChart(id, cfg) {
   if (charts[id]) charts[id].destroy();
   const c = document.getElementById(id);
@@ -330,7 +374,7 @@ function mkChart(id, cfg) {
 }
 
 // ==========================================
-// 3. RENDER ADVANCED CHARTS
+// 3. RENDER ALL CHARTS
 // ==========================================
 function processCharts(ins, jobs) {
   const data5S = ins.filter(i => String(i.inspectionType).toUpperCase() === "5S");
@@ -347,26 +391,18 @@ function processCharts(ins, jobs) {
   });
 
   const sCats = { "ส1. สะสาง": { s: 0, m: 0 }, "ส2. สะดวก": { s: 0, m: 0 }, "ส3. สะอาด": { s: 0, m: 0 }, "ส4. สุขลักษณะ": { s: 0, m: 0 }, "ส5. สร้างนิสัย": { s: 0, m: 0 } };
-  const paretoCount = {}; const deptQuality = {}; 
-  const monthlyData = {}; 
-  
-  // Heatmap Data Prep
+  const paretoCount = {}; const deptQuality = {}; const monthlyData = {}; 
   const deptHeatmap = {}; 
   DEPTS.forEach(d => { deptHeatmap[d] = {}; S_CATS.forEach(c => deptHeatmap[d][c] = {s:0, m:0}); });
-
-  const dScore = {}; // For Leaderboard & Scatter
+  const dScore = {};
 
   data5S.forEach(i => {
-    // Trend Data
     const dateStr = i.timestamp || "";
     let d = new Date(dateStr.replace(" ", "T"));
     if(!isNaN(d)) {
       let ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
       const p = parseFloat(i.score?.percent);
-      if(!isNaN(p)) {
-        if(!monthlyData[ym]) monthlyData[ym] = [];
-        monthlyData[ym].push(p);
-      }
+      if(!isNaN(p)) { if(!monthlyData[ym]) monthlyData[ym] = []; monthlyData[ym].push(p); }
     }
 
     const area = i.area;
@@ -381,41 +417,27 @@ function processCharts(ins, jobs) {
         const cat = get5SCat(area, parseInt(match[1]));
         let val = v === "ดี" ? 1 : v === "พอใช้" ? 0.5 : 0;
         
-        // Accumulate Radar
-        if (cat && sCats[cat]) {
-          sCats[cat].m += 1; sCats[cat].s += val;
-        }
-        // Accumulate Heatmap
-        if (deptHeatmap[area] && cat) {
-          deptHeatmap[area][cat].m += 1; deptHeatmap[area][cat].s += val;
-        }
-        // Accumulate Stacked
+        if (cat && sCats[cat]) { sCats[cat].m += 1; sCats[cat].s += val; }
+        if (deptHeatmap[area] && cat) { deptHeatmap[area][cat].m += 1; deptHeatmap[area][cat].s += val; }
         if(v === "ดี") deptQuality[area].g++; else if(v === "พอใช้") deptQuality[area].f++; else if(v === "ปรับปรุง") deptQuality[area].b++;
-        // Accumulate Pareto
         if (v === "ปรับปรุง") {
-          const qText = getQuestionText(area, parseInt(match[1]), parseInt(match[2]));
-          paretoCount[qText] = (paretoCount[qText] || 0) + 1;
+          const sTitle = CHECKLIST_5S[area] && CHECKLIST_5S[area].sections[parseInt(match[1])] ? CHECKLIST_5S[area].sections[parseInt(match[1])].title : k;
+          paretoCount[sTitle] = (paretoCount[sTitle] || 0) + 1; // Simplified pareto string
         }
       }
     });
   });
 
-  // 2. Leaderboard (Top 3)
+  // 2. Leaderboard
   const lbData = [];
   Object.keys(dScore).forEach(d => {
-    if(dScore[d].length > 0) {
-      lbData.push({ name: d, score: Math.round(dScore[d].reduce((a,b)=>a+b,0)/dScore[d].length) });
-    }
+    if(dScore[d].length > 0) lbData.push({ name: d, score: Math.round(dScore[d].reduce((a,b)=>a+b,0)/dScore[d].length) });
   });
   lbData.sort((a,b) => b.score - a.score);
   const lbHtml = lbData.slice(0,3).map((item, idx) => {
-    return `<div class="lb-item">
-      <div class="lb-rank r${idx+1}">${idx+1}</div>
-      <div class="lb-name">${item.name}</div>
-      <div class="lb-score">${item.score}%</div>
-    </div>`;
+    return `<div class="lb-item"><div class="lb-rank r${idx+1}">${idx+1}</div><div class="lb-name">${item.name}</div><div class="lb-score">${item.score}%</div></div>`;
   }).join("");
-  document.getElementById("lbList").innerHTML = lbHtml || '<div class="lb-item"><div class="lb-name">ไม่มีข้อมูล</div></div>';
+  document.getElementById("lbList").innerHTML = lbHtml || '<div class="lb-item"><div class="lb-name">ไม่พบข้อมูลคะแนน</div></div>';
 
   // 3. Radar
   const radarData = Object.values(sCats).map(c => c.m > 0 ? Math.round((c.s / c.m) * 100) : 0);
@@ -424,21 +446,17 @@ function processCharts(ins, jobs) {
     options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100 } } }
   });
 
-  // 4. Heatmap Matrix
-  // Generate HTML Table
+  // 4. Heatmap
   let hmHtml = `<tr><th>แผนก</th>${S_CATS.map(c=>`<th>${c}</th>`).join('')}</tr>`;
   DEPTS.forEach(d => {
-    // Only show depts that have data
     if(dScore[d] && dScore[d].length > 0) {
       hmHtml += `<tr><td>${d.substring(0,10)}</td>`;
       S_CATS.forEach(c => {
         const cell = deptHeatmap[d][c];
         const pct = cell.m > 0 ? Math.round((cell.s / cell.m) * 100) : null;
-        if(pct === null) {
-          hmHtml += `<td style="background:#f1f5f9; color:#94a3b8">-</td>`;
-        } else {
-          // Color scale: 0 = Red (0 hue), 50 = Yellow (60 hue), 100 = Green (120 hue)
-          const hue = Math.max(0, Math.min(120, (pct - 50) * 2.4)); // Start shifting at 50%
+        if(pct === null) hmHtml += `<td style="background:#f1f5f9; color:#94a3b8">-</td>`;
+        else {
+          const hue = Math.max(0, Math.min(120, (pct - 50) * 2.4)); 
           hmHtml += `<td style="background:hsl(${hue}, 80%, 45%)">${pct}%</td>`;
         }
       });
@@ -447,13 +465,11 @@ function processCharts(ins, jobs) {
   });
   document.getElementById("tbHeatmap").innerHTML = hmHtml || "<tr><td>ไม่พบข้อมูล</td></tr>";
 
-  // 5. Control Chart (SPC)
-  const monthsKeys = Object.keys(monthlyData).sort();
+  // 5. Control Chart
   const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+  const monthsKeys = Object.keys(monthlyData).sort();
   const monthLabels = monthsKeys.map(m => { const [y, mm] = m.split('-'); return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; });
   const monthScores = monthsKeys.map(m => { const arr = monthlyData[m]; return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length); });
-  
-  // Calculate UCL/LCL (Simplified as +/- 10% from Target for stability control)
   const uclData = Array(monthLabels.length || 1).fill(95); 
   const lclData = Array(monthLabels.length || 1).fill(75);
   const targetData = Array(monthLabels.length || 1).fill(85);
@@ -463,7 +479,7 @@ function processCharts(ins, jobs) {
     data: {
       labels: monthLabels.length ? monthLabels : ["-"],
       datasets: [
-        { label: "คะแนนเฉลี่ย (%)", data: monthScores, borderColor: "#2563eb", backgroundColor: "rgba(37, 99, 235, 0.1)", fill: true, tension: 0.2, pointRadius: 5, borderWidth: 3 },
+        { label: "คะแนน (%)", data: monthScores, borderColor: "#2563eb", backgroundColor: "rgba(37, 99, 235, 0.1)", fill: true, tension: 0.2, pointRadius: 5, borderWidth: 3 },
         { label: "UCL (95%)", data: uclData, borderColor: "#ef4444", borderDash: [3, 3], borderWidth: 1, pointRadius: 0, fill: false },
         { label: "Target (85%)", data: targetData, borderColor: "#10b981", borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false },
         { label: "LCL (75%)", data: lclData, borderColor: "#f59e0b", borderDash: [3, 3], borderWidth: 1, pointRadius: 0, fill: false }
@@ -472,7 +488,7 @@ function processCharts(ins, jobs) {
     options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 40, max: 100 } }, plugins: { legend: { position: 'bottom' } } }
   });
 
-  // 6. Stacked Bar & Pareto (Same as before)
+  // 6. Stacked & Pareto
   const deptLabels = Object.keys(deptQuality);
   const pGood = [], pFair = [], pBad = [];
   deptLabels.forEach(d => {
@@ -491,11 +507,11 @@ function processCharts(ins, jobs) {
   let totalIssues = pData.reduce((a, b) => a + b, 0); let cumSum = 0;
   const pLine = pData.map(val => { cumSum += val; return totalIssues > 0 ? (cumSum / totalIssues) * 100 : 0; });
   mkChart("chPareto", {
-    type: "bar", data: { labels: pLabels.length ? pLabels : ["-"], datasets: [ { type: "line", label: "% สะสม", data: pLine, borderColor: "#ef4444", yAxisID: "y1", tension: 0.1, fill: false }, { type: "bar", label: "จำนวนครั้งที่พบ", data: pData, backgroundColor: "#64748b", yAxisID: "y", borderRadius: 4 } ] },
+    type: "bar", data: { labels: pLabels.length ? pLabels : ["-"], datasets: [ { type: "line", label: "% สะสม", data: pLine, borderColor: "#ef4444", yAxisID: "y1", tension: 0.1, fill: false }, { type: "bar", label: "พบปัญหา", data: pData, backgroundColor: "#64748b", yAxisID: "y", borderRadius: 4 } ] },
     options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: "linear", position: "left", title: { display: true, text: 'ครั้ง' } }, y1: { type: "linear", position: "right", min: 0, max: 100, grid: { drawOnChartArea: false } } } }
   });
 
-  // --------- SAFETY LOGIC ---------
+  // --------- 7. SAFETY LOGIC ---------
   const totalSafe = jobs.length;
   const openSafe = jobs.filter(j => j.status === "Open").length;
   const closedSafe = totalSafe - openSafe;
@@ -506,7 +522,6 @@ function processCharts(ins, jobs) {
   document.getElementById("sfClosed").textContent = closedSafe;
   document.getElementById("sfRate").textContent = rateSafe + "%";
 
-  // 7. Safety Pyramid
   const aging = { "ในกำหนด": 0, "เลย 1-7 วัน": 0, "เลย >7 วัน": 0 };
   const today = new Date(); today.setHours(0,0,0,0);
   jobs.filter(j => j.status === "Open").forEach(j => {
@@ -517,40 +532,34 @@ function processCharts(ins, jobs) {
     if (diff <= 0) aging["ในกำหนด"]++; else if (diff <= 7) aging["เลย 1-7 วัน"]++; else aging["เลย >7 วัน"]++;
   });
 
-  // Map to Pyramid
+  // Pyramid
   document.getElementById("pyrTop").textContent = aging["เลย >7 วัน"];
   document.getElementById("pyrMid").textContent = aging["ในกำหนด"] + aging["เลย 1-7 วัน"];
   document.getElementById("pyrBot").textContent = closedSafe;
 
-  // 8. MTTR Trend (Mean Time to Resolution) - Simulated from dateFound to Today (Average Days Open)
+  // MTTR Trend
   const mttrData = {};
   jobs.forEach(j => {
     if(j.dateFound) {
       let d = new Date(j.dateFound);
       if(!isNaN(d)) {
         let ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        // Calculate days open (or assumed close if we had close date)
         const diff = Math.floor((today - d) / (1000 * 60 * 60 * 24));
         if(!mttrData[ym]) mttrData[ym] = [];
-        mttrData[ym].push(diff > 0 ? diff : 1); // Minimum 1 day
+        mttrData[ym].push(diff > 0 ? diff : 1);
       }
     }
   });
-  
   const mttrKeys = Object.keys(mttrData).sort();
   const mttrLabels = mttrKeys.map(m => { const [y, mm] = m.split('-'); return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; });
   const mttrScores = mttrKeys.map(m => { const arr = mttrData[m]; return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length); });
 
   mkChart("chMTTR", {
-    type: "bar",
-    data: {
-      labels: mttrLabels.length ? mttrLabels : ["-"],
-      datasets: [ { label: "จำนวนวันเฉลี่ย (วัน)", data: mttrScores, backgroundColor: "#8b5cf6", borderRadius: 4 } ]
-    },
+    type: "bar", data: { labels: mttrLabels.length ? mttrLabels : ["-"], datasets: [ { label: "จำนวนวันเฉลี่ย", data: mttrScores, backgroundColor: "#8b5cf6", borderRadius: 4 } ] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
   });
 
-  // Other Safety Charts (Dept, Scatter, Aging)
+  // Aging & Dept & Scatter
   mkChart("chAging", {
     type: "bar", data: { labels: Object.keys(aging), datasets: [{ data: Object.values(aging), backgroundColor: ["#10b981", "#f59e0b", "#ef4444"], borderRadius: 6 }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
@@ -578,7 +587,7 @@ function processCharts(ins, jobs) {
   });
   mkChart("chScatter", {
     type: "scatter", data: { datasets: [{ label: "แผนก", data: crossData, backgroundColor: "#2563eb", pointRadius: 6, pointHoverRadius: 8 }] },
-    options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 100, title: { display: true, text: '5S (%)' } }, y: { min: 0, max: 100, title: { display: true, text: 'Safety Closed (%)' } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw.dept}: 5S=${Math.round(c.raw.x)}%, Safe=${Math.round(c.raw.y)}%` } } } }
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 100 }, y: { min: 0, max: 100 } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw.dept}: 5S=${Math.round(c.raw.x)}%, Safe=${Math.round(c.raw.y)}%` } } } }
   });
 }
 </script>
