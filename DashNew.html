@@ -414,6 +414,49 @@ if (is5S) {
       if (window.innerWidth <= 768) row.style.display = isVisible ? 'none' : 'block'; else row.style.display = isVisible ? 'none' : 'table-row';
       icon.className = isVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
     }
+    /**
+ * ✅ คำนวณคะแนน Safety แบบไดนามิก (รองรับจำนวนข้อที่เปลี่ยนแปลง)
+ * @param {Object} details - ข้อมูล JSON จากรายการตรวจสอบ
+ * @param {Object} checklistConfig - ตัวแปรโครงสร้าง Checklist
+ * @param {string} area - พื้นที่ที่ตรวจ
+ * @returns {Object} { total, good, percent }
+ */
+function calculateSafetyScore(details, checklistConfig, area) {
+  let totalQuestions = 0;
+  let passedQuestions = 0;
+  
+  for (let sKey in checklistConfig) {
+    const section = checklistConfig[sKey];
+    const questions = section.questions || section.qs || [];
+    const sNum = sKey.replace('s', '');
+    
+    questions.forEach((q, qIdx) => {
+      const qKey = `section${sNum}_q${qIdx}`;
+      const answer = details[qKey];
+      
+      // ✅ Water Mist Logic เฉพาะบางพื้นที่
+      if (sKey === 's1' && q === 'Water Mist' && (area === 'PRINT' || area === 'LAMINATE')) {
+        const waterVal = parseFloat(details['water_val']);
+        if (!isNaN(waterVal)) {
+          totalQuestions++;
+          if (waterVal >= 50) passedQuestions++;
+        }
+      }
+      // ✅ ข้อปกติ: นับเฉพาะที่มีคำตอบ
+      else if (answer) {
+        totalQuestions++;
+        if (answer === 'ดี' || answer === 'ปกติ') {
+          passedQuestions++;
+        }
+      }
+    });
+  }
+  
+  if (totalQuestions === 0) return { total: 0, good: 0, percent: 0 };
+  
+  const percent = Math.round((passedQuestions / totalQuestions) * 100);
+  return { total: totalQuestions, good: passedQuestions, percent: percent };
+}
   </script>
 </body>
 </html>
