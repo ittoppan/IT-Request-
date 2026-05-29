@@ -330,7 +330,7 @@ if (is5S) {
 } else {
    // ✅ Safety: แสดงคะแนน % + สถานะ
    const checklist = getSafetyChecklist(d.area);
-   const scoreInfo = calculateSafetyScore(d.fullChecklist, checklist, d.area);
+   
    
    // แสดงคะแนน %
    const color = scoreInfo.percent >= 80 ? 'var(--success)' : scoreInfo.percent >= 50 ? '#f39c12' : 'var(--danger)';
