@@ -3,419 +3,199 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>5S & Safety Analytics Dashboard</title>
+<title>5S & Safety Ultimate Analytics Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
+/* ─── TOKENS & RESET ─── */
 :root {
-  --bg-body: #f3f4f6;
+  --bg-body: #f1f5f9;
   --bg-surface: #ffffff;
-  --text-main: #111827;
-  --text-muted: #6b7280;
-  --primary: #3b82f6;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --primary: #2563eb;
+  --primary-light: #eff6ff;
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
-  --border: #e5e7eb;
-  --radius-md: 10px;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --topbar-h: 72px;
+  --border: #e2e8f0;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: var(--text-main); line-height: 1.5; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: var(--text-main); line-height: 1.5; -webkit-font-smoothing: antialiased; }
 
-/* Loader */
+/* ─── LOADER ─── */
 #loader { position: fixed; inset: 0; background: var(--bg-surface); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; gap: 16px; transition: opacity 0.3s; }
 #loader.hide { opacity: 0; pointer-events: none; }
-.spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+.spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Topbar */
-.topbar { background: var(--bg-surface); border-bottom: 1px solid var(--border); padding: 16px 24px; position: sticky; top: 0; z-index: 90; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-.brand { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--primary); }
-.filters { display: flex; gap: 12px; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
-.filters select { height: 36px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit; font-size: 13px; outline: none; }
-.btn-apply { height: 36px; padding: 0 16px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; }
+/* ─── TOPBAR & FILTERS ─── */
+.topbar { background: var(--bg-surface); border-bottom: 1px solid var(--border); padding: 16px 24px; position: sticky; top: 0; z-index: 90; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; box-shadow: var(--shadow-sm); }
+.brand { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--text-main); letter-spacing: -0.5px; }
+.brand i { color: var(--primary); }
+.filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.filters select { height: 40px; padding: 0 32px 0 12px; border-radius: var(--radius-md); border: 1px solid var(--border); font-family: inherit; font-size: 14px; outline: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 8px center/16px; -webkit-appearance: none; cursor: pointer; }
+.btn-apply { height: 40px; padding: 0 20px; background: var(--text-main); color: white; border: none; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-family: inherit; transition: 0.2s; }
+.btn-apply:hover { background: #334155; }
 
-/* Layout */
-.content { max-width: 1400px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 32px; }
-.section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--border); padding-bottom: 8px;}
+/* ─── LAYOUT ─── */
+.content { max-width: 1440px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 32px; }
+.section-header { font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; color: var(--text-main); padding-bottom: 8px; border-bottom: 2px solid var(--border); }
 
-/* Grid Systems */
-.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-.kpi-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; gap: 8px; }
-.kpi-title { font-size: 13px; color: var(--text-muted); font-weight: 600; }
-.kpi-val { font-size: 28px; font-weight: 700; line-height: 1; }
+/* ─── GRIDS & CARDS ─── */
+.grid-cols-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.grid-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.grid-cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
-.chart-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.chart-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; }
-.chart-header { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
-.chart-wrap { height: 280px; position: relative; width: 100%; }
+.card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); }
+.card-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.card-desc { font-size: 12px; color: var(--text-muted); font-weight: 400; display: block; margin-top: 4px; }
+.chart-wrap { position: relative; width: 100%; height: 280px; }
 
-/* Table */
-.table-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); overflow-x: auto; }
-.data-table { width: 100%; border-collapse: collapse; min-width: 800px; }
-.data-table th { background: var(--bg-body); padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: left; border-bottom: 1px solid var(--border); }
-.data-table td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-.badge { padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
-.bg-red { background: #fee2e2; color: #991b1b; }
-.bg-yellow { background: #fef3c7; color: #92400e; }
-.bg-green { background: #d1fae5; color: #065f46; }
+/* Gauge Specific */
+.gauge-container { position: relative; height: 200px; display: flex; justify-content: center; }
+.gauge-text { position: absolute; bottom: 0; text-align: center; }
+.gauge-val { font-size: 42px; font-weight: 700; line-height: 1; color: var(--text-main); }
+.gauge-sub { font-size: 14px; font-weight: 600; color: var(--text-muted); }
 
-@media (max-width: 1024px) { .chart-grid { grid-template-columns: 1fr; } }
-@media (max-width: 640px) { .filters { justify-content: flex-start; width: 100%; } .filters select, .btn-apply { flex: 1; } }
+/* Utilities */
+.badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.b-green { background: #d1fae5; color: #065f46; }
+.b-yellow { background: #fef3c7; color: #92400e; }
+.b-red { background: #fee2e2; color: #991b1b; }
+
+@media (max-width: 1024px) { 
+  .grid-cols-2, .grid-cols-3 { grid-template-columns: 1fr; } 
+}
+@media (max-width: 640px) { 
+  .filters { width: 100%; } .filters select, .btn-apply { flex: 1; min-width: 120px; } 
+  .content { padding: 16px; }
+}
 </style>
 </head>
 <body>
 
-<div id="loader"><div class="spinner"></div><div style="font-weight:500; color:var(--text-muted)">กำลังประมวลผลข้อมูล...</div></div>
+<div id="loader"><div class="spinner"></div><div style="font-weight:500; color:var(--text-muted); margin-top:10px;">กำลังวิเคราะห์ข้อมูลเชิงลึก...</div></div>
 
 <header class="topbar">
-  <div class="brand"><i class="fas fa-chart-line"></i> Analytics Dashboard</div>
+  <div class="brand"><i class="fas fa-layer-group"></i> Ultimate Dashboard</div>
   <div class="filters">
     <select id="timeRange">
       <option value="month" selected>เดือนนี้</option>
       <option value="year">ปีนี้</option>
       <option value="all">ทั้งหมด</option>
     </select>
-    <select id="deptFilter"><option value="all">ทุกแผนก</option></select>
-    <button class="btn-apply" onclick="applyFilters()">วิเคราะห์ข้อมูล</button>
+    <select id="deptFilter"><option value="all">ทุกแผนก (All Areas)</option></select>
+    <button class="btn-apply" onclick="applyFilters()"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูล</button>
   </div>
 </header>
 
 <div class="content">
 
+  <!-- ── 1. 5S EXECUTIVE INSIGHTS ── -->
   <section>
-    <div class="section-title"><i class="fas fa-broom" style="color:var(--primary)"></i> 5S Performance & Insights</div>
+    <div class="section-header"><i class="fas fa-star" style="color:var(--warning)"></i> 5S Performance & Deep Analytics</div>
     
-    <div class="kpi-grid">
-      <div class="kpi-card"><div class="kpi-title">คะแนนเฉลี่ยรวม 5S</div><div class="kpi-val" id="s5avg">0%</div></div>
-      <div class="kpi-card"><div class="kpi-title">รอบการตรวจทั้งหมด</div><div class="kpi-val" id="s5cnt">0</div></div>
-      <div class="kpi-card"><div class="kpi-title">จุดแข็ง (ส. ที่คะแนนสูงสุด)</div><div class="kpi-val" id="s5strong" style="font-size:20px; color:var(--success)">-</div></div>
-      <div class="kpi-card"><div class="kpi-title">จุดอ่อน (ส. ที่ต้องเร่งแก้)</div><div class="kpi-val" id="s5weak" style="font-size:20px; color:var(--danger)">-</div></div>
-    </div>
+    <div class="grid-cols-3" style="margin-bottom:16px;">
+      <!-- Gauge Chart -->
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="card-title">ภาพรวมคะแนน 5S (Gauge) <span class="card-desc">เป้าหมายองค์กร 85%</span></div>
+        <div class="gauge-container">
+          <canvas id="chGauge"></canvas>
+          <div class="gauge-text">
+            <div class="gauge-val" id="gVal">0%</div>
+            <div class="gauge-sub" id="gSub">รอการประมวลผล</div>
+          </div>
+        </div>
+      </div>
 
-    <div class="chart-grid" style="margin-top:16px;">
-      <div class="chart-card">
-        <div class="chart-header">Radar Chart: การประเมินแยกรายหมวด (5 ส.)</div>
+      <!-- Radar Chart -->
+      <div class="card" style="grid-column: span 2;">
+        <div class="card-title">วิเคราะห์ 5 ส. รายหมวด (Radar Chart) <span class="card-desc">สมดุลของ สะสาง, สะดวก, สะอาด, สุขลักษณะ, สร้างนิสัย</span></div>
         <div class="chart-wrap"><canvas id="chRadar"></canvas></div>
       </div>
-      <div class="chart-card">
-        <div class="chart-header">แนวโน้มคะแนนเฉลี่ยรายวัน</div>
-        <div class="chart-wrap"><canvas id="chTrend"></canvas></div>
+    </div>
+
+    <div class="grid-cols-2">
+      <!-- 100% Stacked Bar -->
+      <div class="card">
+        <div class="card-title">คุณภาพ 5S แยกรายแผนก (Stacked Bar) <span class="card-desc">สัดส่วน ดี (เขียว) / พอใช้ (เหลือง) / ปรับปรุง (แดง)</span></div>
+        <div class="chart-wrap"><canvas id="chStacked"></canvas></div>
+      </div>
+
+      <!-- Pareto Chart -->
+      <div class="card">
+        <div class="card-title">Top 5 ปัญหาที่ต้องปรับปรุง (Pareto) <span class="card-desc">หัวข้อที่ถูกหักคะแนนบ่อยที่สุด (กฎ 80/20)</span></div>
+        <div class="chart-wrap"><canvas id="chPareto"></canvas></div>
       </div>
     </div>
   </section>
 
+  <!-- ── 2. SAFETY & CROSS ANALYSIS ── -->
   <section>
-    <div class="section-title"><i class="fas fa-hard-hat" style="color:var(--warning)"></i> Safety & Action Plan Insights</div>
+    <div class="section-header"><i class="fas fa-shield-alt" style="color:var(--success)"></i> Safety & Executive Cross-Analysis</div>
     
-    <div class="kpi-grid">
-      <div class="kpi-card"><div class="kpi-title">งานแก้ไขทั้งหมด (สะสม)</div><div class="kpi-val" id="ssJob">0</div></div>
-      <div class="kpi-card"><div class="kpi-title">งานที่แก้ไขสำเร็จ (Closed)</div><div class="kpi-val" id="ssClosed" style="color:var(--success)">0</div></div>
-      <div class="kpi-card"><div class="kpi-title">งานที่ล่าช้าเกินกำหนด (Overdue)</div><div class="kpi-val" id="ssOverdue" style="color:var(--danger)">0</div></div>
-    </div>
+    <div class="grid-cols-2">
+      <!-- Scatter Plot (Cross Analysis) -->
+      <div class="card">
+        <div class="card-title">ความเชื่อมโยง 5S และ Safety (Scatter Plot) <span class="card-desc">แกน X: คะแนน 5S (%) | แกน Y: อัตราปิดงาน Safety (%)</span></div>
+        <div class="chart-wrap"><canvas id="chScatter"></canvas></div>
+      </div>
 
-    <div class="chart-grid" style="margin-top:16px;">
-      <div class="chart-card">
-        <div class="chart-header">Aging Report: สถานะอายุงานค้าง (Open)</div>
+      <!-- Aging Report -->
+      <div class="card">
+        <div class="card-title">สถานะความล่าช้างาน Safety (Aging) <span class="card-desc">อายุงานค้างที่ยังไม่ได้รับการแก้ไข (Open)</span></div>
         <div class="chart-wrap"><canvas id="chAging"></canvas></div>
       </div>
-      <div class="chart-card">
-        <div class="chart-header">สัดส่วนประเภทความเสี่ยงที่พบ</div>
-        <div class="chart-wrap"><canvas id="chRisk"></canvas></div>
-      </div>
-    </div>
-
-    <div class="table-card" style="margin-top:16px;">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>รหัสอ้างอิง</th>
-            <th>ประเภท</th>
-            <th>แผนก/พื้นที่</th>
-            <th>ปัญหาที่พบ</th>
-            <th>กำหนดเสร็จ</th>
-            <th>สถานะความล่าช้า</th>
-          </tr>
-        </thead>
-        <tbody id="tSafety">
-          <tr><td colspan="6" style="text-align:center; padding:24px;">กำลังโหลดข้อมูล...</td></tr>
-        </tbody>
-      </table>
     </div>
   </section>
 
 </div>
 
 <script>
+// ==========================================
+// 1. DATA & CHECKLIST CONFIGURATION
+// ==========================================
 const API = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
+const TARGET = 85;
+
 const DEPTS = ["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","ENGINEERING","OUTSIDE"];
 const AREA_MAP = {"แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Solvent":"SOLVENT","แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING","แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC","แผนก Warehouse":"WAREHOUSE","Office":"OFFICE","พื้นที่รอบบริเวณโรงงาน":"OUTSIDE","Canteen":"CANTEEN","EN":"ENGINEERING"};
 
-  // ===================================================================
-    // ✅ 5S CHECKLISTS
-    // ===================================================================
-    const FACTORY_5S_SECTIONS = [
-      { title: "1. เครื่องจักร", qs: ["ทำความสะอาดเครื่องจักรทุกครั้งก่อน – หลังเลิกงานพร้อมระบุผู้รับผิดชอบป้ายผู้รับผิดชอบต้องเป็นปัจจุบัน", "ตีเส้นกำหนดจุดที่ตั้ง (ตีเส้นรอบเครื่องจักรด้วยสีเหลือง)", "ก่อนทำงานกับเครื่องจักรต้องแต่งกายให้รัดกุมและต้องสวมอุปกรณ์ป้องกันส่วนบุคคล"] },
-      { title: "2. เครื่องมือ", qs: ["กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน", "หลังจากนำเครื่องมือและอุปกรณ์ไปใช้ให้เก็บเข้าที่เสมอ", "เก็บวางเครื่องมืออย่างเป็นระเบียบในพื้นที่ที่กำหนด", "กำหนดผู้รับผิดชอบให้ชัดเจน"] },
-      { title: "3. การจัดวางวัตถุดิบและผลิตภัณฑ์กึ่งสำเร็จรูป และสำเร็จรูป", qs: ["วางในจุดงานที่กำหนดเท่านั้นไม่ล้นเกินเส้นกำหนด", "ควบคุมตามจัดวางตามหลัก FIFO", "มีสถานะป้ายชี้บ่ง"] },
-      { title: "4. โต๊ะทำงาน /ลิ้นชัก (Production)", qs: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน", "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงาน", "ลิ้นชักใส่เอกสารต้องตรงตามที่มาตรฐานกำหนด"] },
-      { title: "5. การจัดเก็บเอกสาร", qs: ["ในตู้เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน", "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"] },
-      { title: "6. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: ["ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น", "ไม่มีคราบสี, Solvent / น้ำนองพื้น", "กำหนดเวลาการทำความสะอาดประจำ ตามความเหมาะสม"] },
-      { title: "7. สภาพแวดล้อมทั่วไป", qs: ["มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมในแผนกหรือไม่", "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก", "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดและกำหนดผู้รับผิดชอบ"] },
-      { title: "8. การตรวจสุขลักษณะส่วนบุคคล", qs: ["พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
-      { title: "9. ความตระหนัก ความสำเร็จ ผลงาน", qs: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
-    ];
+const FACTORY_5S_SECTIONS = [
+  { title: "1. เครื่องจักร", qs: ["ทำความสะอาดเครื่องจักรทุกครั้งก่อน – หลังเลิกงาน", "ตีเส้นกำหนดจุดที่ตั้ง", "แต่งกายรัดกุมและสวมอุปกรณ์ป้องกัน"] },
+  { title: "2. เครื่องมือ", qs: ["กำหนดตำแหน่งวางเพื่อง่ายต่อการหยิบใช้", "เก็บเข้าที่เสมอ", "เก็บวางเป็นระเบียบ", "กำหนดผู้รับผิดชอบชัดเจน"] },
+  { title: "3. การจัดวางวัตถุดิบฯ", qs: ["วางในจุดที่กำหนดไม่ล้นเส้น", "จัดวางตามหลัก FIFO", "มีป้ายชี้บ่ง"] },
+  { title: "4. โต๊ะทำงาน/ลิ้นชัก", qs: ["ความสะอาดโต๊ะ/เก้าอี้", "ความเป็นระเบียบ", "ลิ้นชักตรงตามมาตรฐาน"] },
+  { title: "5. จัดเก็บเอกสาร", qs: ["เอกสารเรียงเป็นระเบียบ", "หน้าตู้ระบุชื่อเอกสารและแผนก"] },
+  { title: "6. พื้น/ผนัง/เพดาน", qs: ["ไม่มีขยะ/หยากไย่", "ไม่มีคราบสี/น้ำนอง", "กำหนดเวลาทำความสะอาด"] },
+  { title: "7. สภาพแวดล้อมทั่วไป", qs: ["ไม่มีของไม่จำเป็น", "ถังขยะเหมาะสมและเพียงพอ", "มีที่วางอุปกรณ์ทำความสะอาด"] },
+  { title: "8. สุขลักษณะส่วนบุคคล", qs: ["แต่งกายถูกต้องตามระเบียบ", "สุขลักษณะสะอาด", "สุขภาพแข็งแรง"] },
+  { title: "9. ความตระหนัก/ผลงาน", qs: ["ตระหนัก 5ส เป็นงานประจำ", "นำเสนอผลงานสำเร็จ", "นำ 3 ส แรกมาใช้", "แสดง KPI"] }
+];
 
-    // ===================================================================
-// ✅ 5S CHECKLISTS — ครบทุกพื้นที่
-// ===================================================================
 const CHECKLIST_5S = {
-  // 🏭 4 แผนกโรงงาน (ใช้ Checklist เดียวกัน)
-  "PRINT": { sections: FACTORY_5S_SECTIONS },
-  "LAMINATE": { sections: FACTORY_5S_SECTIONS },
-  "REWINDER/SLITTER/PACKING": { sections: FACTORY_5S_SECTIONS },
-  "BAG MAKING": { sections: FACTORY_5S_SECTIONS },
-  "WAREHOUSE": { sections: FACTORY_5S_SECTIONS },
-  
-  // 🏢 OFFICE
-  "OFFICE": { sections: [
-    { title: "1. โต๊ะทำงาน", qs: [
-      "ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน",
-      "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงานให้สามารถหยิบใช้ได้อย่างสะดวกและปลอดภัย",
-      "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงานให้เหมาะสมกับมาตรฐานของพื้นที่",
-      "ตะกร้าเอกสารต้องระบุป้ายชี้บ่งให้ชัดเจนและจัดเก็บเอกสารให้เป็นระเบียบ"
-    ]},
-    { title: "2. ลิ้นชัก", qs: [
-      "ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน",
-      "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO",
-      "ลิ้นชักที่ 3 ใส่อุปกรณ์ส่วนตัว"
-    ]},
-    { title: "3. การจัดเก็บเอกสาร", qs: [
-      "ในตู้เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน",
-      "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"
-    ]},
-    { title: "4. เครื่องคอมพิวเตอร์", qs: [
-      "จัดวางคอมพิวเตอร์ เครื่องแฟกซ์ในตำแหน่งที่เหมาะสมและสะดวกต่อการใช้งาน",
-      "ไม่ติดกระดาษโน๊ตต่าง ๆ ไว้หน้าคอมพิวเตอร์",
-      "จัดเก็บสายไฟคอมพิวเตอร์ให้เป็นระเบียบเรียบร้อย"
-    ]},
-    { title: "5. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น/ผนังห้องต้องไม่มีหยากไย่",
-      "ไม่วางสิ่งกีดขวางทางเดิน",
-      "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม",
-      "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"
-    ]},
-    { title: "6. สภาพแวดล้อมทั่วไป", qs: [
-      "มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมใน Office หรือไม่",
-      "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก",
-      "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดและกำหนดผู้รับผิดชอบ",
-      "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"
-    ]},
-    { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [
-      "พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้",
-      "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด",
-      "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"
-    ]},
-    { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: [
-      "มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน",
-      "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)",
-      "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?",
-      "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"
-    ]}
-  ]},
-  
-  // 🍽️ CANTEEN
-  "CANTEEN": { sections: [
-    { title: "1. ห้องอาหาร (CANTEEN)", qs: [
-      "โต๊ะอาหารและเก้าอี้ต้องสะอาดและพร้อมใช้งานอยู่เสมอไม่ทิ้งสิ่งของที่ไม่จำเป็นไว้บนโต๊ะอาหารและถังขยะเพียงพอต่อการใช้งาน",
-      "ชั้นวางอาหารต้องสะอาดและจัดเก็บเรียบร้อยแยกแผนกให้ชัดเจน",
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น",
-      "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก"
-    ]},
-    { title: "2. ห้องประชุม", qs: [
-      "เก็บโต๊ะและเก้าอี้ให้เป็นระเบียบเข้าที่ก่อน - หลังใช้งาน",
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น",
-      "ห้องประชุมต้องพร้อมใช้งานอยู่เสมอ"
-    ]},
-    { title: "3. ห้องกาแฟ", qs: [
-      "ทำความสะอาดอ่างล้างภาชนะหลังใช้งานแล้ว / การแต่งกายของแม่ครัว",
-      "แบ่งแยกอุปกรณ์เครื่องใช้ออกให้ชัดเจนและเป็นระเบียบ",
-      "จัดวางสิ่งของ แยกตามชนิดและไม่วางสิ่งของปะปนกัน"
-    ]},
-    { title: "4. LOCKER (เสื้อผ้าชาย,หญิง)", qs: [
-      "ป้ายไม่ชำรุดและระบุชื่อของพนักงานให้ชัดเจน",
-      "หลังตู้ต้องสะอาดไม่มีคราบฝุ่นหรือสิ่งของที่ไม่จำเป็นวางอยู่",
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น"
-    ]},
-    { title: "5. LOCKER (รองเท้า)", qs: [
-      "ป้ายไม่ชำรุดและระบุชื่อของพนักงานให้ชัดเจน",
-      "ห้ามนำอาหาร / เครื่องดื่มไปไว้ใน Locker รองเท้าและต้องไม่มีเศษขยะและคราบฝุ่น"
-    ]},
-    { title: "6. ห้องสุขา (ชาย,หญิง)", qs: [
-      "ทำความสะอาดอ่างล้างหน้า / กระจก / พื้น / โถชักโครก / ผนัง ด้วยน้ำให้สะอาด",
-      "กระดาษชำระ สบู่ ผ้าเช็ดมือ ดูแลอย่าให้ขาด"
-    ]},
-    { title: "7. ทางเข้า (AIR SHOWER)", qs: [
-      "ทำความสะอาดอ่างล้างมือ / ที่เป่ามือ / กระจก / รางน้ำ",
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น",
-      "ชั้นวางรองเท้าเซฟตี้ต้องวางให้ถูกช่อง / ช่องบนพื้นสีขาววางรองเท้าเซฟตี้ /ช่องล่างพื้นสีดำวางรองเท้าแตะต้องสะอาดไม่มีคราบฝุ่น"
-    ]}
-  ]},
-  
-  // 🔬 QA&QC
-  "QA&QC": { sections: [
-    { title: "1. โต๊ะทำงาน", qs: [
-      "ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน",
-      "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงานให้สามารถหยิบใช้ได้อย่างสะดวกและปลอดภัย",
-      "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงานให้เหมาะสมกับมาตรฐานของพื้นที่"
-    ]},
-    { title: "2. ลิ้นชัก", qs: [
-      "ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน",
-      "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO",
-      "ลิ้นชักที่ 3 ใส่อุปกรณ์ในการทำงาน",
-      "ลิ้นชักกลางใส่เอกสาร"
-    ]},
-    { title: "3. การจัดเก็บเอกสาร", qs: [
-      "ในตู้เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน",
-      "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"
-    ]},
-    { title: "4. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่/ ไม่มีฝุ่น",
-      "ไม่วางสิ่งกีดขวางทางเดิน",
-      "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม"
-    ]},
-    { title: "5. เครื่องคอมพิวเตอร์", qs: [
-      "จัดวางคอมพิวเตอร์ เครื่องแฟกซ์ในตำแหน่งที่เหมาะสมและสะดวกต่อการใช้งาน",
-      "ไม่ติดกระดาษโน๊ตต่าง ๆ ไว้หน้าคอมพิวเตอร์",
-      "จัดเก็บสายไฟคอมพิวเตอร์ให้เป็นระเบียบเรียบร้อย",
-      "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"
-    ]},
-    { title: "6. เครื่องมือและอุปกรณ์", qs: [
-      "กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน",
-      "หลังจากนำเครื่องมือและอุปกรณ์ไปใช้ให้เก็บเข้าที่เสมอ",
-      "เก็บวางเครื่องมือและอุปกรณ์ต่างๆในพื้นที่ที่กำหนด",
-      "กำหนดผู้รับผิดชอบให้ชัดเจน",
-      "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"
-    ]},
-    { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [
-      "พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้",
-      "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด",
-      "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"
-    ]},
-    { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: [
-      "มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน",
-      "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)",
-      "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?",
-      "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"
-    ]}
-  ]},
-  
-  // 🔧 ENGINEERING
-  "ENGINEERING": { sections: [
-    { title: "1. โต๊ะทำงาน", qs: [
-      "ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน",
-      "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงานให้สามารถหยิบใช้ได้อย่างสะดวกและปลอดภัย",
-      "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงานให้เหมาะสมกับมาตรฐานของพื้นที่"
-    ]},
-    { title: "2. ลิ้นชัก", qs: [
-      "ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน",
-      "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO",
-      "ลิ้นชักที่ 3 ใส่ของส่วนตัวพนักงาน"
-    ]},
-    { title: "3. การจัดเก็บเอกสาร", qs: [
-      "แฟ้มเอกสารทุกแฟ้มสันแฟ้มจะต้องใช้ Font : TH Sarabun ทุกแฟ้มเอกสารจะต้องมีระบุเล่มที่แฟ้ม",
-      "เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน",
-      "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"
-    ]},
-    { title: "4. เครื่องมือ", qs: [
-      "กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน",
-      "หลังจากนำเครื่องมือไปใช้เก็บเข้าที่เสมอ",
-      "เก็บวางอย่างเป็นระเบียบในที่ที่กำหนด และมีป้ายฉลากของชิ้นส่วน",
-      "ส่วนประกอบ / ชิ้นส่วนขนาดเล็ก ควรหากล่องที่เหมาะสมใส่"
-    ]},
-    { title: "5. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น",
-      "ไม่วางสิ่งของกีดขวางทางเดิน",
-      "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม",
-      "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"
-    ]},
-    { title: "6. สภาพแวดล้อมทั่วไป", qs: [
-      "มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมในแผนกหรือไม่",
-      "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอ",
-      "และมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก",
-      "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดหรือไม่",
-      "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"
-    ]},
-    { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [
-      "พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้",
-      "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด",
-      "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"
-    ]},
-    { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: [
-      "มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน",
-      "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)",
-      "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?",
-      "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"
-    ]}
-  ]},
-  
-  // 🌳 OUTSIDE
-  "OUTSIDE": { sections: [
-    { title: "1. พื้นที่โดยรอบบริษัท", qs: [
-      "มีเศษตกหล่นตามทางเดินและที่จอดรถหรือไม่",
-      "หญ้าขึ้นรกสูงเกินไปหรือไม่",
-      "สายยางใช้แล้วเก็บเป็นระเบียบหรือไม่",
-      "อุปกรณ์กำจัดสัตว์พาหะมีการชำรุดหรือไม่",
-      "รอบรั้วโรงงานมีรอยชำรุดเสียหายหรือไม่"
-    ]},
-    { title: "2. โรงเก็บขยะ", qs: [
-      "มีการจัดเรียงถังเป็นระเบียบหรือไม่",
-      "แยกชนิดขยะให้ชัดเจนและมีป้ายชี้บ่ง",
-      "ขยะต้องไม่ล้นออกมา / ปิดฝาสนิท",
-      "ถังเก็บสารเคมีอันตรายต้องไม่ล้น"
-    ]},
-    { title: "3. ป้อมยาม", qs: [
-      "จัดเก็บเอกสารเรียบร้อยและทำความสะอาดสม่ำเสมอ",
-      "อุปกรณ์ต่างๆ สามารถหยิบใช้ได้สะดวก",
-      "การกำหนดจำนวนอุปกรณ์บนโต๊ะทำงาน"
-    ]},
-    { title: "4. ห้องสุขา (ป้อมรปภ.)", qs: [
-      "ทำความสะอาดกระจก / พื้น / โถชักโครก / ผนัง",
-      "กระดาษชำระ สบู่ ผ้าเช็ดมือ ดูแลอย่าให้ขาด"
-    ]},
-    { title: "5. สภาพแวดล้อมทั่วไป", qs: [
-      "ไม่มีสิ่งของที่ไม่จำเป็น",
-      "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและมีป้ายชี้บ่ง",
-      "มีการกำหนดที่วางอุปกรณ์ทำความสะอาด"
-    ]},
-    { title: "6. ถังแก๊ส/ถังก๊าซ", qs: [
-      "ระบุป้ายชี้บ่งให้ชัดเจน",
-      "เก็บถังในลักษณะตั้งตรงและมีเครื่องป้องกันการล้ม",
-      "ไม่วางสิ่งของที่ไม่จำเป็นรอบๆ บริเวณ"
-    ]},
-    { title: "7. โรงจอดรถ", qs: [
-      "จอดรถเป็นระเบียบไม่มีความเสี่ยงอุบัติเหตุ",
-      "หลังคา พื้น ที่กั้น มีสภาพปกติไม่เสียหาย"
-    ]}
-  ]}
+  "PRINT": { sections: FACTORY_5S_SECTIONS }, "LAMINATE": { sections: FACTORY_5S_SECTIONS }, "SOLVENT": { sections: FACTORY_5S_SECTIONS },
+  "REWINDER/SLITTER/PACKING": { sections: FACTORY_5S_SECTIONS }, "BAG MAKING": { sections: FACTORY_5S_SECTIONS }, "WAREHOUSE": { sections: FACTORY_5S_SECTIONS },
+  "OFFICE": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["ความสะอาดของโต๊ะ", "ความเป็นระเบียบ", "จำนวนอุปกรณ์เหมาะสม", "ตะกร้าเอกสารมีป้าย"] }, { title: "2. ลิ้นชัก", qs: ["ลิ้นชัก 1 เครื่องเขียน", "ลิ้นชัก 2 ของไม่ประจำ", "ลิ้นชัก 3 ของส่วนตัว"] }, { title: "3. จัดเก็บเอกสาร", qs: ["เรียงเป็นระเบียบ", "หน้าตู้ระบุชื่อ"] }, { title: "4. คอมพิวเตอร์", qs: ["จัดวางเหมาะสม", "ไม่ติดโพสต์อิทหน้าจอ", "จัดเก็บสายไฟ"] }, { title: "5. พื้น/เพดาน", qs: ["ไม่มีขยะ/หยากไย่", "ไม่กีดขวางทางเดิน", "กำหนดเวลาทำความสะอาด", "ไม่เปิดประตูค้าง"] }, { title: "6. สภาพแวดล้อม", qs: ["ไม่มีของไม่จำเป็น", "ถังขยะเหมาะสม", "กำหนดที่วางอุปกรณ์", "ควบคุมแมลง"] }, { title: "7. สุขลักษณะ", qs: ["แต่งกายถูกต้อง", "ร่างกายสะอาด", "สุขภาพแข็งแรง"] }, { title: "8. ความตระหนัก", qs: ["ตระหนัก 5ส", "นำเสนอผลงาน", "ใช้ 3 ส แรก", "แสดง KPI"] } ]},
+  "CANTEEN": { sections: [ { title: "1. ห้องอาหาร", qs: ["โต๊ะสะอาดพร้อมใช้", "ชั้นวางอาหารสะอาด", "พื้น/ผนังสะอาด", "ถังขยะเพียงพอ"] }, { title: "2. ห้องประชุม", qs: ["เก็บโต๊ะเก้าอี้เข้าที่", "พื้น/ผนังสะอาด", "พร้อมใช้งาน"] }, { title: "3. ห้องกาแฟ", qs: ["ทำความสะอาดอ่าง", "แยกอุปกรณ์ชัดเจน", "จัดวางสิ่งของแยกชนิด"] }, { title: "4. LOCKER", qs: ["ป้ายชื่อชัดเจน", "หลังตู้สะอาด", "พื้น/ผนังสะอาด"] }, { title: "5. รองเท้า", qs: ["ป้ายชื่อชัดเจน", "ไม่มีอาหารในตู้"] }, { title: "6. ห้องสุขา", qs: ["ทำความสะอาดกระจก/พื้น/โถ", "กระดาษ/สบู่ ไม่ขาด"] }, { title: "7. AIR SHOWER", qs: ["ทำความสะอาดอ่าง", "พื้น/ผนังสะอาด", "วางรองเท้าถูกช่อง"] } ]},
+  "QA&QC": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["ความสะอาด", "ความเป็นระเบียบ", "จำนวนอุปกรณ์เหมาะสม"] }, { title: "2. ลิ้นชัก", qs: ["ลิ้นชัก 1 เครื่องเขียน", "ลิ้นชัก 2 ของไม่ประจำ", "ลิ้นชัก 3 อุปกรณ์ทำงาน", "ลิ้นชักกลางเอกสาร"] }, { title: "3. เอกสาร", qs: ["เรียงเป็นระเบียบ", "หน้าตู้มีป้าย"] }, { title: "4. พื้น/เพดาน", qs: ["ไม่มีขยะ", "ไม่วางกีดขวาง", "กำหนดเวลาทำความสะอาด"] }, { title: "5. คอมพิวเตอร์", qs: ["จัดวางเหมาะสม", "ไม่ติดโพสต์อิท", "เก็บสายไฟ", "ไม่เปิดประตูค้าง"] }, { title: "6. เครื่องมือ", qs: ["กำหนดตำแหน่งวาง", "เก็บเข้าที่", "เก็บในพื้นที่กำหนด", "มีผู้รับผิดชอบ", "ควบคุมแมลง"] }, { title: "7. สุขลักษณะ", qs: ["แต่งกายถูกต้อง", "ร่างกายสะอาด", "สุขภาพแข็งแรง"] }, { title: "8. ความตระหนัก", qs: ["ตระหนัก 5ส", "นำเสนอผลงาน", "ใช้ 3 ส แรก", "แสดง KPI"] } ]},
+  "ENGINEERING": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["ความสะอาด", "ความเป็นระเบียบ", "อุปกรณ์เหมาะสม"] }, { title: "2. ลิ้นชัก", qs: ["เครื่องเขียน", "ไม่ประจำ", "ของส่วนตัว"] }, { title: "3. เอกสาร", qs: ["แฟ้มใช้ Font กำหนด", "เรียงระเบียบ", "มีป้ายตู้"] }, { title: "4. เครื่องมือ", qs: ["กำหนดตำแหน่ง", "เก็บเข้าที่", "วางเป็นระเบียบ", "ชิ้นส่วนเล็กใส่กล่อง"] }, { title: "5. พื้น/เพดาน", qs: ["ไม่มีขยะ", "ไม่กีดขวาง", "กำหนดเวลาคลีน", "ไม่เปิดประตูค้าง"] }, { title: "6. สภาพแวดล้อม", qs: ["ไม่มีของไม่จำเป็น", "ถังขยะเหมาะสม", "กำหนดที่เก็บอุปกรณ์คลีน", "ควบคุมแมลง"] }, { title: "7. สุขลักษณะ", qs: ["แต่งกายถูก", "ร่างกายสะอาด", "สุขภาพแข็งแรง"] }, { title: "8. ความตระหนัก", qs: ["ตระหนัก 5ส", "โชว์ผลงาน", "ใช้ 3 ส", "แสดง KPI"] } ]},
+  "OUTSIDE": { sections: [ { title: "1. รอบบริษัท", qs: ["ไม่มีขยะ", "หญ้าไม่รก", "สายยางเก็บระเบียบ", "อุปกรณ์สัตว์ไม่ชำรุด", "รั้วไม่ชำรุด"] }, { title: "2. โรงเก็บขยะ", qs: ["เรียงถังระเบียบ", "แยกชนิดขยะ", "ขยะไม่ล้น", "สารเคมีไม่ล้น"] }, { title: "3. ป้อมยาม", qs: ["เอกสารเรียบร้อย", "อุปกรณ์หยิบง่าย", "จำนวนอุปกรณ์เหมาะสม"] }, { title: "4. สุขา", qs: ["ทำความสะอาด", "กระดาษสบู่มี"] }, { title: "5. สิ่งแวดล้อม", qs: ["ไม่มีของไม่จำเป็น", "ถังขยะเหมาะสม", "มีที่เก็บอุปกรณ์คลีน"] }, { title: "6. ถังแก๊ส", qs: ["ป้ายชัดเจน", "ตั้งตรงกันล้ม", "ไม่มีของไม่จำเป็นรอบๆ"] }, { title: "7. โรงจอดรถ", qs: ["จอดระเบียบ", "หลังคา/พื้นปกติ"] } ]}
 };
 
-
-
-
-
-
-
-
-
-  
 Chart.defaults.font.family = "'Sarabun', sans-serif";
 let raw = { ins: [], jobs: [] };
 let charts = {};
 
+// ==========================================
+// 2. INITIALIZATION & DATA FETCHING
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById("deptFilter");
   DEPTS.forEach(d => el.add(new Option(d, d)));
@@ -423,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadAll() {
-  document.getElementById("loader").classList.remove("hide");
   try {
     const [dash, jobs] = await Promise.all([
       fetch(`${API}?action=getDashboardData`).then(r => r.json()),
@@ -432,11 +211,8 @@ async function loadAll() {
     raw.ins = (dash.details || []).map(d => ({ ...d, area: AREA_MAP[d.area] || String(d.area||"OFFICE").toUpperCase() }));
     raw.jobs = Array.isArray(jobs) ? jobs : [];
     applyFilters();
-  } catch (err) {
-    alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
-  } finally {
-    document.getElementById("loader").classList.add("hide");
-  }
+  } catch (err) { alert("เกิดข้อผิดพลาดในการโหลดข้อมูล"); } 
+  finally { document.getElementById("loader").classList.add("hide"); }
 }
 
 function applyFilters() {
@@ -456,219 +232,248 @@ function applyFilters() {
 
   const jobs = raw.jobs.filter(j => dept === "all" || (AREA_MAP[j.area] || String(j.area).toUpperCase()) === dept);
 
-  process5S(ins);
-  processSafety(jobs);
+  processCharts(ins, jobs);
 }
 
-// 1. นำตัวแปร CHECKLIST_5S ที่คุณให้มา ไปวางไว้ด้านบนสุดของแท็ก <script> (ใต้ AREA_MAP)
-// const CHECKLIST_5S = { ... ข้อมูลของคุณ ... };
-
-// 2. ฟังก์ชันแปลความหมายหัวข้อให้กลายเป็น S1-S5
-function get5SCategory(area, sectionIndex) {
-  // ป้องกัน Error หากไม่มีข้อมูลแผนกนั้นๆ
-  if (!CHECKLIST_5S[area] || !CHECKLIST_5S[area].sections[sectionIndex]) return null;
-  
-  const title = CHECKLIST_5S[area].sections[sectionIndex].title;
-
-  // คัดแยกเข้าหมวด 5ส. โดยดูจากคำในชื่อหัวข้อ
-  if (title.includes("สภาพแวดล้อมทั่วไป")) return "ส1. สะสาง";
-  if (title.includes("เครื่องมือ") || title.includes("วัตถุดิบ") || title.includes("โต๊ะ") || 
-      title.includes("ลิ้นชัก") || title.includes("เอกสาร") || title.includes("คอมพิวเตอร์") || 
-      title.includes("ประชุม") || title.includes("กาแฟ") || title.includes("ป้อมยาม") || 
-      title.includes("ถังแก๊ส") || title.includes("จอดรถ")) return "ส2. สะดวก";
-  if (title.includes("เครื่องจักร") || title.includes("พื้น") || title.includes("อาหาร") || 
-      title.includes("LOCKER") || title.includes("สุขา") || title.includes("ทางเข้า") || 
-      title.includes("โดยรอบ") || title.includes("ขยะ")) return "ส3. สะอาด";
-  if (title.includes("สุขลักษณะส่วนบุคคล")) return "ส4. สุขลักษณะ";
-  if (title.includes("ความตระหนัก")) return "ส5. สร้างนิสัย";
-
-  return null;
+// Helper: แปลงชื่อหัวข้อเป็น S1-S5
+function get5SCat(area, sIndex) {
+  if (!CHECKLIST_5S[area] || !CHECKLIST_5S[area].sections[sIndex]) return null;
+  const t = CHECKLIST_5S[area].sections[sIndex].title;
+  if (t.includes("สภาพแวดล้อม") || t.includes("รอบบริษัท") || t.includes("โรงเก็บขยะ")) return "ส1. สะสาง";
+  if (t.includes("เครื่องมือ") || t.includes("วัตถุดิบ") || t.includes("โต๊ะ") || t.includes("ลิ้นชัก") || t.includes("เอกสาร") || t.includes("คอมพิวเตอร์") || t.includes("ประชุม") || t.includes("ป้อมยาม") || t.includes("ถังแก๊ส") || t.includes("จอดรถ")) return "ส2. สะดวก";
+  if (t.includes("เครื่องจักร") || t.includes("พื้น") || t.includes("อาหาร") || t.includes("LOCKER") || t.includes("สุขา") || t.includes("ทางเข้า") || t.includes("กาแฟ")) return "ส3. สะอาด";
+  if (t.includes("สุขลักษณะ")) return "ส4. สุขลักษณะ";
+  if (t.includes("ตระหนัก")) return "ส5. สร้างนิสัย";
+  return "ส1. สะสาง"; // Default
 }
 
-// 3. นำโค้ดนี้ไปทับฟังก์ชัน process5S เดิมทั้งหมด
-function process5S(ins) {
-  const data = ins.filter(i => String(i.inspectionType).toUpperCase() === "5S");
+// Helper: หาข้อความคำถามจาก Key (เช่น 5s_s1_q2)
+function getQuestionText(area, sIndex, qIndex) {
+  if (CHECKLIST_5S[area] && CHECKLIST_5S[area].sections[sIndex] && CHECKLIST_5S[area].sections[sIndex].qs[qIndex]) {
+    return CHECKLIST_5S[area].sections[sIndex].qs[qIndex];
+  }
+  return `หมวด ${sIndex} ข้อ ${qIndex}`;
+}
+
+// ==========================================
+// 3. MAIN LOGIC: RENDER ALL 4 NEW CHARTS
+// ==========================================
+function processCharts(ins, jobs) {
+  const data5S = ins.filter(i => String(i.inspectionType).toUpperCase() === "5S");
   
-  // KPI ด้านบน
-  const scores = data.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
-  document.getElementById("s5avg").textContent = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) + "%" : "0%";
-  document.getElementById("s5cnt").textContent = data.length;
+  // ----------------------------------------------------
+  // CHART 1: GAUGE CHART (ภาพรวมคะแนน)
+  // ----------------------------------------------------
+  const scores = data5S.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
+  const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  
+  document.getElementById("gVal").textContent = avg + "%";
+  document.getElementById("gVal").style.color = avg >= TARGET ? "var(--success)" : "var(--danger)";
+  document.getElementById("gSub").textContent = avg >= TARGET ? "ผ่านเกณฑ์มาตรฐาน" : "ต้องเร่งปรับปรุง";
 
-  // เตรียมตะกร้า 5 ใบสำหรับเก็บคะแนน
-  const sCats = {
-    "ส1. สะสาง": { score: 0, max: 0 },
-    "ส2. สะดวก": { score: 0, max: 0 },
-    "ส3. สะอาด": { score: 0, max: 0 },
-    "ส4. สุขลักษณะ": { score: 0, max: 0 },
-    "ส5. สร้างนิสัย": { score: 0, max: 0 }
-  };
+  // แบ่งสัดส่วน Gauge (ต่ำกว่าเป้า vs ผ่านเป้า)
+  mkChart("chGauge", {
+    type: "doughnut",
+    data: {
+      labels: ["ต้องปรับปรุง", "พอใช้", "ดีเยี่ยม"],
+      datasets: [{ data: [70, 15, 15], backgroundColor: ["#ef4444", "#f59e0b", "#10b981"], borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      circumference: 180, rotation: 270, cutout: "80%",
+      plugins: { legend: { display: false }, tooltip: { enabled: false } }
+    }
+  });
 
-  // เริ่มกระบวนการนับคะแนนและโยนลงตะกร้า
-  data.forEach(i => {
-    // หาชื่อแผนกที่ตรงกับใน CHECKLIST_5S
-    const areaKey = i.area; 
+  // ----------------------------------------------------
+  // CHART 2: RADAR CHART (5 ส.)
+  // ----------------------------------------------------
+  const sCats = { "ส1. สะสาง": { s: 0, m: 0 }, "ส2. สะดวก": { s: 0, m: 0 }, "ส3. สะอาด": { s: 0, m: 0 }, "ส4. สุขลักษณะ": { s: 0, m: 0 }, "ส5. สร้างนิสัย": { s: 0, m: 0 } };
+  const paretoCount = {}; // สำหรับ Chart 4
+
+  const deptQuality = {}; // สำหรับ Chart 3
+  
+  data5S.forEach(i => {
+    const area = i.area;
+    if(!deptQuality[area]) deptQuality[area] = { g: 0, f: 0, b: 0 }; // Good, Fair, Bad
 
     Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
-      // ดึงเลขหมวด (s0, s1...) ออกมาจาก Key เช่น 5s_s1_q2 จะได้เลข 1
-      const match = k.match(/^5s_s(\d+)_/); 
-      
+      const match = k.match(/^5s_s(\d+)_q(\d+)/); 
       if (match) {
-        const sectionIndex = parseInt(match[1]);
-        const targetS = get5SCategory(areaKey, sectionIndex); // เรียกใช้ฟังก์ชันแปลความหมาย
+        // สำหรับ Radar
+        const cat = get5SCat(area, parseInt(match[1]));
+        if (cat && sCats[cat]) {
+          sCats[cat].m += 1;
+          if (v === "ดี") sCats[cat].s += 1;
+          else if (v === "พอใช้") sCats[cat].s += 0.5;
+        }
 
-        if (targetS && sCats[targetS]) {
-          sCats[targetS].max += 1; // เพิ่มฐานคะแนน (ข้อนี้มีให้ตรวจ)
-          
-          if (v === "ดี") sCats[targetS].score += 1;
-          else if (v === "พอใช้") sCats[targetS].score += 0.5;
-          // "ปรับปรุง" ได้ 0
+        // สำหรับ Stacked Bar
+        if(v === "ดี") deptQuality[area].g++;
+        else if(v === "พอใช้") deptQuality[area].f++;
+        else if(v === "ปรับปรุง") deptQuality[area].b++;
+
+        // สำหรับ Pareto
+        if (v === "ปรับปรุง") {
+          const qText = getQuestionText(area, parseInt(match[1]), parseInt(match[2]));
+          paretoCount[qText] = (paretoCount[qText] || 0) + 1;
         }
       }
     });
   });
 
-  // เตรียมข้อมูลวาดกราฟ Radar
-  const radarLabels = [];
-  const radarData = [];
-  let highestS = { name: "-", pct: -1 };
-  let lowestS = { name: "-", pct: 101 };
-
-  Object.entries(sCats).forEach(([catName, catData]) => {
-    radarLabels.push(catName);
-    // ทำ Normalization เป็น 100%
-    const pct = catData.max > 0 ? Math.round((catData.score / catData.max) * 100) : 0;
-    radarData.push(pct);
-    
-    if(catData.max > 0) {
-      if(pct > highestS.pct) highestS = { name: catName, pct: pct };
-      if(pct < lowestS.pct) lowestS = { name: catName, pct: pct };
-    }
-  });
-
-  // อัปเดตจุดแข็ง - จุดอ่อน บนหน้าจอ
-  document.getElementById("s5strong").textContent = highestS.name !== "-" ? `${highestS.name} (${highestS.pct}%)` : "-";
-  document.getElementById("s5weak").textContent = lowestS.name !== "-" ? `${lowestS.name} (${lowestS.pct}%)` : "-";
-
-  // วาดกราฟ Radar S1-S5
+  const radarData = Object.values(sCats).map(c => c.m > 0 ? Math.round((c.s / c.m) * 100) : 0);
   mkChart("chRadar", {
     type: "radar",
+    data: { labels: Object.keys(sCats), datasets: [{ label: "คะแนน (%)", data: radarData, backgroundColor: "rgba(37, 99, 235, 0.2)", borderColor: "#2563eb", borderWidth: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100 } } }
+  });
+
+  // ----------------------------------------------------
+  // CHART 3: 100% STACKED BAR (คุณภาพคะแนนรายแผนก)
+  // ----------------------------------------------------
+  const deptLabels = Object.keys(deptQuality);
+  const pGood = [], pFair = [], pBad = [];
+  
+  deptLabels.forEach(d => {
+    const total = deptQuality[d].g + deptQuality[d].f + deptQuality[d].b;
+    if(total > 0) {
+      pGood.push((deptQuality[d].g / total) * 100);
+      pFair.push((deptQuality[d].f / total) * 100);
+      pBad.push((deptQuality[d].b / total) * 100);
+    } else { pGood.push(0); pFair.push(0); pBad.push(0); }
+  });
+
+  mkChart("chStacked", {
+    type: "bar",
     data: {
-      labels: radarLabels,
-      datasets: [{
-        label: "คะแนนเฉลี่ย (%)",
-        data: radarData,
-        backgroundColor: "rgba(59, 130, 246, 0.2)",
-        borderColor: "#3b82f6",
-        pointBackgroundColor: "#3b82f6",
-        borderWidth: 2
-      }]
+      labels: deptLabels.map(l => l.substring(0,8)),
+      datasets: [
+        { label: "ดี", data: pGood, backgroundColor: "#10b981" },
+        { label: "พอใช้", data: pFair, backgroundColor: "#f59e0b" },
+        { label: "ปรับปรุง", data: pBad, backgroundColor: "#ef4444" }
+      ]
     },
-    options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20 } } } }
-  });
-
-  // วาดกราฟ Trend Chart (คงเดิม)
-  const daily = {};
-  data.forEach(i => {
-    const d = (i.timestamp || "").slice(0, 10);
-    if (d) { if (!daily[d]) daily[d] = []; const p = parseFloat(i.score?.percent); if (!isNaN(p)) daily[d].push(p); }
-  });
-  const labels = Object.keys(daily).sort();
-  const vals = labels.map(k => Math.round(daily[k].reduce((a, b) => a + b, 0) / daily[k].length));
-  
-  mkChart("chTrend", {
-    type: "line",
-    data: { labels, datasets: [{ label: "คะแนนเฉลี่ย", data: vals, borderColor: "#10b981", tension: 0.3, fill: true, backgroundColor: "rgba(16, 185, 129, 0.1)" }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } }
-  });
-}
-
-// ─── LOGIC 2: คำนวณ Aging (อายุงานค้าง) ───
-function processSafety(jobs) {
-  document.getElementById("ssJob").textContent = jobs.length;
-  document.getElementById("ssClosed").textContent = jobs.filter(j => j.status === "Closed").length;
-
-  let aging = { "อยู่ในกำหนด": 0, "เลยกำหนด 1-7 วัน": 0, "เลยกำหนด >7 วัน": 0 };
-  let overdueCount = 0;
-  const today = new Date();
-  today.setHours(0,0,0,0);
-
-  const openJobs = jobs.filter(j => j.status === "Open");
-  
-  openJobs.forEach(j => {
-    if(!j.dueDate) { aging["อยู่ในกำหนด"]++; return; }
-    
-    // แปลง dueDate เป็น Date object (รองรับ Format ทั่วไป)
-    // หมายเหตุ: หาก format ในชีตเป็นแบบแปลกๆ (เช่น DD/MM/YYYY) อาจต้องเขียน split แยก
-    let dDate = new Date(j.dueDate); 
-    if(isNaN(dDate)) { aging["อยู่ในกำหนด"]++; return; }
-    
-    dDate.setHours(0,0,0,0);
-    const diffTime = today - dDate;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays <= 0) {
-      aging["อยู่ในกำหนด"]++;
-    } else if (diffDays <= 7) {
-      aging["เลยกำหนด 1-7 วัน"]++;
-      overdueCount++;
-    } else {
-      aging["เลยกำหนด >7 วัน"]++;
-      overdueCount++;
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { x: { stacked: true }, y: { stacked: true, max: 100 } },
+      plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${Math.round(c.raw)}%` } } }
     }
   });
 
-  document.getElementById("ssOverdue").textContent = overdueCount;
+  // ----------------------------------------------------
+  // CHART 4: PARETO CHART (กฎ 80/20 ปัญหาพบบ่อยสุด)
+  // ----------------------------------------------------
+  // เรียงลำดับปัญหาจากมากไปน้อย (เอาแค่ Top 5)
+  const sortedIssues = Object.entries(paretoCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const pLabels = sortedIssues.map(i => i[0].substring(0, 20) + "...");
+  const pData = sortedIssues.map(i => i[1]);
+  
+  let totalIssues = pData.reduce((a, b) => a + b, 0);
+  let cumSum = 0;
+  const pLine = pData.map(val => {
+    cumSum += val;
+    return totalIssues > 0 ? (cumSum / totalIssues) * 100 : 0;
+  });
 
-  // Aging Chart
-  mkChart("chAging", {
+  mkChart("chPareto", {
     type: "bar",
     data: {
-      labels: Object.keys(aging),
-      datasets: [{
-        data: Object.values(aging),
-        backgroundColor: ["#10b981", "#f59e0b", "#ef4444"],
-        borderRadius: 4
-      }]
+      labels: pLabels,
+      datasets: [
+        { type: "line", label: "% สะสม", data: pLine, borderColor: "#ef4444", yAxisID: "y1", tension: 0.1, fill: false },
+        { type: "bar", label: "จำนวนครั้งที่พบ", data: pData, backgroundColor: "#64748b", yAxisID: "y", borderRadius: 4 }
+      ]
     },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        y: { type: "linear", position: "left", title: { display: true, text: 'จำนวนครั้ง' } },
+        y1: { type: "linear", position: "right", min: 0, max: 100, grid: { drawOnChartArea: false }, title: { display: true, text: 'เปอร์เซ็นต์สะสม (%)' } }
+      }
+    }
+  });
+
+  // ----------------------------------------------------
+  // CHART 5: AGING REPORT (งานค้าง Safety)
+  // ----------------------------------------------------
+  const aging = { "ในกำหนด": 0, "เลย 1-7 วัน": 0, "เลย >7 วัน": 0 };
+  const today = new Date(); today.setHours(0,0,0,0);
+  
+  jobs.filter(j => j.status === "Open").forEach(j => {
+    if(!j.dueDate) { aging["ในกำหนด"]++; return; }
+    let d = new Date(j.dueDate); d.setHours(0,0,0,0);
+    if(isNaN(d)) { aging["ในกำหนด"]++; return; }
+    const diff = Math.floor((today - d) / (1000 * 60 * 60 * 24));
+    if (diff <= 0) aging["ในกำหนด"]++; else if (diff <= 7) aging["เลย 1-7 วัน"]++; else aging["เลย >7 วัน"]++;
+  });
+
+  mkChart("chAging", {
+    type: "bar",
+    data: { labels: Object.keys(aging), datasets: [{ data: Object.values(aging), backgroundColor: ["#10b981", "#f59e0b", "#ef4444"], borderRadius: 6 }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
   });
 
-  // Risk Type Doughnut
-  const byType = {};
-  jobs.forEach(j => { const t = j.inspectionType || "อื่นๆ"; byType[t] = (byType[t] || 0) + 1; });
-  mkChart("chRisk", {
-    type: "doughnut",
-    data: {
-      labels: Object.keys(byType),
-      datasets: [{ data: Object.values(byType), backgroundColor: ["#3b82f6", "#6366f1", "#8b5cf6", "#ec4899", "#f43f5e"] }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, cutout: "65%", plugins: { legend: { position: "right" } } }
+  // ----------------------------------------------------
+  // CHART 6: SCATTER PLOT (Cross Analysis 5S vs Safety)
+  // ----------------------------------------------------
+  const crossData = [];
+  
+  // คำนวณคะแนน 5S รายแผนก
+  const dScore = {};
+  data5S.forEach(i => {
+    if(!dScore[i.area]) dScore[i.area] = [];
+    const p = parseFloat(i.score?.percent);
+    if(!isNaN(p)) dScore[i.area].push(p);
   });
 
-  // Table (เรียงเอา Overdue ขึ้นก่อน)
-  const tbody = document.getElementById("tSafety");
-  if (!openJobs.length) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">ยอดเยี่ยม! ไม่มีงานความเสี่ยงคงค้าง</td></tr>`; return; }
-  
-  tbody.innerHTML = openJobs.map(j => {
-    let statusHtml = '<span class="badge bg-green">ในกำหนด</span>';
-    if(j.dueDate) {
-      let dDate = new Date(j.dueDate);
-      if(!isNaN(dDate) && today > dDate) {
-        const d = Math.floor((today - dDate) / (1000 * 60 * 60 * 24));
-        statusHtml = `<span class="badge ${d > 7 ? 'bg-red' : 'bg-yellow'}">ล่าช้า ${d} วัน</span>`;
+  // คำนวณ % การปิดงาน Safety รายแผนก
+  const dSafety = {};
+  jobs.forEach(j => {
+    const area = AREA_MAP[j.area] || String(j.area).toUpperCase();
+    if(!dSafety[area]) dSafety[area] = { total: 0, closed: 0 };
+    dSafety[area].total++;
+    if(j.status === "Closed") dSafety[area].closed++;
+  });
+
+  DEPTS.forEach(d => {
+    const s5_avg = dScore[d] && dScore[d].length > 0 ? (dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length) : null;
+    const safe_rate = dSafety[d] && dSafety[d].total > 0 ? (dSafety[d].closed / dSafety[d].total) * 100 : null;
+    
+    // พล็อตเฉพาะแผนกที่มีข้อมูลทั้ง 2 อย่าง
+    if(s5_avg !== null && safe_rate !== null) {
+      crossData.push({ x: s5_avg, y: safe_rate, dept: d });
+    }
+  });
+
+  mkChart("chScatter", {
+    type: "scatter",
+    data: {
+      datasets: [{
+        label: "แผนก",
+        data: crossData,
+        backgroundColor: "#2563eb",
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: { min: 0, max: 100, title: { display: true, text: 'คะแนนเฉลี่ย 5S (%)' } },
+        y: { min: 0, max: 100, title: { display: true, text: 'อัตราการปิดงาน Safety สำเร็จ (%)' } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: { label: (c) => `${c.raw.dept}: 5S = ${Math.round(c.raw.x)}%, Safety = ${Math.round(c.raw.y)}%` }
+        }
       }
     }
-    return `<tr>
-      <td style="color:var(--primary); font-family:monospace;">${j.jobId || "-"}</td>
-      <td>${j.inspectionType || "-"}</td>
-      <td><b>${AREA_MAP[j.area] || j.area || "-"}</b></td>
-      <td>${j.problem || "-"}</td>
-      <td>${j.dueDate || "-"}</td>
-      <td>${statusHtml}</td>
-    </tr>`;
-  }).join("");
+  });
 }
 
+// สร้างกราฟและทำลายกราฟเก่าทิ้ง (กันกราฟซ้อน)
 function mkChart(id, cfg) {
   if (charts[id]) charts[id].destroy();
   const c = document.getElementById(id);
