@@ -202,54 +202,96 @@ function applyFilters() {
   processSafety(jobs);
 }
 
-// ─── LOGIC 1: แกะข้อมูล 5S ทำ Radar Chart ───
+// 1. นำตัวแปร CHECKLIST_5S ที่คุณให้มา ไปวางไว้ด้านบนสุดของแท็ก <script> (ใต้ AREA_MAP)
+// const CHECKLIST_5S = { ... ข้อมูลของคุณ ... };
+
+// 2. ฟังก์ชันแปลความหมายหัวข้อให้กลายเป็น S1-S5
+function get5SCategory(area, sectionIndex) {
+  // ป้องกัน Error หากไม่มีข้อมูลแผนกนั้นๆ
+  if (!CHECKLIST_5S[area] || !CHECKLIST_5S[area].sections[sectionIndex]) return null;
+  
+  const title = CHECKLIST_5S[area].sections[sectionIndex].title;
+
+  // คัดแยกเข้าหมวด 5ส. โดยดูจากคำในชื่อหัวข้อ
+  if (title.includes("สภาพแวดล้อมทั่วไป")) return "ส1. สะสาง";
+  if (title.includes("เครื่องมือ") || title.includes("วัตถุดิบ") || title.includes("โต๊ะ") || 
+      title.includes("ลิ้นชัก") || title.includes("เอกสาร") || title.includes("คอมพิวเตอร์") || 
+      title.includes("ประชุม") || title.includes("กาแฟ") || title.includes("ป้อมยาม") || 
+      title.includes("ถังแก๊ส") || title.includes("จอดรถ")) return "ส2. สะดวก";
+  if (title.includes("เครื่องจักร") || title.includes("พื้น") || title.includes("อาหาร") || 
+      title.includes("LOCKER") || title.includes("สุขา") || title.includes("ทางเข้า") || 
+      title.includes("โดยรอบ") || title.includes("ขยะ")) return "ส3. สะอาด";
+  if (title.includes("สุขลักษณะส่วนบุคคล")) return "ส4. สุขลักษณะ";
+  if (title.includes("ความตระหนัก")) return "ส5. สร้างนิสัย";
+
+  return null;
+}
+
+// 3. นำโค้ดนี้ไปทับฟังก์ชัน process5S เดิมทั้งหมด
 function process5S(ins) {
   const data = ins.filter(i => String(i.inspectionType).toUpperCase() === "5S");
   
-  // KPI
+  // KPI ด้านบน
   const scores = data.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
   document.getElementById("s5avg").textContent = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) + "%" : "0%";
   document.getElementById("s5cnt").textContent = data.length;
 
-  // Radar Logic: แกะ s1 ถึง s5
+  // เตรียมตะกร้า 5 ใบสำหรับเก็บคะแนน
   const sCats = {
-    1: { name: "สะสาง (Seiri)", score: 0, max: 0 },
-    2: { name: "สะดวก (Seiton)", score: 0, max: 0 },
-    3: { name: "สะอาด (Seiso)", score: 0, max: 0 },
-    4: { name: "สุขลักษณะ (Seiketsu)", score: 0, max: 0 },
-    5: { name: "สร้างนิสัย (Shitsuke)", score: 0, max: 0 }
+    "ส1. สะสาง": { score: 0, max: 0 },
+    "ส2. สะดวก": { score: 0, max: 0 },
+    "ส3. สะอาด": { score: 0, max: 0 },
+    "ส4. สุขลักษณะ": { score: 0, max: 0 },
+    "ส5. สร้างนิสัย": { score: 0, max: 0 }
   };
 
+  // เริ่มกระบวนการนับคะแนนและโยนลงตะกร้า
   data.forEach(i => {
+    // หาชื่อแผนกที่ตรงกับใน CHECKLIST_5S
+    const areaKey = i.area; 
+
     Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
-      const match = k.match(/^5s_s(\d)_/); // ค้นหา Pattern ข้อ เช่น 5s_s1_q1
-      if (match && sCats[match[1]]) {
-        sCats[match[1]].max += 1;
-        if (v === "ดี") sCats[match[1]].score += 1;
-        else if (v === "พอใช้") sCats[match[1]].score += 0.5;
-        // ถ้า "ปรับปรุง" ได้ 0
+      // ดึงเลขหมวด (s0, s1...) ออกมาจาก Key เช่น 5s_s1_q2 จะได้เลข 1
+      const match = k.match(/^5s_s(\d+)_/); 
+      
+      if (match) {
+        const sectionIndex = parseInt(match[1]);
+        const targetS = get5SCategory(areaKey, sectionIndex); // เรียกใช้ฟังก์ชันแปลความหมาย
+
+        if (targetS && sCats[targetS]) {
+          sCats[targetS].max += 1; // เพิ่มฐานคะแนน (ข้อนี้มีให้ตรวจ)
+          
+          if (v === "ดี") sCats[targetS].score += 1;
+          else if (v === "พอใช้") sCats[targetS].score += 0.5;
+          // "ปรับปรุง" ได้ 0
+        }
       }
     });
   });
 
+  // เตรียมข้อมูลวาดกราฟ Radar
   const radarLabels = [];
   const radarData = [];
   let highestS = { name: "-", pct: -1 };
   let lowestS = { name: "-", pct: 101 };
 
-  Object.values(sCats).forEach(cat => {
-    radarLabels.push(cat.name);
-    const pct = cat.max > 0 ? Math.round((cat.score / cat.max) * 100) : 0;
+  Object.entries(sCats).forEach(([catName, catData]) => {
+    radarLabels.push(catName);
+    // ทำ Normalization เป็น 100%
+    const pct = catData.max > 0 ? Math.round((catData.score / catData.max) * 100) : 0;
     radarData.push(pct);
-    if(cat.max > 0) {
-      if(pct > highestS.pct) highestS = { name: cat.name, pct: pct };
-      if(pct < lowestS.pct) lowestS = { name: cat.name, pct: pct };
+    
+    if(catData.max > 0) {
+      if(pct > highestS.pct) highestS = { name: catName, pct: pct };
+      if(pct < lowestS.pct) lowestS = { name: catName, pct: pct };
     }
   });
 
+  // อัปเดตจุดแข็ง - จุดอ่อน บนหน้าจอ
   document.getElementById("s5strong").textContent = highestS.name !== "-" ? `${highestS.name} (${highestS.pct}%)` : "-";
   document.getElementById("s5weak").textContent = lowestS.name !== "-" ? `${lowestS.name} (${lowestS.pct}%)` : "-";
 
+  // วาดกราฟ Radar S1-S5
   mkChart("chRadar", {
     type: "radar",
     data: {
@@ -266,7 +308,7 @@ function process5S(ins) {
     options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20 } } } }
   });
 
-  // Trend Chart
+  // วาดกราฟ Trend Chart (คงเดิม)
   const daily = {};
   data.forEach(i => {
     const d = (i.timestamp || "").slice(0, 10);
@@ -278,7 +320,7 @@ function process5S(ins) {
   mkChart("chTrend", {
     type: "line",
     data: { labels, datasets: [{ label: "คะแนนเฉลี่ย", data: vals, borderColor: "#10b981", tension: 0.3, fill: true, backgroundColor: "rgba(16, 185, 129, 0.1)" }] },
-    options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } }
   });
 }
 
