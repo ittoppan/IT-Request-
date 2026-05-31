@@ -502,7 +502,7 @@ function processCharts(ins, jobs) {
     options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: "linear", position: "left", title: { display: true, text: 'ครั้ง' } }, y1: { type: "linear", position: "right", min: 0, max: 100, grid: { drawOnChartArea: false } } } }
   });
 
-  // --------- 7. SAFETY LOGIC ---------
+ // --------- SAFETY LOGIC ---------
   const totalSafe = jobs.length;
   const openSafe = jobs.filter(j => j.status === "Open").length;
   const closedSafe = totalSafe - openSafe;
@@ -513,108 +513,106 @@ function processCharts(ins, jobs) {
   document.getElementById("sfClosed").textContent = closedSafe;
   document.getElementById("sfRate").textContent = rateSafe + "%";
 
+  // ----------------------------------------------------
+  // 7. Aging Report & Safety Pyramid (วิเคราะห์งานที่ยัง Open)
+  // ใช้ dueDate เทียบกับ วันปัจจุบัน
+  // ----------------------------------------------------
   const aging = { "ในกำหนด": 0, "เลย 1-7 วัน": 0, "เลย >7 วัน": 0 };
-  const today = new Date(); today.setHours(0,0,0,0);
+  const today = new Date(); 
+  today.setHours(0,0,0,0);
+
   jobs.filter(j => j.status === "Open").forEach(j => {
-    if(!j.dueDate) { aging["ในกำหนด"]++; return; }
-    let d = new Date(j.dueDate); d.setHours(0,0,0,0);
-    if(isNaN(d)) { aging["ในกำหนด"]++; return; }
-    const diff = Math.floor((today - d) / (1000 * 60 * 60 * 24));
-    if (diff <= 0) aging["ในกำหนด"]++; else if (diff <= 7) aging["เลย 1-7 วัน"]++; else aging["เลย >7 วัน"]++;
+    if(!j.dueDate) { 
+      aging["ในกำหนด"]++; 
+      return; 
+    }
+    
+    // แปลง dueDate (เช่น 5/26/2026 10:47:41) ให้เป็นวันที่
+    let dDue = new Date(j.dueDate); 
+    dDue.setHours(0,0,0,0);
+    
+    if(isNaN(dDue)) { 
+      aging["ในกำหนด"]++; 
+      return; 
+    }
+    
+    // เอาวันปัจจุบัน ลบด้วย กำหนดส่ง
+    const diff = Math.floor((today - dDue) / (1000 * 60 * 60 * 24));
+    
+    if (diff <= 0) aging["ในกำหนด"]++; 
+    else if (diff <= 7) aging["เลย 1-7 วัน"]++; 
+    else aging["เลย >7 วัน"]++;
   });
 
-  // Pyramid
+  // นำค่าไปใส่ใน Safety Pyramid
   document.getElementById("pyrTop").textContent = aging["เลย >7 วัน"];
   document.getElementById("pyrMid").textContent = aging["ในกำหนด"] + aging["เลย 1-7 วัน"];
   document.getElementById("pyrBot").textContent = closedSafe;
 
-// ----------------------------------------------------
-  // การวิเคราะห์ระยะเวลาในการปิดงาน (MTTR Trend)
+  // วาดกราฟ Aging
+  mkChart("chAging", {
+    type: "bar", 
+    data: { labels: Object.keys(aging), datasets: [{ data: Object.values(aging), backgroundColor: ["#10b981", "#f59e0b", "#ef4444"], borderRadius: 6 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+  });
+
+  // ----------------------------------------------------
+  // 8. MTTR Trend (วิเคราะห์ระยะเวลาในการปิดงาน - เฉพาะงาน Closed)
+  // ใช้ finishDate ลบด้วย dateFound
   // ----------------------------------------------------
   const mttrData = {};
   
   jobs.forEach(j => {
-    // 1. คัดเฉพาะงานที่ "Closed" และมีข้อมูลทั้ง "วันที่พบ" และ "Finish Date"
-    // หมายเหตุ: ตรวจสอบให้แน่ใจว่า API ส่งชื่อตัวแปรมาเป็น finishDate (หรือแก้ชื่อให้ตรงกับ API ของคุณ)
-    if(j.status === "Closed" && j.dateFound && j.finishDate) {
+    // ดึงเฉพาะงานที่แก้ไขเสร็จแล้ว และมีข้อมูลวันที่ครบ
+    if (j.status === "Closed" && j.dateFound && j.finishDate) {
       
-      let dFound = new Date(j.dateFound);
-      let dFinish = new Date(j.finishDate);
-      
-      if(!isNaN(dFound) && !isNaN(dFinish)) {
-        // 2. จัดกลุ่มตาม "เดือนที่งานถูกปิด" (Finish Date)
+      let dFound = new Date(j.dateFound); // เช่น 5/19/2026 10:47:41
+      let dFinish = new Date(j.finishDate); // เช่น 5/20/2026
+
+      if (!isNaN(dFound) && !isNaN(dFinish)) {
+        // จัดกลุ่มตามเดือนที่งานถูก "ปิด" 
         let ym = `${dFinish.getFullYear()}-${String(dFinish.getMonth() + 1).padStart(2, '0')}`;
         
-        // 3. คำนวณส่วนต่างของเวลา (มิลลิวินาที -> วัน)
+        // ตัดเวลาออกให้เหลือแต่วันที่
+        dFound.setHours(0,0,0,0);
+        dFinish.setHours(0,0,0,0);
+
+        // คำนวณจำนวนวันที่ใช้แก้ปัญหา
         const diffTime = dFinish.getTime() - dFound.getTime();
         let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         
-        // 4. ถ้าแก้จบภายในวันเดียวกัน (0 วัน) ให้ปัดเป็น 1 วันเป็นอย่างน้อย
-        if (diffDays <= 0) diffDays = 1; 
+        // กรณีพบปัญหาและแก้จบในวันเดียวกัน (0 วัน) ให้ปัดเป็น 1 วัน (Minimum 1 day)
+        if (diffDays <= 0) { diffDays = 1; }
 
-        if(!mttrData[ym]) mttrData[ym] = [];
+        if (!mttrData[ym]) mttrData[ym] = [];
         mttrData[ym].push(diffDays);
       }
     }
   });
 
   const mttrKeys = Object.keys(mttrData).sort();
+  const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+  
   const mttrLabels = mttrKeys.map(m => { 
     const [y, mm] = m.split('-'); 
     return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; 
   });
   
-  // หาค่าเฉลี่ยของจำนวนวันที่ใช้ปิดงานในแต่ละเดือน
+  // หาค่าเฉลี่ยจำนวนวัน MTTR
   const mttrScores = mttrKeys.map(m => { 
     const arr = mttrData[m]; 
     return Math.round(arr.reduce((a,b)=>a+b,0) / arr.length); 
   });
 
+  // วาดกราฟ MTTR
   mkChart("chMTTR", {
     type: "bar", 
     data: { 
-      labels: mttrLabels.length ? mttrLabels : ["-"], 
-      datasets: [ { label: "จำนวนวันเฉลี่ย", data: mttrScores, backgroundColor: "#8b5cf6", borderRadius: 4 } ] 
+      labels: mttrLabels.length ? mttrLabels : ["ยังไม่มีงานปิด"], 
+      datasets: [ { label: "ระยะเวลาปิดงานเฉลี่ย (วัน)", data: mttrScores, backgroundColor: "#8b5cf6", borderRadius: 4 } ] 
     },
-    options: { 
-      responsive: true, 
-      maintainAspectRatio: false, 
-      plugins: { legend: { display: false } }, 
-      scales: { y: { beginAtZero: true } } 
-    }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
   });
-
-  // Aging & Dept & Scatter
-  mkChart("chAging", {
-    type: "bar", data: { labels: Object.keys(aging), datasets: [{ data: Object.values(aging), backgroundColor: ["#10b981", "#f59e0b", "#ef4444"], borderRadius: 6 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-  });
-
-  const dSafe = {};
-  jobs.forEach(j => {
-    const area = AREA_MAP[j.area] || String(j.area).toUpperCase();
-    if(!dSafe[area]) dSafe[area] = { open: 0, closed: 0 };
-    if(j.status === "Open") dSafe[area].open++; else dSafe[area].closed++;
-  });
-  const safeDeptLabels = Object.keys(dSafe);
-  mkChart("chSafeDept", {
-    type: "bar",
-    data: { labels: safeDeptLabels.map(l => l.substring(0,8)), datasets: [ { label: "เสร็จ", data: safeDeptLabels.map(d => dSafe[d].closed), backgroundColor: "#10b981" }, { label: "ค้าง", data: safeDeptLabels.map(d => dSafe[d].open), backgroundColor: "#ef4444" } ] },
-    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
-  });
-
-  const crossData = [];
-  DEPTS.forEach(d => {
-    const s5_avg = dScore[d] && dScore[d].length > 0 ? (dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length) : null;
-    const sArea = dSafe[d];
-    const safe_rate = sArea && (sArea.open + sArea.closed > 0) ? (sArea.closed / (sArea.open + sArea.closed)) * 100 : null;
-    if(s5_avg !== null && safe_rate !== null) crossData.push({ x: s5_avg, y: safe_rate, dept: d });
-  });
-  mkChart("chScatter", {
-    type: "scatter", data: { datasets: [{ label: "แผนก", data: crossData, backgroundColor: "#2563eb", pointRadius: 6, pointHoverRadius: 8 }] },
-    options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 100, title: { display: true, text: '5S (%)' } }, y: { min: 0, max: 100, title: { display: true, text: 'Safety Closed (%)' } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw.dept}: 5S=${Math.round(c.raw.x)}%, Safe=${Math.round(c.raw.y)}%` } } } }
-  });
-}
 </script>
 </body>
 </html>
