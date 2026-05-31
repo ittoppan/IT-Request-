@@ -293,6 +293,8 @@ const CHECKLIST_5S = {
 Chart.defaults.font.family = "'Sarabun', sans-serif";
 let raw = { ins: [], jobs: [] };
 let charts = {};
+// ตัวแปรประกาศรายชื่อเดือนครั้งเดียว ป้องกัน Error
+const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 
 // ==========================================
 // 2. MODAL & INIT
@@ -310,14 +312,27 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadAll() {
   try {
     const [dash, jobs] = await Promise.all([
-      fetch(`${API}?action=getDashboardData`).then(r => r.json()),
-      fetch(`${API}?action=getReport`).then(r => r.json())
+      fetch(`${API}?action=getDashboardData`).then(async r => {
+        if (!r.ok) throw new Error("API Dashboard ขัดข้อง");
+        return r.json();
+      }),
+      fetch(`${API}?action=getReport`).then(async r => {
+        if (!r.ok) throw new Error("API Report ขัดข้อง");
+        return r.json();
+      })
     ]);
+    
+    if (dash.status === "error") throw new Error(dash.message);
+    
     raw.ins = (dash.details || []).map(d => ({ ...d, area: AREA_MAP[d.area] || String(d.area||"OFFICE").toUpperCase() }));
     raw.jobs = Array.isArray(jobs) ? jobs : [];
     applyFilters();
-  } catch (err) { alert("เกิดข้อผิดพลาดในการโหลดข้อมูล"); } 
-  finally { document.getElementById("loader").classList.add("hide"); }
+  } catch (err) { 
+    console.error(err);
+    alert("ไม่สามารถโหลดข้อมูลได้: " + err.message + "\n\n(หากเพิ่งอัปเดตสคริปต์ กรุณาตรวจสอบให้แน่ใจว่าสิทธิ์การเข้าถึงเป็น 'Everyone')"); 
+  } finally { 
+    document.getElementById("loader").classList.add("hide"); 
+  }
 }
 
 function applyFilters() {
@@ -362,17 +377,18 @@ function mkChart(id, cfg) {
 }
 
 // ==========================================
-// 3. RENDER ALL CHARTS (WITH NEW SCORING: 2, 1, 0)
+// 3. RENDER ALL CHARTS
 // ==========================================
 function processCharts(ins, jobs) {
+  // --------- 5S LOGIC ---------
   const data5S = ins.filter(i => String(i.inspectionType).toUpperCase() === "5S");
   const scores = data5S.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
   const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
   
-  // 1. Gauge
   document.getElementById("gVal").textContent = avg + "%";
   document.getElementById("gVal").style.color = avg >= TARGET ? "var(--success)" : "var(--danger)";
   document.getElementById("gSub").textContent = avg >= TARGET ? "ผ่านเกณฑ์มาตรฐาน" : "ต้องเร่งปรับปรุง";
+  
   mkChart("chGauge", {
     type: "doughnut", data: { labels: ["ปรับปรุง", "พอใช้", "ดี"], datasets: [{ data: [70, 15, 15], backgroundColor: ["#ef4444", "#f59e0b", "#10b981"], borderWidth: 0 }] },
     options: { responsive: true, maintainAspectRatio: false, circumference: 180, rotation: 270, cutout: "80%", plugins: { legend: { display: false }, tooltip: { enabled: false } } }
@@ -407,7 +423,7 @@ function processCharts(ins, jobs) {
         // 🔴 UPDATE NEW SCORING: ดี=2, พอใช้=1, ปรับปรุง=0 
         let val = v === "ดี" ? 2 : v === "พอใช้" ? 1 : 0;
         
-        if (cat && sCats[cat]) { sCats[cat].m += 2; sCats[cat].s += val; } // m+=2 because max score per question is now 2
+        if (cat && sCats[cat]) { sCats[cat].m += 2; sCats[cat].s += val; } 
         if (deptHeatmap[area] && cat) { deptHeatmap[area][cat].m += 2; deptHeatmap[area][cat].s += val; }
         
         if(v === "ดี") deptQuality[area].g++; else if(v === "พอใช้") deptQuality[area].f++; else if(v === "ปรับปรุง") deptQuality[area].b++;
@@ -419,7 +435,7 @@ function processCharts(ins, jobs) {
     });
   });
 
-  // 2. Leaderboard
+  // Leaderboard
   const lbData = [];
   Object.keys(dScore).forEach(d => {
     if(dScore[d].length > 0) lbData.push({ name: d, score: Math.round(dScore[d].reduce((a,b)=>a+b,0)/dScore[d].length) });
@@ -430,14 +446,14 @@ function processCharts(ins, jobs) {
   }).join("");
   document.getElementById("lbList").innerHTML = lbHtml || '<div class="lb-item"><div class="lb-name">ไม่พบข้อมูลคะแนน</div></div>';
 
-  // 3. Radar
+  // Radar
   const radarData = Object.values(sCats).map(c => c.m > 0 ? Math.round((c.s / c.m) * 100) : 0);
   mkChart("chRadar", {
     type: "radar", data: { labels: Object.keys(sCats), datasets: [{ label: "คะแนน (%)", data: radarData, backgroundColor: "rgba(37, 99, 235, 0.2)", borderColor: "#2563eb", borderWidth: 2 }] },
     options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100 } } }
   });
 
-  // 4. Heatmap
+  // Heatmap
   let hmHtml = `<tr><th>แผนก</th>${S_CATS.map(c=>`<th>${c}</th>`).join('')}</tr>`;
   DEPTS.forEach(d => {
     if(dScore[d] && dScore[d].length > 0) {
@@ -456,8 +472,7 @@ function processCharts(ins, jobs) {
   });
   document.getElementById("tbHeatmap").innerHTML = hmHtml || "<tr><td>ไม่พบข้อมูล</td></tr>";
 
-  // 5. Control Chart
-
+  // Control Chart
   const monthsKeys = Object.keys(monthlyData).sort();
   const monthLabels = monthsKeys.map(m => { const [y, mm] = m.split('-'); return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; });
   const monthScores = monthsKeys.map(m => { const arr = monthlyData[m]; return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length); });
@@ -479,7 +494,7 @@ function processCharts(ins, jobs) {
     options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 40, max: 100 } }, plugins: { legend: { position: 'bottom' } } }
   });
 
-  // 6. Stacked & Pareto
+  // Stacked Bar
   const deptLabels = Object.keys(deptQuality);
   const pGood = [], pFair = [], pBad = [];
   deptLabels.forEach(d => {
@@ -492,6 +507,7 @@ function processCharts(ins, jobs) {
     options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, max: 100 } } }
   });
 
+  // Pareto
   const sortedIssues = Object.entries(paretoCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const pLabels = sortedIssues.map(i => i[0].substring(0, 20) + "...");
   const pData = sortedIssues.map(i => i[1]);
@@ -502,7 +518,7 @@ function processCharts(ins, jobs) {
     options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: "linear", position: "left", title: { display: true, text: 'ครั้ง' } }, y1: { type: "linear", position: "right", min: 0, max: 100, grid: { drawOnChartArea: false } } } }
   });
 
- // --------- SAFETY LOGIC ---------
+  // --------- SAFETY LOGIC ---------
   const totalSafe = jobs.length;
   const openSafe = jobs.filter(j => j.status === "Open").length;
   const closedSafe = totalSafe - openSafe;
@@ -513,77 +529,47 @@ function processCharts(ins, jobs) {
   document.getElementById("sfClosed").textContent = closedSafe;
   document.getElementById("sfRate").textContent = rateSafe + "%";
 
-  // ----------------------------------------------------
-  // 7. Aging Report & Safety Pyramid (วิเคราะห์งานที่ยัง Open)
-  // ใช้ dueDate เทียบกับ วันปัจจุบัน
-  // ----------------------------------------------------
+  // Aging Report & Safety Pyramid
   const aging = { "ในกำหนด": 0, "เลย 1-7 วัน": 0, "เลย >7 วัน": 0 };
   const today = new Date(); 
   today.setHours(0,0,0,0);
 
   jobs.filter(j => j.status === "Open").forEach(j => {
-    if(!j.dueDate) { 
-      aging["ในกำหนด"]++; 
-      return; 
-    }
-    
-    // แปลง dueDate (เช่น 5/26/2026 10:47:41) ให้เป็นวันที่
+    if(!j.dueDate) { aging["ในกำหนด"]++; return; }
     let dDue = new Date(j.dueDate); 
     dDue.setHours(0,0,0,0);
     
-    if(isNaN(dDue)) { 
-      aging["ในกำหนด"]++; 
-      return; 
-    }
+    if(isNaN(dDue)) { aging["ในกำหนด"]++; return; }
     
-    // เอาวันปัจจุบัน ลบด้วย กำหนดส่ง
     const diff = Math.floor((today - dDue) / (1000 * 60 * 60 * 24));
-    
     if (diff <= 0) aging["ในกำหนด"]++; 
     else if (diff <= 7) aging["เลย 1-7 วัน"]++; 
     else aging["เลย >7 วัน"]++;
   });
 
-  // นำค่าไปใส่ใน Safety Pyramid
   document.getElementById("pyrTop").textContent = aging["เลย >7 วัน"];
   document.getElementById("pyrMid").textContent = aging["ในกำหนด"] + aging["เลย 1-7 วัน"];
   document.getElementById("pyrBot").textContent = closedSafe;
 
-  // วาดกราฟ Aging
   mkChart("chAging", {
     type: "bar", 
     data: { labels: Object.keys(aging), datasets: [{ data: Object.values(aging), backgroundColor: ["#10b981", "#f59e0b", "#ef4444"], borderRadius: 6 }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
   });
 
-  // ----------------------------------------------------
-  // 8. MTTR Trend (วิเคราะห์ระยะเวลาในการปิดงาน - เฉพาะงาน Closed)
-  // ใช้ finishDate ลบด้วย dateFound
-  // ----------------------------------------------------
+  // MTTR Trend
   const mttrData = {};
-  
   jobs.forEach(j => {
-    // ดึงเฉพาะงานที่แก้ไขเสร็จแล้ว และมีข้อมูลวันที่ครบ
     if (j.status === "Closed" && j.dateFound && j.finishDate) {
-      
-      let dFound = new Date(j.dateFound); // เช่น 5/19/2026 10:47:41
-      let dFinish = new Date(j.finishDate); // เช่น 5/20/2026
-
+      let dFound = new Date(j.dateFound); 
+      let dFinish = new Date(j.finishDate); 
       if (!isNaN(dFound) && !isNaN(dFinish)) {
-        // จัดกลุ่มตามเดือนที่งานถูก "ปิด" 
         let ym = `${dFinish.getFullYear()}-${String(dFinish.getMonth() + 1).padStart(2, '0')}`;
-        
-        // ตัดเวลาออกให้เหลือแต่วันที่
         dFound.setHours(0,0,0,0);
         dFinish.setHours(0,0,0,0);
-
-        // คำนวณจำนวนวันที่ใช้แก้ปัญหา
         const diffTime = dFinish.getTime() - dFound.getTime();
         let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        
-        // กรณีพบปัญหาและแก้จบในวันเดียวกัน (0 วัน) ให้ปัดเป็น 1 วัน (Minimum 1 day)
-        if (diffDays <= 0) { diffDays = 1; }
-
+        if (diffDays <= 0) diffDays = 1; 
         if (!mttrData[ym]) mttrData[ym] = [];
         mttrData[ym].push(diffDays);
       }
@@ -591,27 +577,50 @@ function processCharts(ins, jobs) {
   });
 
   const mttrKeys = Object.keys(mttrData).sort();
-  const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-  
   const mttrLabels = mttrKeys.map(m => { 
     const [y, mm] = m.split('-'); 
     return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; 
   });
   
-  // หาค่าเฉลี่ยจำนวนวัน MTTR
   const mttrScores = mttrKeys.map(m => { 
     const arr = mttrData[m]; 
     return Math.round(arr.reduce((a,b)=>a+b,0) / arr.length); 
   });
 
-  // วาดกราฟ MTTR
   mkChart("chMTTR", {
     type: "bar", 
     data: { 
-      labels: mttrLabels.length ? mttrLabels : ["ยังไม่มีงานปิด"], 
-      datasets: [ { label: "ระยะเวลาปิดงานเฉลี่ย (วัน)", data: mttrScores, backgroundColor: "#8b5cf6", borderRadius: 4 } ] 
+      labels: mttrLabels.length ? mttrLabels : ["-"], 
+      datasets: [ { label: "จำนวนวันเฉลี่ย (วัน)", data: mttrScores, backgroundColor: "#8b5cf6", borderRadius: 4 } ] 
     },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  // Safety Dept
+  const dSafe = {};
+  jobs.forEach(j => {
+    const area = AREA_MAP[j.area] || String(j.area).toUpperCase();
+    if(!dSafe[area]) dSafe[area] = { open: 0, closed: 0 };
+    if(j.status === "Open") dSafe[area].open++; else dSafe[area].closed++;
+  });
+  const safeDeptLabels = Object.keys(dSafe);
+  mkChart("chSafeDept", {
+    type: "bar",
+    data: { labels: safeDeptLabels.map(l => l.substring(0,8)), datasets: [ { label: "เสร็จ", data: safeDeptLabels.map(d => dSafe[d].closed), backgroundColor: "#10b981" }, { label: "ค้าง", data: safeDeptLabels.map(d => dSafe[d].open), backgroundColor: "#ef4444" } ] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+  });
+
+  // Scatter
+  const crossData = [];
+  DEPTS.forEach(d => {
+    const s5_avg = dScore[d] && dScore[d].length > 0 ? (dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length) : null;
+    const sArea = dSafe[d];
+    const safe_rate = sArea && (sArea.open + sArea.closed > 0) ? (sArea.closed / (sArea.open + sArea.closed)) * 100 : null;
+    if(s5_avg !== null && safe_rate !== null) crossData.push({ x: s5_avg, y: safe_rate, dept: d });
+  });
+  mkChart("chScatter", {
+    type: "scatter", data: { datasets: [{ label: "แผนก", data: crossData, backgroundColor: "#2563eb", pointRadius: 6, pointHoverRadius: 8 }] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 100, title: { display: true, text: '5S (%)' } }, y: { min: 0, max: 100, title: { display: true, text: 'Safety Closed (%)' } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw.dept}: 5S=${Math.round(c.raw.x)}%, Safe=${Math.round(c.raw.y)}%` } } } }
   });
 }
 </script>
