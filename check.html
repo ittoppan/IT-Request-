@@ -3,185 +3,167 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SAFETY PATROL & 5S INSPECTION SYSTEM</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #f39c12; --primary-dark: #e67e22; --bg: #f0f2f5; --card-bg: #ffffff;
-      --text: #2c3e50; --danger: #e74c3c; --success: #27ae60; --blue: #2980b9;
-      --gray: #95a5a6; --border: #e0e0e0; --shadow: 0 4px 20px rgba(0,0,0,0.06);
-      --focus-ring: 0 0 0 3px rgba(243, 156, 18, 0.25);
-    }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg: #1a1a2e; --card-bg: #16213e; --text: #eaeaea; --text-muted: #a0a0b0; --border: #3a3a5a; --shadow: 0 4px 20px rgba(0,0,0,0.3); }
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Prompt', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; -webkit-tap-highlight-color: transparent; padding-bottom: 80px; }
-    :focus-visible { outline: none; box-shadow: var(--focus-ring); }
-
-    /* Header */
-    .header { background: linear-gradient(135deg, #ff8c00, var(--primary)); color: white; padding: 18px 15px 40px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
-    .header h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
-    .header p { font-size: 0.8rem; opacity: 0.9; }
-    .btn-back { display: inline-flex; align-items: center; gap: 6px; color: white; text-decoration: none; font-size: 0.85rem; margin-bottom: 8px; }
-
-    /* Container & Cards */
-    .container { max-width: 600px; margin: -25px auto 0; padding: 0 12px; position: relative; z-index: 101; }
-    .card { background: var(--card-bg); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); margin-bottom: 16px; }
-    label { font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 8px; color: #555; }
-    .section-label { color: var(--primary-dark); border-left: 4px solid var(--primary); padding-left: 10px; margin: 16px 0 12px; font-size: 1rem; }
-
-    /* Type Selector */
-    .type-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-    .type-btn { padding: 10px 6px; border-radius: 12px; border: 2px solid var(--border); background: #f8f9fa; text-align: center; cursor: pointer; font-family: 'Prompt'; font-size: 0.7rem; font-weight: 600; color: #666; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 62px; }
-    .type-btn i { font-size: 1.2rem; color: var(--gray); transition: 0.2s; }
-    .type-btn:hover { transform: translateY(-2px); border-color: var(--primary); background: #fff9f0; }
-    .type-btn:hover i { color: var(--primary); }
-    .type-btn.active { background: linear-gradient(145deg, #fff3e0, #ffe0b2); color: var(--primary-dark); border-color: var(--primary-dark); box-shadow: 0 4px 12px rgba(230, 126, 34, 0.2); }
-    .type-btn.active i { color: var(--primary-dark); transform: scale(1.1); }
-    .type-btn.active-5s { background: linear-gradient(145deg, #e8f5e9, #c8e6c9); color: #219a52; border-color: #219a52; }
-    .type-btn.active-5s i { color: #219a52; }
-
-    /* Inputs & Selects */
-    input[type="text"], input[type="number"], input[type="date"], select, textarea, .form-select {
-      width: 100%; padding: 11px 12px; border-radius: 10px; border: 1.5px solid var(--border);
-      font-family: 'Prompt'; font-size: 14px; background: #fafafa; transition: 0.2s; color: var(--text);
-    }
-    .form-select {
-      appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;
-      cursor: pointer;
-    }
-    input:focus, select:focus, textarea:focus, .form-select:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15); }
-    textarea { resize: vertical; min-height: 65px; }
-
-    /* Check Items */
-    .check-item { background: #fff; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 1.5px solid var(--border); transition: 0.2s; }
-    .check-item.error { border-color: var(--danger); background: #fff5f5; animation: shake 0.3s; }
-    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
-    .check-item small { font-size: 0.9rem; color: var(--text); font-weight: 600; line-height: 1.4; display: block; margin-bottom: 10px; }
-    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0; }
-    .options label { cursor: pointer; padding: 10px; border-radius: 10px; background: #f8f9fa; text-align: center; font-weight: 600; font-size: 0.85rem; margin: 0; transition: 0.2s; border: 2px solid transparent; color: #666; display: flex; align-items: center; justify-content: center; gap: 5px; }
-    .options label:hover { background: #f0f0f0; }
-    input[type="radio"] { display: none; }
-    input[value="ดี"]:checked + label { background: linear-gradient(145deg, #e8f5e9, #c8e6c9); color: #2e7d32; border-color: #2e7d32; }
-    input[value="ไม่ดี"]:checked + label { background: linear-gradient(145deg, #ffebee, #ffcdd2); color: #c62828; border-color: #c62828; }
-    .duedate-box { display: none; margin-top: 10px; background: linear-gradient(145deg, #fff5f5, #ffebee); padding: 10px 12px; border-radius: 9px; border: 1.5px dashed var(--danger); animation: fadeIn 0.2s; }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
-    .water-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-left: 8px; }
-    .water-badge.warning { background: #ffebee; color: #c62828; }
-    .water-badge.success { background: #e8f5e9; color: #27ae60; }
-
-    /* Photo Upload */
-    .photo-area { background: #fafafa; padding: 10px; border-radius: 10px; border: 1.5px dashed var(--border); margin-top: 10px; }
-    .photo-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-    .photo-thumb { position: relative; width: 28%; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; border: 2px solid var(--border); }
-    .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .photo-remove { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; background: var(--danger); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; border: 2px solid white; }
-    .photo-caption { margin-top: 5px; font-size: 0.75rem; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; width: 100%; }
-    .camera-row { display: flex; gap: 8px; }
-    .btn-cam { flex: 1; padding: 10px; border: 2px dashed var(--border); border-radius: 9px; background: #fff; color: var(--text); font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.8rem; }
-    .btn-cam:hover { border-color: var(--primary); background: #fff9f0; }
-
-    /* Submit Button */
-    .btn-submit { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 16px; border-radius: 14px; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 6px 20px rgba(230, 126, 34, 0.3); margin-top: 12px; font-family: 'Prompt'; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(230, 126, 34, 0.4); }
-    .btn-submit:active { transform: scale(0.98); }
-    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-
-    /* Loader & Toast */
-    .loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.92); display:none; flex-direction:column; align-items:center; justify-content:center; z-index:2000; backdrop-filter:blur(5px); }
-    .loader.show { display:flex; }
-    .loader i { color:var(--primary); font-size:2rem; animation:spin 1s linear infinite; }
-    @keyframes spin { to{transform:rotate(360deg)} }
-    .toast { position:fixed; bottom:20px; right:20px; padding:10px 16px; border-radius:9px; background:var(--card-bg); box-shadow:0 4px 15px rgba(0,0,0,0.15); z-index:9999; display:flex; align-items:center; gap:8px; font-size:0.85rem; animation:slideIn 0.3s; }
-    .toast.success { border-left:4px solid var(--success); }
-    .toast.error { border-left:4px solid var(--danger); }
-    @keyframes slideIn { from{transform:translateX(100px);opacity:0} to{transform:translateX(0);opacity:1} }
-
-    /* Responsive */
-    @media (max-width: 480px) {
-      .type-selector { grid-template-columns: repeat(2, 1fr); }
-      .header h2 { font-size: 1.15rem; }
-    }
-    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:0.01ms!important; transition-duration:0.01ms!important; } }
+  <title class="system-title">SAFETY PATROL & 5S INSPECTION</title>
   
-    /* ✅ 3-Level Score Options (สำหรับ 5S) */
-    .score-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 6px 0; }
-    .score-options input[type="radio"] { display: none; }
-    .score-label {
-      padding: 10px 6px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 0.8rem;
-      cursor: pointer; transition: all 0.2s; border: 2px solid var(--border); background: #f8f9fa; color: #666;
-      display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 60px;
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: 'var(--color-primary, #f39c12)',
+            secondary: 'var(--color-secondary, #e67e22)',
+            dark: '#2c3e50',
+          },
+          fontFamily: {
+            sans: ['var(--font-family, "Prompt")', 'sans-serif'],
+          },
+          animation: {
+            'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
+            'slide-in': 'slideIn 0.3s ease-out forwards',
+            'slide-out': 'slideOut 0.3s ease-in forwards',
+          },
+          keyframes: {
+            shake: {
+              '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+              '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+              '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+              '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+            },
+            slideIn: {
+              '0%': { transform: 'translateY(100%)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' }
+            },
+            slideOut: {
+              '0%': { transform: 'translateY(0)', opacity: '1' },
+              '100%': { transform: 'translateY(100%)', opacity: '0' }
+            }
+          }
+        }
+      }
     }
-    .score-label:hover { background: #f0f0f0; transform: translateY(-1px); }
-    .score-label i { font-size: 1.1rem; }
-    input[value="ดี"]:checked + .score-label { background: linear-gradient(145deg, #e8f5e9, #c8e6c9); color: #2e7d32; border-color: #2e7d32; }
-    input[value="พอใช้"]:checked + .score-label { background: linear-gradient(145deg, #fff3e0, #ffe0b2); color: #e65100; border-color: #e65100; }
-    input[value="ปรับปรุง"]:checked + .score-label { background: linear-gradient(145deg, #ffebee, #ffcdd2); color: #c62828; border-color: #c62828; }
+  </script>
+  <style>
+    /* ซ่อน Scrollbar ของ Container แบบเนียนๆ */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800 font-sans pb-24 selection:bg-primary selection:text-white">
 
-  <div id="loader" class="loader">
-    <i class="fas fa-circle-notch"></i>
-    <p style="margin-top:15px; font-weight:600;">กำลังบันทึกข้อมูล...</p>
-  </div>
+  <nav class="bg-gradient-to-r from-primary to-secondary text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <i class="fas fa-shield-halved text-2xl mr-2"></i>
+          <span class="font-bold text-lg tracking-wide hidden sm:block system-title">SAFETY & 5S SYSTEM</span>
+        </div>
+        <div class="hidden md:flex items-center space-x-2">
+          <a href="DashNew.html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-home mr-1"></i> หน้าหลัก</a>
+          <a href="check (1).html" class="bg-white/20 px-3 py-2 rounded-xl text-sm font-semibold transition"><i class="fas fa-plus mr-1"></i> ตรวจสอบพื้นที่</a>
+          <a href="reportnew.html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-chart-line mr-1"></i> Action Plan</a>
+          <a href="dashboard (1).html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-chart-pie mr-1"></i> สถิติเชิงลึก</a>
+          <a href="admin.html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-cog mr-1"></i> ตั้งค่าระบบ</a>
+        </div>
+        <div class="flex items-center md:hidden">
+          <button id="mobile-menu-btn" class="text-white hover:text-slate-200 focus:outline-none p-2">
+            <i class="fas fa-bars text-2xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden flex-col bg-secondary/95 px-4 pt-2 pb-4 space-y-1 shadow-inner border-t border-white/10">
+      <a href="DashNew.html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-home w-6"></i> หน้าหลัก</a>
+      <a href="check (1).html" class="block px-3 py-2 rounded-lg bg-white/20 font-semibold"><i class="fas fa-plus w-6"></i> ตรวจสอบพื้นที่</a>
+      <a href="reportnew.html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-chart-line w-6"></i> Action Plan</a>
+      <a href="dashboard (1).html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-chart-pie w-6"></i> สถิติเชิงลึก</a>
+      <a href="admin.html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-cog w-6"></i> ตั้งค่าระบบ</a>
+    </div>
+  </nav>
 
-  <div class="header">
-    <a href="dashnew.html" class="btn-back"><i class="fas fa-chevron-left"></i> กลับหน้า Dashboard</a>
-    <h2 id="headerTitle">SAFETY PATROL & 5S INSPECTION SYSTEM</h2>
-    <p id="headerSub">ระบบตรวจตราความปลอดภัยและตรวจประเมิน 5ส </p>
-  </div>
+  <header class="bg-gradient-to-r from-primary to-secondary pt-4 pb-16 px-4 text-center rounded-b-[2.5rem] shadow-sm mb-[-40px]">
+    <div class="max-w-2xl mx-auto flex flex-col items-center">
+      <h2 id="headerTitle" class="text-white font-bold text-xl md:text-2xl mb-1">SAFETY PATROL SYSTEM</h2>
+      <p id="headerSub" class="text-white/90 text-sm font-medium">ระบบตรวจตราความปลอดภัยในพื้นที่</p>
+    </div>
+  </header>
 
-  <div class="container">
+  <div class="max-w-2xl mx-auto px-4 relative z-10">
     <form id="safetyForm">
-      <!-- Info Card -->
-      <div class="card">
-        <label><i class="fas fa-clipboard-check" style="color:var(--primary)"></i> ประเภทการตรวจสอบ</label>
-        <div class="type-selector" id="typeSelector">
-          <div class="type-btn active" data-type="จป.ว" onclick="selectType('จป.ว', this)"><i class="fas fa-hard-hat"></i>จป.ว</div>
-          <div class="type-btn" data-type="คปอ." onclick="selectType('คปอ.', this)"><i class="fas fa-users-cog"></i>คปอ.</div>
-          <div class="type-btn" data-type="Foreman/Mgr." onclick="selectType('Foreman/Mgr.', this)"><i class="fas fa-user-tie"></i>Foreman/Mgr.</div>
-          <div class="type-btn" data-type="Audit" onclick="selectType('Audit', this)"><i class="fas fa-search"></i>Audit</div>
-          <div class="type-btn" data-type="Accident/Fire" onclick="selectType('Accident/Fire', this)"><i class="fas fa-fire-extinguisher"></i>Accident/Fire</div>
-          <div class="type-btn" data-type="5S" onclick="selectType('5S', this)"><i class="fas fa-broom"></i>5S</div>
+      
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 mb-5">
+        <label class="block font-semibold text-slate-700 text-sm mb-3">
+          <i class="fas fa-clipboard-check text-primary mr-1"></i> ประเภทการตรวจสอบ
+        </label>
+        
+        <div class="grid grid-cols-3 md:grid-cols-3 gap-2 mb-4" id="typeSelector">
+          <div class="type-btn border-2 border-primary bg-amber-50 text-amber-700 rounded-xl p-2.5 text-center cursor-pointer text-xs font-semibold flex flex-col items-center justify-center gap-1.5 transition select-none min-h-[60px]" data-type="จป.ว" onclick="selectType('จป.ว', this)"><i class="fas fa-hard-hat text-lg"></i>จป.ว</div>
+          <div class="type-btn border-2 border-slate-200 bg-slate-50 text-slate-500 hover:border-primary hover:bg-amber-50/50 rounded-xl p-2.5 text-center cursor-pointer text-xs font-semibold flex flex-col items-center justify-center gap-1.5 transition select-none min-h-[60px]" data-type="คปอ." onclick="selectType('คปอ.', this)"><i class="fas fa-users-cog text-lg"></i>คปอ.</div>
+          <div class="type-btn border-2 border-slate-200 bg-slate-50 text-slate-500 hover:border-primary hover:bg-amber-50/50 rounded-xl p-2.5 text-center cursor-pointer text-xs font-semibold flex flex-col items-center justify-center gap-1.5 transition select-none min-h-[60px]" data-type="Foreman/Mgr." onclick="selectType('Foreman/Mgr.', this)"><i class="fas fa-user-tie text-lg"></i>Foreman/Mgr.</div>
+          <div class="type-btn border-2 border-slate-200 bg-slate-50 text-slate-500 hover:border-primary hover:bg-amber-50/50 rounded-xl p-2.5 text-center cursor-pointer text-xs font-semibold flex flex-col items-center justify-center gap-1.5 transition select-none min-h-[60px]" data-type="Audit" onclick="selectType('Audit', this)"><i class="fas fa-search text-lg"></i>Audit</div>
+          <div class="type-btn border-2 border-slate-200 bg-slate-50 text-slate-500 hover:border-primary hover:bg-amber-50/50 rounded-xl p-2.5 text-center cursor-pointer text-xs font-semibold flex flex-col items-center justify-center gap-1.5 transition select-none min-h-[60px]" data-type="Accident/Fire" onclick="selectType('Accident/Fire', this)"><i class="fas fa-fire-extinguisher text-lg"></i>Accident/Fire</div>
+          <div class="type-btn border-2 border-slate-200 bg-slate-50 text-slate-500 hover:border-emerald-500 hover:bg-emerald-50 rounded-xl p-2.5 text-center cursor-pointer text-xs font-semibold flex flex-col items-center justify-center gap-1.5 transition select-none min-h-[60px]" data-type="5S" onclick="selectType('5S', this)"><i class="fas fa-broom text-lg"></i>5S</div>
         </div>
         <input type="hidden" id="inspectionType" value="จป.ว">
 
-        <!-- ✅ DROPDOWN: Safety Area -->
-        <div id="areaSafety" style="margin-top:12px;">
-          <label><i class="fas fa-map-marker-alt" style="color:var(--primary)"></i> พื้นที่สำรวจ</label>
-          <select id="areaSafetySelect" class="form-select" onchange="handleAreaChange(this.value)"></select>
+        <div id="areaSafety" class="mt-4">
+          <label class="block font-semibold text-slate-700 text-sm mb-2"><i class="fas fa-map-marker-alt text-primary mr-1"></i> พื้นที่สำรวจ</label>
+          <div class="relative">
+            <select id="areaSafetySelect" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:ring-0 focus:border-primary appearance-none outline-none transition font-medium text-slate-700 text-sm" onchange="handleAreaChange(this.value)"></select>
+            <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+          </div>
           <input type="hidden" id="areaSafetyVal" value="PRINT">
         </div>
 
-        <!-- ✅ DROPDOWN: 5S Area -->
-        <div id="area5S" style="margin-top:12px; display:none;">
-          <label><i class="fas fa-broom" style="color:var(--success)"></i> พื้นที่ 5S</label>
-          <select id="area5SSelect" class="form-select" onchange="handle5SAreaChange(this.value)"></select>
+        <div id="area5S" class="mt-4 hidden">
+          <label class="block font-semibold text-slate-700 text-sm mb-2"><i class="fas fa-broom text-emerald-500 mr-1"></i> พื้นที่ทำ 5S</label>
+          <div class="relative">
+            <select id="area5SSelect" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:ring-0 focus:border-emerald-500 appearance-none outline-none transition font-medium text-slate-700 text-sm" onchange="handle5SAreaChange(this.value)"></select>
+            <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+          </div>
           <input type="hidden" id="area5SVal" value="PRINT">
         </div>
 
-        <label style="margin-top:16px;"><i class="fas fa-user-edit" style="color:var(--primary)"></i> ชื่อผู้ตรวจสอบ</label>
-        <input type="text" id="inspectorName" placeholder="ระบุชื่อ-นามสกุล" required>
+        <div class="mt-5">
+          <label class="block font-semibold text-slate-700 text-sm mb-2"><i class="fas fa-user-edit text-primary mr-1"></i> ชื่อผู้ตรวจสอบ</label>
+          <input type="text" id="inspectorName" placeholder="ระบุชื่อ-นามสกุลผู้ตรวจสอบ..." class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:ring-0 focus:border-primary outline-none transition text-sm font-medium placeholder:text-slate-400" required>
+        </div>
       </div>
 
-      <!-- Checklist Container -->
-      <div id="checklistContainer"></div>
+      <div id="checklistContainer" class="space-y-4"></div>
 
-      <button type="submit" class="btn-submit" id="submitBtn">
-        <i class="fas fa-paper-plane"></i> ส่งรายงานตรวจสอบ
+      <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-primary to-secondary text-white font-bold py-4 rounded-2xl shadow-lg hover:shadow-primary/30 transition transform active:scale-[0.98] mt-6 flex items-center justify-center gap-2">
+        <i class="fas fa-paper-plane"></i> ส่งรายงานการตรวจสอบ
       </button>
     </form>
   </div>
 
+  <div id="loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[2000] hidden flex-col items-center justify-center">
+    <i class="fas fa-circle-notch fa-spin fa-3x text-primary"></i>
+    <p class="mt-4 font-bold text-slate-700">กำลังบันทึกข้อมูลและอัปโหลดรูปภาพ...</p>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 pointer-events-none"></div>
+
   <script>
-    // ===================================================================
-    // CONFIGURATION & DATA
-    // ===================================================================
+    // System Config Sync
+    window.addEventListener('DOMContentLoaded', () => {
+      const sysSettings = JSON.parse(localStorage.getItem('systemSettings'));
+      if (sysSettings) {
+        document.documentElement.style.setProperty('--color-primary', sysSettings.primaryColor);
+        document.documentElement.style.setProperty('--color-secondary', sysSettings.secondaryColor);
+        document.documentElement.style.setProperty('--font-family', sysSettings.fontFamily);
+        document.querySelectorAll('.system-title').forEach(el => el.textContent = sysSettings.systemTitle);
+      }
+    });
+
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
     const CONFIG = {
       API_URL: "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec",
       MAX_IMAGES_PER_ITEM: 3,
@@ -190,7 +172,6 @@
       DRAFT_KEY: 'safety_form_draft'
     };
 
-    // ✅ Unified Area List
     const UNIFIED_AREAS = [
       { value: "PRINT", label: "🖨️ PRINT", has5S: true, hasSafety: true },
       { value: "LAMINATE", label: "📦 LAMINATE", has5S: true, hasSafety: true },
@@ -205,41 +186,18 @@
       { value: "OUTSIDE", label: "🌳 OUTSIDE", has5S: true, hasSafety: true }
     ];
 
-    // ===================================================================
-    // 📋 SAFETY CHECKLISTS — แยกตามพื้นที่ (รองรับการแก้ไขในอนาคต)
-    // ===================================================================
-
-    // 🏭 แบบมาตรฐาน (พื้นที่โรงงาน/ผลิต/คลังสินค้า)
+    // Data Structures
     const SAFETY_CHECKLIST_FACTORY = {
-      s1: { title: "1. สถานที่ทำงาน", qs: [
-        "วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก",
-        "การดูแลและทำความสะอาดของพื้นที่", "การจัดเก็บ และกองวัสดุมีการกำหนดสูงไม่เกิน กองวัสดุมีความปลอดภัย", "Water Mist"
-      ]},
-      s2: { title: "2. ท่าทางการทำงาน", qs: [
-        "พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์, หรืออุปกรณ์ที่มีล้อในการเคลื่อนย้ายสิ่งของ", "การยกของอย่างถูกต้องและปลอดภัย"
-      ]},
-      s3: { title: "3. เครื่องจักร", qs: [
-        "พนักงานสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงานตามที่กำหนด", "การปฏิบัติงานตามวิธีการทำงานหรือมาตรฐานการทำงานที่ปลอดภัย",
-        "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย", "ไม่มีเสียง/สั่นผิดปกติ และไม่มีน้ำมันรั่วไหล"
-      ]},
-      s4: { title: "4. สารเคมี", qs: [
-        "การสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงานตามที่กำหนด", "ไม่มีสารเคมีหกรั่วไหล, ไม่มีกลิ่นสารเคมีฟุ้งกระจายในอากาศ",
-        "ภาชนะปิดสนิท, สภาพถังใส่สารเคมีแข็งแรงปลอดภัยและสะอาด, อุปกรณ์ใช้งานกับสารเคมีเช่น Valv/Flange/Pipe อยู่ในสภาพไม่ชำรุด รั่วซึม",
-        "อากาศถ่ายเท", "มีอุปกรณ์ Spill Kit พร้อมใช้งาน", "มีขั้นตอนการปฏิบัติงาน", "บันทึกการตรวจสายกราวด์", "มีฉลากระบุสารเคมี และมี SDS"
-      ]},
-      s5: { title: "5. ไฟฟ้า", qs: [
-        "ตรวจสอบอุปกรณ์ไฟฟ้าเช่น สายไฟ ปลั๊กไฟ ต้องไม่ชำรุดเสียหาย", "ปล๊กไฟ/เต้าเสียบไม่หลวม", "ไม่มีการต่ออุปกรณ์พวงไฟฟ้าแบบชั่วคราว",
-        "อุปกรณ์ไฟฟ้าต้องมีการต่อสายดิน", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย, ไม่มีสายไฟโผล่, ไม่มีสิ่งกีดขวางหน้าตู้",
-        "ไม่มีสิ่งของต่างๆหรือฝุ่นละอองสะสมอยู่บนแผงควบคุมไฟฟ้า, ไม่มีกระดาษ,พลาสติกหรืออุปกรณ์ติดไฟง่าย อยู่ในตู้ไฟและติดหน้าตู้ไฟ"
-      ]},
-      s6: { title: "6. ระบบป้องกันอัคคีภัย", qs: [
-        "ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT และ Layout ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน (เข็มอยู่ตำแหน่งสีเขียว)", "พื้นที่สะอาด ไม่มีของวางเกะกะ"
-      ]},
+      s1: { title: "1. สถานที่ทำงาน", qs: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "การจัดเก็บ และกองวัสดุมีการกำหนดสูงไม่เกิน กองวัสดุมีความปลอดภัย", "Water Mist"] },
+      s2: { title: "2. ท่าทางการทำงาน", qs: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์, หรืออุปกรณ์ที่มีล้อในการเคลื่อนย้ายสิ่งของ", "การยกของอย่างถูกต้องและปลอดภัย"] },
+      s3: { title: "3. เครื่องจักร", qs: ["พนักงานสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงานตามที่กำหนด", "การปฏิบัติงานตามวิธีการทำงานหรือมาตรฐานการทำงานที่ปลอดภัย", "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย", "ไม่มีเสียง/สั่นผิดปกติ และไม่มีน้ำมันรั่วไหล"] },
+      s4: { title: "4. สารเคมี", qs: ["การสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงานตามที่กำหนด", "ไม่มีสารเคมีหกรั่วไหล, ไม่มีกลิ่นสารเคมีฟุ้งกระจายในอากาศ", "ภาชนะปิดสนิท, สภาพถังใส่สารเคมีแข็งแรงปลอดภัยและสะอาด, อุปกรณ์ใช้งานกับสารเคมีเช่น Valv/Flange/Pipe อยู่ในสภาพไม่ชำรุด รั่วซึม", "อากาศถ่ายเท", "มีอุปกรณ์ Spill Kit พร้อมใช้งาน", "มีขั้นตอนการปฏิบัติงาน", "บันทึกการตรวจสายกราวด์", "มีฉลากระบุสารเคมี และมี SDS"] },
+      s5: { title: "5. ไฟฟ้า", qs: ["ตรวจสอบอุปกรณ์ไฟฟ้าเช่น สายไฟ ปลั๊กไฟ ต้องไม่ชำรุดเสียหาย", "ปล๊กไฟ/เต้าเสียบไม่หลวม", "ไม่มีการต่ออุปกรณ์พวงไฟฟ้าแบบชั่วคราว", "อุปกรณ์ไฟฟ้าต้องมีการต่อสายดิน", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย, ไม่มีสายไฟโผล่, ไม่มีสิ่งกีดขวางหน้าตู้", "ไม่มีสิ่งของต่างๆหรือฝุ่นละอองสะสมอยู่บนแผงควบคุมไฟฟ้า, ไม่มีกระดาษ,พลาสติกหรืออุปกรณ์ติดไฟง่าย อยู่ในตู้ไฟและติดหน้าตู้ไฟ"] },
+      s6: { title: "6. ระบบป้องกันอัคคีภัย", qs: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT และ Layout ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน (เข็มอยู่ตำแหน่งสีเขียว)", "พื้นที่สะอาด ไม่มีของวางเกะกะ"] },
       s7: { title: "7. การกำจัดของเสีย", qs: ["มีการแยกประเภทขยะ, การปิดฝาถังขยะ, ถังขยะไม่มีชำรุด แตกหัก"] },
       s8: { title: "8. Other", qs: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
 
-    // 🏢 แบบสำนักงาน (OFFICE)
     const SAFETY_CHECKLIST_OFFICE = {
       s1: { title: "1. สภาพแวดล้อมสำนักงาน", qs: ["พื้นที่ทำงานสะอาด เป็นระเบียบ ไม่มีสิ่งของวางเกะกะ", "แสงสว่างเพียงพอต่อการทำงาน", "ระบบปรับอากาศ/อากาศถ่ายเทสะดวก", "เฟอร์นิเจอร์อยู่ในสภาพปลอดภัยมั่นคง", "ไม่มีการจัดวางของหนักบนที่สูงเกินระดับปลอดภัย"] },
       s2: { title: "2. ท่านั่งทำงานและ Ergonomics", qs: ["ท่านั่งทำงานถูกต้อง จอคอมพิวเตอร์ระดับสายตา", "มีการพักสายตา/ยืดเหยียดร่างกายตามความเหมาะสม", "การหยิบเอกสารไม่มีการบิดเอี้ยวหรือก้มเงยมากเกินไป"] },
@@ -250,7 +208,6 @@
       s7: { title: "7. Other (ไม่บังคับ)", qs: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
 
-    // 🌳 แบบพื้นที่ภายนอก (OUTSIDE)
     const SAFETY_CHECKLIST_OUTSIDE = {
       s1: { title: "1. พื้นที่โดยรอบ", qs: ["ไม่มีเศษขยะ/เศษวัสดุตกหล่นตามทางเดินและที่จอดรถ", "หญ้า/พืชพรรณไม่ขึ้นรกสูงเกินไป", "สายยาง/ท่อต่างๆ เก็บเป็นระเบียบเรียบร้อย", "อุปกรณ์กำจัดสัตว์พาหะอยู่ในสภาพพร้อมใช้งาน", "รั้วโรงงานไม่มีรอยชำรุดเสียหาย"] },
       s2: { title: "2. โรงเก็บขยะ", qs: ["มีการจัดเรียงถังเป็นระเบียบ", "แยกชนิดขยะให้ชัดเจนและมีป้ายชี้บ่ง", "ขยะไม่ล้นออกมา / ปิดฝาสนิท", "ถังเก็บสารเคมีอันตรายไม่ล้นและอยู่ในสภาพปลอดภัย"] },
@@ -261,7 +218,6 @@
       s7: { title: "7. Other (ไม่บังคับ)", qs: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
 
-    // 🗺️ MAP: พื้นที่ → Checklist ที่ใช้
     const SAFETY_CHECKLIST_MAP = {
       "PRINT": "FACTORY", "LAMINATE": "FACTORY", "SOLVENT": "FACTORY",
       "REWINDER/SLITTER/PACKING": "FACTORY", "BAG MAKING": "FACTORY",
@@ -269,7 +225,6 @@
       "OFFICE": "OFFICE", "OUTSIDE": "OUTSIDE", "DEFAULT": "FACTORY"
     };
 
-    // ✅ ฟังก์ชันดึง Checklist ตามพื้นที่
     function getSafetyChecklist(area) {
       const normalized = String(area || "").trim().toUpperCase();
       const key = SAFETY_CHECKLIST_MAP[normalized] || SAFETY_CHECKLIST_MAP["DEFAULT"];
@@ -278,9 +233,6 @@
       return SAFETY_CHECKLIST_FACTORY;
     }
 
-    // ===================================================================
-    // ✅ 5S CHECKLISTS
-    // ===================================================================
     const FACTORY_5S_SECTIONS = [
       { title: "1. เครื่องจักร", qs: ["ทำความสะอาดเครื่องจักรทุกครั้งก่อน – หลังเลิกงานพร้อมระบุผู้รับผิดชอบป้ายผู้รับผิดชอบต้องเป็นปัจจุบัน", "ตีเส้นกำหนดจุดที่ตั้ง (ตีเส้นรอบเครื่องจักรด้วยสีเหลือง)", "ก่อนทำงานกับเครื่องจักรต้องแต่งกายให้รัดกุมและต้องสวมอุปกรณ์ป้องกันส่วนบุคคล"] },
       { title: "2. เครื่องมือ", qs: ["กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน", "หลังจากนำเครื่องมือและอุปกรณ์ไปใช้ให้เก็บเข้าที่เสมอ", "เก็บวางเครื่องมืออย่างเป็นระเบียบในพื้นที่ที่กำหนด", "กำหนดผู้รับผิดชอบให้ชัดเจน"] },
@@ -293,249 +245,31 @@
       { title: "9. ความตระหนัก ความสำเร็จ ผลงาน", qs: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
     ];
 
-    // ===================================================================
-// ✅ 5S CHECKLISTS — ครบทุกพื้นที่
-// ===================================================================
-const CHECKLIST_5S = {
-  // 🏭 4 แผนกโรงงาน (ใช้ Checklist เดียวกัน)
-  "PRINT": { sections: FACTORY_5S_SECTIONS },
-  "LAMINATE": { sections: FACTORY_5S_SECTIONS },
-  "REWINDER/SLITTER/PACKING": { sections: FACTORY_5S_SECTIONS },
-  "BAG MAKING": { sections: FACTORY_5S_SECTIONS },
-  "WAREHOUSE": { sections: FACTORY_5S_SECTIONS },
-  
-  // 🏢 OFFICE
-  "OFFICE": { sections: [
-    { title: "1. โต๊ะทำงาน", qs: [
-      "ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน",
-      "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงานให้สามารถหยิบใช้ได้อย่างสะดวกและปลอดภัย",
-      "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงานให้เหมาะสมกับมาตรฐานของพื้นที่",
-      "ตะกร้าเอกสารต้องระบุป้ายชี้บ่งให้ชัดเจนและจัดเก็บเอกสารให้เป็นระเบียบ"
-    ]},
-    { title: "2. ลิ้นชัก", qs: [
-      "ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน",
-      "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO",
-      "ลิ้นชักที่ 3 ใส่อุปกรณ์ส่วนตัว"
-    ]},
-    { title: "3. การจัดเก็บเอกสาร", qs: [
-      "ในตู้เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน",
-      "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"
-    ]},
-    { title: "4. เครื่องคอมพิวเตอร์", qs: [
-      "จัดวางคอมพิวเตอร์ เครื่องแฟกซ์ในตำแหน่งที่เหมาะสมและสะดวกต่อการใช้งาน",
-      "ไม่ติดกระดาษโน๊ตต่าง ๆ ไว้หน้าคอมพิวเตอร์",
-      "จัดเก็บสายไฟคอมพิวเตอร์ให้เป็นระเบียบเรียบร้อย"
-    ]},
-    { title: "5. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น/ผนังห้องต้องไม่มีหยากไย่",
-      "ไม่วางสิ่งกีดขวางทางเดิน",
-      "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม",
-      "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"
-    ]},
-    { title: "6. สภาพแวดล้อมทั่วไป", qs: [
-      "มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมใน Office หรือไม่",
-      "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก",
-      "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดและกำหนดผู้รับผิดชอบ",
-      "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"
-    ]},
-    { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [
-      "พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้",
-      "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด",
-      "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"
-    ]},
-    { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: [
-      "มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน",
-      "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)",
-      "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?",
-      "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"
-    ]}
-  ]},
-  
-  // 🍽️ CANTEEN
-  "CANTEEN": { sections: [
-    { title: "1. ห้องอาหาร (CANTEEN)", qs: [
-      "โต๊ะอาหารและเก้าอี้ต้องสะอาดและพร้อมใช้งานอยู่เสมอไม่ทิ้งสิ่งของที่ไม่จำเป็นไว้บนโต๊ะอาหารและถังขยะเพียงพอต่อการใช้งาน",
-      "ชั้นวางอาหารต้องสะอาดและจัดเก็บเรียบร้อยแยกแผนกให้ชัดเจน",
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น",
-      "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก"
-    ]},
-    { title: "2. ห้องประชุม", qs: [
-      "เก็บโต๊ะและเก้าอี้ให้เป็นระเบียบเข้าที่ก่อน - หลังใช้งาน",
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น",
-      "ห้องประชุมต้องพร้อมใช้งานอยู่เสมอ"
-    ]},
-    { title: "3. ห้องกาแฟ", qs: [
-      "ทำความสะอาดอ่างล้างภาชนะหลังใช้งานแล้ว / การแต่งกายของแม่ครัว",
-      "แบ่งแยกอุปกรณ์เครื่องใช้ออกให้ชัดเจนและเป็นระเบียบ",
-      "จัดวางสิ่งของ แยกตามชนิดและไม่วางสิ่งของปะปนกัน"
-    ]},
-    { title: "4. LOCKER (เสื้อผ้าชาย,หญิง)", qs: [
-      "ป้ายไม่ชำรุดและระบุชื่อของพนักงานให้ชัดเจน",
-      "หลังตู้ต้องสะอาดไม่มีคราบฝุ่นหรือสิ่งของที่ไม่จำเป็นวางอยู่",
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น"
-    ]},
-    { title: "5. LOCKER (รองเท้า)", qs: [
-      "ป้ายไม่ชำรุดและระบุชื่อของพนักงานให้ชัดเจน",
-      "ห้ามนำอาหาร / เครื่องดื่มไปไว้ใน Locker รองเท้าและต้องไม่มีเศษขยะและคราบฝุ่น"
-    ]},
-    { title: "6. ห้องสุขา (ชาย,หญิง)", qs: [
-      "ทำความสะอาดอ่างล้างหน้า / กระจก / พื้น / โถชักโครก / ผนัง ด้วยน้ำให้สะอาด",
-      "กระดาษชำระ สบู่ ผ้าเช็ดมือ ดูแลอย่าให้ขาด"
-    ]},
-    { title: "7. ทางเข้า (AIR SHOWER)", qs: [
-      "ทำความสะอาดอ่างล้างมือ / ที่เป่ามือ / กระจก / รางน้ำ",
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น",
-      "ชั้นวางรองเท้าเซฟตี้ต้องวางให้ถูกช่อง / ช่องบนพื้นสีขาววางรองเท้าเซฟตี้ /ช่องล่างพื้นสีดำวางรองเท้าแตะต้องสะอาดไม่มีคราบฝุ่น"
-    ]}
-  ]},
-  
-  // 🔬 QA&QC
-  "QA&QC": { sections: [
-    { title: "1. โต๊ะทำงาน", qs: [
-      "ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน",
-      "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงานให้สามารถหยิบใช้ได้อย่างสะดวกและปลอดภัย",
-      "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงานให้เหมาะสมกับมาตรฐานของพื้นที่"
-    ]},
-    { title: "2. ลิ้นชัก", qs: [
-      "ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน",
-      "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO",
-      "ลิ้นชักที่ 3 ใส่อุปกรณ์ในการทำงาน",
-      "ลิ้นชักกลางใส่เอกสาร"
-    ]},
-    { title: "3. การจัดเก็บเอกสาร", qs: [
-      "ในตู้เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน",
-      "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"
-    ]},
-    { title: "4. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่/ ไม่มีฝุ่น",
-      "ไม่วางสิ่งกีดขวางทางเดิน",
-      "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม"
-    ]},
-    { title: "5. เครื่องคอมพิวเตอร์", qs: [
-      "จัดวางคอมพิวเตอร์ เครื่องแฟกซ์ในตำแหน่งที่เหมาะสมและสะดวกต่อการใช้งาน",
-      "ไม่ติดกระดาษโน๊ตต่าง ๆ ไว้หน้าคอมพิวเตอร์",
-      "จัดเก็บสายไฟคอมพิวเตอร์ให้เป็นระเบียบเรียบร้อย",
-      "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"
-    ]},
-    { title: "6. เครื่องมือและอุปกรณ์", qs: [
-      "กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน",
-      "หลังจากนำเครื่องมือและอุปกรณ์ไปใช้ให้เก็บเข้าที่เสมอ",
-      "เก็บวางเครื่องมือและอุปกรณ์ต่างๆในพื้นที่ที่กำหนด",
-      "กำหนดผู้รับผิดชอบให้ชัดเจน",
-      "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"
-    ]},
-    { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [
-      "พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้",
-      "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด",
-      "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"
-    ]},
-    { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: [
-      "มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน",
-      "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)",
-      "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?",
-      "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"
-    ]}
-  ]},
-  
-  // 🔧 ENGINEERING
-  "ENGINEERING": { sections: [
-    { title: "1. โต๊ะทำงาน", qs: [
-      "ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน",
-      "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงานให้สามารถหยิบใช้ได้อย่างสะดวกและปลอดภัย",
-      "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงานให้เหมาะสมกับมาตรฐานของพื้นที่"
-    ]},
-    { title: "2. ลิ้นชัก", qs: [
-      "ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน",
-      "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO",
-      "ลิ้นชักที่ 3 ใส่ของส่วนตัวพนักงาน"
-    ]},
-    { title: "3. การจัดเก็บเอกสาร", qs: [
-      "แฟ้มเอกสารทุกแฟ้มสันแฟ้มจะต้องใช้ Font : TH Sarabun ทุกแฟ้มเอกสารจะต้องมีระบุเล่มที่แฟ้ม",
-      "เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน",
-      "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"
-    ]},
-    { title: "4. เครื่องมือ", qs: [
-      "กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน",
-      "หลังจากนำเครื่องมือไปใช้เก็บเข้าที่เสมอ",
-      "เก็บวางอย่างเป็นระเบียบในที่ที่กำหนด และมีป้ายฉลากของชิ้นส่วน",
-      "ส่วนประกอบ / ชิ้นส่วนขนาดเล็ก ควรหากล่องที่เหมาะสมใส่"
-    ]},
-    { title: "5. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [
-      "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น",
-      "ไม่วางสิ่งของกีดขวางทางเดิน",
-      "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม",
-      "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"
-    ]},
-    { title: "6. สภาพแวดล้อมทั่วไป", qs: [
-      "มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมในแผนกหรือไม่",
-      "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอ",
-      "และมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก",
-      "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดหรือไม่",
-      "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"
-    ]},
-    { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [
-      "พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้",
-      "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด",
-      "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"
-    ]},
-    { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: [
-      "มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน",
-      "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)",
-      "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?",
-      "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"
-    ]}
-  ]},
-  
-  // 🌳 OUTSIDE
-  "OUTSIDE": { sections: [
-    { title: "1. พื้นที่โดยรอบบริษัท", qs: [
-      "มีเศษตกหล่นตามทางเดินและที่จอดรถหรือไม่",
-      "หญ้าขึ้นรกสูงเกินไปหรือไม่",
-      "สายยางใช้แล้วเก็บเป็นระเบียบหรือไม่",
-      "อุปกรณ์กำจัดสัตว์พาหะมีการชำรุดหรือไม่",
-      "รอบรั้วโรงงานมีรอยชำรุดเสียหายหรือไม่"
-    ]},
-    { title: "2. โรงเก็บขยะ", qs: [
-      "มีการจัดเรียงถังเป็นระเบียบหรือไม่",
-      "แยกชนิดขยะให้ชัดเจนและมีป้ายชี้บ่ง",
-      "ขยะต้องไม่ล้นออกมา / ปิดฝาสนิท",
-      "ถังเก็บสารเคมีอันตรายต้องไม่ล้น"
-    ]},
-    { title: "3. ป้อมยาม", qs: [
-      "จัดเก็บเอกสารเรียบร้อยและทำความสะอาดสม่ำเสมอ",
-      "อุปกรณ์ต่างๆ สามารถหยิบใช้ได้สะดวก",
-      "การกำหนดจำนวนอุปกรณ์บนโต๊ะทำงาน"
-    ]},
-    { title: "4. ห้องสุขา (ป้อมรปภ.)", qs: [
-      "ทำความสะอาดกระจก / พื้น / โถชักโครก / ผนัง",
-      "กระดาษชำระ สบู่ ผ้าเช็ดมือ ดูแลอย่าให้ขาด"
-    ]},
-    { title: "5. สภาพแวดล้อมทั่วไป", qs: [
-      "ไม่มีสิ่งของที่ไม่จำเป็น",
-      "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและมีป้ายชี้บ่ง",
-      "มีการกำหนดที่วางอุปกรณ์ทำความสะอาด"
-    ]},
-    { title: "6. ถังแก๊ส/ถังก๊าซ", qs: [
-      "ระบุป้ายชี้บ่งให้ชัดเจน",
-      "เก็บถังในลักษณะตั้งตรงและมีเครื่องป้องกันการล้ม",
-      "ไม่วางสิ่งของที่ไม่จำเป็นรอบๆ บริเวณ"
-    ]},
-    { title: "7. โรงจอดรถ", qs: [
-      "จอดรถเป็นระเบียบไม่มีความเสี่ยงอุบัติเหตุ",
-      "หลังคา พื้น ที่กั้น มีสภาพปกติไม่เสียหาย"
-    ]}
-  ]}
-};
+    const CHECKLIST_5S = {
+      "PRINT": { sections: FACTORY_5S_SECTIONS }, "LAMINATE": { sections: FACTORY_5S_SECTIONS },
+      "REWINDER/SLITTER/PACKING": { sections: FACTORY_5S_SECTIONS }, "BAG MAKING": { sections: FACTORY_5S_SECTIONS }, "WAREHOUSE": { sections: FACTORY_5S_SECTIONS },
+      "OFFICE": { sections: [
+        { title: "1. โต๊ะทำงาน", qs: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน", "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงานให้สามารถหยิบใช้ได้อย่างสะดวกและปลอดภัย", "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงานให้เหมาะสมกับมาตรฐานของพื้นที่", "ตะกร้าเอกสารต้องระบุป้ายชี้บ่งให้ชัดเจนและจัดเก็บเอกสารให้เป็นระเบียบ"] },
+        { title: "2. ลิ้นชัก", qs: ["ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน", "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO", "ลิ้นชักที่ 3 ใส่อุปกรณ์ส่วนตัว"] },
+        { title: "3. การจัดเก็บเอกสาร", qs: ["ในตู้เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน", "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"] },
+        { title: "4. เครื่องคอมพิวเตอร์", qs: ["จัดวางคอมพิวเตอร์ เครื่องแฟกซ์ในตำแหน่งที่เหมาะสมและสะดวกต่อการใช้งาน", "ไม่ติดกระดาษโน๊ตต่าง ๆ ไว้หน้าคอมพิวเตอร์", "จัดเก็บสายไฟคอมพิวเตอร์ให้เป็นระเบียบเรียบร้อย"] },
+        { title: "5. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: ["ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น/ผนังห้องต้องไม่มีหยากไย่", "ไม่วางสิ่งกีดขวางทางเดิน", "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม", "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"] },
+        { title: "6. สภาพแวดล้อมทั่วไป", qs: ["มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมใน Office หรือไม่", "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก", "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดและกำหนดผู้รับผิดชอบ", "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"] },
+        { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: ["พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
+        { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
+      ]},
+      "CANTEEN": { sections: [{ title: "1. ห้องอาหาร", qs: ["ความสะอาดเรียบร้อย"] }] }, "QA&QC": { sections: [{ title: "1. โต๊ะทำงาน", qs: ["ความสะอาดเรียบร้อย"] }] }, "ENGINEERING": { sections: [{ title: "1. โต๊ะทำงาน", qs: ["ความสะอาดเรียบร้อย"] }] }, "OUTSIDE": { sections: [{ title: "1. พื้นที่โดยรอบ", qs: ["ความสะอาดเรียบร้อย"] }] }
+    };
 
-    // ===================================================================
-    // STATE
-    // ===================================================================
     let state = { type: 'จป.ว', area: 'PRINT', area5S: 'PRINT', responses: {}, images: {} };
 
-    // ===================================================================
-    // INIT & RENDER
-    // ===================================================================
-    function init() { populateDropdowns(); buildChecklist(); loadDraft(); setupAutoSave(); document.getElementById('safetyForm').addEventListener('submit', handleSubmit); }
+    function init() { 
+      populateDropdowns(); 
+      buildChecklist(); 
+      loadDraft(); 
+      setupAutoSave(); 
+      document.getElementById('safetyForm').addEventListener('submit', handleSubmit); 
+    }
 
     function populateDropdowns() {
       const fillSelect = (id, filterBy, defaultVal) => {
@@ -550,123 +284,212 @@ const CHECKLIST_5S = {
     function handle5SAreaChange(val) { state.area5S = val; document.getElementById('area5SVal').value = val; buildChecklist(); }
 
     function selectType(type, el) {
-      state.type = type; document.getElementById('inspectionType').value = type;
-      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active', 'active-5s'));
-      el.classList.add(type === '5S' ? 'active-5s' : 'active');
+      state.type = type; 
+      document.getElementById('inspectionType').value = type;
+      
+      // Reset All Classes
+      document.querySelectorAll('.type-btn').forEach(b => {
+        b.classList.remove('border-primary', 'bg-amber-50', 'text-amber-700', 'border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+        b.classList.add('border-slate-200', 'bg-slate-50', 'text-slate-500');
+      });
+      
+      // Active Current
+      el.classList.remove('border-slate-200', 'bg-slate-50', 'text-slate-500');
       const is5S = type === '5S';
-      document.getElementById('areaSafety').style.display = is5S ? 'none' : 'block';
-      document.getElementById('area5S').style.display = is5S ? 'block' : 'none';
+      
+      if (is5S) {
+        el.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+        document.getElementById('areaSafety').classList.add('hidden');
+        document.getElementById('area5S').classList.remove('hidden');
+        state.area5S = "PRINT"; 
+        document.getElementById('area5SSelect').value = "PRINT";
+        document.getElementById('headerTitle').textContent = '5S INSPECTION SYSTEM';
+        document.getElementById('headerSub').textContent = 'ระบบตรวจประเมิน 5ส ในพื้นที่';
+      } else {
+        el.classList.add('border-primary', 'bg-amber-50', 'text-amber-700');
+        document.getElementById('areaSafety').classList.remove('hidden');
+        document.getElementById('area5S').classList.add('hidden');
+        state.area = "PRINT"; 
+        document.getElementById('areaSafetySelect').value = "PRINT";
+        document.getElementById('headerTitle').textContent = 'SAFETY PATROL SYSTEM';
+        document.getElementById('headerSub').textContent = 'ระบบตรวจตราความปลอดภัยในพื้นที่';
+      }
       populateDropdowns();
-      if (is5S) { state.area5S = "PRINT"; document.getElementById('area5SSelect').value = "PRINT"; }
-      else { state.area = "PRINT"; document.getElementById('areaSafetySelect').value = "PRINT"; }
-      document.getElementById('headerTitle').textContent = is5S ? 'การตรวจ 5ส' : 'SAFETY PATROL';
-      document.getElementById('headerSub').textContent = is5S ? 'กิจกรรม 5 ส' : 'ระบบตรวจสอบความปลอดภัย';
       buildChecklist();
     }
 
     function buildChecklist() {
-      const container = document.getElementById('checklistContainer'); container.innerHTML = ''; state.responses = {}; state.images = {};
+      const container = document.getElementById('checklistContainer'); 
+      container.innerHTML = ''; 
+      state.responses = {}; 
+      state.images = {};
       if (state.type === '5S') render5SChecklist(container); else renderSafetyChecklist(container);
     }
 
     function renderSafetyChecklist(container) {
-      const checklist = getSafetyChecklist(state.area); // ✅ ดึงตามพื้นที่
+      const checklist = getSafetyChecklist(state.area); 
       Object.entries(checklist).forEach(([sKey, section]) => {
-        const sNum = sKey.replace('s', ''); const card = document.createElement('div'); card.className = 'card';
-        let html = `<div class="section-badge" style="display:inline-block;background:var(--primary);color:#fff;padding:3px 10px;border-radius:15px;font-size:0.7rem;font-weight:700;margin-bottom:10px;">Safety</div><label class="section-label">${section.title}</label>`;
+        const sNum = sKey.replace('s', ''); 
+        const card = document.createElement('div'); 
+        card.className = 'bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 mb-5';
+        
+        let html = `<div class="inline-block bg-primary text-white px-3 py-1 rounded-full text-xs font-bold mb-3 tracking-wide">Safety Area</div>
+                    <h3 class="font-bold text-slate-800 text-base mb-4 border-l-4 border-primary pl-3">${section.title}</h3>`;
+        
         section.qs.forEach((q, i) => {
           const qKey = `s${sNum}_q${i}`; const isOptional = sKey === 's7' || sKey === 's8';
-          const isWater = sKey === 's1' && q === 'Water Mist'; const showWater = (state.area === 'PRINT' || state.area === 'LAMINATE') && isWater;
+          const isWater = sKey === 's1' && q === 'Water Mist'; 
+          const showWater = (state.area === 'PRINT' || state.area === 'LAMINATE') && isWater;
+          
           if (showWater) {
-            html += `<div class="check-item water-mist-block" id="item_${qKey}"><small>${i+1}. ${q}</small>
-              <div style="display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap;">
-                <input type="number" step="any" id="water_val_${sNum}_${i}" placeholder="ระบุ %" style="width:100px;padding:8px;" oninput="handleWaterMist(this.value,'${sNum}',${i})">
-                <span style="font-weight:600;">%</span><span id="water_badge_${sNum}_${i}" class="water-badge" style="display:none;"></span>
-              </div><input type="hidden" name="section${sNum}_q${i}" id="hidden_${qKey}">
-              <textarea name="section${sNum}_remark${i}" placeholder="หมายเหตุ (ถ้ามี)" style="margin:8px 0 0;"></textarea>
-              <div class="duedate-box" id="dd_${qKey}"><label><i class="fas fa-calendar-times"></i> วันแก้ไขเสร็จ *</label><input type="date" name="section${sNum}_duedate${i}"></div>${photoUploadHTML(qKey)}</div>`;
+            html += `
+            <div class="check-item water-mist-block bg-white p-4 mb-3 rounded-xl border-2 border-slate-100 transition-all duration-300" id="item_${qKey}">
+              <small class="block font-semibold text-slate-700 text-sm mb-3">${i+1}. ${q}</small>
+              <div class="flex items-center gap-3 mb-3 flex-wrap bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <input type="number" step="any" id="water_val_${sNum}_${i}" placeholder="ระบุ %" class="w-24 px-3 py-2 rounded-lg border-2 border-slate-200 focus:border-primary outline-none transition text-sm" oninput="handleWaterMist(this.value,'${sNum}',${i})">
+                <span class="font-bold text-slate-500">%</span>
+                <span id="water_badge_${sNum}_${i}" class="hidden px-3 py-1 rounded-full text-xs font-bold"></span>
+              </div>
+              <input type="hidden" name="section${sNum}_q${i}" id="hidden_${qKey}">
+              <textarea name="section${sNum}_remark${i}" placeholder="หมายเหตุ (ถ้ามี)" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none text-sm transition mt-2"></textarea>
+              <div class="duedate-box hidden mt-3 bg-rose-50 p-3 rounded-xl border border-rose-200" id="dd_${qKey}">
+                <label class="block text-xs font-bold text-rose-700 mb-1"><i class="fas fa-calendar-times"></i> วันที่ต้องแก้ไขเสร็จ (Due Date) *</label>
+                <input type="date" name="section${sNum}_duedate${i}" class="w-full px-3 py-2 rounded-lg border-2 border-rose-200 bg-white focus:border-rose-400 outline-none text-sm text-slate-700">
+              </div>
+              ${photoUploadHTML(qKey)}
+            </div>`;
           } else {
-            html += `<div class="check-item" id="item_${qKey}"><small>${i+1}. ${q} ${!isOptional ? '<span style="color:var(--danger)">*</span>' : ''}</small>
-              <div class="options"><input type="radio" name="section${sNum}_q${i}" id="y_${qKey}" value="ดี" onchange="handleStatusChange('${qKey}', 'ดี')"><label for="y_${qKey}"><i class="fas fa-check-circle"></i> ปกติ</label>
-              <input type="radio" name="section${sNum}_q${i}" id="n_${qKey}" value="ไม่ดี" onchange="handleStatusChange('${qKey}', 'ไม่ดี')"><label for="n_${qKey}"><i class="fas fa-exclamation-triangle"></i> ไม่ปกติ</label></div>
-              <textarea name="section${sNum}_remark${i}" placeholder="หมายเหตุ (ถ้ามี)" style="margin:8px 0 0;"></textarea>
-              <div class="duedate-box" id="dd_${qKey}"><label><i class="fas fa-calendar-times"></i> วันแก้ไขเสร็จ *</label><input type="date" name="section${sNum}_duedate${i}"></div>${photoUploadHTML(qKey)}</div>`;
+            html += `
+            <div class="check-item bg-white p-4 mb-3 rounded-xl border-2 border-slate-100 transition-all duration-300" id="item_${qKey}">
+              <small class="block font-semibold text-slate-700 text-sm mb-3">${i+1}. ${q} ${!isOptional ? '<span class="text-rose-500">*</span>' : ''}</small>
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <input type="radio" class="peer/good hidden" name="section${sNum}_q${i}" id="y_${qKey}" value="ดี" onchange="handleStatusChange('${qKey}', 'ดี')">
+                  <label for="y_${qKey}" class="block cursor-pointer p-3 rounded-xl bg-slate-50 border-2 border-slate-200 text-center font-bold text-sm text-slate-500 transition-all hover:bg-slate-100 peer-checked/good:bg-emerald-50 peer-checked/good:border-emerald-500 peer-checked/good:text-emerald-700 shadow-sm"><i class="fas fa-check-circle mr-1"></i> ปกติ</label>
+                </div>
+                <div>
+                  <input type="radio" class="peer/bad hidden" name="section${sNum}_q${i}" id="n_${qKey}" value="ไม่ดี" onchange="handleStatusChange('${qKey}', 'ไม่ดี')">
+                  <label for="n_${qKey}" class="block cursor-pointer p-3 rounded-xl bg-slate-50 border-2 border-slate-200 text-center font-bold text-sm text-slate-500 transition-all hover:bg-slate-100 peer-checked/bad:bg-rose-50 peer-checked/bad:border-rose-500 peer-checked/bad:text-rose-700 shadow-sm"><i class="fas fa-exclamation-triangle mr-1"></i> ไม่ปกติ</label>
+                </div>
+              </div>
+              <textarea name="section${sNum}_remark${i}" placeholder="หมายเหตุ (ถ้ามี)" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none text-sm transition"></textarea>
+              <div class="duedate-box hidden mt-3 bg-rose-50 p-3 rounded-xl border border-rose-200" id="dd_${qKey}">
+                <label class="block text-xs font-bold text-rose-700 mb-1"><i class="fas fa-calendar-times"></i> วันที่ต้องแก้ไขเสร็จ (Due Date) *</label>
+                <input type="date" name="section${sNum}_duedate${i}" class="w-full px-3 py-2 rounded-lg border-2 border-rose-200 bg-white focus:border-rose-400 outline-none text-sm text-slate-700">
+              </div>
+              ${photoUploadHTML(qKey)}
+            </div>`;
           }
-        }); card.innerHTML = html; container.appendChild(card);
+        }); 
+        card.innerHTML = html; 
+        container.appendChild(card);
       });
+    }
+
+    function render5SChecklist(container) {
+      const areaData = CHECKLIST_5S[state.area5S];
+      if (!areaData || !areaData.sections || areaData.sections.length === 0) {
+        container.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center shadow-sm border border-slate-200 text-slate-500"><i class="fas fa-info-circle fa-2x mb-3 text-emerald-500"></i><p class="font-bold text-slate-700">ยังไม่ได้กำหนดแบบประเมิน 5S</p><p class="text-sm">สำหรับพื้นที่: ${state.area5S}</p></div>`;
+        return;
+      }
+      
+      areaData.sections.forEach((sec, sIdx) => {
+        const card = document.createElement('div'); 
+        card.className = 'bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 mb-5';
+        
+        let html = `<div class="inline-block bg-emerald-500 text-white px-3 py-1 rounded-full text-xs font-bold mb-3 tracking-wide">5S Standard</div>
+                    <h3 class="font-bold text-slate-800 text-base mb-4 border-l-4 border-emerald-500 pl-3">${sec.title}</h3>`;
+        
+        sec.qs.forEach((q, qIdx) => {
+          const qKey = `5s_s${sIdx}_q${qIdx}`;
+          html += `
+          <div class="check-item bg-white p-4 mb-3 rounded-xl border-2 border-slate-100 transition-all duration-300" id="item_${qKey}">
+            <small class="block font-semibold text-slate-700 text-sm mb-3">${qIdx+1}. ${q}</small>
+            <div class="grid grid-cols-3 gap-2 mb-3">
+              <div>
+                <input type="radio" class="peer/good hidden" name="5s_s${sIdx}_q${qIdx}" id="g_${qKey}" value="ดี" onchange="handle5SStatusChange('${qKey}', 'ดี')">
+                <label for="g_${qKey}" class="block cursor-pointer p-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-center font-bold text-xs sm:text-sm text-slate-500 transition-all hover:bg-slate-100 peer-checked/good:bg-emerald-50 peer-checked/good:border-emerald-500 peer-checked/good:text-emerald-700 shadow-sm flex flex-col items-center gap-1"><i class="fas fa-check-circle text-lg"></i>ดี</label>
+              </div>
+              <div>
+                <input type="radio" class="peer/fair hidden" name="5s_s${sIdx}_q${qIdx}" id="f_${qKey}" value="พอใช้" onchange="handle5SStatusChange('${qKey}', 'พอใช้')">
+                <label for="f_${qKey}" class="block cursor-pointer p-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-center font-bold text-xs sm:text-sm text-slate-500 transition-all hover:bg-slate-100 peer-checked/fair:bg-amber-50 peer-checked/fair:border-amber-500 peer-checked/fair:text-amber-700 shadow-sm flex flex-col items-center gap-1"><i class="fas fa-circle-half-stroke text-lg"></i>พอใช้</label>
+              </div>
+              <div>
+                <input type="radio" class="peer/bad hidden" name="5s_s${sIdx}_q${qIdx}" id="p_${qKey}" value="ปรับปรุง" onchange="handle5SStatusChange('${qKey}', 'ปรับปรุง')">
+                <label for="p_${qKey}" class="block cursor-pointer p-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-center font-bold text-xs sm:text-sm text-slate-500 transition-all hover:bg-slate-100 peer-checked/bad:bg-rose-50 peer-checked/bad:border-rose-500 peer-checked/bad:text-rose-700 shadow-sm flex flex-col items-center gap-1"><i class="fas fa-wrench text-lg"></i>ปรับปรุง</label>
+              </div>
+            </div>
+            <textarea name="5s_remark_s${sIdx}_q${qIdx}" placeholder="หมายเหตุ (ถ้ามี)" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none text-sm transition"></textarea>
+            <div class="duedate-box hidden mt-3 bg-rose-50 p-3 rounded-xl border border-rose-200" id="dd_${qKey}">
+              <label class="block text-xs font-bold text-rose-700 mb-1"><i class="fas fa-calendar-times"></i> วันที่ต้องแก้ไขเสร็จ (Due Date) *</label>
+              <input type="date" name="5s_duedate_s${sIdx}_q${qIdx}" class="w-full px-3 py-2 rounded-lg border-2 border-rose-200 bg-white focus:border-rose-400 outline-none text-sm text-slate-700">
+            </div>
+            ${photoUploadHTML(qKey)}
+          </div>`;
+        });
+        card.innerHTML = html; 
+        container.appendChild(card);
+      });
+    }
+
+    function photoUploadHTML(qKey) { 
+      return `
+      <div class="bg-slate-50 p-3 rounded-xl border-2 border-dashed border-slate-200 mt-3">
+        <div id="preview_${qKey}" class="flex flex-wrap gap-2 mb-2 empty:mb-0"></div>
+        <div class="flex gap-2">
+          <button type="button" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-bold text-xs hover:border-primary hover:text-primary transition shadow-sm flex items-center justify-center gap-2" onclick="triggerInput('cam','${qKey}')"><i class="fas fa-camera"></i> ถ่ายรูป</button>
+          <button type="button" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-bold text-xs hover:border-primary hover:text-primary transition shadow-sm flex items-center justify-center gap-2" onclick="triggerInput('gal','${qKey}')"><i class="fas fa-images"></i> อัลบั้ม</button>
+        </div>
+        <input type="file" id="cam_${qKey}" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto(this,'${qKey}')">
+        <input type="file" id="gal_${qKey}" accept="image/*" class="hidden" onchange="handlePhoto(this,'${qKey}')">
+      </div>`; 
+    }
+
+    // Handlers
+    function handleStatusChange(qKey, status) {
+      const el = document.getElementById(`item_${qKey}`), remark = el.querySelector('textarea'), ddBox = document.getElementById(`dd_${qKey}`), ddInput = ddBox.querySelector('input');
+      state.responses[qKey] = { status };
+      if (status === 'ไม่ดี') { 
+        el.classList.add('border-rose-300', 'bg-rose-50/30'); el.classList.remove('border-slate-100');
+        remark.required = true; remark.placeholder = '* กรุณาระบุรายละเอียดปัญหา'; 
+        ddBox.classList.remove('hidden'); ddInput.required = true; 
+      } else { 
+        el.classList.remove('border-rose-300', 'bg-rose-50/30'); el.classList.add('border-slate-100');
+        remark.required = false; remark.placeholder = 'หมายเหตุ (ถ้ามี)'; 
+        ddBox.classList.add('hidden'); ddInput.required = false; ddInput.value = ''; 
+      }
     }
 
     function handle5SStatusChange(qKey, status) {
       const el = document.getElementById(`item_${qKey}`), remark = el.querySelector('textarea'), ddBox = document.getElementById(`dd_${qKey}`), ddInput = ddBox.querySelector('input');
       state.responses[qKey] = { status };
-      if (status === "ปรับปรุง") { el.classList.add('needs-attention'); remark.required = true; remark.placeholder = '* กรุณาระบุปัญหาที่ต้องแก้ไข'; ddBox.style.display = 'block'; ddInput.required = true; }
-      else { el.classList.remove('needs-attention'); remark.required = false; remark.placeholder = 'หมายเหตุ (ถ้ามี)'; ddBox.style.display = 'none'; ddInput.required = false; ddInput.value = ''; }
+      if (status === "ปรับปรุง") { 
+        el.classList.add('border-rose-300', 'bg-rose-50/30'); el.classList.remove('border-slate-100');
+        remark.required = true; remark.placeholder = '* กรุณาระบุปัญหาที่ต้องแก้ไข'; 
+        ddBox.classList.remove('hidden'); ddInput.required = true; 
+      } else { 
+        el.classList.remove('border-rose-300', 'bg-rose-50/30'); el.classList.add('border-slate-100');
+        remark.required = false; remark.placeholder = 'หมายเหตุ (ถ้ามี)'; 
+        ddBox.classList.add('hidden'); ddInput.required = false; ddInput.value = ''; 
+      }
     }
 
-    function render5SChecklist(container) {
-  // ✅ ดึงข้อมูลพื้นที่ที่เลือก พร้อมตรวจสอบความถูกต้อง
-  const areaData = CHECKLIST_5S[state.area5S];
-  
-  // ✅ กรณีไม่มีข้อมูลสำหรับพื้นที่นี้ → แสดงข้อความแจ้งเตือน
-  if (!areaData || !areaData.sections || areaData.sections.length === 0) {
-    container.innerHTML = `
-      <div class="card" style="text-align:center;padding:30px;color:#666;">
-        <i class="fas fa-info-circle fa-2x" style="margin-bottom:10px;color:var(--primary);"></i>
-        <p><strong>ยังไม่ได้กำหนดแบบประเมิน 5S</strong></p>
-        <p style="font-size:0.9rem;">สำหรับพื้นที่: <strong>${state.area5S}</strong></p>
-        <small>กรุณาติดต่อผู้ดูแลระบบเพื่อเพิ่มแบบประเมิน</small>
-      </div>
-    `;
-    return;
-  }
-  
-  const sections = areaData.sections;
-  
-  sections.forEach((sec, sIdx) => {
-    const card = document.createElement('div'); 
-    card.className = 'card';
-    
-    let html = `<div class="section-badge" style="display:inline-block;background:var(--success);color:#fff;padding:3px 10px;border-radius:15px;font-size:0.7rem;font-weight:700;margin-bottom:10px;">5S</div>
-      <label class="section-label" style="border-color:var(--success);color:var(--success)">${sec.title}</label>`;
-    
-    sec.qs.forEach((q, qIdx) => {
-      const qKey = `5s_s${sIdx}_q${qIdx}`;
-      
-      html += `<div class="check-item" id="item_${qKey}">
-        <small>${qIdx+1}. ${q}</small>
-        <div class="score-options">
-          <input type="radio" name="5s_s${sIdx}_q${qIdx}" id="g_${qKey}" value="ดี" onchange="handle5SStatusChange('${qKey}', 'ดี')">
-          <label for="g_${qKey}" class="score-label"><i class="fas fa-check-circle"></i>ดี</label>
-          
-          <input type="radio" name="5s_s${sIdx}_q${qIdx}" id="f_${qKey}" value="พอใช้" onchange="handle5SStatusChange('${qKey}', 'พอใช้')">
-          <label for="f_${qKey}" class="score-label"><i class="fas fa-circle-half-stroke"></i>พอใช้</label>
-          
-          <input type="radio" name="5s_s${sIdx}_q${qIdx}" id="p_${qKey}" value="ปรับปรุง" onchange="handle5SStatusChange('${qKey}', 'ปรับปรุง')">
-          <label for="p_${qKey}" class="score-label"><i class="fas fa-wrench"></i>ปรับปรุง</label>
-        </div>
-        <textarea name="5s_remark_s${sIdx}_q${qIdx}" placeholder="หมายเหตุ (ถ้ามี)" style="margin:8px 0 0;"></textarea>
-        <div class="duedate-box" id="dd_${qKey}">
-          <label><i class="fas fa-calendar-times"></i> วันแก้ไขเสร็จ *</label>
-          <input type="date" name="5s_duedate_s${sIdx}_q${qIdx}">
-        </div>
-        ${photoUploadHTML(qKey)}
-      </div>`;
-    });
-    
-    card.innerHTML = html; 
-    container.appendChild(card);
-  });
-}
+    function handleWaterMist(val, sNum, i) {
+      const qKey = `s${sNum}_q${i}`, badge = document.getElementById(`water_badge_${sNum}_${i}`), el = document.getElementById(`item_${qKey}`), remark = el.querySelector('textarea'), ddBox = document.getElementById(`dd_${qKey}`), ddInput = ddBox?.querySelector('input'), hidden = document.getElementById(`hidden_${qKey}`);
+      if (!val) { badge.classList.add('hidden'); hidden.value=''; state.responses[qKey] = {}; return; }
+      const num = parseFloat(val); badge.classList.remove('hidden');
+      if (num < 50) { 
+        badge.textContent = '⚠️ ไม่ปกติ'; badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700 ml-2'; hidden.value = 'ไม่ดี'; state.responses[qKey] = { status: 'ไม่ดี', waterValue: num }; 
+        remark.required = true; ddBox.classList.remove('hidden'); ddInput.required = true; 
+        el.classList.add('border-rose-300', 'bg-rose-50/30');
+      } else { 
+        badge.textContent = '✅ ปกติ'; badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 ml-2'; hidden.value = 'ดี'; state.responses[qKey] = { status: 'ดี', waterValue: num }; 
+        remark.required = false; ddBox.classList.add('hidden'); ddInput.required = false; ddInput.value = ''; 
+        el.classList.remove('border-rose-300', 'bg-rose-50/30');
+      }
+    }
 
-    function photoUploadHTML(qKey) { return `<div class="photo-area"><div id="preview_${qKey}" class="photo-preview"></div><div class="camera-row">
-      <button type="button" class="btn-cam" onclick="triggerInput('cam','${qKey}')"><i class="fas fa-camera"></i> ถ่ายรูป</button>
-      <button type="button" class="btn-cam" onclick="triggerInput('gal','${qKey}')"><i class="fas fa-images"></i> อัลบั้ม</button></div>
-      <input type="file" id="cam_${qKey}" accept="image/*" capture="environment" hidden onchange="handlePhoto(this,'${qKey}')">
-      <input type="file" id="gal_${qKey}" accept="image/*" hidden onchange="handlePhoto(this,'${qKey}')"></div>`; }
-
-    // ===================================================================
-    // EVENT HANDLERS
-    // ===================================================================
+    // Photo Handlers
     function triggerInput(type, qKey) { document.getElementById(`${type}_${qKey}`).click(); }
     function handlePhoto(input, qKey) {
       if (!input.files[0]) return; if (!state.images[qKey]) state.images[qKey] = [];
@@ -678,139 +501,144 @@ const CHECKLIST_5S = {
           state.images[qKey].push({ b64: canvas.toDataURL('image/jpeg', CONFIG.IMAGE_QUALITY), caption: '' }); renderPhotos(qKey); input.value = '';
         }; img.src = e.target.result; }; reader.readAsDataURL(input.files[0]);
     }
-    function renderPhotos(qKey) { const container = document.getElementById(`preview_${qKey}`); container.innerHTML = (state.images[qKey] || []).map((img, idx) => `<div class="photo-thumb"><img src="${img.b64}"><div class="photo-remove" onclick="removePhoto('${qKey}', ${idx})"><i class="fas fa-times"></i></div></div><input class="photo-caption" value="${escapeHtml(img.caption)}" placeholder="คอมเมนต์.." onchange="updateCaption('${qKey}', ${idx}, this.value)">`).join(''); }
+    function renderPhotos(qKey) { 
+      const container = document.getElementById(`preview_${qKey}`); 
+      container.innerHTML = (state.images[qKey] || []).map((img, idx) => `
+        <div class="relative w-[30%] aspect-square rounded-lg overflow-hidden border-2 border-slate-200">
+          <img src="${img.b64}" class="w-full h-full object-cover">
+          <div class="absolute top-1 right-1 w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center cursor-pointer shadow-md text-xs border border-white" onclick="removePhoto('${qKey}', ${idx})"><i class="fas fa-times"></i></div>
+          <input class="absolute bottom-0 left-0 w-full text-[10px] p-1 bg-white/90 border-t border-slate-200 outline-none text-slate-700" value="${escapeHtml(img.caption)}" placeholder="คำอธิบายภาพ.." onchange="updateCaption('${qKey}', ${idx}, this.value)">
+        </div>`).join(''); 
+    }
     function removePhoto(qKey, idx) { state.images[qKey].splice(idx, 1); renderPhotos(qKey); }
     function updateCaption(qKey, idx, val) { if (state.images[qKey][idx]) state.images[qKey][idx].caption = val; }
 
-    function handleStatusChange(qKey, status) {
-      const el = document.getElementById(`item_${qKey}`), remark = el.querySelector('textarea'), ddBox = document.getElementById(`dd_${qKey}`), ddInput = ddBox.querySelector('input');
-      state.responses[qKey] = { status };
-      if (status === 'ไม่ดี') { el.classList.add('needs-attention'); remark.required = true; remark.placeholder = '* กรุณาระบุรายละเอียด'; ddBox.style.display = 'block'; ddInput.required = true; }
-      else { el.classList.remove('needs-attention'); remark.required = false; remark.placeholder = 'หมายเหตุ (ถ้ามี)'; ddBox.style.display = 'none'; ddInput.required = false; ddInput.value = ''; }
-    }
-
-    function handleWaterMist(val, sNum, i) {
-      const qKey = `s${sNum}_q${i}`, badge = document.getElementById(`water_badge_${sNum}_${i}`), el = document.getElementById(`item_${qKey}`), remark = el.querySelector('textarea'), ddBox = document.getElementById(`dd_${qKey}`), ddInput = ddBox?.querySelector('input'), hidden = document.getElementById(`hidden_${qKey}`);
-      if (!val) { badge.style.display='none'; hidden.value=''; state.responses[qKey] = {}; return; }
-      const num = parseFloat(val); badge.style.display = 'inline-block';
-      if (num < 50) { badge.textContent = '⚠️ ไม่ปกติ'; badge.className = 'water-badge warning'; hidden.value = 'ไม่ดี'; state.responses[qKey] = { status: 'ไม่ดี', waterValue: num }; remark.required = true; ddBox.style.display = 'block'; ddInput.required = true; }
-      else { badge.textContent = '✅ ปกติ'; badge.className = 'water-badge success'; hidden.value = 'ดี'; state.responses[qKey] = { status: 'ดี', waterValue: num }; remark.required = false; ddBox.style.display = 'none'; ddInput.required = false; ddInput.value = ''; }
-    }
-
-    // ===================================================================
-    // VALIDATION & SUBMIT
-    // ===================================================================
+    // Validation & Submit
     function validate() {
       if (!document.getElementById('inspectorName').value.trim()) { showToast('กรุณาระบุชื่อผู้ตรวจสอบ', 'error'); return false; }
-      document.querySelectorAll('.check-item').forEach(el => el.classList.remove('error', 'needs-attention')); let valid = true;
+      let valid = true;
       document.querySelectorAll('.check-item').forEach(el => {
-        if (el.style.display === 'none') return; const qKey = el.id.replace('item_', '');
+        el.classList.remove('border-rose-500', 'animate-shake'); 
+        if (el.style.display === 'none') return; 
+        const qKey = el.id.replace('item_', '');
+        
         if (state.type === '5S') {
-          const radios = el.querySelectorAll('.score-options input[type="radio"]');
-          if (radios.length > 0) { const checked = el.querySelector('.score-options input[type="radio"]:checked');
-            if (!checked) { el.classList.add('error'); valid = false; }
-            else if (checked.value === 'ปรับปรุง') { const remark = el.querySelector('textarea'), dueDate = el.querySelector('input[type="date"]'); if (!remark.value.trim() || !dueDate.value) { el.classList.add('error'); valid = false; } } }
+          const radios = el.querySelectorAll('input[type="radio"]');
+          if (radios.length > 0) { 
+            const checked = el.querySelector('input[type="radio"]:checked');
+            if (!checked) { el.classList.add('border-rose-500', 'animate-shake'); valid = false; }
+            else if (checked.value === 'ปรับปรุง') { 
+              const remark = el.querySelector('textarea'), dueDate = el.querySelector('input[type="date"]'); 
+              if (!remark.value.trim() || !dueDate.value) { el.classList.add('border-rose-500', 'animate-shake'); valid = false; } 
+            } 
+          }
         } else {
           const radios = el.querySelectorAll('input[type="radio"]');
-          if (radios.length > 0) { const checked = el.querySelector('input[type="radio"]:checked');
-            if (!checked && !el.classList.contains('water-mist-block')) { el.classList.add('error'); valid = false; }
-            else if (checked?.value === 'ไม่ดี') { if (!el.querySelector('textarea').value.trim() || !el.querySelector('input[type="date"]').value) { el.classList.add('error'); valid = false; } } }
-          if (el.classList.contains('water-mist-block') && el.style.display !== 'none') {
-            const wv = el.querySelector('input[type="number"]'); if (!wv.value.trim()) { el.classList.add('error'); valid = false; }
-            else if (parseFloat(wv.value) < 50) { if (!el.querySelector('textarea').value.trim() || !el.querySelector('input[type="date"]').value) { el.classList.add('error'); valid = false; } } }
+          if (radios.length > 0) { 
+            const checked = el.querySelector('input[type="radio"]:checked');
+            if (!checked && !el.classList.contains('water-mist-block')) { el.classList.add('border-rose-500', 'animate-shake'); valid = false; }
+            else if (checked?.value === 'ไม่ดี') { 
+              if (!el.querySelector('textarea').value.trim() || !el.querySelector('input[type="date"]').value) { el.classList.add('border-rose-500', 'animate-shake'); valid = false; } 
+            } 
+          }
+          if (el.classList.contains('water-mist-block')) {
+            const wv = el.querySelector('input[type="number"]'); 
+            if (!wv.value.trim()) { el.classList.add('border-rose-500', 'animate-shake'); valid = false; }
+            else if (parseFloat(wv.value) < 50) { 
+              if (!el.querySelector('textarea').value.trim() || !el.querySelector('input[type="date"]').value) { el.classList.add('border-rose-500', 'animate-shake'); valid = false; } 
+            } 
+          }
         }
-      }); if (!valid) { const firstErr = document.querySelector('.check-item.error'); if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' }); } return valid;
+      }); 
+      if (!valid) { 
+        const firstErr = document.querySelector('.border-rose-500'); 
+        if (firstErr) {
+          firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+          showToast('กรุณากรอกข้อมูลในข้อที่ไฮไลต์สีแดงให้ครบถ้วน', 'error');
+        }
+      } 
+      return valid;
     }
 
-    async function handleSubmit(e) { e.preventDefault(); if (!validate()) return; document.getElementById('loader').classList.add('show'); document.getElementById('submitBtn').disabled = true;
-      try { const res = await fetchWithRetry(CONFIG.API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(buildPayload()) });
-        if (res.status === 'success') { showToast('✅ ส่งรายงานสำเร็จ', 'success'); localStorage.removeItem(CONFIG.DRAFT_KEY); setTimeout(() => window.location.href = 'Dash.html', 1500); }
-        else throw new Error(res.message || 'Submission failed'); } catch (err) { showToast(`❌ ${err.message}`, 'error'); }
-      finally { document.getElementById('loader').classList.remove('show'); document.getElementById('submitBtn').disabled = false; }
+    async function handleSubmit(e) { 
+      e.preventDefault(); 
+      if (!validate()) return; 
+      document.getElementById('loader').classList.remove('hidden'); document.getElementById('loader').classList.add('flex');
+      document.getElementById('submitBtn').disabled = true;
+      try { 
+        const res = await fetchWithRetry(CONFIG.API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(buildPayload()) });
+        if (res.status === 'success') { 
+          showToast('✅ ส่งรายงานสำเร็จ', 'success'); 
+          localStorage.removeItem(CONFIG.DRAFT_KEY); 
+          setTimeout(() => window.location.href = 'DashNew.html', 1500); 
+        } else throw new Error(res.message || 'Submission failed'); 
+      } catch (err) { 
+        showToast(`❌ ${err.message}`, 'error'); 
+      } finally { 
+        document.getElementById('loader').classList.add('hidden'); document.getElementById('loader').classList.remove('flex');
+        document.getElementById('submitBtn').disabled = false; 
+      }
     }
 
     function buildPayload() {
-  const details = {}, images = {}, is5S = state.type === '5S', area = is5S ? state.area5S : state.area;
-  
-  // 1. รวบรวมคำตอบ & หมายเหตุ
-  Object.entries(state.responses).forEach(([qKey, resp]) => {
-    if (!resp.status) return;
-    
-    // ✅ ใช้คีย์รูปแบบเดียวกันทั้งบันทึกและตรวจสอบ
-    const detailKey = qKey.startsWith('5s_') ? qKey : `section${qKey.replace('s', '')}`;
-    details[detailKey] = resp.status;
-    
-    // หมายเหตุ + Due Date เฉพาะ "ปรับปรุง" (5S) หรือ "ไม่ดี" (Safety)
-    if ((is5S && resp.status === 'ปรับปรุง') || (!is5S && resp.status === 'ไม่ดี')) {
-      details[`${detailKey}_remark`] = document.querySelector(`#item_${qKey} textarea`)?.value || '';
-      details[`${detailKey}_duedate`] = document.querySelector(`#item_${qKey} input[type="date"]`)?.value || '';
-    }
-    
-    // Water Mist value
-    if (resp.waterValue !== undefined) details.water_val = resp.waterValue;
-  });
-  
-  // 2. รวบรวมรูปภาพ
-  Object.entries(state.images).forEach(([qKey, imgs]) => imgs.forEach((img, idx) => {
-    let backendKey = qKey;
-    if (qKey.startsWith('5s_s')) {
-      const match = qKey.match(/5s_s(\d+)_q(\d+)/);
-      if (match) backendKey = `5s_${match[1]}_${match[2]}`;
-    }
-    images[`${backendKey}_${idx}`] = img.b64;
-    if (img.caption?.trim()) details[`caption_${backendKey}_${idx}`] = img.caption;
-  }));
-  
-  // 3. คำนวณสถานะรายส่วน (secRes)
-  const secRes = {};
-  if (is5S) {
-    // 5S: ดึงจำนวนส่วนจากพื้นที่จริง
-    const sections = (CHECKLIST_5S[state.area5S] || CHECKLIST_5S["OFFICE"])?.sections || [];
-    sections.forEach((_, sIdx) => { secRes[`s${sIdx+1}_res`] = 'ดี'; });
-  } else {
-    // Safety: ใช้ checklist ตามพื้นที่
-    const checklist = getSafetyChecklist(area);
-    Object.keys(checklist).forEach(sKey => {
-      const sNum = sKey.replace('s', '');
-      let hasBad = false;
-      
-      checklist[sKey].qs.forEach((_, qIdx) => {
-        // ✅ ใช้คีย์เดียวกันกับที่บันทึกไว้: section1_q0, section2_q1, ...
-        if (details[`section${sNum}_q${qIdx}`] === 'ไม่ดี') hasBad = true;
+      const details = {}, images = {}, is5S = state.type === '5S', area = is5S ? state.area5S : state.area;
+      Object.entries(state.responses).forEach(([qKey, resp]) => {
+        if (!resp.status) return;
+        const detailKey = qKey.startsWith('5s_') ? qKey : `section${qKey.replace('s', '')}`;
+        details[detailKey] = resp.status;
+        if ((is5S && resp.status === 'ปรับปรุง') || (!is5S && resp.status === 'ไม่ดี')) {
+          details[`${detailKey}_remark`] = document.querySelector(`#item_${qKey} textarea`)?.value || '';
+          details[`${detailKey}_duedate`] = document.querySelector(`#item_${qKey} input[type="date"]`)?.value || '';
+        }
+        if (resp.waterValue !== undefined) details.water_val = resp.waterValue;
       });
       
-      // Water Mist Logic เฉพาะโรงงาน
-      if (sKey === 's1' && (area === 'PRINT' || area === 'LAMINATE')) {
-        const wv = parseFloat(details.water_val);
-        if (!isNaN(wv) && wv < 50) hasBad = true;
+      Object.entries(state.images).forEach(([qKey, imgs]) => imgs.forEach((img, idx) => {
+        let backendKey = qKey;
+        if (qKey.startsWith('5s_s')) {
+          const match = qKey.match(/5s_s(\d+)_q(\d+)/);
+          if (match) backendKey = `5s_${match[1]}_${match[2]}`;
+        }
+        images[`${backendKey}_${idx}`] = img.b64;
+        if (img.caption?.trim()) details[`caption_${backendKey}_${idx}`] = img.caption;
+      }));
+      
+      const secRes = {};
+      if (is5S) {
+        const sections = (CHECKLIST_5S[state.area5S] || CHECKLIST_5S["OFFICE"])?.sections || [];
+        sections.forEach((_, sIdx) => { secRes[`s${sIdx+1}_res`] = 'ดี'; });
+      } else {
+        const checklist = getSafetyChecklist(area);
+        Object.keys(checklist).forEach(sKey => {
+          const sNum = sKey.replace('s', ''); let hasBad = false;
+          checklist[sKey].qs.forEach((_, qIdx) => { if (details[`section${sNum}_q${qIdx}`] === 'ไม่ดี') hasBad = true; });
+          if (sKey === 's1' && (area === 'PRINT' || area === 'LAMINATE')) {
+            const wv = parseFloat(details.water_val); if (!isNaN(wv) && wv < 50) hasBad = true;
+          }
+          secRes[`${sKey}_res`] = hasBad ? 'ไม่ดี' : 'ดี';
+        });
       }
       
-      secRes[`${sKey}_res`] = hasBad ? 'ไม่ดี' : 'ดี';
-    });
-  }
-  
-  // 4. ส่ง payload
-  return { 
-    inspector: document.getElementById('inspectorName').value.trim(), 
-    area, 
-    inspectionType: state.type, 
-    area5S: is5S ? area : null, 
-    images, 
-    details, 
-    ...secRes 
-  };
-}
+      return { inspector: document.getElementById('inspectorName').value.trim(), area, inspectionType: state.type, area5S: is5S ? area : null, images, details, ...secRes };
+    }
 
     async function fetchWithRetry(url, options, retries = 3) { for (let i=0; i<retries; i++) { try { const res = await fetch(url, options); return await res.json(); } catch(e) { if(i===retries-1) throw e; await new Promise(r=>setTimeout(r, 1000*(i+1))); } } }
 
-    // ===================================================================
-    // DRAFT & UTILS
-    // ===================================================================
     function setupAutoSave() { setInterval(() => { localStorage.setItem(CONFIG.DRAFT_KEY, JSON.stringify({ type: state.type, area: state.area, area5S: state.area5S, inspector: document.getElementById('inspectorName').value, timestamp: Date.now() })); }, 30000); }
     function loadDraft() { const raw = localStorage.getItem(CONFIG.DRAFT_KEY); if (!raw) return; try { const d = JSON.parse(raw); if (Date.now() - d.timestamp < 86400000) { document.getElementById('inspectorName').value = d.inspector || ''; if (d.type) selectType(d.type, document.querySelector(`.type-btn[data-type="${d.type}"]`)); state.area = d.area || 'PRINT'; state.area5S = d.area5S || 'PRINT'; populateDropdowns(); buildChecklist(); showToast('📥 โหลดข้อมูลล่าสุดจากเครื่อง', 'success'); } } catch {} }
     function escapeHtml(t) { return t ? t.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])) : ''; }
-    function showToast(msg, type='info') { const t = document.createElement('div'); t.className = `toast ${type}`; t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i><span>${msg}</span>`; document.body.appendChild(t); setTimeout(() => { t.style.animation = 'slideOut 0.3s'; setTimeout(()=>t.remove(), 300); }, 3000); }
-    document.head.appendChild(Object.assign(document.createElement('style'), {textContent:`@keyframes slideOut{from{opacity:1}to{opacity:0;transform:translateX(100px)}}`}));
+    
+    function showToast(msg, type='info') { 
+      const tContainer = document.getElementById('toastContainer');
+      const t = document.createElement('div'); 
+      const color = type === 'success' ? 'border-emerald-500 text-emerald-700' : 'border-rose-500 text-rose-700';
+      const icon = type === 'success' ? 'fa-check-circle text-emerald-500' : 'fa-exclamation-circle text-rose-500';
+      t.className = `bg-white px-5 py-3 rounded-xl shadow-lg border-l-4 ${color} flex items-center gap-3 font-semibold text-sm animate-slide-in pointer-events-auto`; 
+      t.innerHTML = `<i class="fas ${icon} text-lg"></i><span>${msg}</span>`; 
+      tContainer.appendChild(t); 
+      setTimeout(() => { t.classList.remove('animate-slide-in'); t.classList.add('animate-slide-out'); setTimeout(()=>t.remove(), 300); }, 3000); 
+    }
+    
     init();
   </script>
 </body>
