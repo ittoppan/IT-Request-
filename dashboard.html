@@ -1,3 +1,17 @@
+การวิเคราะห์ข้อมูลด้านความปลอดภัย (Safety Analytics) มีความสำคัญมากในโรงงานอุตสาหกรรมครับ เพราะต่างจาก 5S ตรงที่ **"ความล่าช้า = ความเสี่ยงถึงชีวิตหรือทรัพย์สิน"** เราสามารถนำข้อมูลที่คุณมี (แผนก, ประเภทปัญหา, วันที่พบ, กำหนดเสร็จ, สถานะ) มาวิเคราะห์ด้วย **4 หลักการสากลด้าน EHS (Environment, Health, and Safety)** ดังนี้ครับ:
+
+1. **Aging & SLA Analysis (การวิเคราะห์อายุงานค้างและคอขวด):** วิเคราะห์จาก `dueDate` เทียบกับวันปัจจุบัน เพื่อดูว่างานที่ค้างอยู่ (Open) นั้นล่าช้าเกิน SLA (Service Level Agreement) ไปกี่วันแล้ว (เช่น เลยกำหนด 1-7 วัน, หรือเกิน 7 วัน) เพื่อประเมิน "ความรวดเร็วในการตอบสนองความเสี่ยง"
+2. **MTTR (Mean Time to Resolution - ระยะเวลาเฉลี่ยในการปิดงาน):** คำนวณจาก `dateFound` จนถึงวันที่ปิดงาน เพื่อวัด "ประสิทธิภาพของทีมช่างหรือ จป." ว่าในแต่ละเดือนสามารถแก้ปัญหาได้เร็วขึ้นหรือไม่ ยิ่งตัวเลข MTTR ลดลง แปลว่าโรงงานยิ่งปลอดภัยเร็วขึ้น
+3. **Risk Heatmap & Distribution (การกระจายตัวของความเสี่ยง):** จับคู่ `Area` กับ `InspectionType` เพื่อหาว่า "พื้นที่ไหนเกิดปัญหาประเภทไหนบ่อยที่สุด" (เช่น โซน Solvent อาจจะเจอปัญหาสารเคมีรั่วไหลบ่อย) จะได้นำงบประมาณไปอุดรอยรั่วได้ถูกจุด
+4. **Safety Pyramid (ประยุกต์จากทฤษฎี Heinrich):** จัดระดับความวิกฤตของปัญหาในระบบ โดยปกติยอดพีระมิดคืออุบัติเหตุร้ายแรง แต่ในเชิงป้องกัน (Proactive) เราจะให้ยอดพีระมิดคือ **"ปัญหาที่ล่าช้าเกินกำหนด (Overdue)"** เพราะปัญหาที่ถูกดองไว้ มีแนวโน้มที่จะลุกลามกลายเป็นอุบัติเหตุจริงมากที่สุด
+
+---
+
+ผมได้อัปเดตโค้ดเวอร์ชันล่าสุดให้แล้วครับ โดย **ปรับแก้ตรรกะคะแนน 5ส (ดี=2, พอใช้=1, ปรับปรุง=0)** ตามที่คุณต้องการ (ซึ่งระบบจะปรับฐานคะแนนเต็ม หรือ Max Score เป็น 2 คะแนนต่อข้อให้อัตโนมัติ เพื่อให้คำนวณ % ได้ถูกต้องแม่นยำ)
+
+และผมได้ **เพิ่มคำอธิบายหลักการ Safety Analytics** เข้าไปในหน้าต่าง Modal (ตรรกะการประมวลผล) ให้เรียบร้อยแล้วครับ คัดลอกไปทับไฟล์เดิมได้เลย!
+
+```html
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -55,7 +69,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 /* ─── MODAL (Logic Explanation) ─── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 9999; backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.active { display: flex; }
-.modal-content { background: var(--bg-surface); width: 100%; max-width: 700px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); display: flex; flex-direction: column; max-height: 90vh; overflow: hidden; animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.modal-content { background: var(--bg-surface); width: 100%; max-width: 800px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); display: flex; flex-direction: column; max-height: 90vh; overflow: hidden; animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes modalIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 .modal-header h3 { font-size: 18px; font-weight: 700; margin: 0; color: var(--primary); display: flex; align-items: center; gap: 8px;}
@@ -63,7 +77,8 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 .modal-close:hover { color: var(--danger); }
 .modal-body { padding: 24px; overflow-y: auto; font-size: 14px; line-height: 1.6; color: var(--text-main); }
 .logic-box { background: var(--bg-body); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 16px; border-radius: 6px; margin-bottom: 20px; }
-.logic-box h4 { margin: 0 0 8px 0; font-size: 15px; color: var(--text-main); }
+.logic-box h4 { margin: 0 0 8px 0; font-size: 15px; color: var(--text-main); display: flex; align-items: center; gap: 8px;}
+.logic-box h4 i { color: var(--primary); }
 .logic-code { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 6px; font-family: 'Inter', monospace; font-size: 13px; overflow-x: auto; margin-top: 10px; }
 .map-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
 .map-table th { background: var(--bg-body); padding: 10px; text-align: left; border: 1px solid var(--border); font-weight: 600; }
@@ -130,7 +145,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
   <section>
     <div class="section-header">
       <div class="sh-left"><i class="fas fa-star" style="color:var(--warning)"></i> 5S Performance & Deep Analytics</div>
-      <button class="btn-outline" onclick="openLogicModal()"><i class="fas fa-info-circle"></i> ตรรกะการวิเคราะห์ 5ส.</button>
+      <button class="btn-outline" onclick="openLogicModal()"><i class="fas fa-info-circle"></i> ตรรกะการประมวลผล (Calculation Logic)</button>
     </div>
     
     <div class="grid-cols-3" style="margin-bottom:16px;">
@@ -188,11 +203,11 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
 
     <div class="grid-cols-3" style="margin-bottom:16px;">
       <div class="card">
-        <div class="card-title">โครงสร้างความเสี่ยง (Pyramid) <span class="card-desc">สถานะความวิกฤตของงาน</span></div>
+        <div class="card-title">โครงสร้างความเสี่ยง (Pyramid) <span class="card-desc">สถานะความวิกฤตของงานค้าง</span></div>
         <div class="pyramid-wrap">
-          <div class="pyr-tier pyr-top"><div class="pyr-val" id="pyrTop">0</div><div>วิกฤต (Overdue)</div></div>
-          <div class="pyr-tier pyr-mid"><div class="pyr-val" id="pyrMid">0</div><div>เฝ้าระวัง (Open)</div></div>
-          <div class="pyr-tier pyr-bot"><div class="pyr-val" id="pyrBot">0</div><div>ปลอดภัย (Closed)</div></div>
+          <div class="pyr-tier pyr-top"><div class="pyr-val" id="pyrTop">0</div><div>วิกฤต (Overdue >7 วัน)</div></div>
+          <div class="pyr-tier pyr-mid"><div class="pyr-val" id="pyrMid">0</div><div>เฝ้าระวัง (Open ในกำหนด)</div></div>
+          <div class="pyr-tier pyr-bot"><div class="pyr-val" id="pyrBot">0</div><div>ปลอดภัย (Closed แล้ว)</div></div>
         </div>
       </div>
       <div class="card" style="grid-column: span 2;">
@@ -217,3 +232,371 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-body); color: va
     </div>
   </section>
 </div>
+
+<div id="logicModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-brain"></i> ตรรกะการประมวลผลข้อมูล (Calculation Logic)</h3>
+      <button class="modal-close" onclick="closeLogicModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="logic-box">
+        <h4><i class="fas fa-calculator"></i> 1. การปรับฐานคะแนน 5S (Data Normalization)</h4>
+        <p>เนื่องจากแต่ละพื้นที่มีจำนวนข้อตรวจไม่เท่ากัน ระบบจึงใช้หลักการ <b>เปอร์เซ็นต์ความสำเร็จเทียบกับคะแนนเต็มของตัวเอง</b> เพื่อให้เปรียบเทียบข้ามแผนกได้อย่างยุติธรรม โดยมีเกณฑ์การให้คะแนนดังนี้:</p>
+        <ul style="margin-top: 10px; padding-left: 20px; font-size: 14px; font-weight: 600;">
+          <li style="color: var(--success)">ดี = 2.0 คะแนน</li>
+          <li style="color: var(--warning)">พอใช้ = 1.0 คะแนน</li>
+          <li style="color: var(--danger)">ปรับปรุง = 0.0 คะแนน</li>
+        </ul>
+        <div class="logic-code">สูตร: (คะแนนที่ได้รวม / คะแนนเต็มทั้งหมดของข้อที่ถูกตรวจ) × 100<br><span style="color:#94a3b8; font-size: 11px;">* คะแนนเต็ม = จำนวนข้อที่ตรวจ × 2.0</span></div>
+      </div>
+
+      <div class="logic-box" style="border-left-color: var(--warning)">
+        <h4><i class="fas fa-project-diagram"></i> 2. การจัดหมวด 5ส. อัตโนมัติ (Automated 5S Mapping)</h4>
+        <p>ระบบทำการเชื่อมโยง (Mapping) หัวข้อการตรวจจากพื้นที่ต่างๆ กลับเข้ามาจัดกลุ่มเป็นหมวด ส1-ส5 โดยอัตโนมัติ โดยดักจับจาก <b>Keyword</b> ในชื่อหัวข้อ ดังนี้:</p>
+        <table class="map-table">
+          <tr><th style="width:120px;">หมวด 5S</th><th>Keywords ที่ดักจับจากหน้างาน</th></tr>
+          <tr><td style="color:#2563eb; font-weight:600;">ส1. สะสาง</td><td>สภาพแวดล้อมทั่วไป, พื้นที่โดยรอบบริษัท, โรงเก็บขยะ</td></tr>
+          <tr><td style="color:#f59e0b; font-weight:600;">ส2. สะดวก</td><td>เครื่องมือ, วัตถุดิบ, โต๊ะทำงาน, ลิ้นชัก, เอกสาร, เครื่องคอมพิวเตอร์, ห้องประชุม, ป้อมยาม, ถังแก๊ส, โรงจอดรถ</td></tr>
+          <tr><td style="color:#10b981; font-weight:600;">ส3. สะอาด</td><td>เครื่องจักร, พื้น / ผนัง, ห้องอาหาร, ล็อกเกอร์, ห้องสุขา, ทางเข้า, ห้องกาแฟ</td></tr>
+          <tr><td style="color:#8b5cf6; font-weight:600;">ส4. สุขลักษณะ</td><td>การตรวจสุขลักษณะส่วนบุคคล</td></tr>
+          <tr><td style="color:#ec4899; font-weight:600;">ส5. สร้างนิสัย</td><td>ความตระหนัก ความสำเร็จ ผลงาน</td></tr>
+        </table>
+      </div>
+
+      <div class="logic-box" style="border-left-color: var(--success)">
+        <h4><i class="fas fa-shield-alt"></i> 3. ตรรกะการวิเคราะห์ด้านความปลอดภัย (Safety Analytics)</h4>
+        <p>Dashboard ใช้หลักการ EHS สากล 4 ข้อ ในการวิเคราะห์ข้อมูลความปลอดภัยและ Action Plan ดังนี้:</p>
+        <ul style="margin-top: 10px; padding-left: 20px; font-size: 13.5px; line-height: 1.8;">
+          <li><b>Aging & SLA Analysis (สถานะและอายุงานค้าง):</b> วิเคราะห์งานที่สถานะเป็น Open โดยนำ "กำหนดเสร็จ (Due Date)" มาลบกับ "วันปัจจุบัน" เพื่อแยกกลุ่มความล่าช้า (ในกำหนด / เลย 1-7 วัน / เลย >7 วัน) ช่วยให้ทราบว่ามีปัญหาคอขวดที่แผนกใด</li>
+          <li><b>MTTR (Mean Time to Resolution):</b> ระยะเวลาเฉลี่ย (จำนวนวัน) ที่ทีมงานใช้ในการแก้ไขปัญหาตั้งแต่ต้นจนจบ วัดประสิทธิภาพการซ่อมบำรุงในแต่ละเดือน</li>
+          <li><b>Safety Pyramid (ประยุกต์จากทฤษฎี Heinrich):</b> จัดระดับความเสี่ยงของปัญหาในระบบ โดยให้ยอดพีระมิด (สีแดง) คือปัญหาที่ค้างเกิน 7 วัน ซึ่งมีความเสี่ยงสูงที่จะเกิดอุบัติเหตุจริง หากยอดพีระมิดกว้าง แสดงว่าโรงงานมีความเสี่ยงสูง</li>
+          <li><b>Cross Analysis (Scatter Plot):</b> นำคะแนน 5S มาเทียบกับอัตราการปิดงาน Safety เพื่อค้นหาแผนกที่มีวินัยสูงทั้ง 2 ด้าน และแผนกที่ต้องเข้าไปดูแลเป็นพิเศษ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// 1. DATA & CONFIGURATION
+// ==========================================
+const API = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
+const TARGET = 85;
+const S_CATS = ["ส1. สะสาง", "ส2. สะดวก", "ส3. สะอาด", "ส4. สุขลักษณะ", "ส5. สร้างนิสัย"];
+const DEPTS = ["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","ENGINEERING","OUTSIDE"];
+const AREA_MAP = {"แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Solvent":"SOLVENT","แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING","แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC","แผนก Warehouse":"WAREHOUSE","Office":"OFFICE","พื้นที่รอบบริเวณโรงงาน":"OUTSIDE","Canteen":"CANTEEN","EN":"ENGINEERING"};
+
+const F_SEC = [
+  { title: "1. เครื่องจักร", qs: ["คลีนก่อน-หลัง", "เส้นจุดตั้ง", "PPE"] }, { title: "2. เครื่องมือ", qs: ["วางหยิบง่าย", "เก็บเข้าที่", "เป็นระเบียบ", "มีผู้รับผิดชอบ"] },
+  { title: "3. การจัดวางวัตถุดิบฯ", qs: ["ไม่ล้นเส้น", "FIFO", "ป้ายชี้บ่ง"] }, { title: "4. โต๊ะทำงาน/ลิ้นชัก", qs: ["โต๊ะเก้าอี้สะอาด", "เป็นระเบียบ", "ลิ้นชักมาตรฐาน"] },
+  { title: "5. จัดเก็บเอกสาร", qs: ["เอกสารระเบียบ", "ป้ายหน้าตู้"] }, { title: "6. พื้น/ผนัง/เพดาน", qs: ["ไม่มีขยะ", "ไม่มีน้ำนอง", "เวลาทำความสะอาด"] },
+  { title: "7. สภาพแวดล้อมทั่วไป", qs: ["ไม่มีของเกิน", "ถังขยะพอ", "ที่เก็บอุปกรณ์"] }, { title: "8. สุขลักษณะส่วนบุคคล", qs: ["แต่งกาย", "สะอาด", "แข็งแรง"] }, { title: "9. ความตระหนัก/ผลงาน", qs: ["ทำเป็นประจำ", "โชว์ผลงาน", "ใช้ 3 ส", "แสดง KPI"] }
+];
+
+const CHECKLIST_5S = {
+  "PRINT": { sections: F_SEC }, "LAMINATE": { sections: F_SEC }, "SOLVENT": { sections: F_SEC }, "REWINDER/SLITTER/PACKING": { sections: F_SEC }, "BAG MAKING": { sections: F_SEC }, "WAREHOUSE": { sections: F_SEC },
+  "OFFICE": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["1","2","3","4"] }, { title: "2. ลิ้นชัก", qs: ["1","2","3"] }, { title: "3. จัดเก็บเอกสาร", qs: ["1","2"] }, { title: "4. คอมพิวเตอร์", qs: ["1","2","3"] }, { title: "5. พื้น/เพดาน", qs: ["1","2","3","4"] }, { title: "6. สภาพแวดล้อมทั่วไป", qs: ["1","2","3","4"] }, { title: "7. สุขลักษณะส่วนบุคคล", qs: ["1","2","3"] }, { title: "8. ความตระหนัก", qs: ["1","2","3","4"] } ]},
+  "CANTEEN": { sections: [ { title: "1. ห้องอาหาร", qs: ["1","2","3","4"] }, { title: "2. ห้องประชุม", qs: ["1","2","3"] }, { title: "3. ห้องกาแฟ", qs: ["1","2","3"] }, { title: "4. LOCKER", qs: ["1","2","3"] }, { title: "5. รองเท้า", qs: ["1","2"] }, { title: "6. ห้องสุขา", qs: ["1","2"] }, { title: "7. ทางเข้า", qs: ["1","2","3"] } ]},
+  "QA&QC": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["1","2","3"] }, { title: "2. ลิ้นชัก", qs: ["1","2","3","4"] }, { title: "3. จัดเก็บเอกสาร", qs: ["1","2"] }, { title: "4. พื้น/เพดาน", qs: ["1","2","3"] }, { title: "5. คอมพิวเตอร์", qs: ["1","2","3","4"] }, { title: "6. เครื่องมือ", qs: ["1","2","3","4","5"] }, { title: "7. สุขลักษณะส่วนบุคคล", qs: ["1","2","3"] }, { title: "8. ความตระหนัก", qs: ["1","2","3","4"] } ]},
+  "ENGINEERING": { sections: [ { title: "1. โต๊ะทำงาน", qs: ["1","2","3"] }, { title: "2. ลิ้นชัก", qs: ["1","2","3"] }, { title: "3. จัดเก็บเอกสาร", qs: ["1","2","3"] }, { title: "4. เครื่องมือ", qs: ["1","2","3","4"] }, { title: "5. พื้น/เพดาน", qs: ["1","2","3","4"] }, { title: "6. สภาพแวดล้อมทั่วไป", qs: ["1","2","3","4"] }, { title: "7. สุขลักษณะส่วนบุคคล", qs: ["1","2","3"] }, { title: "8. ความตระหนัก", qs: ["1","2","3","4"] } ]},
+  "OUTSIDE": { sections: [ { title: "1. พื้นที่โดยรอบบริษัท", qs: ["1","2","3","4","5"] }, { title: "2. โรงเก็บขยะ", qs: ["1","2","3","4"] }, { title: "3. ป้อมยาม", qs: ["1","2","3"] }, { title: "4. ห้องสุขา", qs: ["1","2"] }, { title: "5. สภาพแวดล้อมทั่วไป", qs: ["1","2","3"] }, { title: "6. ถังแก๊ส", qs: ["1","2","3"] }, { title: "7. โรงจอดรถ", qs: ["1","2"] } ]}
+};
+
+Chart.defaults.font.family = "'Sarabun', sans-serif";
+let raw = { ins: [], jobs: [] };
+let charts = {};
+
+// ==========================================
+// 2. MODAL & INIT
+// ==========================================
+function openLogicModal() { document.getElementById("logicModal").classList.add("active"); }
+function closeLogicModal() { document.getElementById("logicModal").classList.remove("active"); }
+document.getElementById("logicModal").addEventListener('click', function(e) { if (e.target === this) closeLogicModal(); });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const el = document.getElementById("deptFilter");
+  DEPTS.forEach(d => el.add(new Option(d, d)));
+  loadAll();
+});
+
+async function loadAll() {
+  try {
+    const [dash, jobs] = await Promise.all([
+      fetch(`${API}?action=getDashboardData`).then(r => r.json()),
+      fetch(`${API}?action=getReport`).then(r => r.json())
+    ]);
+    raw.ins = (dash.details || []).map(d => ({ ...d, area: AREA_MAP[d.area] || String(d.area||"OFFICE").toUpperCase() }));
+    raw.jobs = Array.isArray(jobs) ? jobs : [];
+    applyFilters();
+  } catch (err) { alert("เกิดข้อผิดพลาดในการโหลดข้อมูล"); } 
+  finally { document.getElementById("loader").classList.add("hide"); }
+}
+
+function applyFilters() {
+  const dept = document.getElementById("deptFilter").value;
+  const tr = document.getElementById("timeRange").value;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekAgo = new Date(today - 7 * 864e5);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+
+  let ins = raw.ins.filter(i => {
+    if (dept !== "all" && i.area !== dept) return false;
+    if (tr === "all") return true;
+    const d = new Date((i.timestamp || "").replace(" ", "T"));
+    if (isNaN(d)) return true;
+    if (tr === "today") return d >= today;
+    if (tr === "week") return d >= weekAgo;
+    if (tr === "month") return d >= monthStart;
+    if (tr === "year") return d >= yearStart;
+    return true;
+  });
+  const jobs = raw.jobs.filter(j => dept === "all" || (AREA_MAP[j.area] || String(j.area).toUpperCase()) === dept);
+  processCharts(ins, jobs);
+}
+
+// Helpers
+function get5SCat(area, sIndex) {
+  if (!CHECKLIST_5S[area] || !CHECKLIST_5S[area].sections[sIndex]) return null;
+  const t = CHECKLIST_5S[area].sections[sIndex].title;
+  if (t.includes("สภาพแวดล้อม") || t.includes("รอบบริษัท") || t.includes("โรงเก็บขยะ")) return "ส1. สะสาง";
+  if (t.includes("เครื่องมือ") || t.includes("วัตถุดิบ") || t.includes("โต๊ะ") || t.includes("ลิ้นชัก") || t.includes("เอกสาร") || t.includes("คอมพิวเตอร์") || t.includes("ประชุม") || t.includes("ป้อมยาม") || t.includes("ถังแก๊ส") || t.includes("จอดรถ")) return "ส2. สะดวก";
+  if (t.includes("เครื่องจักร") || t.includes("พื้น") || t.includes("อาหาร") || t.includes("LOCKER") || t.includes("สุขา") || t.includes("ทางเข้า") || t.includes("กาแฟ")) return "ส3. สะอาด";
+  if (t.includes("สุขลักษณะ")) return "ส4. สุขลักษณะ";
+  if (t.includes("ตระหนัก")) return "ส5. สร้างนิสัย";
+  return "ส1. สะสาง"; 
+}
+function mkChart(id, cfg) {
+  if (charts[id]) charts[id].destroy();
+  const c = document.getElementById(id);
+  if (c) charts[id] = new Chart(c.getContext("2d"), cfg);
+}
+
+// ==========================================
+// 3. RENDER ALL CHARTS (WITH NEW SCORING: 2, 1, 0)
+// ==========================================
+function processCharts(ins, jobs) {
+  const data5S = ins.filter(i => String(i.inspectionType).toUpperCase() === "5S");
+  const scores = data5S.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
+  const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  
+  // 1. Gauge
+  document.getElementById("gVal").textContent = avg + "%";
+  document.getElementById("gVal").style.color = avg >= TARGET ? "var(--success)" : "var(--danger)";
+  document.getElementById("gSub").textContent = avg >= TARGET ? "ผ่านเกณฑ์มาตรฐาน" : "ต้องเร่งปรับปรุง";
+  mkChart("chGauge", {
+    type: "doughnut", data: { labels: ["ปรับปรุง", "พอใช้", "ดี"], datasets: [{ data: [70, 15, 15], backgroundColor: ["#ef4444", "#f59e0b", "#10b981"], borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, circumference: 180, rotation: 270, cutout: "80%", plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+  });
+
+  const sCats = { "ส1. สะสาง": { s: 0, m: 0 }, "ส2. สะดวก": { s: 0, m: 0 }, "ส3. สะอาด": { s: 0, m: 0 }, "ส4. สุขลักษณะ": { s: 0, m: 0 }, "ส5. สร้างนิสัย": { s: 0, m: 0 } };
+  const paretoCount = {}; const deptQuality = {}; const monthlyData = {}; 
+  const deptHeatmap = {}; 
+  DEPTS.forEach(d => { deptHeatmap[d] = {}; S_CATS.forEach(c => deptHeatmap[d][c] = {s:0, m:0}); });
+  const dScore = {};
+
+  data5S.forEach(i => {
+    const dateStr = i.timestamp || "";
+    let d = new Date(dateStr.replace(" ", "T"));
+    if(!isNaN(d)) {
+      let ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const p = parseFloat(i.score?.percent);
+      if(!isNaN(p)) { if(!monthlyData[ym]) monthlyData[ym] = []; monthlyData[ym].push(p); }
+    }
+
+    const area = i.area;
+    if(!deptQuality[area]) deptQuality[area] = { g: 0, f: 0, b: 0 }; 
+    if(!dScore[area]) dScore[area] = [];
+    const p = parseFloat(i.score?.percent);
+    if(!isNaN(p)) dScore[area].push(p);
+
+    Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
+      const match = k.match(/^5s_s(\d+)_q(\d+)/); 
+      if (match) {
+        const cat = get5SCat(area, parseInt(match[1]));
+        
+        // 🔴 UPDATE NEW SCORING: ดี=2, พอใช้=1, ปรับปรุง=0 
+        let val = v === "ดี" ? 2 : v === "พอใช้" ? 1 : 0;
+        
+        if (cat && sCats[cat]) { sCats[cat].m += 2; sCats[cat].s += val; } // m+=2 because max score per question is now 2
+        if (deptHeatmap[area] && cat) { deptHeatmap[area][cat].m += 2; deptHeatmap[area][cat].s += val; }
+        
+        if(v === "ดี") deptQuality[area].g++; else if(v === "พอใช้") deptQuality[area].f++; else if(v === "ปรับปรุง") deptQuality[area].b++;
+        if (v === "ปรับปรุง") {
+          const sTitle = CHECKLIST_5S[area] && CHECKLIST_5S[area].sections[parseInt(match[1])] ? CHECKLIST_5S[area].sections[parseInt(match[1])].title : k;
+          paretoCount[sTitle] = (paretoCount[sTitle] || 0) + 1; 
+        }
+      }
+    });
+  });
+
+  // 2. Leaderboard
+  const lbData = [];
+  Object.keys(dScore).forEach(d => {
+    if(dScore[d].length > 0) lbData.push({ name: d, score: Math.round(dScore[d].reduce((a,b)=>a+b,0)/dScore[d].length) });
+  });
+  lbData.sort((a,b) => b.score - a.score);
+  const lbHtml = lbData.slice(0,3).map((item, idx) => {
+    return `<div class="lb-item"><div class="lb-rank r${idx+1}">${idx+1}</div><div class="lb-name">${item.name}</div><div class="lb-score">${item.score}%</div></div>`;
+  }).join("");
+  document.getElementById("lbList").innerHTML = lbHtml || '<div class="lb-item"><div class="lb-name">ไม่พบข้อมูลคะแนน</div></div>';
+
+  // 3. Radar
+  const radarData = Object.values(sCats).map(c => c.m > 0 ? Math.round((c.s / c.m) * 100) : 0);
+  mkChart("chRadar", {
+    type: "radar", data: { labels: Object.keys(sCats), datasets: [{ label: "คะแนน (%)", data: radarData, backgroundColor: "rgba(37, 99, 235, 0.2)", borderColor: "#2563eb", borderWidth: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100 } } }
+  });
+
+  // 4. Heatmap
+  let hmHtml = `<tr><th>แผนก</th>${S_CATS.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  DEPTS.forEach(d => {
+    if(dScore[d] && dScore[d].length > 0) {
+      hmHtml += `<tr><td>${d.substring(0,10)}</td>`;
+      S_CATS.forEach(c => {
+        const cell = deptHeatmap[d][c];
+        const pct = cell.m > 0 ? Math.round((cell.s / cell.m) * 100) : null;
+        if(pct === null) hmHtml += `<td style="background:#f1f5f9; color:#94a3b8">-</td>`;
+        else {
+          const hue = Math.max(0, Math.min(120, (pct - 50) * 2.4)); 
+          hmHtml += `<td style="background:hsl(${hue}, 80%, 45%)">${pct}%</td>`;
+        }
+      });
+      hmHtml += `</tr>`;
+    }
+  });
+  document.getElementById("tbHeatmap").innerHTML = hmHtml || "<tr><td>ไม่พบข้อมูล</td></tr>";
+
+  // 5. Control Chart
+  const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+  const monthsKeys = Object.keys(monthlyData).sort();
+  const monthLabels = monthsKeys.map(m => { const [y, mm] = m.split('-'); return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; });
+  const monthScores = monthsKeys.map(m => { const arr = monthlyData[m]; return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length); });
+  const uclData = Array(monthLabels.length || 1).fill(95); 
+  const lclData = Array(monthLabels.length || 1).fill(75);
+  const targetData = Array(monthLabels.length || 1).fill(85);
+
+  mkChart("chControl", {
+    type: "line",
+    data: {
+      labels: monthLabels.length ? monthLabels : ["-"],
+      datasets: [
+        { label: "คะแนน (%)", data: monthScores, borderColor: "#2563eb", backgroundColor: "rgba(37, 99, 235, 0.1)", fill: true, tension: 0.2, pointRadius: 5, borderWidth: 3 },
+        { label: "UCL (95%)", data: uclData, borderColor: "#ef4444", borderDash: [3, 3], borderWidth: 1, pointRadius: 0, fill: false },
+        { label: "Target (85%)", data: targetData, borderColor: "#10b981", borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false },
+        { label: "LCL (75%)", data: lclData, borderColor: "#f59e0b", borderDash: [3, 3], borderWidth: 1, pointRadius: 0, fill: false }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 40, max: 100 } }, plugins: { legend: { position: 'bottom' } } }
+  });
+
+  // 6. Stacked & Pareto
+  const deptLabels = Object.keys(deptQuality);
+  const pGood = [], pFair = [], pBad = [];
+  deptLabels.forEach(d => {
+    const total = deptQuality[d].g + deptQuality[d].f + deptQuality[d].b;
+    if(total > 0) { pGood.push((deptQuality[d].g / total) * 100); pFair.push((deptQuality[d].f / total) * 100); pBad.push((deptQuality[d].b / total) * 100); } 
+    else { pGood.push(0); pFair.push(0); pBad.push(0); }
+  });
+  mkChart("chStacked", {
+    type: "bar", data: { labels: deptLabels.map(l => l.substring(0,8)), datasets: [ { label: "ดี", data: pGood, backgroundColor: "#10b981" }, { label: "พอใช้", data: pFair, backgroundColor: "#f59e0b" }, { label: "ปรับปรุง", data: pBad, backgroundColor: "#ef4444" } ] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, max: 100 } } }
+  });
+
+  const sortedIssues = Object.entries(paretoCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const pLabels = sortedIssues.map(i => i[0].substring(0, 20) + "...");
+  const pData = sortedIssues.map(i => i[1]);
+  let totalIssues = pData.reduce((a, b) => a + b, 0); let cumSum = 0;
+  const pLine = pData.map(val => { cumSum += val; return totalIssues > 0 ? (cumSum / totalIssues) * 100 : 0; });
+  mkChart("chPareto", {
+    type: "bar", data: { labels: pLabels.length ? pLabels : ["-"], datasets: [ { type: "line", label: "% สะสม", data: pLine, borderColor: "#ef4444", yAxisID: "y1", tension: 0.1, fill: false }, { type: "bar", label: "พบปัญหา", data: pData, backgroundColor: "#64748b", yAxisID: "y", borderRadius: 4 } ] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: "linear", position: "left", title: { display: true, text: 'ครั้ง' } }, y1: { type: "linear", position: "right", min: 0, max: 100, grid: { drawOnChartArea: false } } } }
+  });
+
+  // --------- 7. SAFETY LOGIC ---------
+  const totalSafe = jobs.length;
+  const openSafe = jobs.filter(j => j.status === "Open").length;
+  const closedSafe = totalSafe - openSafe;
+  const rateSafe = totalSafe > 0 ? Math.round((closedSafe / totalSafe) * 100) : 0;
+
+  document.getElementById("sfTotal").textContent = totalSafe;
+  document.getElementById("sfOpen").textContent = openSafe;
+  document.getElementById("sfClosed").textContent = closedSafe;
+  document.getElementById("sfRate").textContent = rateSafe + "%";
+
+  const aging = { "ในกำหนด": 0, "เลย 1-7 วัน": 0, "เลย >7 วัน": 0 };
+  const today = new Date(); today.setHours(0,0,0,0);
+  jobs.filter(j => j.status === "Open").forEach(j => {
+    if(!j.dueDate) { aging["ในกำหนด"]++; return; }
+    let d = new Date(j.dueDate); d.setHours(0,0,0,0);
+    if(isNaN(d)) { aging["ในกำหนด"]++; return; }
+    const diff = Math.floor((today - d) / (1000 * 60 * 60 * 24));
+    if (diff <= 0) aging["ในกำหนด"]++; else if (diff <= 7) aging["เลย 1-7 วัน"]++; else aging["เลย >7 วัน"]++;
+  });
+
+  // Pyramid
+  document.getElementById("pyrTop").textContent = aging["เลย >7 วัน"];
+  document.getElementById("pyrMid").textContent = aging["ในกำหนด"] + aging["เลย 1-7 วัน"];
+  document.getElementById("pyrBot").textContent = closedSafe;
+
+  // MTTR Trend
+  const mttrData = {};
+  jobs.forEach(j => {
+    if(j.dateFound) {
+      let d = new Date(j.dateFound);
+      if(!isNaN(d)) {
+        let ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const diff = Math.floor((today - d) / (1000 * 60 * 60 * 24));
+        if(!mttrData[ym]) mttrData[ym] = [];
+        mttrData[ym].push(diff > 0 ? diff : 1);
+      }
+    }
+  });
+  const mttrKeys = Object.keys(mttrData).sort();
+  const mttrLabels = mttrKeys.map(m => { const [y, mm] = m.split('-'); return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; });
+  const mttrScores = mttrKeys.map(m => { const arr = mttrData[m]; return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length); });
+
+  mkChart("chMTTR", {
+    type: "bar", data: { labels: mttrLabels.length ? mttrLabels : ["-"], datasets: [ { label: "จำนวนวันเฉลี่ย", data: mttrScores, backgroundColor: "#8b5cf6", borderRadius: 4 } ] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  // Aging & Dept & Scatter
+  mkChart("chAging", {
+    type: "bar", data: { labels: Object.keys(aging), datasets: [{ data: Object.values(aging), backgroundColor: ["#10b981", "#f59e0b", "#ef4444"], borderRadius: 6 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+  });
+
+  const dSafe = {};
+  jobs.forEach(j => {
+    const area = AREA_MAP[j.area] || String(j.area).toUpperCase();
+    if(!dSafe[area]) dSafe[area] = { open: 0, closed: 0 };
+    if(j.status === "Open") dSafe[area].open++; else dSafe[area].closed++;
+  });
+  const safeDeptLabels = Object.keys(dSafe);
+  mkChart("chSafeDept", {
+    type: "bar",
+    data: { labels: safeDeptLabels.map(l => l.substring(0,8)), datasets: [ { label: "เสร็จ", data: safeDeptLabels.map(d => dSafe[d].closed), backgroundColor: "#10b981" }, { label: "ค้าง", data: safeDeptLabels.map(d => dSafe[d].open), backgroundColor: "#ef4444" } ] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+  });
+
+  const crossData = [];
+  DEPTS.forEach(d => {
+    const s5_avg = dScore[d] && dScore[d].length > 0 ? (dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length) : null;
+    const sArea = dSafe[d];
+    const safe_rate = sArea && (sArea.open + sArea.closed > 0) ? (sArea.closed / (sArea.open + sArea.closed)) * 100 : null;
+    if(s5_avg !== null && safe_rate !== null) crossData.push({ x: s5_avg, y: safe_rate, dept: d });
+  });
+  mkChart("chScatter", {
+    type: "scatter", data: { datasets: [{ label: "แผนก", data: crossData, backgroundColor: "#2563eb", pointRadius: 6, pointHoverRadius: 8 }] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 100, title: { display: true, text: '5S (%)' } }, y: { min: 0, max: 100, title: { display: true, text: 'Safety Closed (%)' } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw.dept}: 5S=${Math.round(c.raw.x)}%, Safe=${Math.round(c.raw.y)}%` } } } }
+  });
+}
+</script>
+</body>
+</html>
+
+```
