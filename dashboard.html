@@ -457,7 +457,7 @@ function processCharts(ins, jobs) {
   document.getElementById("tbHeatmap").innerHTML = hmHtml || "<tr><td>ไม่พบข้อมูล</td></tr>";
 
   // 5. Control Chart
-  const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+
   const monthsKeys = Object.keys(monthlyData).sort();
   const monthLabels = monthsKeys.map(m => { const [y, mm] = m.split('-'); return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; });
   const monthScores = monthsKeys.map(m => { const arr = monthlyData[m]; return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length); });
