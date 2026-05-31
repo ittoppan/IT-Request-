@@ -3,169 +3,145 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SAFETY & 5S PATROL DASHBOARD</title>
+  <title class="system-title">SAFETY & 5S PATROL DASHBOARD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
-  <style>
-    :root { 
-      --primary: #f39c12; --primary-dark: #e67e22; --dark: #2c3e50; 
-      --success: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; 
-      --light-orange: #fff5e6; --border: #e0e0e0; 
-    }
-    body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    
-    /* Navigation */
-    .nav { background: linear-gradient(90deg, #ff8c00, var(--primary)); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; }
-    .nav h2 { margin: 0; font-size: 1.3rem; letter-spacing: 0.5px; }
-    .nav-actions { display: flex; gap: 10px; }
-    .btn-main { background: white; color: var(--primary); padding: 8px 15px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: 0.3s; font-size: 0.95rem; white-space: nowrap; border: 1px solid white; display: inline-flex; align-items: center; gap: 5px; }
-    .btn-report { background: #3498db; color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: 0.3s; font-size: 0.95rem; white-space: nowrap; border: 1px solid #3498db; display: inline-flex; align-items: center; gap: 5px; }
-    .btn-report:hover { background: #2980b9; }
-    
-    .container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
-
-    /* Filters */
-    .filter-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
-    .date-filter-box { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-    input[type="date"] { padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd; font-family: 'Prompt'; font-size: 1rem; color: var(--dark); outline: none; transition: border 0.3s; }
-    input[type="date"]:focus { border-color: var(--primary); }
-    .btn-clear-date { background: #f8f9fa; border: 1px solid #ddd; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: 600; color: #555; transition: 0.2s; }
-    .btn-clear-date:hover { background: #e9ecef; }
-    
-    .type-selector-title { font-weight: 600; color: var(--dark); font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-    .type-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
-    .type-btn { padding: 10px 5px; border-radius: 8px; border: 2px solid var(--border); background: #f8f9fa; text-align: center; cursor: pointer; font-family: 'Prompt'; font-size: 0.75rem; font-weight: 600; color: #666; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 60px; user-select: none; }
-    .type-btn i { font-size: 1.1rem; color: #95a5a6; transition: color 0.2s; }
-    .type-btn:hover { border-color: var(--primary); background: #fff9f0; }
-    .type-btn:hover i { color: var(--primary); }
-    .type-btn.active { background: linear-gradient(145deg, #fff3e0, #ffe0b2); color: var(--primary-dark); border-color: var(--primary-dark); box-shadow: 0 4px 12px rgba(230, 126, 34, 0.2); }
-    .type-btn.active i { color: var(--primary-dark); transform: scale(1.1); }
-    .type-btn[data-type="5S"].active { background: linear-gradient(145deg, #e8f5e9, #c8e6c9); color: #219a52; border-color: #219a52; }
-    .type-btn[data-type="5S"].active i { color: #219a52; }
-    
-    /* Stats Cards */
-    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
-    .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-bottom: 5px solid #ddd; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    .stat-card:hover { transform: translateY(-2px); }
-    .stat-card.active { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .stat-card small { color: #7f8c8d; font-weight: 600; }
-    
-    /* Main Table */
-    .table-box { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); -webkit-overflow-scrolling: touch; }
-    table { width: 100%; border-collapse: collapse; min-width: 750px; }
-    th { background: #fff8f0; color: #e67e22; padding: 15px; text-align: left; font-size: 0.95rem; white-space: nowrap; }
-    td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; font-size: 0.95rem; }
-    .badge { padding: 5px 12px; border-radius: 50px; color: white; font-size: 0.8rem; white-space: nowrap; font-weight: 600;}
-    .type-badge { padding: 3px 10px; border-radius: 18px; color: white; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
-    .type-badge.badge-5s { background: linear-gradient(135deg, var(--success), #219a52); }
-    
-    /* Details Row */
-    .detail-row { display: none; background: var(--light-orange); }
-    .inner-detail { padding: 20px; background: white; border: 1px solid #f9e3b4; margin: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.1); }
-    .section-group { margin-bottom: 15px; border-radius: 10px; overflow: hidden; border: 1px solid #ffe8cc; }
-    .section-head { background: var(--primary); color: white; padding: 12px 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;}
-    .sub-item { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #fff3e0; padding: 12px 15px; background: #fffdfa; gap: 10px; }
-    .sub-item-text { flex: 1; color: #5a4a3a; font-size: 0.95rem; line-height: 1.5; }
-    
-    /* Status Pills */
-    .status-pill { min-width: 80px; padding: 5px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-align: center; white-space: nowrap; }
-    .status-good { background: #e8f5e9; color: var(--success); }
-    .status-bad { background: #ffebee; color: var(--danger); }
-    .status-5s-good { background: #e8f5e9; color: #2e7d32; border: 1px solid #2e7d32; }
-    .status-5s-fair { background: #fff3e0; color: #e65100; border: 1px solid #e65100; }
-    .status-5s-improve { background: #ffebee; color: #c62828; border: 1px solid #c62828; }
-    .score-badge { font-size: 0.75rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 6px; display: inline-flex; align-items: center; }
-    .score-badge.good { background: #2e7d32; color: white; }
-    .score-badge.fair { background: #e65100; color: white; }
-    .score-badge.improve { background: #c62828; color: white; }
-    
-    .remark-box { font-size: 0.85rem; color: #d35400; margin-top: 8px; padding: 8px 12px; background: #fff9f0; border-left: 3px solid var(--primary); border-radius: 4px; }
-    .btn-view { background: #f4f6f7; border: 1px solid #d5dbdb; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--dark); font-family: 'Prompt'; transition: 0.2s; white-space: nowrap; font-weight: 600; }
-    .btn-view:hover { background: #e5e8e8; border-color: var(--primary); }
-    
-    /* Images & Loader */
-    .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; transition: transform 0.2s; margin-right: 5px; margin-bottom: 5px; background-color: #f9f9f9; }
-    .img-preview:hover { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-    .img-preview-large { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; margin:0; background-color: #f9f9f9; }
-    .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; align-items: center; justify-content: center; z-index: 2000; flex-direction: column; }
-    .loader.show { display: flex; }
-
-    @media (max-width: 768px) {
-      .nav h2 { font-size: 1.1rem; width: 100%; text-align: center; }
-      .nav-actions { width: 100%; justify-content: center; }
-      .container { padding: 0 10px; margin: 15px auto; }
-      .type-selector { grid-template-columns: repeat(3, 1fr); }
-      .stats { gap: 10px; margin-bottom: 15px; }
-      .stat-card { padding: 12px 8px; border-radius: 10px; border-bottom: 4px solid #ddd; }
-      .stat-card small { font-size: 0.7rem; letter-spacing: -0.5px; }
-      .stat-card .value { font-size: 1.5rem !important; }
-      .inner-detail { padding: 12px; margin: 10px 5px; }
-      .sub-item { flex-direction: column; padding: 12px 10px; }
-      .status-pill { margin-left: 0; margin-top: 10px; align-self: flex-start; }
-      .img-preview-large { width: 75px; height: 75px; }
-      input[type="date"] { width: 100%; max-width: 200px;}
-      .date-filter-box { flex-wrap: wrap; }
-      table, thead, tbody, th, td, tr { display: block; }
-      thead { display: none; }
-      tr { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-      td { text-align: left !important; padding: 10px 15px; border: none; border-bottom: 1px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center; }
-      td::before { content: attr(data-label); font-weight: 600; color: var(--primary-dark); font-size: 0.85rem; }
-    }
-  </style>
-</head>
-<body>
-  <div id="loader" class="loader">
-    <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i>
-    <p style="margin-top: 15px; font-weight: 600; color: #555;">กำลังโหลดข้อมูล...</p>
-  </div>
   
-  <nav class="nav">
-    <div><h2><i class="fas fa-shield-halved"></i> SAFETY & 5S DASHBOARD</h2></div>
-    <div class="nav-actions">
-      <a href="reportnew.html" class="btn-report"><i class="fas fa-chart-line"></i> Action Plan</a>
-      <a href="https://itrequests.netlify.app/check" class="btn-main"><i class="fas fa-plus"></i> ตรวจสอบพื้นที่</a>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: 'var(--color-primary, #f39c12)',
+            secondary: 'var(--color-secondary, #e67e22)',
+            dark: '#2c3e50',
+          },
+          fontFamily: {
+            sans: ['var(--font-family, "Prompt")', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
+
+  <nav class="bg-gradient-to-r from-primary to-secondary text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <i class="fas fa-shield-halved text-2xl mr-2"></i>
+          <span class="font-bold text-lg tracking-wide hidden sm:block system-title">SAFETY & 5S SYSTEM</span>
+        </div>
+        <div class="hidden md:flex items-center space-x-2">
+          <a href="DashNew.html" class="bg-white/20 px-3 py-2 rounded-xl text-sm font-semibold transition"><i class="fas fa-home mr-1"></i> หน้าหลัก</a>
+          <a href="check (1).html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-plus mr-1"></i> ตรวจสอบพื้นที่</a>
+          <a href="reportnew.html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-chart-line mr-1"></i> Action Plan</a>
+          <a href="dashboard (1).html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-chart-pie mr-1"></i> สถิติเชิงลึก</a>
+          <a href="admin.html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-cog mr-1"></i> ตั้งค่าระบบ</a>
+        </div>
+        <div class="flex items-center md:hidden">
+          <button id="mobile-menu-btn" class="text-white hover:text-slate-200 focus:outline-none p-2">
+            <i class="fas fa-bars text-2xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden flex-col bg-secondary/95 px-4 pt-2 pb-4 space-y-1 shadow-inner border-t border-white/10">
+      <a href="DashNew.html" class="block px-3 py-2 rounded-lg bg-white/20 font-semibold"><i class="fas fa-home w-6"></i> หน้าหลัก</a>
+      <a href="check (1).html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-plus w-6"></i> ตรวจสอบพื้นที่</a>
+      <a href="reportnew.html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-chart-line w-6"></i> Action Plan</a>
+      <a href="dashboard (1).html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-chart-pie w-6"></i> สถิติเชิงลึก</a>
+      <a href="admin.html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-cog w-6"></i> ตั้งค่าระบบ</a>
     </div>
   </nav>
 
-  <div class="container">
-    <div class="filter-section">
-      <div class="date-filter-box">
-        <i class="fas fa-calendar-alt" style="color:var(--primary); font-size:1.2rem;"></i>
-        <input type="date" id="dateFilter" onchange="renderTable()">
-        <button class="btn-clear-date" onclick="clearDateFilter()">ดูทั้งหมด</button>
-      </div>
-      <div class="type-selector-title"><i class="fas fa-filter" style="color: var(--primary);"></i> กรองตามประเภทการตรวจสอบ</div>
-      <div class="type-selector">
-        <div class="type-btn active" data-type="all" onclick="selectTypeFilter('all', this)"><i class="fas fa-list"></i>ทั้งหมด</div>
-        <div class="type-btn" data-type="จป.ว" onclick="selectTypeFilter('จป.ว', this)"><i class="fas fa-hard-hat"></i>จป.ว</div>
-        <div class="type-btn" data-type="คปอ." onclick="selectTypeFilter('คปอ.', this)"><i class="fas fa-users-cog"></i>คปอ.</div>
-        <div class="type-btn" data-type="Foreman/Mgr." onclick="selectTypeFilter('Foreman/Mgr.', this)"><i class="fas fa-user-tie"></i>Foreman</div>
-        <div class="type-btn" data-type="Audit" onclick="selectTypeFilter('Audit', this)"><i class="fas fa-search"></i>Audit</div>
-        <div class="type-btn" data-type="Accident/Fire" onclick="selectTypeFilter('Accident/Fire', this)"><i class="fas fa-fire-extinguisher"></i>Accident</div>
-        <div class="type-btn" data-type="5S" onclick="selectTypeFilter('5S', this)"><i class="fas fa-broom"></i>5S</div>
-      </div>
-    </div>
-    
-    <div class="stats">
-      <div class="stat-card active" id="card-all" onclick="updateStatusFilter('all')"><small>ทั้งหมดในตาราง</small><div class="value" id="countTotal" style="font-size:2.2rem; color:#3498db;">0</div></div>
-      <div class="stat-card" id="card-good" onclick="updateStatusFilter('good')"><small>ปกติ</small><div class="value" id="countGood" style="font-size:2.2rem; color:var(--success);">0</div></div>
-      <div class="stat-card" id="card-bad" onclick="updateStatusFilter('bad')"><small>พบปัญหา</small><div class="value" id="countBad" style="font-size:2.2rem; color:var(--danger);">0</div></div>
-    </div>
-    
-    <div class="table-box">
-      <table>
-        <thead><tr><th>เวลา</th><th>ประเภท</th><th>พื้นที่</th><th>ผู้ตรวจ</th><th>สถานะรวม</th><th>รูปถ่าย</th><th>รายละเอียด</th></tr></thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
+  <div id="loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[2000] hidden flex-col items-center justify-center">
+    <i class="fas fa-circle-notch fa-spin fa-3x text-primary"></i>
+    <p class="mt-4 font-semibold text-slate-600">กำลังโหลดข้อมูล...</p>
   </div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 mb-6">
+      <div class="flex flex-wrap items-center gap-3 mb-5">
+        <div class="flex items-center gap-2 text-primary font-semibold">
+          <i class="fas fa-calendar-alt text-lg"></i>
+          <span class="text-slate-700">เลือกวันที่ตรวจ:</span>
+        </div>
+        <input type="date" id="dateFilter" onchange="renderTable()" class="px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-sm font-medium focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+        <button onclick="clearDateFilter()" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-50 transition">ดูทั้งหมด</button>
+      </div>
+      
+      <div class="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+        <i class="fas fa-filter text-primary"></i> กรองตามประเภทการตรวจสอบ
+      </div>
+      
+      <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
+        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30 active" data-type="all" onclick="selectTypeFilter('all', this)"><i class="fas fa-list text-lg text-slate-400"></i>ทั้งหมด</button>
+        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30" data-type="จป.ว" onclick="selectTypeFilter('จป.ว', this)"><i class="fas fa-hard-hat text-lg text-slate-400"></i>จป.ว</button>
+        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30" data-type="คปอ." onclick="selectTypeFilter('คปอ.', this)"><i class="fas fa-users-cog text-lg text-slate-400"></i>คปอ.</button>
+        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30" data-type="Foreman/Mgr." onclick="selectTypeFilter('Foreman/Mgr.', this)"><i class="fas fa-user-tie text-lg text-slate-400"></i>Foreman</button>
+        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30" data-type="Audit" onclick="selectTypeFilter('Audit', this)"><i class="fas fa-search text-lg text-slate-400"></i>Audit</button>
+        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30" data-type="Accident/Fire" onclick="selectTypeFilter('Accident/Fire', this)"><i class="fas fa-fire-extinguisher text-lg text-slate-400"></i>Accident</button>
+        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-emerald-500 hover:bg-emerald-50/30" data-type="5S" onclick="selectTypeFilter('5S', this)"><i class="fas fa-broom text-lg text-slate-400"></i>5S</button>
+      </div>
+    </section>
+    
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div id="card-all" onclick="updateStatusFilter('all')" class="bg-white p-5 rounded-2xl text-center border-b-4 border-blue-500 cursor-pointer transition shadow-sm hover:-translate-y-0.5 active">
+        <small class="text-slate-400 font-semibold tracking-wider uppercase text-[11px]">ทั้งหมดในตาราง</small>
+        <div id="countTotal" class="text-3xl font-bold text-blue-600 mt-1">0</div>
+      </div>
+      <div id="card-good" onclick="updateStatusFilter('good')" class="bg-white p-5 rounded-2xl text-center border-b-4 border-slate-200 cursor-pointer transition shadow-sm hover:-translate-y-0.5">
+        <small class="text-slate-400 font-semibold tracking-wider uppercase text-[11px]">ปกติ</small>
+        <div id="countGood" class="text-3xl font-bold text-emerald-600 mt-1">0</div>
+      </div>
+      <div id="card-bad" onclick="updateStatusFilter('bad')" class="bg-white p-5 rounded-2xl text-center border-b-4 border-slate-200 cursor-pointer transition shadow-sm hover:-translate-y-0.5">
+        <small class="text-slate-400 font-semibold tracking-wider uppercase text-[11px]">พบปัญหา</small>
+        <div id="countBad" class="text-3xl font-bold text-rose-600 mt-1">0</div>
+      </div>
+    </section>
+    
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-x-auto">
+      <table class="w-full text-left border-collapse min-width-[800px]">
+        <thead>
+          <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+            <th class="px-5 py-4">เวลา</th>
+            <th class="px-5 py-4">ประเภท</th>
+            <th class="px-5 py-4">พื้นที่</th>
+            <th class="px-5 py-4">ผู้ตรวจ</th>
+            <th class="px-5 py-4 text-center">สถานะรวม</th>
+            <th class="px-5 py-4 text-center">รูปถ่าย</th>
+            <th class="px-5 py-4 text-center">รายละเอียด</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody" class="divide-y divide-slate-100 text-sm text-slate-700">
+          </tbody>
+      </table>
+    </section>
+  </main>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
 
-    // ===================================================================
-    // ✅ SAFETY CHECKLISTS — อัปเดต 8 หมวดตามรายการใหม่
-    // ===================================================================
+    // เมนูมือถือ Toggle Toggle
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    // โดดไปดึงสีแอดมินมาทับสไตล์หลัก
+    window.addEventListener('DOMContentLoaded', () => {
+      const sysSettings = JSON.parse(localStorage.getItem('systemSettings'));
+      if (sysSettings) {
+        document.documentElement.style.setProperty('--color-primary', sysSettings.primaryColor);
+        document.documentElement.style.setProperty('--color-secondary', sysSettings.secondaryColor);
+        document.documentElement.style.setProperty('--font-family', sysSettings.fontFamily);
+        document.querySelectorAll('.system-title').forEach(el => el.textContent = sysSettings.systemTitle);
+      }
+    });
+
     const SAFETY_CHECKLIST_FACTORY = {
       s1: { title: "1. สถานที่ทำงาน", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "การจัดเก็บ และกองวัสดุมีการกำหนดสูงไม่เกิน กองวัสดุมีความปลอดภัย", "Water Mist"] },
       s2: { title: "2. ท่าทางการทำงาน", questions: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์, หรืออุปกรณ์ที่มีล้อในการเคลื่อนย้ายสิ่งของ", "การยกของอย่างถูกต้องและปลอดภัย"] },
@@ -212,9 +188,6 @@
       return SAFETY_CHECKLIST_FACTORY;
     }
 
-    // ===================================================================
-    // ✅ 5S CHECKLISTS
-    // ===================================================================
     const FACTORY_5S_SECTIONS = [
       { title: "1. เครื่องจักร", questions: ["ทำความสะอาดเครื่องจักรทุกครั้งก่อน – หลังเลิกงานพร้อมระบุผู้รับผิดชอบป้ายผู้รับผิดชอบต้องเป็นปัจจุบัน", "ตีเส้นกำหนดจุดที่ตั้ง (ตีเส้นรอบเครื่องจักรด้วยสีเหลือง)", "ก่อนทำงานกับเครื่องจักรต้องแต่งกายให้รัดกุมและต้องสวมอุปกรณ์ป้องกันส่วนบุคคล"] },
       { title: "2. เครื่องมือ", questions: ["กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน", "หลังจากนำเครื่องมือและอุปกรณ์ไปใช้ให้เก็บเข้าที่เสมอ", "เก็บวางเครื่องมืออย่างเป็นระเบียบในพื้นที่ที่กำหนด", "กำหนดผู้รับผิดชอบให้ชัดเจน"] },
@@ -245,8 +218,15 @@
 
     let rawData = [], currentType = 'all', currentStatus = 'all';
 
-    window.onload = function() { document.getElementById('dateFilter').valueAsDate = new Date(); loadData(); };
-    function clearDateFilter() { document.getElementById('dateFilter').value = ""; renderTable(); }
+    window.onload = function() { 
+      document.getElementById('dateFilter').valueAsDate = new Date(); 
+      loadData(); 
+    };
+    
+    function clearDateFilter() { 
+      document.getElementById('dateFilter').value = ""; 
+      renderTable(); 
+    }
 
     function getDriveThumbnailUrl(url) {
       if(!url) return "";
@@ -255,31 +235,25 @@
       return url;
     }
 
-   /**
- * คำนวณคะแนน 5S แบบไดนามิก (รองรับจำนวนข้อที่เปลี่ยนแปลง)
- */
-function calculate5SScore(checklist, areaStr) {
-  const areaData = CHECKLIST_5S[areaStr] || CHECKLIST_5S["OFFICE"];
-  const sections = areaData?.sections || [];
-  
-  let total = 0, max = 0;
-  
-  sections.forEach((sec, sIdx) => {
-    const questions = sec.questions || sec.qs || [];
-    questions.forEach((_, qIdx) => {
-      const val = checklist?.[`5s_s${sIdx}_q${qIdx}`];
-      max += 2; // Max 2 คะแนนต่อข้อ
-      if (val === "ดี") total += 2;
-      else if (val === "พอใช้") total += 1;
-      // "ปรับปรุง" = 0 คะแนน
-    });
-  });
-  
-  return max > 0 ? Math.round((total / max) * 100) : 0;
-}
+    function calculate5SScore(checklist, areaStr) {
+      const areaData = CHECKLIST_5S[areaStr] || CHECKLIST_5S["OFFICE"];
+      const sections = areaData?.sections || [];
+      let total = 0, max = 0;
+      sections.forEach((sec, sIdx) => {
+        const questions = sec.questions || sec.qs || [];
+        questions.forEach((_, qIdx) => {
+          const val = checklist?.[`5s_s${sIdx}_q${qIdx}`];
+          max += 2;
+          if (val === "ดี") total += 2;
+          else if (val === "พอใช้") total += 1;
+        });
+      });
+      return max > 0 ? Math.round((total / max) * 100) : 0;
+    }
 
     function loadData() {
-      const loader = document.getElementById('loader'); loader.classList.add('show');
+      const loader = document.getElementById('loader'); 
+      loader.classList.remove('hidden'); loader.classList.add('flex');
       fetch(API_URL + "?action=getDashboardData")
       .then(r => r.json()).then(data => {
         rawData = data.details || [];
@@ -289,12 +263,35 @@ function calculate5SScore(checklist, areaStr) {
             d.hasBad = Object.values(d.fullChecklist).includes("ปรับปรุง") || Object.values(d.fullChecklist).includes("ไม่ดี");
           }
         });
-        renderTable(); loader.classList.remove('show');
-      }).catch(err => { loader.classList.remove('show'); console.error("Error:", err); });
+        renderTable(); 
+        loader.classList.remove('flex'); loader.classList.add('hidden');
+      }).catch(err => { 
+        loader.classList.remove('flex'); loader.classList.add('hidden'); 
+        console.error("Error:", err); 
+      });
     }
 
-    function selectTypeFilter(type, el) { currentType = type; document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); renderTable(); }
-    function updateStatusFilter(status) { currentStatus = status; document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active')); document.getElementById('card-' + status).classList.add('active'); renderTable(); }
+    function selectTypeFilter(type, el) { 
+      currentType = type; 
+      document.querySelectorAll('.type-btn').forEach(b => {
+        b.classList.remove('active', 'border-primary', 'bg-amber-50/30', 'text-amber-700', 'border-emerald-500', 'bg-emerald-50/30', 'text-emerald-700');
+      });
+      if(type === '5S') {
+        el.classList.add('border-emerald-500', 'bg-emerald-50/30', 'text-emerald-700');
+      } else {
+        el.classList.add('border-primary', 'bg-amber-50/30', 'text-amber-700');
+      }
+      renderTable(); 
+    }
+
+    function updateStatusFilter(status) { 
+      currentStatus = status; 
+      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('border-blue-500', 'border-emerald-500', 'border-rose-500', 'shadow-md'));
+      const activeCard = document.getElementById('card-' + status);
+      const color = status === 'all' ? 'border-blue-500' : (status === 'good' ? 'border-emerald-500' : 'border-rose-500');
+      activeCard.classList.add(color, 'shadow-md');
+      renderTable(); 
+    }
 
     function renderTable() {
       let filtered = [...rawData];
@@ -303,77 +300,101 @@ function calculate5SScore(checklist, areaStr) {
       if (currentType !== 'all') filtered = filtered.filter(d => d.inspectionType?.toUpperCase() === currentType.toUpperCase());
       
       const t = filtered.length, b = filtered.filter(d => d.hasBad).length, g = t - b;
-      document.getElementById('countTotal').innerText = t; document.getElementById('countGood').innerText = g; document.getElementById('countBad').innerText = b;
+      document.getElementById('countTotal').innerText = t; 
+      document.getElementById('countGood').innerText = g; 
+      document.getElementById('countBad').innerText = b;
       
       if (currentStatus === 'good') filtered = filtered.filter(d => !d.hasBad);
       if (currentStatus === 'bad') filtered = filtered.filter(d => d.hasBad);
 
-      const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
-      if(filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px; color:#95a5a6;"><i class="fas fa-folder-open fa-3x" style="opacity:0.3; margin-bottom:15px; display:block;"></i> ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`; return; }
+      const tbody = document.getElementById('tableBody'); 
+      tbody.innerHTML = '';
+      if(filtered.length === 0) { 
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-12 text-slate-400 font-medium"><i class="fas fa-folder-open text-4xl opacity-30 block mb-3"></i> ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`; 
+        return; 
+      }
 
       filtered.forEach(d => {
         const is5S = d.inspectionType?.toUpperCase() === "5S";
         let photoDisplay = '-';
         if (typeof d.photo === 'object' && d.photo !== null) {
           let photoCount = Object.values(d.photo).filter(url => url && url !== "ไม่มีรูปถ่าย" && url.trim() !== "").length;
-          if(photoCount > 0) photoDisplay = `<span style="color:var(--primary); font-size:0.9rem; font-weight:600;"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
+          if(photoCount > 0) photoDisplay = `<span class="text-primary font-semibold text-xs bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg"><i class="fas fa-images mr-1"></i> ${photoCount} รูป</span>`;
         } else if (typeof d.photo === 'string' && d.photo !== "ไม่มีรูปถ่าย" && d.photo.trim() !== "") {
-          photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image fa-lg"></i></a>`;
+          photoDisplay = `<a href="${d.photo}" target="_blank" class="text-primary hover:text-secondary"><i class="fas fa-image text-lg"></i></a>`;
         }
 
         let statusHtml = '';
-if (is5S) {
-   // ✅ 5S: แสดงคะแนน %
-   const percent = calculate5SScore(d.fullChecklist, d.area);
-   const color = percent >= 80 ? 'var(--success)' : percent >= 50 ? '#f39c12' : 'var(--danger)';
-   statusHtml = `<span style="background:${color}20;color:${color};padding:5px 12px;border-radius:18px;font-size:0.8rem;font-weight:600;white-space:nowrap;"><i class="fas fa-chart-pie"></i> ${percent}%</span>`;
-} else {
-   // ✅ Safety: แสดงแค่สถานะ "ปกติ/พบปัญหา" (ไม่มีคะแนน %)
-   const statusText = d.hasBad ? 'พบปัญหา' : 'ปกติ';
-   const statusColor = d.hasBad ? 'var(--danger)' : 'var(--success)';
-   statusHtml = `<span class="badge" style="background:${statusColor}">${statusText}</span>`;
-}
-  
+        if (is5S) {
+          const percent = calculate5SScore(d.fullChecklist, d.area);
+          const bg = percent >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : (percent >= 50 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200');
+          statusHtml = `<span class="border px-2.5 py-1 rounded-full text-xs font-bold ${bg}"><i class="fas fa-chart-pie mr-1"></i> ${percent}%</span>`;
+        } else {
+          const bg = d.hasBad ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
+          statusHtml = `<span class="border px-2.5 py-1 rounded-full text-xs font-bold ${bg}">${d.hasBad ? 'พบปัญหา' : 'ปกติ'}</span>`;
+        }
 
-
-        let typeBadgeCls = is5S ? 'badge-5s' : '';
+        let badgeStyle = is5S ? 'from-emerald-500 to-teal-600' : 'from-amber-500 to-orange-500';
         let typeIcon = is5S ? 'fa-broom' : 'fa-hard-hat';
         if(d.inspectionType === 'Audit') typeIcon = 'fa-search';
         if(d.inspectionType?.includes('Accident')) typeIcon = 'fa-fire-extinguisher';
 
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td data-label="เวลา">${d.timestamp || '-'}</td><td data-label="ประเภท"><span class="type-badge ${typeBadgeCls}"><i class="fas ${typeIcon}"></i> ${d.inspectionType}</span></td><td data-label="พื้นที่"><strong>${d.area || '-'}</strong></td><td data-label="ผู้ตรวจ">${d.inspector || '-'}</td><td data-label="สถานะรวม">${statusHtml}</td><td data-label="รูปถ่าย">${photoDisplay}</td><td data-label="รายละเอียด"><button class="btn-view" onclick="toggleDetail('${d.id}')"><i class="fas fa-chevron-down" id="icon-${d.id}"></i> ดูผลตรวจ</button></td>`;
+        tr.className = "hover:bg-slate-50/50 transition duration-150";
+        tr.innerHTML = `
+          <td class="px-5 py-3.5 text-slate-500 font-medium">${d.timestamp || '-'}</td>
+          <td class="px-5 py-3.5"><span class="bg-gradient-to-r ${badgeStyle} text-white px-2.5 py-1 rounded-lg text-xs font-semibold inline-flex items-center gap-1"><i class="fas ${typeIcon}"></i> ${d.inspectionType}</span></td>
+          <td class="px-5 py-3.5 font-bold text-slate-700">${d.area || '-'}</td>
+          <td class="px-5 py-3.5 text-slate-600">${d.inspector || '-'}</td>
+          <td class="px-5 py-3.5 text-center">${statusHtml}</td>
+          <td class="px-5 py-3.5 text-center">${photoDisplay}</td>
+          <td class="px-5 py-3.5 text-center"><button class="text-xs font-bold px-3 py-1.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-primary hover:text-white transition inline-flex items-center gap-1" onclick="toggleDetail('${d.id}')"><i class="fas fa-chevron-down" id="icon-${d.id}"></i> ดูผลตรวจ</button></td>
+        `;
         tbody.appendChild(tr);
 
-        const detailTr = document.createElement('tr'); detailTr.id = `detail-${d.id}`; detailTr.className = 'detail-row';
-        let detailHtml = `<div class="inner-detail"><h4 style="margin:0 0 15px 0; color:var(--dark); border-bottom:3px solid var(--primary); padding-bottom:8px;"><i class="fas fa-clipboard-check"></i> รายละเอียดผลการตรวจสอบ</h4>`;
+        // Details Row Box
+        const detailTr = document.createElement('tr'); 
+        detailTr.id = `detail-${d.id}`; 
+        detailTr.className = 'hidden bg-slate-50/50';
+        
+        let detailHtml = `<div class="p-4 sm:p-6 bg-slate-50 border border-slate-200 rounded-2xl m-4 shadow-inner"><h4 class="text-sm font-bold text-slate-700 mb-4 pb-2 border-b-2 border-primary/30 flex items-center gap-2"><i class="fas fa-clipboard-check text-primary"></i> รายละเอียดผลการตรวจสอบอย่างละเอียด</h4>`;
         
         if (is5S) {
           const sections = (CHECKLIST_5S[d.area] || CHECKLIST_5S["OFFICE"])?.sections || [];
           sections.forEach((sec, sIdx) => {
-            detailHtml += `<div class="section-group"><div class="section-head"><span>${sec.title}</span></div>`;
+            detailHtml += `<div class="mb-4 rounded-xl overflow-hidden border border-slate-200/60 shadow-sm"><div class="bg-emerald-600 text-white px-4 py-2.5 font-semibold text-xs tracking-wide">${sec.title}</div>`;
             sec.questions.forEach((qText, qIdx) => {
               const res = d.fullChecklist?.[`5s_s${sIdx}_q${qIdx}`];
               const remark = d.fullChecklist?.[`5s_remark_s${sIdx}_q${qIdx}`] || "";
-              let statusText = '-', statusClass = '', scoreBadge = '';
-              if (res === "ดี") { statusText = '✔ ดี'; statusClass = 'status-5s-good'; scoreBadge = '<span class="score-badge good">+2</span>'; }
-              else if (res === "พอใช้") { statusText = '🔶 พอใช้'; statusClass = 'status-5s-fair'; scoreBadge = '<span class="score-badge fair">+1</span>'; }
-              else if (res === "ปรับปรุง") { statusText = '✘ ปรับปรุง'; statusClass = 'status-5s-improve'; scoreBadge = '<span class="score-badge improve">0</span>'; }
-              detailHtml += `<div class="sub-item"><div class="sub-item-text">• ${qText} ${scoreBadge} ${remark ? `<div class="remark-box"><i class="fas fa-comment-dots"></i> ${remark}</div>` : ''}</div><div class="status-pill ${statusClass}">${statusText}</div></div>`;
+              let pillBg = 'bg-slate-100 text-slate-400', badgeScore = '0';
+              if (res === "ดี") { pillBg = 'bg-emerald-50 text-emerald-700 border-emerald-200'; badgeScore = '+2'; }
+              else if (res === "พอใช้") { pillBg = 'bg-amber-50 text-amber-700 border-amber-200'; badgeScore = '+1'; }
+              else if (res === "ปรับปรุง") { pillBg = 'bg-rose-50 text-rose-700 border-rose-200'; badgeScore = '0'; }
+              
+              detailHtml += `
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start p-4 bg-white border-b border-slate-100 last:border-b-0 gap-2">
+                  <div class="text-slate-600 text-xs font-medium">• ${qText} <span class="ml-2 bg-slate-100 text-slate-600 text-[10px] px-1.5 py-0.5 rounded font-bold">${badgeScore}</span>
+                    ${remark ? `<div class="mt-2 text-xs p-2.5 bg-rose-50/50 border-l-4 border-rose-400 text-rose-700 rounded-r-lg font-medium"><i class="fas fa-comment-dots mr-1"></i> ${remark}</div>` : ''}
+                  </div>
+                  <div class="border px-3 py-1 rounded-lg text-xs font-bold self-start sm:self-center ${pillBg}">${res || '-'}</div>
+                </div>`;
             });
             detailHtml += `</div>`;
           });
         } else {
           const checklist = getSafetyChecklist(d.area);
           for(let secKey in checklist) {
-            const section = checklist[secKey]; const sNum = secKey.replace('s', '');
-            detailHtml += `<div class="section-group"><div class="section-head"><span>${section.title}</span></div>`;
+            const section = checklist[secKey]; 
+            const sNum = secKey.replace('s', '');
+            detailHtml += `<div class="mb-4 rounded-xl overflow-hidden border border-slate-200/60 shadow-sm"><div class="bg-primary text-white px-4 py-2.5 font-semibold text-xs tracking-wide">${section.title}</div>`;
             section.questions.forEach((qText, idx) => {
               const res = d.fullChecklist?.[`section${sNum}_q${idx}`];
               const remark = d.fullChecklist?.[`section${sNum}_remark${idx}`];
               const isBad = res === "ไม่ดี";
               let displayQText = qText;
-              if(secKey === 's1' && qText === 'Water Mist' && d.fullChecklist?.['water_val']) displayQText += ` <span style="color:#e67e22; font-weight:bold;">(${d.fullChecklist['water_val']}%)</span>`;
+              if(secKey === 's1' && qText === 'Water Mist' && d.fullChecklist?.['water_val']) {
+                displayQText += ` <span class="text-orange-600 font-bold">(${d.fullChecklist['water_val']}%)</span>`;
+              }
               
               let qPhotoPreviews = "";
               if(typeof d.photo === 'object' && d.photo !== null) {
@@ -382,70 +403,48 @@ if (is5S) {
                     if(d.photo[pKey] && d.photo[pKey] !== "") {
                        let thumbUrl = getDriveThumbnailUrl(d.photo[pKey]);
                        let imgCaption = d.fullChecklist?.[`caption_${pKey}`] || "";
-                       qPhotoPreviews += `<div style="display:flex; flex-direction:column; align-items:center; width:90px; margin-right:10px; margin-top:8px;"><a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large"></a>${imgCaption ? `<span style="font-size:0.7rem; color:#555; text-align:center; margin-top:4px;">${imgCaption}</span>` : ''}</div>`;
+                       qPhotoPreviews += `
+                        <div class="flex flex-col items-center w-24 border border-slate-200 p-1 bg-slate-50 rounded-lg mt-2 mr-2">
+                          <a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="w-full h-16 object-cover rounded shadow-sm hover:scale-105 transition"></a>
+                          ${imgCaption ? `<span class="text-[10px] text-slate-500 text-center mt-1 truncate w-full">${imgCaption}</span>` : ''}
+                        </div>`;
                     }
                  }
               }
-              detailHtml += `<div class="sub-item"><div class="sub-item-text">- ${displayQText} ${remark ? `<div class="remark-box"><b>หมายเหตุ:</b> ${remark}</div>` : ''} ${qPhotoPreviews !== "" ? `<div style="display:flex; flex-wrap:wrap;">${qPhotoPreviews}</div>` : ''}</div><div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}</div></div>`;
+              const pillBg = isBad ? 'bg-rose-50 text-rose-700 border-rose-200' : (res === 'ดี' || res === 'ปกติ' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-400');
+              detailHtml += `
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start p-4 bg-white border-b border-slate-100 last:border-b-0 gap-2">
+                  <div class="text-slate-600 text-xs font-medium">- ${displayQText}
+                    ${remark ? `<div class="mt-2 text-xs p-2.5 bg-amber-50 border-l-4 border-amber-400 text-amber-800 rounded-r-lg font-medium"><b>หมายเหตุ:</b> ${remark}</div>` : ''} 
+                    ${qPhotoPreviews !== "" ? `<div class="flex flex-wrap mt-1">${qPhotoPreviews}</div>` : ''}
+                  </div>
+                  <div class="border px-3 py-1 rounded-lg text-xs font-bold self-start sm:self-center ${pillBg}">${isBad ? '✘ ไม่ปกติ' : (res === 'ดี' || res === 'ปกติ' ? '✔ ปกติ' : '-')}</div>
+                </div>`;
             });
             detailHtml += `</div>`;
           }
         }
         detailHtml += `</div>`;
-        detailTr.innerHTML = `<td colspan="7" style="padding:0;">${detailHtml}</td>`;
+        detailTr.innerHTML = `<td colspan="7" class="p-0">${detailHtml}</td>`;
         tbody.appendChild(detailTr);
       });
     }
 
     function toggleDetail(id) {
-      const row = document.getElementById('detail-' + id), icon = document.getElementById('icon-' + id);
-      const isVisible = row.style.display === 'table-row' || row.style.display === 'block';
-      if (window.innerWidth <= 768) row.style.display = isVisible ? 'none' : 'block'; else row.style.display = isVisible ? 'none' : 'table-row';
-      icon.className = isVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
-    }
-    /**
- * ✅ คำนวณคะแนน Safety แบบไดนามิก (รองรับจำนวนข้อที่เปลี่ยนแปลง)
- * @param {Object} details - ข้อมูล JSON จากรายการตรวจสอบ
- * @param {Object} checklistConfig - ตัวแปรโครงสร้าง Checklist
- * @param {string} area - พื้นที่ที่ตรวจ
- * @returns {Object} { total, good, percent }
- */
-function calculateSafetyScore(details, checklistConfig, area) {
-  let totalQuestions = 0;
-  let passedQuestions = 0;
-  
-  for (let sKey in checklistConfig) {
-    const section = checklistConfig[sKey];
-    const questions = section.questions || section.qs || [];
-    const sNum = sKey.replace('s', '');
-    
-    questions.forEach((q, qIdx) => {
-      const qKey = `section${sNum}_q${qIdx}`;
-      const answer = details[qKey];
+      const row = document.getElementById('detail-' + id);
+      const icon = document.getElementById('icon-' + id);
+      const isHidden = row.classList.contains('hidden');
       
-      // ✅ Water Mist Logic เฉพาะบางพื้นที่
-      if (sKey === 's1' && q === 'Water Mist' && (area === 'PRINT' || area === 'LAMINATE')) {
-        const waterVal = parseFloat(details['water_val']);
-        if (!isNaN(waterVal)) {
-          totalQuestions++;
-          if (waterVal >= 50) passedQuestions++;
-        }
+      if (isHidden) {
+        row.classList.remove('hidden');
+        if (window.innerWidth <= 768) row.style.display = 'block'; else row.style.display = 'table-row';
+        icon.className = 'fas fa-chevron-up';
+      } else {
+        row.classList.add('hidden');
+        row.style.display = 'none';
+        icon.className = 'fas fa-chevron-down';
       }
-      // ✅ ข้อปกติ: นับเฉพาะที่มีคำตอบ
-      else if (answer) {
-        totalQuestions++;
-        if (answer === 'ดี' || answer === 'ปกติ') {
-          passedQuestions++;
-        }
-      }
-    });
-  }
-  
-  if (totalQuestions === 0) return { total: 0, good: 0, percent: 0 };
-  
-  const percent = Math.round((passedQuestions / totalQuestions) * 100);
-  return { total: totalQuestions, good: passedQuestions, percent: percent };
-}
+    }
   </script>
 </body>
 </html>
