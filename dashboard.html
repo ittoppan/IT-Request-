@@ -528,26 +528,60 @@ function processCharts(ins, jobs) {
   document.getElementById("pyrMid").textContent = aging["ในกำหนด"] + aging["เลย 1-7 วัน"];
   document.getElementById("pyrBot").textContent = closedSafe;
 
-  // MTTR Trend
+// ----------------------------------------------------
+  // การวิเคราะห์ระยะเวลาในการปิดงาน (MTTR Trend)
+  // ----------------------------------------------------
   const mttrData = {};
+  
   jobs.forEach(j => {
-    if(j.dateFound) {
-      let d = new Date(j.dateFound);
-      if(!isNaN(d)) {
-        let ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        const diff = Math.floor((today - d) / (1000 * 60 * 60 * 24));
+    // 1. คัดเฉพาะงานที่ "Closed" และมีข้อมูลทั้ง "วันที่พบ" และ "Finish Date"
+    // หมายเหตุ: ตรวจสอบให้แน่ใจว่า API ส่งชื่อตัวแปรมาเป็น finishDate (หรือแก้ชื่อให้ตรงกับ API ของคุณ)
+    if(j.status === "Closed" && j.dateFound && j.finishDate) {
+      
+      let dFound = new Date(j.dateFound);
+      let dFinish = new Date(j.finishDate);
+      
+      if(!isNaN(dFound) && !isNaN(dFinish)) {
+        // 2. จัดกลุ่มตาม "เดือนที่งานถูกปิด" (Finish Date)
+        let ym = `${dFinish.getFullYear()}-${String(dFinish.getMonth() + 1).padStart(2, '0')}`;
+        
+        // 3. คำนวณส่วนต่างของเวลา (มิลลิวินาที -> วัน)
+        const diffTime = dFinish.getTime() - dFound.getTime();
+        let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        // 4. ถ้าแก้จบภายในวันเดียวกัน (0 วัน) ให้ปัดเป็น 1 วันเป็นอย่างน้อย
+        if (diffDays <= 0) diffDays = 1; 
+
         if(!mttrData[ym]) mttrData[ym] = [];
-        mttrData[ym].push(diff > 0 ? diff : 1);
+        mttrData[ym].push(diffDays);
       }
     }
   });
+
   const mttrKeys = Object.keys(mttrData).sort();
-  const mttrLabels = mttrKeys.map(m => { const [y, mm] = m.split('-'); return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; });
-  const mttrScores = mttrKeys.map(m => { const arr = mttrData[m]; return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length); });
+  const mttrLabels = mttrKeys.map(m => { 
+    const [y, mm] = m.split('-'); 
+    return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; 
+  });
+  
+  // หาค่าเฉลี่ยของจำนวนวันที่ใช้ปิดงานในแต่ละเดือน
+  const mttrScores = mttrKeys.map(m => { 
+    const arr = mttrData[m]; 
+    return Math.round(arr.reduce((a,b)=>a+b,0) / arr.length); 
+  });
 
   mkChart("chMTTR", {
-    type: "bar", data: { labels: mttrLabels.length ? mttrLabels : ["-"], datasets: [ { label: "จำนวนวันเฉลี่ย", data: mttrScores, backgroundColor: "#8b5cf6", borderRadius: 4 } ] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    type: "bar", 
+    data: { 
+      labels: mttrLabels.length ? mttrLabels : ["-"], 
+      datasets: [ { label: "จำนวนวันเฉลี่ย", data: mttrScores, backgroundColor: "#8b5cf6", borderRadius: 4 } ] 
+    },
+    options: { 
+      responsive: true, 
+      maintainAspectRatio: false, 
+      plugins: { legend: { display: false } }, 
+      scales: { y: { beginAtZero: true } } 
+    }
   });
 
   // Aging & Dept & Scatter
