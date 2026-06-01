@@ -1,692 +1,81 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🔧 Admin - SAFETY PATROL</title>
-  
+  <title>Admin - ตั้งค่าระบบ Safety</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#3498db',
-            success: '#27ae60',
-            warning: '#f39c12',
-            danger: '#e74c3c',
-            sidebar: '#2c3e50'
-          },
-          fontFamily: { prompt: ['Prompt', 'sans-serif'] }
-        }
-      }
-    }
-  </script>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
-  <style>
-    .swal2-popup { font-family: 'Prompt', sans-serif !important; border-radius: 1rem !important; }
-    .swal2-title { font-size: 1.25rem !important; font-weight: 600 !important; }
-    .swal2-confirm { border-radius: 0.75rem !important; font-weight: 500 !important; }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body class="font-prompt bg-gray-100">
+<body class="bg-slate-50 text-slate-800 pb-20 lg:pb-0">
 
-  <div id="authModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
-      <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">
-        <i class="fas fa-lock text-primary mr-2"></i>เข้าสู่ระบบ Admin
-      </h3>
-      <div class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Admin Token</label>
-          <input type="password" id="adminTokenInput" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary outline-none" placeholder="กรอกรหัสผ่าน">
-        </div>
-        <button onclick="submitAuth()" class="w-full py-3 px-4 rounded-xl bg-primary text-white hover:bg-primary/90 transition font-semibold">
-          เข้าสู่ระบบ
-        </button>
-      </div>
-    </div>
-  </div>
+  <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 flex items-center shadow-md">
+    <button onclick="window.location.href='index.html'" class="mr-4 hover:text-gray-300"><i class="fas fa-arrow-left text-lg"></i></button>
+    <h1 class="text-lg font-bold">Admin Settings</h1>
+  </nav>
 
-  <aside class="fixed md:static top-0 left-0 w-64 md:h-screen bg-sidebar text-white z-40 transform -translate-x-full md:translate-x-0 transition-transform overflow-y-auto" id="sidebar">
-    <div class="p-5">
-      <h3 class="text-lg font-semibold border-b border-gray-600 pb-4 mb-4">🔧 Admin Panel</h3>
-      <nav class="space-y-2">
-        <p class="text-xs text-gray-400 font-semibold mb-2 mt-4 uppercase tracking-wider">รายงานผล</p>
-        <button onclick="showTab('dashboard')" class="nav-item w-full text-left py-3 px-4 rounded-xl transition flex items-center gap-3 bg-primary/20" data-tab="dashboard">
-          <i class="fas fa-chart-line w-5"></i> ข้อมูลการตรวจ
-        </button>
-        <button onclick="showTab('actionplans')" class="nav-item w-full text-left py-3 px-4 rounded-xl hover:bg-primary/20 transition flex items-center gap-3" data-tab="actionplans">
-          <i class="fas fa-tools w-5"></i> ใบแจ้งซ่อม
-        </button>
-
-        <p class="text-xs text-gray-400 font-semibold mb-2 mt-6 uppercase tracking-wider">ตั้งค่าระบบ</p>
-        <button onclick="showTab('types')" class="nav-item w-full text-left py-3 px-4 rounded-xl hover:bg-primary/20 transition flex items-center gap-3" data-tab="types">
-          <i class="fas fa-list w-5"></i> ประเภทเช็คลิสต์
-        </button>
-        <button onclick="showTab('areas')" class="nav-item w-full text-left py-3 px-4 rounded-xl hover:bg-primary/20 transition flex items-center gap-3" data-tab="areas">
-          <i class="fas fa-map-marker-alt w-5"></i> พื้นที่
-        </button>
-        <button onclick="showTab('sections')" class="nav-item w-full text-left py-3 px-4 rounded-xl hover:bg-primary/20 transition flex items-center gap-3" data-tab="sections">
-          <i class="fas fa-th-large w-5"></i> หัวข้อหลัก
-        </button>
-        <button onclick="showTab('questions')" class="nav-item w-full text-left py-3 px-4 rounded-xl hover:bg-primary/20 transition flex items-center gap-3" data-tab="questions">
-          <i class="fas fa-question-circle w-5"></i> คำถาม
-        </button>
-      </nav>
-      <div class="mt-8 pt-4 border-t border-gray-600">
-        <button onclick="logout()" class="w-full text-left py-3 px-4 rounded-xl hover:bg-danger/20 transition flex items-center gap-3 text-danger">
-          <i class="fas fa-sign-out-alt w-5"></i> ออกจากระบบ
-        </button>
-      </div>
-    </div>
-  </aside>
-
-  <button onclick="toggleSidebar()" class="md:hidden fixed bottom-4 right-4 w-14 h-14 bg-primary text-white rounded-full shadow-lg z-50 flex items-center justify-center">
-    <i class="fas fa-bars text-xl"></i>
-  </button>
-
-  <main class="md:ml-64 min-h-screen">
-    <header class="bg-white shadow-sm sticky top-0 z-30">
-      <div class="px-6 py-4 flex items-center justify-between">
-        <h2 id="pageTitle" class="text-lg font-semibold text-gray-800">ข้อมูลการตรวจสอบ (Database)</h2>
-        <button id="addBtn" onclick="openModal('add')" class="bg-primary text-white py-2 px-4 rounded-xl hover:bg-primary/90 transition flex items-center gap-2 hidden">
-          <i class="fas fa-plus"></i> <span class="hidden sm:inline">เพิ่มข้อมูล</span>
-        </button>
-      </div>
-    </header>
-
-    <div class="p-6">
+  <main class="max-w-2xl mx-auto p-4 mt-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <h2 class="text-xl font-bold mb-6 text-slate-800 border-b pb-3"><i class="fas fa-cogs text-blue-500 mr-2"></i> ปรับแต่งการแสดงผล</h2>
       
-      <div id="tab-dashboard" class="tab-content">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-5 border-b border-gray-100 flex justify-between items-center">
-            <h4 class="font-semibold text-primary">📊 ประวัติการตรวจสอบ (ล่าสุด 100 รายการ)</h4>
-            <button onclick="loadConfig()" class="text-gray-500 hover:text-primary transition"><i class="fas fa-sync-alt"></i> รีเฟรช</button>
+      <div class="space-y-6">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">ชื่อระบบ (Header Title)</label>
+          <input type="text" id="setAppName" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="เช่น SAFETY & 5S DASHBOARD">
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">สีหลักของระบบ (Primary Theme Color)</label>
+          <div class="flex items-center gap-4">
+            <input type="color" id="setAppColor" class="h-12 w-20 cursor-pointer rounded-lg border border-slate-300">
+            <span class="text-sm text-slate-500">เลือกสีสำหรับปุ่มและแถบเมนูหลัก</span>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600">วัน-เวลา</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600">ผู้ตรวจ</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600">พื้นที่</th>
-                  <th class="text-center py-3 px-5 font-semibold text-gray-600">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="dataLogsTable" class="divide-y divide-gray-100"></tbody>
-            </table>
-          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">แบบอักษร (Font Family)</label>
+          <select id="setAppFont" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="'Prompt', sans-serif">Prompt (ทันสมัย / ค่าเริ่มต้น)</option>
+            <option value="'Sarabun', sans-serif">Sarabun (ทางการ)</option>
+          </select>
         </div>
       </div>
 
-      <div id="tab-actionplans" class="tab-content hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-5 border-b border-gray-100 flex justify-between items-center">
-            <h4 class="font-semibold text-primary">🛠️ รายการใบแจ้งซ่อม (Action Plan)</h4>
-            <button onclick="loadConfig()" class="text-gray-500 hover:text-primary transition"><i class="fas fa-sync-alt"></i> รีเฟรช</button>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600 whitespace-nowrap">Job No.</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600">พื้นที่</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600 min-w-[200px]">ปัญหา</th>
-                  <th class="text-center py-3 px-5 font-semibold text-gray-600">สถานะ</th>
-                  <th class="text-center py-3 px-5 font-semibold text-gray-600">ภาพก่อน</th>
-                  <th class="text-center py-3 px-5 font-semibold text-gray-600">ภาพหลัง</th>
-                </tr>
-              </thead>
-              <tbody id="actionPlanTable" class="divide-y divide-gray-100"></tbody>
-            </table>
-          </div>
-        </div>
+      <div class="mt-8 flex gap-4">
+        <button onclick="saveSettings()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-md"><i class="fas fa-save mr-2"></i> บันทึกการตั้งค่า</button>
+        <button onclick="resetSettings()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-xl transition"><i class="fas fa-undo"></i></button>
       </div>
-
-      <div id="tab-types" class="tab-content hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-5 border-b border-gray-100"><h4 class="font-semibold text-primary">📋 ประเภทเช็คลิสต์</h4></div>
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600">ชื่อภาษาไทย</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden md:table-cell">ชื่อภาษาอังกฤษ</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600">สถานะ</th>
-                  <th class="py-3 px-5 font-semibold text-gray-600">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="typesTable" class="divide-y divide-gray-100"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div id="tab-areas" class="tab-content hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-5 border-b border-gray-100"><h4 class="font-semibold text-primary">🏭 พื้นที่/แผนก</h4></div>
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600">พื้นที่</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden md:table-cell">แผนก</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden lg:table-cell">ประเภทที่ใช้ได้</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600">สถานะ</th>
-                  <th class="py-3 px-5 font-semibold text-gray-600">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="areasTable" class="divide-y divide-gray-100"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div id="tab-sections" class="tab-content hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-5 border-b border-gray-100">
-            <h4 class="font-semibold text-primary">🗂️ หัวข้อหลัก</h4>
-            <div class="mt-4">
-              <label class="text-sm text-gray-600">กรองตามประเภท:</label>
-              <select id="filterSectionType" onchange="renderSections()" class="mt-1 w-full md:w-64 px-4 py-2 rounded-lg border border-gray-200 outline-none"><option value="">ทั้งหมด</option></select>
-            </div>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden md:table-cell">ประเภท</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600">ลำดับ</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600">หัวข้อ (ไทย)</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden md:table-cell">บังคับตอบ</th>
-                  <th class="py-3 px-5 font-semibold text-gray-600">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="sectionsTable" class="divide-y divide-gray-100"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div id="tab-questions" class="tab-content hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-5 border-b border-gray-100">
-            <h4 class="font-semibold text-primary">❓ คำถาม</h4>
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="text-sm text-gray-600">ประเภท:</label>
-                <select id="filterQType" onchange="renderQuestions()" class="mt-1 w-full px-4 py-2 rounded-lg border border-gray-200 outline-none"><option value="">ทั้งหมด</option></select>
-              </div>
-              <div>
-                <label class="text-sm text-gray-600">หัวข้อ:</label>
-                <select id="filterQSection" onchange="renderQuestions()" class="mt-1 w-full px-4 py-2 rounded-lg border border-gray-200 outline-none"><option value="">ทั้งหมด</option></select>
-              </div>
-            </div>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden md:table-cell">หัวข้อ</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600">คำถาม</th>
-                  <th class="text-left py-3 px-5 font-semibold text-gray-600 hidden lg:table-cell">ประเภทคำตอบ</th>
-                  <th class="py-3 px-5 font-semibold text-gray-600">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="questionsTable" class="divide-y divide-gray-100"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
     </div>
   </main>
 
-  <div id="modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-      <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-        <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">เพิ่มข้อมูล</h3>
-        <button onclick="closeModal()" class="text-gray-400 hover:text-danger"><i class="fas fa-times text-xl"></i></button>
-      </div>
-      <form id="configForm" class="p-6 space-y-4">
-        <input type="hidden" id="editId">
-        <input type="hidden" id="currentSheet">
-        <div id="formFields" class="space-y-4"></div>
-        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
-          <button type="button" onclick="closeModal()" class="py-2 px-6 rounded-xl border border-gray-300 hover:bg-gray-50 transition font-semibold">ยกเลิก</button>
-          <button type="submit" class="py-2 px-6 rounded-xl bg-success text-white hover:bg-success/90 transition font-semibold">💾 บันทึก</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="loading" class="fixed inset-0 bg-white/90 z-50 hidden flex-col items-center justify-center">
-    <i class="fas fa-circle-notch fa-spin text-4xl text-primary"></i>
-    <p class="mt-4 font-semibold text-gray-700">กำลังโหลด...</p>
-  </div>
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-200 flex justify-around items-center z-50">
+    <a href="index.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600"><i class="fas fa-chart-pie"></i><span class="text-[10px] font-bold">แดชบอร์ด</span></a>
+    <a href="check.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600"><i class="fas fa-clipboard-check"></i><span class="text-[10px] font-bold">ตรวจพื้นที่</span></a>
+    <a href="report.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600"><i class="fas fa-list"></i><span class="text-[10px] font-bold">รายการ</span></a>
+    <a href="admin.html" class="flex flex-col items-center gap-1 text-blue-600"><i class="fas fa-cog"></i><span class="text-[10px] font-bold">ตั้งค่า</span></a>
+  </nav>
 
   <script>
-    // 🔴 วาง URL ของ Google Apps Script ของคุณตรงนี้ 🔴
-    var API_URL = "https://script.google.com/macros/s/AKfycbzhaO5AbSaTM0CRbxkClrPyKU4PMqAuUFpu90O9_3dD2HTWPk8nz2BlPTTV2eSgt99FKg/exec";
-    
-    var configData = {};
-    var adminDataLogs = [];
-    var adminActionPlans = [];
-    var currentTab = 'dashboard';
+    // โหลดค่าเดิมมาแสดง
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById('setAppName').value = localStorage.getItem('appName') || 'SAFETY & 5S PATROL';
+      document.getElementById('setAppColor').value = localStorage.getItem('appColor') || '#f39c12'; // สีส้มเดิม
+      document.getElementById('setAppFont').value = localStorage.getItem('appFont') || "'Prompt', sans-serif";
+    });
 
-    // === Auth Functions ===
-    function checkAuth() {
-      var token = localStorage.getItem('adminToken');
-      if (!token) {
-        document.getElementById('authModal').classList.remove('hidden');
-      } else {
-        document.getElementById('authModal').classList.add('hidden');
-        loadConfig();
-      }
+    function saveSettings() {
+      localStorage.setItem('appName', document.getElementById('setAppName').value);
+      localStorage.setItem('appColor', document.getElementById('setAppColor').value);
+      localStorage.setItem('appFont', document.getElementById('setAppFont').value);
+      alert('บันทึกการตั้งค่าเรียบร้อยแล้ว');
+      window.location.href = 'index.html'; // กลับไปหน้าแรกเพื่อดูผลลัพธ์
     }
 
-    function submitAuth() {
-      var token = document.getElementById('adminTokenInput').value;
-      if (token) {
-        localStorage.setItem('adminToken', token);
-        document.getElementById('authModal').classList.add('hidden');
-        loadConfig();
-      } else {
-        Swal.fire({ icon: 'warning', title: 'กรุณากรอก Token', confirmButtonColor: '#3498db' });
-      }
+    function resetSettings() {
+      localStorage.clear();
+      location.reload();
     }
-
-    function logout() {
-      localStorage.removeItem('adminToken');
-      window.location.reload();
-    }
-
-    // === Fetch Data ===
-    function loadConfig() {
-      var loading = document.getElementById('loading');
-      loading.classList.remove('hidden'); loading.classList.add('flex');
-      
-      Promise.all([
-        fetch(API_URL + "?action=getConfig").then(r => r.json()),
-        fetch(API_URL + "?action=getAdminDashboard").then(r => r.json())
-      ]).then(([confData, dashData]) => {
-        loading.classList.add('hidden'); loading.classList.remove('flex');
-        
-        if (confData.status === 'success') {
-          configData = confData;
-          populateFilters();
-          renderTypes(); renderAreas(); renderSections(); renderQuestions();
-        }
-        if (dashData.status === 'success') {
-          renderDashboardLogs(dashData.dataLogs);
-          renderActionPlans(dashData.actionPlans);
-        }
-      }).catch(err => {
-        loading.classList.add('hidden'); loading.classList.remove('flex');
-        Swal.fire({ icon: 'error', title: 'เชื่อมต่อล้มเหลว', text: 'โปรดตรวจสอบ URL ของ App Script' });
-      });
-    }
-
-    // === Render Dashboard (Data Logs) ===
-    function renderDashboardLogs(logs) {
-      adminDataLogs = logs;
-      var tbody = document.getElementById('dataLogsTable');
-      var html = '';
-      logs.forEach((log, index) => {
-        if(!log.Timestamp) return;
-        var d = new Date(log.Timestamp);
-        var dateStr = isNaN(d) ? log.Timestamp : d.toLocaleDateString('th-TH') + ' ' + d.toLocaleTimeString('th-TH');
-        html += `<tr class="hover:bg-gray-50 transition border-b border-gray-100">
-          <td class="py-3 px-5 text-gray-600">${dateStr}</td>
-          <td class="py-3 px-5 font-semibold text-gray-800">${log.Inspector || '-'}</td>
-          <td class="py-3 px-5">${log.Area || '-'}</td>
-          <td class="py-3 px-5 text-center">
-            <button onclick="viewLogDetails(${index})" class="bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition shadow-sm text-xs font-semibold">
-              <i class="fas fa-file-alt mr-1"></i> ดูรายละเอียด
-            </button>
-          </td>
-        </tr>`;
-      });
-      tbody.innerHTML = html || '<tr><td colspan="4" class="py-8 text-center text-gray-500">ไม่มีข้อมูลการตรวจสอบ</td></tr>';
-    }
-
-    function viewLogDetails(index) {
-      var log = adminDataLogs[index];
-      var detailsHtml = '<div class="text-left text-sm bg-gray-50 p-4 rounded-xl border border-gray-200 max-h-96 overflow-y-auto space-y-2">';
-      try {
-        var obj = JSON.parse(log.Full_Details);
-        for(let key in obj) {
-           if(obj[key] && obj[key].trim() !== '') {
-             let formattedKey = key.replace(/section/g, 'หมวด').replace(/_q/g, ' ข้อ ').replace(/_remark/g, ' หมายเหตุ ');
-             detailsHtml += `<div class="border-b border-gray-200 pb-1"><span class="text-gray-500 font-semibold">${formattedKey}:</span> <span class="text-gray-800">${obj[key]}</span></div>`;
-           }
-        }
-      } catch(e) {
-        detailsHtml += log.Full_Details;
-      }
-      detailsHtml += '</div>';
-
-      Swal.fire({
-        title: `📑 ข้อมูลตรวจ: ${log.Area}`,
-        html: detailsHtml,
-        confirmButtonColor: '#3498db',
-        confirmButtonText: 'ปิด',
-        width: '600px'
-      });
-    }
-
-    // === Render Action Plans ===
-    function renderActionPlans(plans) {
-      adminActionPlans = plans;
-      var tbody = document.getElementById('actionPlanTable');
-      var html = '';
-      plans.forEach((plan) => {
-        if(!plan['Job No.']) return;
-        var statusBadge = plan.Status === 'Closed'
-          ? '<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold"><i class="fas fa-check-circle"></i> Closed</span>'
-          : '<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold"><i class="fas fa-clock"></i> Open</span>';
-
-        var picBefore = plan['รูปภาพ Before'] ? `<a href="${plan['รูปภาพ Before']}" target="_blank" class="text-orange-500 hover:text-orange-700 text-lg"><i class="fas fa-image"></i></a>` : '-';
-        var picAfter = plan['รูปภาพ After'] ? `<a href="${plan['รูปภาพ After']}" target="_blank" class="text-green-500 hover:text-green-700 text-lg"><i class="fas fa-image"></i></a>` : '-';
-
-        html += `<tr class="hover:bg-gray-50 transition border-b border-gray-100">
-          <td class="py-3 px-5 text-gray-700 font-semibold">${plan['Job No.']}</td>
-          <td class="py-3 px-5 text-gray-600">${plan['พื้นที่']}</td>
-          <td class="py-3 px-5 text-gray-800 truncate max-w-[250px]" title="${plan['รายละเอียดปัญหา']}">${plan['รายละเอียดปัญหา']}</td>
-          <td class="py-3 px-5 text-center">${statusBadge}</td>
-          <td class="py-3 px-5 text-center">${picBefore}</td>
-          <td class="py-3 px-5 text-center">${picAfter}</td>
-        </tr>`;
-      });
-      tbody.innerHTML = html || '<tr><td colspan="6" class="py-8 text-center text-gray-500">ไม่มีใบแจ้งซ่อม</td></tr>';
-    }
-
-    function populateFilters() {
-      var typeOptions = '';
-      var types = configData.types || [];
-      types.forEach(t => {
-        if (t.is_active === 'TRUE') typeOptions += `<option value="${t.id}">${t.name_th}</option>`;
-      });
-      ['filterSectionType', 'filterQType'].forEach(id => {
-        if (document.getElementById(id)) document.getElementById(id).innerHTML = '<option value="">ทั้งหมด</option>' + typeOptions;
-      });
-    }
-
-    // === Tab Controls ===
-    function showTab(tab) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-primary/20'));
-      document.getElementById('tab-' + tab).classList.remove('hidden');
-      event.currentTarget.classList.add('bg-primary/20');
-      currentTab = tab;
-      
-      var titles = {
-        'dashboard': 'ข้อมูลการตรวจสอบ (Database)',
-        'actionplans': 'จัดการใบแจ้งซ่อม (Action Plan)',
-        'types': 'ตั้งค่า: ประเภทเช็คลิสต์',
-        'areas': 'ตั้งค่า: พื้นที่/แผนก',
-        'sections': 'ตั้งค่า: หัวข้อหลัก',
-        'questions': 'ตั้งค่า: คำถาม'
-      };
-      document.getElementById('pageTitle').innerText = titles[tab];
-      
-      // Toggle "Add" button visibility
-      var addBtn = document.getElementById('addBtn');
-      if (tab === 'dashboard' || tab === 'actionplans') { addBtn.classList.add('hidden'); } 
-      else { addBtn.classList.remove('hidden'); }
-      
-      document.getElementById('sidebar').classList.add('-translate-x-full');
-    }
-    
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
-
-    // === Render Config Tables ===
-    function renderTypes() {
-      var tbody = document.getElementById('typesTable');
-      if (!tbody) return;
-      var html = '';
-      (configData.types || []).forEach(t => {
-        if (t.is_active === undefined) return;
-        var badge = t.is_active === 'TRUE' ? '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">✅ ใช้งาน</span>' : '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">❌ ปิด</span>';
-        html += `<tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="py-4 px-5"><strong class="text-gray-800">${t.name_th}</strong></td>
-          <td class="py-4 px-5 text-gray-600 hidden md:table-cell">${t.name_en || '-'}</td>
-          <td class="py-4 px-5">${badge}</td>
-          <td class="py-4 px-5">
-            <button onclick="editItem('Config_Types', ${t.id})" class="text-warning hover:bg-warning/10 p-2 rounded-lg"><i class="fas fa-edit"></i></button>
-            <button onclick="deleteItem('Config_Types', ${t.id})" class="text-danger hover:bg-danger/10 p-2 rounded-lg"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>`;
-      });
-      tbody.innerHTML = html || '<tr><td colspan="4" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
-    }
-
-    function renderAreas() {
-      var tbody = document.getElementById('areasTable');
-      if (!tbody) return;
-      var html = '';
-      (configData.areas || []).forEach(a => {
-        if (a.is_active === undefined) return;
-        var typesHtml = 'ทั้งหมด';
-        if (a.applicable_types) {
-          typesHtml = '';
-          a.applicable_types.toString().split(',').forEach(id => {
-            var type = (configData.types || []).find(t => t.id == id);
-            if (type) typesHtml += `<span class="px-2 py-1 rounded-lg text-xs bg-blue-100 text-blue-700 mr-1">${type.name_th}</span>`;
-          });
-        }
-        var badge = a.is_active === 'TRUE' ? '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">✅</span>' : '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">❌</span>';
-        html += `<tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="py-4 px-5"><strong class="text-gray-800">${a.area_name}</strong></td>
-          <td class="py-4 px-5 text-gray-600 hidden md:table-cell">${a.department || '-'}</td>
-          <td class="py-4 px-5 hidden lg:table-cell">${typesHtml}</td>
-          <td class="py-4 px-5">${badge}</td>
-          <td class="py-4 px-5">
-            <button onclick="editItem('Config_Areas', ${a.id})" class="text-warning hover:bg-warning/10 p-2 rounded-lg"><i class="fas fa-edit"></i></button>
-            <button onclick="deleteItem('Config_Areas', ${a.id})" class="text-danger hover:bg-danger/10 p-2 rounded-lg"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>`;
-      });
-      tbody.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
-    }
-
-    function renderSections() {
-      var tbody = document.getElementById('sectionsTable');
-      var filterVal = document.getElementById('filterSectionType').value;
-      var html = '';
-      var sections = (configData.sections || []).filter(s => s.is_active === 'TRUE');
-      if (filterVal) sections = sections.filter(s => s.type_id == filterVal);
-      sections.sort((a,b) => (a.order||0) - (b.order||0));
-      
-      sections.forEach(s => {
-        var type = (configData.types || []).find(t => t.id == s.type_id);
-        html += `<tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="py-4 px-5 hidden md:table-cell"><span class="px-2 py-1 rounded-lg text-xs bg-blue-100 text-blue-700">${type ? type.name_th : s.type_id}</span></td>
-          <td class="py-4 px-5 text-gray-600">${s.order || '-'}</td>
-          <td class="py-4 px-5"><strong class="text-gray-800">${s.title_th}</strong></td>
-          <td class="py-4 px-5 hidden md:table-cell">${s.is_required === 'TRUE' ? '✅' : '-'}</td>
-          <td class="py-4 px-5">
-            <button onclick="editItem('Config_Sections', ${s.id})" class="text-warning hover:bg-warning/10 p-2 rounded-lg"><i class="fas fa-edit"></i></button>
-            <button onclick="deleteItem('Config_Sections', ${s.id})" class="text-danger hover:bg-danger/10 p-2 rounded-lg"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>`;
-      });
-      tbody.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
-    }
-
-    function renderQuestions() {
-      var tbody = document.getElementById('questionsTable');
-      var typeFilter = document.getElementById('filterQType').value;
-      var secFilter = document.getElementById('filterQSection').value;
-      var html = '';
-      var questions = (configData.questions || []).filter(q => q.is_active === 'TRUE');
-      
-      if (typeFilter) {
-        var validSecIds = (configData.sections || []).filter(s => s.type_id == typeFilter).map(s => s.id);
-        questions = questions.filter(q => validSecIds.includes(q.section_id));
-      }
-      if (secFilter) questions = questions.filter(q => q.section_id == secFilter);
-      questions.sort((a,b) => (a.order||0) - (b.order||0));
-
-      questions.forEach(q => {
-        var sec = (configData.sections || []).find(s => s.id == q.section_id);
-        html += `<tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="py-4 px-5 hidden md:table-cell"><small class="text-gray-500">${sec ? sec.title_th : '-'}</small></td>
-          <td class="py-4 px-5 text-gray-800">${q.question_th}</td>
-          <td class="py-4 px-5 hidden lg:table-cell"><span class="px-2 py-1 rounded-lg text-xs bg-purple-100 text-purple-700">${q.answer_type}</span></td>
-          <td class="py-4 px-5">
-            <button onclick="editItem('Config_Questions', ${q.id})" class="text-warning hover:bg-warning/10 p-2 rounded-lg"><i class="fas fa-edit"></i></button>
-            <button onclick="deleteItem('Config_Questions', ${q.id})" class="text-danger hover:bg-danger/10 p-2 rounded-lg"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>`;
-      });
-      tbody.innerHTML = html || '<tr><td colspan="4" class="py-8 text-center text-gray-500">ไม่มีข้อมูล</td></tr>';
-    }
-
-    // === Modal & Form Logic ===
-    function openModal(mode, sheetName, id) {
-      sheetName = sheetName || getSheetByTab(currentTab);
-      document.getElementById('modal').classList.remove('hidden');
-      document.getElementById('modal').classList.add('flex');
-      document.getElementById('modalTitle').innerText = mode === 'add' ? '➕ เพิ่มข้อมูล' : '✏️ แก้ไขข้อมูล';
-      document.getElementById('editId').value = id || '';
-      document.getElementById('currentSheet').value = sheetName;
-      generateFormFields(sheetName, id);
-    }
-    function closeModal() { document.getElementById('modal').classList.add('hidden'); document.getElementById('modal').classList.remove('flex'); document.getElementById('configForm').reset(); }
-    
-    function getSheetByTab(tab) {
-      var map = { 'types': 'Config_Types', 'areas': 'Config_Areas', 'sections': 'Config_Sections', 'questions': 'Config_Questions' };
-      return map[tab] || 'Config_Types';
-    }
-
-    function getActiveOptions(type) {
-      if(type === 'types') return (configData.types||[]).filter(t => t.is_active === 'TRUE').map(t => [t.id, t.name_th]);
-      if(type === 'sections') return (configData.sections||[]).filter(s => s.is_active === 'TRUE').map(s => [s.id, s.title_th]);
-      return [];
-    }
-
-    function generateFormFields(sheetName, editId) {
-      var container = document.getElementById('formFields');
-      var fields = [];
-      var existingData = {};
-      
-      if (editId) {
-        var key = sheetName.replace('Config_', '').toLowerCase() + 's';
-        existingData = (configData[key] || []).find(item => item.id == editId) || {};
-      }
-      
-      if (sheetName === 'Config_Types') {
-        fields = [
-          {name:'name_th', label:'ชื่อภาษาไทย*', type:'text', required:true},
-          {name:'name_en', label:'ชื่อภาษาอังกฤษ', type:'text'},
-          {name:'description', label:'คำอธิบาย', type:'textarea'},
-          {name:'color', label:'สี (Hex)', type:'text', placeholder:'#3498db'},
-          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-        ];
-      } else if (sheetName === 'Config_Areas') {
-        fields = [
-          {name:'area_name', label:'ชื่อพื้นที่*', type:'text', required:true},
-          {name:'department', label:'แผนก', type:'text'},
-          {name:'applicable_types', label:'ประเภทที่ใช้ได้ (เลือกได้หลายข้อ)', type:'checkbox_group', options: getActiveOptions('types')},
-          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-        ];
-      } else if (sheetName === 'Config_Sections') {
-        fields = [
-          {name:'type_id', label:'ประเภทเช็คลิสต์*', type:'select', options:getActiveOptions('types'), required:true},
-          {name:'order', label:'ลำดับแสดงผล', type:'number'},
-          {name:'title_th', label:'หัวข้อ (ไทย)*', type:'text', required:true},
-          {name:'title_en', label:'หัวข้อ (อังกฤษ)', type:'text'},
-          {name:'is_required', label:'บังคับตอบ', type:'select', options:[['TRUE','✅ บังคับ'],['FALSE','❌ ไม่บังคับ']]},
-          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-        ];
-      } else if (sheetName === 'Config_Questions') {
-        fields = [
-          {name:'section_id', label:'หัวข้อหลัก*', type:'select', options:getActiveOptions('sections'), required:true},
-          {name:'order', label:'ลำดับแสดงผล', type:'number'},
-          {name:'question_th', label:'คำถาม (ไทย)*', type:'textarea', required:true},
-          {name:'answer_type', label:'ประเภทคำตอบ*', type:'select', options:[['radio','✅/❌'],['number','🔢 ตัวเลข'],['text','📝 พิมพ์ข้อความ']], required:true},
-          {name:'has_remark', label:'มีช่องหมายเหตุ', type:'select', options:[['TRUE','✅ มี'],['FALSE','❌ ไม่มี']]},
-          {name:'has_duedate', label:'มีให้เลือก Due Date (สำหรับสร้างใบงาน)', type:'select', options:[['TRUE','✅ มี'],['FALSE','❌ ไม่มี']]},
-          {name:'is_active', label:'สถานะ', type:'select', options:[['TRUE','✅ ใช้งาน'],['FALSE','❌ ปิด']]}
-        ];
-      }
-      
-      var html = '';
-      fields.forEach(f => {
-        var val = existingData[f.name] !== undefined ? existingData[f.name] : '';
-        if (f.type === 'select') {
-          var opts = (f.options||[]).map(opt => `<option value="${opt[0]}" ${val == opt[0] ? 'selected' : ''}>${opt[1]}</option>`).join('');
-          html += `<div><label class="block text-sm font-medium text-gray-700 mb-1">${f.label}</label><select name="${f.name}" ${f.required?'required':''} class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:border-primary outline-none">${opts}</select></div>`;
-        } else if (f.type === 'textarea') {
-          html += `<div><label class="block text-sm font-medium text-gray-700 mb-1">${f.label}</label><textarea name="${f.name}" rows="3" ${f.required?'required':''} class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:border-primary outline-none resize-none">${val}</textarea></div>`;
-        } else if (f.type === 'checkbox_group') {
-          var cbHtml = '<div class="flex flex-wrap gap-3 mt-2 p-3 bg-gray-50 border border-gray-200 rounded-xl">';
-          var selectedVals = val ? val.toString().split(',') : [];
-          f.options.forEach(opt => {
-            var checked = selectedVals.includes(opt[0].toString()) ? 'checked' : '';
-            cbHtml += `<label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg border border-gray-200 hover:border-primary transition"><input type="checkbox" name="${f.name}[]" value="${opt[0]}" ${checked} class="w-4 h-4 text-primary rounded"><span class="text-sm font-semibold text-gray-700">${opt[1]}</span></label>`;
-          });
-          cbHtml += '</div>';
-          html += `<div><label class="block text-sm font-medium text-gray-700">${f.label}</label>${cbHtml}</div>`;
-        } else {
-          html += `<div><label class="block text-sm font-medium text-gray-700 mb-1">${f.label}</label><input type="${f.type}" name="${f.name}" value="${val}" ${f.required?'required':''} placeholder="${f.placeholder||''}" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:border-primary outline-none"></div>`;
-        }
-      });
-      container.innerHTML = html;
-    }
-
-    // === Form Submission ===
-    document.getElementById('configForm').onsubmit = function(e) {
-      e.preventDefault();
-      var formData = new FormData(this);
-      var data = {};
-      
-      // ดักจับ Checkbox Array ให้กลายเป็น String (ex. "1,2,3")
-      for (var pair of formData.entries()) {
-        if (pair[0].endsWith('[]')) {
-           var cleanName = pair[0].replace('[]', '');
-           if (!data[cleanName]) data[cleanName] = [];
-           data[cleanName].push(pair[1]);
-        } else { data[pair[0]] = pair[1]; }
-      }
-      for (var key in data) { if (Array.isArray(data[key])) data[key] = data[key].join(','); }
-      
-      var payload = {
-        action: document.getElementById('editId').value ? 'update' : 'create',
-        sheetName: document.getElementById('currentSheet').value,
-        data: data,
-        id: document.getElementById('editId').value || null,
-        adminToken: localStorage.getItem('adminToken')
-      };
-      
-      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-      fetch(API_URL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain' } })
-      .then(res => res.json())
-      .then(result => {
-        if (result.status === 'success') {
-          Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: result.message }).then(() => { closeModal(); loadConfig(); });
-        } else { Swal.fire('ผิดพลาด', result.message, 'error'); }
-      }).catch(() => Swal.fire('เชื่อมต่อล้มเหลว', '', 'error'));
-    };
-
-    function editItem(sheetName, id) { showTab({'Config_Types':'types', 'Config_Areas':'areas', 'Config_Sections':'sections', 'Config_Questions':'questions'}[sheetName]); openModal('edit', sheetName, id); }
-    
-    function deleteItem(sheetName, id) {
-      Swal.fire({ title: 'ยืนยันการลบ?', text: 'ข้อมูลจะถูกลบถาวร!', icon: 'warning', showCancelButton: true, confirmButtonText: '✅ ลบเลย', confirmButtonColor: '#e74c3c' })
-      .then(result => {
-        if (result.isConfirmed) {
-          fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', sheetName: sheetName, id: id, adminToken: localStorage.getItem('adminToken') }), headers: { 'Content-Type': 'text/plain' } })
-          .then(res => res.json()).then(res => { if(res.status === 'success') { Swal.fire('ลบสำเร็จ!', '', 'success').then(()=>loadConfig()); } else { Swal.fire('ผิดพลาด', res.message, 'error'); } });
-        }
-      });
-    }
-
-    window.onload = checkAuth;
   </script>
 </body>
 </html>
