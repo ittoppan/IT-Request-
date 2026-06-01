@@ -3,145 +3,158 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title class="system-title">SAFETY & 5S PATROL DASHBOARD</title>
+  <title>SAFETY & 5S DASHBOARD</title>
+  
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   
   <script>
+    const appColor = localStorage.getItem('appColor') || '#E65100'; // สีเริ่มต้น (ส้ม)
+    const appFont = localStorage.getItem('appFont') || "'Prompt', sans-serif";
+    
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            primary: 'var(--color-primary, #f39c12)',
-            secondary: 'var(--color-secondary, #e67e22)',
-            dark: '#2c3e50',
-          },
-          fontFamily: {
-            sans: ['var(--font-family, "Prompt")', 'sans-serif'],
-          }
+          colors: { primary: appColor },
+          fontFamily: { sans: [appFont] }
         }
       }
     }
   </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      body { font-family: theme('fontFamily.sans'); }
+      .hide-scroll::-webkit-scrollbar { display: none; }
+      .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+      
+      /* Responsive Table Styles (CSS Trick เดิมปรับให้เข้ากับ Tailwind) */
+      @media (max-width: 768px) {
+        .responsive-table thead { display: none; }
+        .responsive-table tr { display: flex; flex-direction: column; margin-bottom: 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; overflow: hidden; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .responsive-table td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; text-align: right; }
+        .responsive-table td::before { content: attr(data-label); font-weight: 600; color: theme('colors.slate.500'); font-size: 0.8rem; text-align: left; margin-right: 1rem; }
+        .responsive-table td:last-child { border-bottom: none; }
+      }
+    }
+    
+    /* Loader Animation */
+    .spin-ring { border-top-color: theme('colors.primary'); animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
+<body class="bg-slate-50 text-slate-800 pb-20 lg:pb-8">
 
-  <nav class="bg-gradient-to-r from-primary to-secondary text-white shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
-        <div class="flex items-center">
-          <i class="fas fa-shield-halved text-2xl mr-2"></i>
-          <span class="font-bold text-lg tracking-wide hidden sm:block system-title">SAFETY & 5S SYSTEM</span>
-        </div>
-        <div class="hidden md:flex items-center space-x-2">
-          <a href="DashNew.html" class="bg-white/20 px-3 py-2 rounded-xl text-sm font-semibold transition"><i class="fas fa-home mr-1"></i> หน้าหลัก</a>
-          <a href="check (1).html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-plus mr-1"></i> ตรวจสอบพื้นที่</a>
-          <a href="reportnew.html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-chart-line mr-1"></i> Action Plan</a>
-          <a href="dashboard (1).html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-chart-pie mr-1"></i> สถิติเชิงลึก</a>
-          <a href="admin.html" class="hover:bg-white/10 px-3 py-2 rounded-xl text-sm font-medium transition"><i class="fas fa-cog mr-1"></i> ตั้งค่าระบบ</a>
-        </div>
-        <div class="flex items-center md:hidden">
-          <button id="mobile-menu-btn" class="text-white hover:text-slate-200 focus:outline-none p-2">
-            <i class="fas fa-bars text-2xl"></i>
-          </button>
-        </div>
+  <div id="loader" class="fixed inset-0 bg-white/90 flex-col items-center justify-center z-[9999] gap-3 hidden">
+    <div class="w-12 h-12 border-4 border-slate-200 rounded-full spin-ring"></div>
+    <div class="text-sm text-slate-600 font-semibold">กำลังโหลดข้อมูล...</div>
+  </div>
+  
+  <nav class="bg-slate-900 text-white p-3 md:px-6 sticky top-0 z-50 flex items-center justify-between shadow-md">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-inner shrink-0">
+        <i class="fas fa-shield-halved text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-sm md:text-base font-bold tracking-wide truncate" id="dynamicAppName">SAFETY & 5S DASHBOARD</h1>
+        <span class="text-[10px] text-primary block -mt-1 font-medium">Master Command Center</span>
       </div>
     </div>
-    <div id="mobile-menu" class="hidden md:hidden flex-col bg-secondary/95 px-4 pt-2 pb-4 space-y-1 shadow-inner border-t border-white/10">
-      <a href="DashNew.html" class="block px-3 py-2 rounded-lg bg-white/20 font-semibold"><i class="fas fa-home w-6"></i> หน้าหลัก</a>
-      <a href="check (1).html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-plus w-6"></i> ตรวจสอบพื้นที่</a>
-      <a href="reportnew.html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-chart-line w-6"></i> Action Plan</a>
-      <a href="dashboard (1).html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-chart-pie w-6"></i> สถิติเชิงลึก</a>
-      <a href="admin.html" class="block px-3 py-2 rounded-lg hover:bg-white/10"><i class="fas fa-cog w-6"></i> ตั้งค่าระบบ</a>
+    <div class="flex gap-2 shrink-0">
+      <a href="check.html" class="hidden md:flex bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-semibold transition items-center gap-2 shadow-sm">
+        <i class="fas fa-plus"></i> ตรวจพื้นที่
+      </a>
+      <a href="report.html" class="hidden md:flex bg-slate-700 hover:bg-slate-600 text-white w-10 h-10 rounded-lg items-center justify-center transition" title="Action Plan">
+        <i class="fas fa-chart-line"></i>
+      </a>
     </div>
   </nav>
 
-  <div id="loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[2000] hidden flex-col items-center justify-center">
-    <i class="fas fa-circle-notch fa-spin fa-3x text-primary"></i>
-    <p class="mt-4 font-semibold text-slate-600">กำลังโหลดข้อมูล...</p>
-  </div>
-
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <main class="max-w-6xl mx-auto p-4 space-y-6 mt-2">
     
-    <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 mb-6">
-      <div class="flex flex-wrap items-center gap-3 mb-5">
-        <div class="flex items-center gap-2 text-primary font-semibold">
-          <i class="fas fa-calendar-alt text-lg"></i>
-          <span class="text-slate-700">เลือกวันที่ตรวจ:</span>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6">
+      
+      <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 flex-1 md:flex-none">
+          <i class="fas fa-calendar-alt text-primary"></i>
+          <input type="date" id="dateFilter" onchange="renderTable()" class="bg-transparent border-none outline-none text-sm text-slate-700 w-full cursor-pointer">
         </div>
-        <input type="date" id="dateFilter" onchange="renderTable()" class="px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-sm font-medium focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
-        <button onclick="clearDateFilter()" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-50 transition">ดูทั้งหมด</button>
+        <button onclick="clearDateFilter()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-semibold transition">ดูทั้งหมด</button>
       </div>
       
-      <div class="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-        <i class="fas fa-filter text-primary"></i> กรองตามประเภทการตรวจสอบ
+      <div>
+        <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2"><i class="fas fa-filter text-primary"></i> กรองตามประเภทการตรวจสอบ</h3>
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-2">
+          <button class="type-btn border-2 border-primary bg-primary/10 text-primary rounded-xl py-3 flex flex-col items-center gap-1 transition shadow-sm" data-type="all" onclick="selectTypeFilter('all', this)"><i class="fas fa-list text-lg"></i><span class="text-[10px] font-bold">ทั้งหมด</span></button>
+          <button class="type-btn border-2 border-slate-100 bg-slate-50 text-slate-500 hover:border-primary hover:text-primary rounded-xl py-3 flex flex-col items-center gap-1 transition" data-type="จป.ว" onclick="selectTypeFilter('จป.ว', this)"><i class="fas fa-hard-hat text-lg"></i><span class="text-[10px] font-bold">จป.ว</span></button>
+          <button class="type-btn border-2 border-slate-100 bg-slate-50 text-slate-500 hover:border-primary hover:text-primary rounded-xl py-3 flex flex-col items-center gap-1 transition" data-type="คปอ." onclick="selectTypeFilter('คปอ.', this)"><i class="fas fa-users-cog text-lg"></i><span class="text-[10px] font-bold">คปอ.</span></button>
+          <button class="type-btn border-2 border-slate-100 bg-slate-50 text-slate-500 hover:border-primary hover:text-primary rounded-xl py-3 flex flex-col items-center gap-1 transition" data-type="Foreman/Mgr." onclick="selectTypeFilter('Foreman/Mgr.', this)"><i class="fas fa-user-tie text-lg"></i><span class="text-[10px] font-bold">Foreman</span></button>
+          <button class="type-btn border-2 border-slate-100 bg-slate-50 text-slate-500 hover:border-blue-500 hover:text-blue-500 rounded-xl py-3 flex flex-col items-center gap-1 transition" data-type="Audit" onclick="selectTypeFilter('Audit', this)"><i class="fas fa-search text-lg"></i><span class="text-[10px] font-bold">Audit</span></button>
+          <button class="type-btn border-2 border-slate-100 bg-slate-50 text-slate-500 hover:border-green-500 hover:text-green-500 rounded-xl py-3 flex flex-col items-center gap-1 transition" data-type="5S" onclick="selectTypeFilter('5S', this)"><i class="fas fa-broom text-lg"></i><span class="text-[10px] font-bold">5S</span></button>
+        </div>
       </div>
-      
-      <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
-        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30 active" data-type="all" onclick="selectTypeFilter('all', this)"><i class="fas fa-list text-lg text-slate-400"></i>ทั้งหมด</button>
-        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30" data-type="จป.ว" onclick="selectTypeFilter('จป.ว', this)"><i class="fas fa-hard-hat text-lg text-slate-400"></i>จป.ว</button>
-        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30" data-type="คปอ." onclick="selectTypeFilter('คปอ.', this)"><i class="fas fa-users-cog text-lg text-slate-400"></i>คปอ.</button>
-        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30" data-type="Foreman/Mgr." onclick="selectTypeFilter('Foreman/Mgr.', this)"><i class="fas fa-user-tie text-lg text-slate-400"></i>Foreman</button>
-        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30" data-type="Audit" onclick="selectTypeFilter('Audit', this)"><i class="fas fa-search text-lg text-slate-400"></i>Audit</button>
-        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-primary hover:bg-amber-50/30" data-type="Accident/Fire" onclick="selectTypeFilter('Accident/Fire', this)"><i class="fas fa-fire-extinguisher text-lg text-slate-400"></i>Accident</button>
-        <button class="type-btn p-3 rounded-xl border-2 border-slate-100 bg-slate-50 text-center cursor-pointer text-xs font-semibold text-slate-600 transition duration-200 flex flex-col items-center justify-center gap-1.5 min-h-[65px] select-none hover:border-emerald-500 hover:bg-emerald-50/30" data-type="5S" onclick="selectTypeFilter('5S', this)"><i class="fas fa-broom text-lg text-slate-400"></i>5S</button>
-      </div>
-    </section>
+    </div>
     
-    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-      <div id="card-all" onclick="updateStatusFilter('all')" class="bg-white p-5 rounded-2xl text-center border-b-4 border-blue-500 cursor-pointer transition shadow-sm hover:-translate-y-0.5 active">
-        <small class="text-slate-400 font-semibold tracking-wider uppercase text-[11px]">ทั้งหมดในตาราง</small>
-        <div id="countTotal" class="text-3xl font-bold text-blue-600 mt-1">0</div>
+    <div class="grid grid-cols-3 gap-3 md:gap-6">
+      <div class="stat-card bg-white rounded-2xl shadow-sm border border-slate-200 p-4 text-center cursor-pointer transition transform hover:-translate-y-1 border-b-4 border-b-primary" id="card-all" onclick="updateStatusFilter('all')">
+        <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wide">ทั้งหมด</p>
+        <h2 class="text-2xl md:text-4xl font-bold text-blue-600 mt-1" id="countTotal">0</h2>
       </div>
-      <div id="card-good" onclick="updateStatusFilter('good')" class="bg-white p-5 rounded-2xl text-center border-b-4 border-slate-200 cursor-pointer transition shadow-sm hover:-translate-y-0.5">
-        <small class="text-slate-400 font-semibold tracking-wider uppercase text-[11px]">ปกติ</small>
-        <div id="countGood" class="text-3xl font-bold text-emerald-600 mt-1">0</div>
+      <div class="stat-card bg-white rounded-2xl shadow-sm border border-slate-200 p-4 text-center cursor-pointer transition transform hover:-translate-y-1 border-b-4 border-b-slate-200" id="card-good" onclick="updateStatusFilter('good')">
+        <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wide">ปกติ</p>
+        <h2 class="text-2xl md:text-4xl font-bold text-green-500 mt-1" id="countGood">0</h2>
       </div>
-      <div id="card-bad" onclick="updateStatusFilter('bad')" class="bg-white p-5 rounded-2xl text-center border-b-4 border-slate-200 cursor-pointer transition shadow-sm hover:-translate-y-0.5">
-        <small class="text-slate-400 font-semibold tracking-wider uppercase text-[11px]">พบปัญหา</small>
-        <div id="countBad" class="text-3xl font-bold text-rose-600 mt-1">0</div>
+      <div class="stat-card bg-white rounded-2xl shadow-sm border border-slate-200 p-4 text-center cursor-pointer transition transform hover:-translate-y-1 border-b-4 border-b-slate-200" id="card-bad" onclick="updateStatusFilter('bad')">
+        <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wide">พบปัญหา</p>
+        <h2 class="text-2xl md:text-4xl font-bold text-red-500 mt-1" id="countBad">0</h2>
       </div>
-    </section>
+    </div>
     
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-x-auto">
-      <table class="w-full text-left border-collapse min-width-[800px]">
-        <thead>
-          <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs font-semibold uppercase tracking-wider">
-            <th class="px-5 py-4">เวลา</th>
-            <th class="px-5 py-4">ประเภท</th>
-            <th class="px-5 py-4">พื้นที่</th>
-            <th class="px-5 py-4">ผู้ตรวจ</th>
-            <th class="px-5 py-4 text-center">สถานะรวม</th>
-            <th class="px-5 py-4 text-center">รูปถ่าย</th>
-            <th class="px-5 py-4 text-center">รายละเอียด</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody" class="divide-y divide-slate-100 text-sm text-slate-700">
-          </tbody>
-      </table>
-    </section>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+        <h3 class="font-bold text-slate-700 text-sm"><i class="fas fa-clipboard-list text-primary mr-2"></i> รายการตรวจประเมิน</h3>
+      </div>
+      <div class="overflow-x-auto w-full">
+        <table class="w-full text-left whitespace-nowrap responsive-table min-w-[800px] md:min-w-full">
+          <thead class="bg-slate-100 text-slate-500 text-xs uppercase font-semibold">
+            <tr>
+              <th class="p-4">เวลา</th>
+              <th class="p-4">ประเภท</th>
+              <th class="p-4">พื้นที่</th>
+              <th class="p-4">ผู้ตรวจ</th>
+              <th class="p-4">สถานะรวม</th>
+              <th class="p-4 text-center">รูปถ่าย</th>
+              <th class="p-4 text-right">รายละเอียด</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-slate-100 text-sm">
+            </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
+
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 h-[60px] bg-slate-900 border-t border-slate-800 flex justify-around items-center z-50 pb-safe">
+    <a href="index.html" class="flex flex-col items-center gap-1 text-primary"><i class="fas fa-chart-pie text-lg"></i><span class="text-[10px] font-bold">แดชบอร์ด</span></a>
+    <a href="check.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary"><i class="fas fa-clipboard-check text-lg"></i><span class="text-[10px] font-bold">ตรวจพื้นที่</span></a>
+    <a href="report.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary"><i class="fas fa-list text-lg"></i><span class="text-[10px] font-bold">รายงาน</span></a>
+    <a href="admin.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary"><i class="fas fa-cog text-lg"></i><span class="text-[10px] font-bold">ตั้งค่า</span></a>
+  </nav>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
 
-    // เมนูมือถือ Toggle Toggle
-    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-      document.getElementById('mobile-menu').classList.toggle('hidden');
+    // อัปเดตชื่อระบบตอนโหลดหน้า
+    document.addEventListener("DOMContentLoaded", () => {
+      const appName = localStorage.getItem('appName');
+      if (appName) document.getElementById('dynamicAppName').textContent = appName;
     });
 
-    // โดดไปดึงสีแอดมินมาทับสไตล์หลัก
-    window.addEventListener('DOMContentLoaded', () => {
-      const sysSettings = JSON.parse(localStorage.getItem('systemSettings'));
-      if (sysSettings) {
-        document.documentElement.style.setProperty('--color-primary', sysSettings.primaryColor);
-        document.documentElement.style.setProperty('--color-secondary', sysSettings.secondaryColor);
-        document.documentElement.style.setProperty('--font-family', sysSettings.fontFamily);
-        document.querySelectorAll('.system-title').forEach(el => el.textContent = sysSettings.systemTitle);
-      }
-    });
-
+    // ===================================================================
+    // CHECKLISTS DATA (คงไว้เหมือนเดิมเป๊ะๆ เพื่อไม่ให้กระทบ Logic)
+    // ===================================================================
     const SAFETY_CHECKLIST_FACTORY = {
       s1: { title: "1. สถานที่ทำงาน", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "การจัดเก็บ และกองวัสดุมีการกำหนดสูงไม่เกิน กองวัสดุมีความปลอดภัย", "Water Mist"] },
       s2: { title: "2. ท่าทางการทำงาน", questions: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์, หรืออุปกรณ์ที่มีล้อในการเคลื่อนย้ายสิ่งของ", "การยกของอย่างถูกต้องและปลอดภัย"] },
@@ -152,7 +165,6 @@
       s7: { title: "7. การกำจัดของเสีย", questions: ["มีการแยกประเภทขยะ, การปิดฝาถังขยะ, ถังขยะไม่มีชำรุด แตกหัก"] },
       s8: { title: "8. Other", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
-
     const SAFETY_CHECKLIST_OFFICE = {
       s1: { title: "1. สภาพแวดล้อมสำนักงาน", questions: ["พื้นที่ทำงานสะอาด เป็นระเบียบ ไม่มีสิ่งของวางเกะกะ", "แสงสว่างเพียงพอต่อการทำงาน", "ระบบปรับอากาศ/อากาศถ่ายเทสะดวก", "เฟอร์นิเจอร์อยู่ในสภาพปลอดภัยมั่นคง", "ไม่มีการจัดวางของหนักบนที่สูงเกินระดับปลอดภัย"] },
       s2: { title: "2. ท่านั่งทำงานและ Ergonomics", questions: ["ท่านั่งทำงานถูกต้อง จอคอมพิวเตอร์ระดับสายตา", "มีการพักสายตา/ยืดเหยียดร่างกายตามความเหมาะสม", "การหยิบเอกสารไม่มีการบิดเอี้ยวหรือก้มเงยมากเกินไป"] },
@@ -162,7 +174,6 @@
       s6: { title: "6. การกำจัดขยะ", questions: ["มีการแยกขยะ (ทั่วไป/รีไซเคิล/อันตราย) ถูกต้อง", "ถังขยะมีฝาปิดมิดชิด และอยู่ในสภาพไม่ชำรุด", "ไม่มีการทิ้งขยะเกลื่อนกลาดหรือวางกองไว้เกินกำหนด"] },
       s7: { title: "7. Other (ไม่บังคับ)", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
-
     const SAFETY_CHECKLIST_OUTSIDE = {
       s1: { title: "1. พื้นที่โดยรอบ", questions: ["ไม่มีเศษขยะ/เศษวัสดุตกหล่นตามทางเดินและที่จอดรถ", "หญ้า/พืชพรรณไม่ขึ้นรกสูงเกินไป", "สายยาง/ท่อต่างๆ เก็บเป็นระเบียบเรียบร้อย", "อุปกรณ์กำจัดสัตว์พาหะอยู่ในสภาพพร้อมใช้งาน", "รั้วโรงงานไม่มีรอยชำรุดเสียหาย"] },
       s2: { title: "2. โรงเก็บขยะ", questions: ["มีการจัดเรียงถังเป็นระเบียบ", "แยกชนิดขยะให้ชัดเจนและมีป้ายชี้บ่ง", "ขยะไม่ล้นออกมา / ปิดฝาสนิท", "ถังเก็บสารเคมีอันตรายไม่ล้นและอยู่ในสภาพปลอดภัย"] },
@@ -172,7 +183,6 @@
       s6: { title: "6. โรงจอดรถ", questions: ["จอดรถเป็นระเบียบไม่มีความเสี่ยงอุบัติเหตุ", "หลังคา/พื้น/ที่กั้น มีสภาพปกติไม่เสียหาย"] },
       s7: { title: "7. Other (ไม่บังคับ)", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
-
     const SAFETY_CHECKLIST_MAP = {
       "PRINT": "FACTORY", "LAMINATE": "FACTORY", "SOLVENT": "FACTORY",
       "REWINDER/SLITTER/PACKING": "FACTORY", "BAG MAKING": "FACTORY",
@@ -218,15 +228,8 @@
 
     let rawData = [], currentType = 'all', currentStatus = 'all';
 
-    window.onload = function() { 
-      document.getElementById('dateFilter').valueAsDate = new Date(); 
-      loadData(); 
-    };
-    
-    function clearDateFilter() { 
-      document.getElementById('dateFilter').value = ""; 
-      renderTable(); 
-    }
+    window.onload = function() { document.getElementById('dateFilter').valueAsDate = new Date(); loadData(); };
+    function clearDateFilter() { document.getElementById('dateFilter').value = ""; renderTable(); }
 
     function getDriveThumbnailUrl(url) {
       if(!url) return "";
@@ -252,8 +255,7 @@
     }
 
     function loadData() {
-      const loader = document.getElementById('loader'); 
-      loader.classList.remove('hidden'); loader.classList.add('flex');
+      const loader = document.getElementById('loader'); loader.classList.remove('hidden'); loader.classList.add('flex');
       fetch(API_URL + "?action=getDashboardData")
       .then(r => r.json()).then(data => {
         rawData = data.details || [];
@@ -264,9 +266,9 @@
           }
         });
         renderTable(); 
-        loader.classList.remove('flex'); loader.classList.add('hidden');
+        loader.classList.add('hidden'); loader.classList.remove('flex');
       }).catch(err => { 
-        loader.classList.remove('flex'); loader.classList.add('hidden'); 
+        loader.classList.add('hidden'); loader.classList.remove('flex'); 
         console.error("Error:", err); 
       });
     }
@@ -274,22 +276,26 @@
     function selectTypeFilter(type, el) { 
       currentType = type; 
       document.querySelectorAll('.type-btn').forEach(b => {
-        b.classList.remove('active', 'border-primary', 'bg-amber-50/30', 'text-amber-700', 'border-emerald-500', 'bg-emerald-50/30', 'text-emerald-700');
-      });
-      if(type === '5S') {
-        el.classList.add('border-emerald-500', 'bg-emerald-50/30', 'text-emerald-700');
-      } else {
-        el.classList.add('border-primary', 'bg-amber-50/30', 'text-amber-700');
-      }
+        b.classList.remove('border-primary', 'bg-primary/10', 'text-primary', 'border-green-500', 'text-green-500', 'border-blue-500', 'text-blue-500');
+        b.classList.add('border-slate-100', 'bg-slate-50', 'text-slate-500');
+      }); 
+      
+      el.classList.remove('border-slate-100', 'bg-slate-50', 'text-slate-500');
+      if(type === '5S') el.classList.add('border-green-500', 'bg-green-50', 'text-green-600');
+      else if(type === 'Audit') el.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-600');
+      else el.classList.add('border-primary', 'bg-primary/10', 'text-primary');
+      
       renderTable(); 
     }
-
+    
     function updateStatusFilter(status) { 
       currentStatus = status; 
-      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('border-blue-500', 'border-emerald-500', 'border-rose-500', 'shadow-md'));
-      const activeCard = document.getElementById('card-' + status);
-      const color = status === 'all' ? 'border-blue-500' : (status === 'good' ? 'border-emerald-500' : 'border-rose-500');
-      activeCard.classList.add(color, 'shadow-md');
+      document.querySelectorAll('.stat-card').forEach(c => {
+        c.classList.remove('border-b-primary');
+        c.classList.add('border-b-slate-200');
+      }); 
+      document.getElementById('card-' + status).classList.remove('border-b-slate-200');
+      document.getElementById('card-' + status).classList.add('border-b-primary');
       renderTable(); 
     }
 
@@ -307,93 +313,106 @@
       if (currentStatus === 'good') filtered = filtered.filter(d => !d.hasBad);
       if (currentStatus === 'bad') filtered = filtered.filter(d => d.hasBad);
 
-      const tbody = document.getElementById('tableBody'); 
-      tbody.innerHTML = '';
+      const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
       if(filtered.length === 0) { 
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-12 text-slate-400 font-medium"><i class="fas fa-folder-open text-4xl opacity-30 block mb-3"></i> ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`; 
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-12 text-slate-400"><i class="fas fa-folder-open text-4xl opacity-30 mb-3 block"></i> <p class="font-semibold text-slate-600">ไม่พบข้อมูลตามเงื่อนไขที่เลือก</p></td></tr>`; 
         return; 
       }
 
       filtered.forEach(d => {
         const is5S = d.inspectionType?.toUpperCase() === "5S";
-        let photoDisplay = '-';
+        let photoDisplay = '<span class="text-slate-300">-</span>';
+        
         if (typeof d.photo === 'object' && d.photo !== null) {
           let photoCount = Object.values(d.photo).filter(url => url && url !== "ไม่มีรูปถ่าย" && url.trim() !== "").length;
-          if(photoCount > 0) photoDisplay = `<span class="text-primary font-semibold text-xs bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg"><i class="fas fa-images mr-1"></i> ${photoCount} รูป</span>`;
+          if(photoCount > 0) photoDisplay = `<span class="text-primary text-xs font-bold bg-primary/10 px-2 py-1 rounded"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
         } else if (typeof d.photo === 'string' && d.photo !== "ไม่มีรูปถ่าย" && d.photo.trim() !== "") {
-          photoDisplay = `<a href="${d.photo}" target="_blank" class="text-primary hover:text-secondary"><i class="fas fa-image text-lg"></i></a>`;
+          photoDisplay = `<a href="${d.photo}" target="_blank" class="text-primary hover:text-primary/80"><i class="fas fa-image fa-lg"></i></a>`;
         }
 
         let statusHtml = '';
         if (is5S) {
-          const percent = calculate5SScore(d.fullChecklist, d.area);
-          const bg = percent >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : (percent >= 50 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200');
-          statusHtml = `<span class="border px-2.5 py-1 rounded-full text-xs font-bold ${bg}"><i class="fas fa-chart-pie mr-1"></i> ${percent}%</span>`;
+           const percent = calculate5SScore(d.fullChecklist, d.area);
+           const colorClass = percent >= 80 ? 'text-green-600 bg-green-100' : percent >= 50 ? 'text-orange-600 bg-orange-100' : 'text-red-600 bg-red-100';
+           statusHtml = `<span class="${colorClass} px-2.5 py-1 rounded-full text-[10px] font-bold"><i class="fas fa-chart-pie"></i> ${percent}%</span>`;
         } else {
-          const bg = d.hasBad ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
-          statusHtml = `<span class="border px-2.5 py-1 rounded-full text-xs font-bold ${bg}">${d.hasBad ? 'พบปัญหา' : 'ปกติ'}</span>`;
+           const statusText = d.hasBad ? 'พบปัญหา' : 'ปกติ';
+           const statusClass = d.hasBad ? 'bg-red-500 text-white' : 'bg-green-500 text-white';
+           statusHtml = `<span class="${statusClass} px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm">${statusText}</span>`;
         }
 
-        let badgeStyle = is5S ? 'from-emerald-500 to-teal-600' : 'from-amber-500 to-orange-500';
+        let typeBadgeCls = is5S ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-primary to-orange-600';
         let typeIcon = is5S ? 'fa-broom' : 'fa-hard-hat';
-        if(d.inspectionType === 'Audit') typeIcon = 'fa-search';
-        if(d.inspectionType?.includes('Accident')) typeIcon = 'fa-fire-extinguisher';
+        if(d.inspectionType === 'Audit') { typeIcon = 'fa-search'; typeBadgeCls = 'bg-gradient-to-r from-blue-500 to-blue-600'; }
+        if(d.inspectionType?.includes('Accident')) { typeIcon = 'fa-fire-extinguisher'; typeBadgeCls = 'bg-gradient-to-r from-red-500 to-red-600'; }
 
+        // Main Row
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50/50 transition duration-150";
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-100 group";
         tr.innerHTML = `
-          <td class="px-5 py-3.5 text-slate-500 font-medium">${d.timestamp || '-'}</td>
-          <td class="px-5 py-3.5"><span class="bg-gradient-to-r ${badgeStyle} text-white px-2.5 py-1 rounded-lg text-xs font-semibold inline-flex items-center gap-1"><i class="fas ${typeIcon}"></i> ${d.inspectionType}</span></td>
-          <td class="px-5 py-3.5 font-bold text-slate-700">${d.area || '-'}</td>
-          <td class="px-5 py-3.5 text-slate-600">${d.inspector || '-'}</td>
-          <td class="px-5 py-3.5 text-center">${statusHtml}</td>
-          <td class="px-5 py-3.5 text-center">${photoDisplay}</td>
-          <td class="px-5 py-3.5 text-center"><button class="text-xs font-bold px-3 py-1.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-primary hover:text-white transition inline-flex items-center gap-1" onclick="toggleDetail('${d.id}')"><i class="fas fa-chevron-down" id="icon-${d.id}"></i> ดูผลตรวจ</button></td>
+          <td data-label="เวลา" class="p-3 md:p-4 whitespace-nowrap text-slate-500">${d.timestamp || '-'}</td>
+          <td data-label="ประเภท" class="p-3 md:p-4"><span class="${typeBadgeCls} text-white px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm inline-flex items-center gap-1"><i class="fas ${typeIcon}"></i> ${d.inspectionType}</span></td>
+          <td data-label="พื้นที่" class="p-3 md:p-4 font-bold text-slate-700">${d.area || '-'}</td>
+          <td data-label="ผู้ตรวจ" class="p-3 md:p-4 text-slate-600">${d.inspector || '-'}</td>
+          <td data-label="สถานะรวม" class="p-3 md:p-4">${statusHtml}</td>
+          <td data-label="รูปถ่าย" class="p-3 md:p-4 text-center md:text-left">${photoDisplay}</td>
+          <td data-label="รายละเอียด" class="p-3 md:p-4 text-right">
+            <button class="bg-white border border-slate-200 hover:border-primary hover:text-primary text-slate-600 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-sm" onclick="toggleDetail('${d.id}')">
+              <i class="fas fa-chevron-down mr-1" id="icon-${d.id}"></i> ดูผล
+            </button>
+          </td>
         `;
         tbody.appendChild(tr);
 
-        // Details Row Box
+        // Detail Row
         const detailTr = document.createElement('tr'); 
         detailTr.id = `detail-${d.id}`; 
         detailTr.className = 'hidden bg-slate-50/50';
         
-        let detailHtml = `<div class="p-4 sm:p-6 bg-slate-50 border border-slate-200 rounded-2xl m-4 shadow-inner"><h4 class="text-sm font-bold text-slate-700 mb-4 pb-2 border-b-2 border-primary/30 flex items-center gap-2"><i class="fas fa-clipboard-check text-primary"></i> รายละเอียดผลการตรวจสอบอย่างละเอียด</h4>`;
+        let detailHtml = `<div class="p-4 md:p-6 w-full">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <h4 class="bg-slate-100 p-3 border-b border-slate-200 font-bold text-slate-700 text-sm flex items-center gap-2">
+              <i class="fas fa-clipboard-check text-primary"></i> รายละเอียดผลการตรวจสอบ
+            </h4>
+            <div class="p-4 space-y-4">`;
         
         if (is5S) {
           const sections = (CHECKLIST_5S[d.area] || CHECKLIST_5S["OFFICE"])?.sections || [];
           sections.forEach((sec, sIdx) => {
-            detailHtml += `<div class="mb-4 rounded-xl overflow-hidden border border-slate-200/60 shadow-sm"><div class="bg-emerald-600 text-white px-4 py-2.5 font-semibold text-xs tracking-wide">${sec.title}</div>`;
+            detailHtml += `<div class="border border-slate-200 rounded-lg overflow-hidden"><div class="bg-slate-50 p-2.5 font-bold text-slate-700 text-xs border-b border-slate-200">${sec.title}</div><div class="divide-y divide-slate-100">`;
             sec.questions.forEach((qText, qIdx) => {
               const res = d.fullChecklist?.[`5s_s${sIdx}_q${qIdx}`];
               const remark = d.fullChecklist?.[`5s_remark_s${sIdx}_q${qIdx}`] || "";
-              let pillBg = 'bg-slate-100 text-slate-400', badgeScore = '0';
-              if (res === "ดี") { pillBg = 'bg-emerald-50 text-emerald-700 border-emerald-200'; badgeScore = '+2'; }
-              else if (res === "พอใช้") { pillBg = 'bg-amber-50 text-amber-700 border-amber-200'; badgeScore = '+1'; }
-              else if (res === "ปรับปรุง") { pillBg = 'bg-rose-50 text-rose-700 border-rose-200'; badgeScore = '0'; }
+              let statusText = '-', statusClass = '', scoreBadge = '';
               
-              detailHtml += `
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start p-4 bg-white border-b border-slate-100 last:border-b-0 gap-2">
-                  <div class="text-slate-600 text-xs font-medium">• ${qText} <span class="ml-2 bg-slate-100 text-slate-600 text-[10px] px-1.5 py-0.5 rounded font-bold">${badgeScore}</span>
-                    ${remark ? `<div class="mt-2 text-xs p-2.5 bg-rose-50/50 border-l-4 border-rose-400 text-rose-700 rounded-r-lg font-medium"><i class="fas fa-comment-dots mr-1"></i> ${remark}</div>` : ''}
-                  </div>
-                  <div class="border px-3 py-1 rounded-lg text-xs font-bold self-start sm:self-center ${pillBg}">${res || '-'}</div>
-                </div>`;
+              if (res === "ดี") { statusText = '✔ ดี'; statusClass = 'bg-green-50 text-green-700 border-green-200'; scoreBadge = '<span class="bg-green-600 text-white px-1.5 py-0.5 rounded text-[9px] ml-2 font-bold">+2</span>'; }
+              else if (res === "พอใช้") { statusText = '🔶 พอใช้'; statusClass = 'bg-orange-50 text-orange-700 border-orange-200'; scoreBadge = '<span class="bg-orange-500 text-white px-1.5 py-0.5 rounded text-[9px] ml-2 font-bold">+1</span>'; }
+              else if (res === "ปรับปรุง") { statusText = '✘ ปรับปรุง'; statusClass = 'bg-red-50 text-red-700 border-red-200'; scoreBadge = '<span class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] ml-2 font-bold">0</span>'; }
+              
+              detailHtml += `<div class="p-3 flex flex-col md:flex-row md:items-start justify-between gap-3 hover:bg-slate-50 transition">
+                <div class="text-xs text-slate-700 leading-relaxed flex-1">
+                  <span class="font-semibold">&bull; ${qText}</span> ${scoreBadge}
+                  ${remark ? `<div class="mt-2 bg-orange-50 border-l-2 border-primary text-orange-800 p-2 rounded text-[10px]"><i class="fas fa-comment-dots opacity-50 mr-1"></i> ${remark}</div>` : ''}
+                </div>
+                <div class="border ${statusClass} px-3 py-1 rounded-md text-[10px] font-bold text-center shrink-0 self-start">${statusText}</div>
+              </div>`;
             });
-            detailHtml += `</div>`;
+            detailHtml += `</div></div>`;
           });
         } else {
           const checklist = getSafetyChecklist(d.area);
           for(let secKey in checklist) {
-            const section = checklist[secKey]; 
-            const sNum = secKey.replace('s', '');
-            detailHtml += `<div class="mb-4 rounded-xl overflow-hidden border border-slate-200/60 shadow-sm"><div class="bg-primary text-white px-4 py-2.5 font-semibold text-xs tracking-wide">${section.title}</div>`;
+            const section = checklist[secKey]; const sNum = secKey.replace('s', '');
+            detailHtml += `<div class="border border-slate-200 rounded-lg overflow-hidden"><div class="bg-slate-50 p-2.5 font-bold text-slate-700 text-xs border-b border-slate-200">${section.title}</div><div class="divide-y divide-slate-100">`;
+            
             section.questions.forEach((qText, idx) => {
               const res = d.fullChecklist?.[`section${sNum}_q${idx}`];
               const remark = d.fullChecklist?.[`section${sNum}_remark${idx}`];
               const isBad = res === "ไม่ดี";
               let displayQText = qText;
+              
               if(secKey === 's1' && qText === 'Water Mist' && d.fullChecklist?.['water_val']) {
-                displayQText += ` <span class="text-orange-600 font-bold">(${d.fullChecklist['water_val']}%)</span>`;
+                displayQText += ` <span class="text-orange-600 font-bold bg-orange-100 px-1.5 py-0.5 rounded text-[10px] ml-1">(${d.fullChecklist['water_val']}%)</span>`;
               }
               
               let qPhotoPreviews = "";
@@ -403,29 +422,27 @@
                     if(d.photo[pKey] && d.photo[pKey] !== "") {
                        let thumbUrl = getDriveThumbnailUrl(d.photo[pKey]);
                        let imgCaption = d.fullChecklist?.[`caption_${pKey}`] || "";
-                       qPhotoPreviews += `
-                        <div class="flex flex-col items-center w-24 border border-slate-200 p-1 bg-slate-50 rounded-lg mt-2 mr-2">
-                          <a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="w-full h-16 object-cover rounded shadow-sm hover:scale-105 transition"></a>
-                          ${imgCaption ? `<span class="text-[10px] text-slate-500 text-center mt-1 truncate w-full">${imgCaption}</span>` : ''}
-                        </div>`;
+                       qPhotoPreviews += `<div class="mt-2 inline-flex flex-col items-center mr-2"><a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="w-16 h-16 object-cover rounded-lg border border-slate-300 hover:scale-110 transition bg-slate-100"></a>${imgCaption ? `<span class="text-[9px] text-slate-500 mt-1 max-w-[64px] truncate">${imgCaption}</span>` : ''}</div>`;
                     }
                  }
               }
-              const pillBg = isBad ? 'bg-rose-50 text-rose-700 border-rose-200' : (res === 'ดี' || res === 'ปกติ' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-400');
-              detailHtml += `
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start p-4 bg-white border-b border-slate-100 last:border-b-0 gap-2">
-                  <div class="text-slate-600 text-xs font-medium">- ${displayQText}
-                    ${remark ? `<div class="mt-2 text-xs p-2.5 bg-amber-50 border-l-4 border-amber-400 text-amber-800 rounded-r-lg font-medium"><b>หมายเหตุ:</b> ${remark}</div>` : ''} 
-                    ${qPhotoPreviews !== "" ? `<div class="flex flex-wrap mt-1">${qPhotoPreviews}</div>` : ''}
-                  </div>
-                  <div class="border px-3 py-1 rounded-lg text-xs font-bold self-start sm:self-center ${pillBg}">${isBad ? '✘ ไม่ปกติ' : (res === 'ดี' || res === 'ปกติ' ? '✔ ปกติ' : '-')}</div>
-                </div>`;
+              
+              detailHtml += `<div class="p-3 flex flex-col md:flex-row md:items-start justify-between gap-3 hover:bg-slate-50 transition">
+                <div class="text-xs text-slate-700 leading-relaxed flex-1">
+                  <span class="font-medium">- ${displayQText}</span>
+                  ${remark ? `<div class="mt-2 bg-red-50 border-l-2 border-red-500 text-red-800 p-2 rounded text-[10px]"><b>หมายเหตุ:</b> ${remark}</div>` : ''}
+                  ${qPhotoPreviews !== "" ? `<div class="flex flex-wrap">${qPhotoPreviews}</div>` : ''}
+                </div>
+                <div class="${isBad ? 'bg-red-100 text-red-700' : (res === 'ดี' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500')} px-3 py-1 rounded-md text-[10px] font-bold text-center shrink-0 self-start">
+                  ${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}
+                </div>
+              </div>`;
             });
-            detailHtml += `</div>`;
+            detailHtml += `</div></div>`;
           }
         }
-        detailHtml += `</div>`;
-        detailTr.innerHTML = `<td colspan="7" class="p-0">${detailHtml}</td>`;
+        detailHtml += `</div></div></div>`;
+        detailTr.innerHTML = `<td colspan="7" class="p-0 border-b border-slate-200">${detailHtml}</td>`;
         tbody.appendChild(detailTr);
       });
     }
@@ -433,16 +450,14 @@
     function toggleDetail(id) {
       const row = document.getElementById('detail-' + id);
       const icon = document.getElementById('icon-' + id);
-      const isHidden = row.classList.contains('hidden');
+      const isVisible = !row.classList.contains('hidden');
       
-      if (isHidden) {
-        row.classList.remove('hidden');
-        if (window.innerWidth <= 768) row.style.display = 'block'; else row.style.display = 'table-row';
-        icon.className = 'fas fa-chevron-up';
-      } else {
+      if(isVisible) {
         row.classList.add('hidden');
-        row.style.display = 'none';
-        icon.className = 'fas fa-chevron-down';
+        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+      } else {
+        row.classList.remove('hidden');
+        icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
       }
     }
   </script>
