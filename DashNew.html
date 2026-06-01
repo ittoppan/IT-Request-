@@ -3,157 +3,168 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SAFETY & 5S DASHBOARD</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  
-  <script>
-    const appColor = localStorage.getItem('appColor') || '#E65100'; // สีเริ่มต้น (ส้ม)
-    const appFont = localStorage.getItem('appFont') || "'Prompt', sans-serif";
-    
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { primary: appColor },
-          fontFamily: { sans: [appFont] }
-        }
-      }
+  <title>SAFETY & 5S PATROL DASHBOARD</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root { 
+      --primary: #f39c12; --primary-dark: #e67e22; --dark: #2c3e50; 
+      --success: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; 
+      --light-orange: #fff5e6; --border: #e0e0e0; 
     }
-  </script>
-  
-  <style type="text/tailwindcss">
-    @layer utilities {
-      body { font-family: theme('fontFamily.sans'); }
-      .hide-scroll::-webkit-scrollbar { display: none; }
-      .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-      
-      /* Responsive Table Styles (CSS Trick เดิมปรับให้เข้ากับ Tailwind) */
-      @media (max-width: 768px) {
-        .responsive-table thead { display: none; }
-        .responsive-table tr { display: flex; flex-direction: column; margin-bottom: 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; overflow: hidden; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .responsive-table td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; text-align: right; }
-        .responsive-table td::before { content: attr(data-label); font-weight: 600; color: theme('colors.slate.500'); font-size: 0.8rem; text-align: left; margin-right: 1rem; }
-        .responsive-table td:last-child { border-bottom: none; }
-      }
-    }
+    body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     
-    /* Loader Animation */
-    .spin-ring { border-top-color: theme('colors.primary'); animation: spin 0.8s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Navigation */
+    .nav { background: linear-gradient(90deg, #ff8c00, var(--primary)); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; }
+    .nav h2 { margin: 0; font-size: 1.3rem; letter-spacing: 0.5px; }
+    .nav-actions { display: flex; gap: 10px; }
+    .btn-main { background: white; color: var(--primary); padding: 8px 15px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: 0.3s; font-size: 0.95rem; white-space: nowrap; border: 1px solid white; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-report { background: #3498db; color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: 0.3s; font-size: 0.95rem; white-space: nowrap; border: 1px solid #3498db; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-report:hover { background: #2980b9; }
+    
+    .container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
+
+    /* Filters */
+    .filter-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
+    .date-filter-box { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    input[type="date"] { padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd; font-family: 'Prompt'; font-size: 1rem; color: var(--dark); outline: none; transition: border 0.3s; }
+    input[type="date"]:focus { border-color: var(--primary); }
+    .btn-clear-date { background: #f8f9fa; border: 1px solid #ddd; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: 600; color: #555; transition: 0.2s; }
+    .btn-clear-date:hover { background: #e9ecef; }
+    
+    .type-selector-title { font-weight: 600; color: var(--dark); font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .type-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+    .type-btn { padding: 10px 5px; border-radius: 8px; border: 2px solid var(--border); background: #f8f9fa; text-align: center; cursor: pointer; font-family: 'Prompt'; font-size: 0.75rem; font-weight: 600; color: #666; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 60px; user-select: none; }
+    .type-btn i { font-size: 1.1rem; color: #95a5a6; transition: color 0.2s; }
+    .type-btn:hover { border-color: var(--primary); background: #fff9f0; }
+    .type-btn:hover i { color: var(--primary); }
+    .type-btn.active { background: linear-gradient(145deg, #fff3e0, #ffe0b2); color: var(--primary-dark); border-color: var(--primary-dark); box-shadow: 0 4px 12px rgba(230, 126, 34, 0.2); }
+    .type-btn.active i { color: var(--primary-dark); transform: scale(1.1); }
+    .type-btn[data-type="5S"].active { background: linear-gradient(145deg, #e8f5e9, #c8e6c9); color: #219a52; border-color: #219a52; }
+    .type-btn[data-type="5S"].active i { color: #219a52; }
+    
+    /* Stats Cards */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
+    .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-bottom: 5px solid #ddd; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-card.active { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .stat-card small { color: #7f8c8d; font-weight: 600; }
+    
+    /* Main Table */
+    .table-box { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; min-width: 750px; }
+    th { background: #fff8f0; color: #e67e22; padding: 15px; text-align: left; font-size: 0.95rem; white-space: nowrap; }
+    td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; font-size: 0.95rem; }
+    .badge { padding: 5px 12px; border-radius: 50px; color: white; font-size: 0.8rem; white-space: nowrap; font-weight: 600;}
+    .type-badge { padding: 3px 10px; border-radius: 18px; color: white; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+    .type-badge.badge-5s { background: linear-gradient(135deg, var(--success), #219a52); }
+    
+    /* Details Row */
+    .detail-row { display: none; background: var(--light-orange); }
+    .inner-detail { padding: 20px; background: white; border: 1px solid #f9e3b4; margin: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.1); }
+    .section-group { margin-bottom: 15px; border-radius: 10px; overflow: hidden; border: 1px solid #ffe8cc; }
+    .section-head { background: var(--primary); color: white; padding: 12px 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;}
+    .sub-item { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #fff3e0; padding: 12px 15px; background: #fffdfa; gap: 10px; }
+    .sub-item-text { flex: 1; color: #5a4a3a; font-size: 0.95rem; line-height: 1.5; }
+    
+    /* Status Pills */
+    .status-pill { min-width: 80px; padding: 5px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-align: center; white-space: nowrap; }
+    .status-good { background: #e8f5e9; color: var(--success); }
+    .status-bad { background: #ffebee; color: var(--danger); }
+    .status-5s-good { background: #e8f5e9; color: #2e7d32; border: 1px solid #2e7d32; }
+    .status-5s-fair { background: #fff3e0; color: #e65100; border: 1px solid #e65100; }
+    .status-5s-improve { background: #ffebee; color: #c62828; border: 1px solid #c62828; }
+    .score-badge { font-size: 0.75rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 6px; display: inline-flex; align-items: center; }
+    .score-badge.good { background: #2e7d32; color: white; }
+    .score-badge.fair { background: #e65100; color: white; }
+    .score-badge.improve { background: #c62828; color: white; }
+    
+    .remark-box { font-size: 0.85rem; color: #d35400; margin-top: 8px; padding: 8px 12px; background: #fff9f0; border-left: 3px solid var(--primary); border-radius: 4px; }
+    .btn-view { background: #f4f6f7; border: 1px solid #d5dbdb; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--dark); font-family: 'Prompt'; transition: 0.2s; white-space: nowrap; font-weight: 600; }
+    .btn-view:hover { background: #e5e8e8; border-color: var(--primary); }
+    
+    /* Images & Loader */
+    .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; transition: transform 0.2s; margin-right: 5px; margin-bottom: 5px; background-color: #f9f9f9; }
+    .img-preview:hover { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    .img-preview-large { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; margin:0; background-color: #f9f9f9; }
+    .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; align-items: center; justify-content: center; z-index: 2000; flex-direction: column; }
+    .loader.show { display: flex; }
+
+    @media (max-width: 768px) {
+      .nav h2 { font-size: 1.1rem; width: 100%; text-align: center; }
+      .nav-actions { width: 100%; justify-content: center; }
+      .container { padding: 0 10px; margin: 15px auto; }
+      .type-selector { grid-template-columns: repeat(3, 1fr); }
+      .stats { gap: 10px; margin-bottom: 15px; }
+      .stat-card { padding: 12px 8px; border-radius: 10px; border-bottom: 4px solid #ddd; }
+      .stat-card small { font-size: 0.7rem; letter-spacing: -0.5px; }
+      .stat-card .value { font-size: 1.5rem !important; }
+      .inner-detail { padding: 12px; margin: 10px 5px; }
+      .sub-item { flex-direction: column; padding: 12px 10px; }
+      .status-pill { margin-left: 0; margin-top: 10px; align-self: flex-start; }
+      .img-preview-large { width: 75px; height: 75px; }
+      input[type="date"] { width: 100%; max-width: 200px;}
+      .date-filter-box { flex-wrap: wrap; }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tr { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+      td { text-align: left !important; padding: 10px 15px; border: none; border-bottom: 1px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center; }
+      td::before { content: attr(data-label); font-weight: 600; color: var(--primary-dark); font-size: 0.85rem; }
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 pb-20 lg:pb-8">
-
-  <div id="loader" class="fixed inset-0 bg-white/90 flex-col items-center justify-center z-[9999] gap-3 hidden">
-    <div class="w-12 h-12 border-4 border-slate-200 rounded-full spin-ring"></div>
-    <div class="text-sm text-slate-600 font-semibold">กำลังโหลดข้อมูล...</div>
+<body>
+  <div id="loader" class="loader">
+    <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i>
+    <p style="margin-top: 15px; font-weight: 600; color: #555;">กำลังโหลดข้อมูล...</p>
   </div>
   
-  <nav class="bg-slate-900 text-white p-3 md:px-6 sticky top-0 z-50 flex items-center justify-between shadow-md">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-inner shrink-0">
-        <i class="fas fa-shield-halved text-xl"></i>
-      </div>
-      <div>
-        <h1 class="text-sm md:text-base font-bold tracking-wide truncate" id="dynamicAppName">SAFETY & 5S DASHBOARD</h1>
-        <span class="text-[10px] text-primary block -mt-1 font-medium">Master Command Center</span>
-      </div>
-    </div>
-    <div class="flex gap-2 shrink-0">
-      <a href="check.html" class="hidden md:flex bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-semibold transition items-center gap-2 shadow-sm">
-        <i class="fas fa-plus"></i> ตรวจพื้นที่
-      </a>
-      <a href="report.html" class="hidden md:flex bg-slate-700 hover:bg-slate-600 text-white w-10 h-10 rounded-lg items-center justify-center transition" title="Action Plan">
-        <i class="fas fa-chart-line"></i>
-      </a>
+  <nav class="nav">
+    <div><h2><i class="fas fa-shield-halved"></i> SAFETY & 5S DASHBOARD</h2></div>
+    <div class="nav-actions">
+      <a href="reportnew.html" class="btn-report"><i class="fas fa-chart-line"></i> Action Plan</a>
+      <a href="https://itrequests.netlify.app/check" class="btn-main"><i class="fas fa-plus"></i> ตรวจสอบพื้นที่</a>
     </div>
   </nav>
 
-  <main class="max-w-6xl mx-auto p-4 space-y-6 mt-2">
-    
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6">
-      
-      <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-slate-100">
-        <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 flex-1 md:flex-none">
-          <i class="fas fa-calendar-alt text-primary"></i>
-          <input type="date" id="dateFilter" onchange="renderTable()" class="bg-transparent border-none outline-none text-sm text-slate-700 w-full cursor-pointer">
-        </div>
-        <button onclick="clearDateFilter()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-semibold transition">ดูทั้งหมด</button>
+  <div class="container">
+    <div class="filter-section">
+      <div class="date-filter-box">
+        <i class="fas fa-calendar-alt" style="color:var(--primary); font-size:1.2rem;"></i>
+        <input type="date" id="dateFilter" onchange="renderTable()">
+        <button class="btn-clear-date" onclick="clearDateFilter()">ดูทั้งหมด</button>
       </div>
-      
-      <div>
-        <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2"><i class="fas fa-filter text-primary"></i> กรองตามประเภทการตรวจสอบ</h3>
-        <div class="grid grid-cols-3 md:grid-cols-6 gap-2">
-          <button class="type-btn border-2 border-primary bg-primary/10 text-primary rounded-xl py-3 flex flex-col items-center gap-1 transition shadow-sm" data-type="all" onclick="selectTypeFilter('all', this)"><i class="fas fa-list text-lg"></i><span class="text-[10px] font-bold">ทั้งหมด</span></button>
-          <button class="type-btn border-2 border-slate-100 bg-slate-50 text-slate-500 hover:border-primary hover:text-primary rounded-xl py-3 flex flex-col items-center gap-1 transition" data-type="จป.ว" onclick="selectTypeFilter('จป.ว', this)"><i class="fas fa-hard-hat text-lg"></i><span class="text-[10px] font-bold">จป.ว</span></button>
-          <button class="type-btn border-2 border-slate-100 bg-slate-50 text-slate-500 hover:border-primary hover:text-primary rounded-xl py-3 flex flex-col items-center gap-1 transition" data-type="คปอ." onclick="selectTypeFilter('คปอ.', this)"><i class="fas fa-users-cog text-lg"></i><span class="text-[10px] font-bold">คปอ.</span></button>
-          <button class="type-btn border-2 border-slate-100 bg-slate-50 text-slate-500 hover:border-primary hover:text-primary rounded-xl py-3 flex flex-col items-center gap-1 transition" data-type="Foreman/Mgr." onclick="selectTypeFilter('Foreman/Mgr.', this)"><i class="fas fa-user-tie text-lg"></i><span class="text-[10px] font-bold">Foreman</span></button>
-          <button class="type-btn border-2 border-slate-100 bg-slate-50 text-slate-500 hover:border-blue-500 hover:text-blue-500 rounded-xl py-3 flex flex-col items-center gap-1 transition" data-type="Audit" onclick="selectTypeFilter('Audit', this)"><i class="fas fa-search text-lg"></i><span class="text-[10px] font-bold">Audit</span></button>
-          <button class="type-btn border-2 border-slate-100 bg-slate-50 text-slate-500 hover:border-green-500 hover:text-green-500 rounded-xl py-3 flex flex-col items-center gap-1 transition" data-type="5S" onclick="selectTypeFilter('5S', this)"><i class="fas fa-broom text-lg"></i><span class="text-[10px] font-bold">5S</span></button>
-        </div>
+      <div class="type-selector-title"><i class="fas fa-filter" style="color: var(--primary);"></i> กรองตามประเภทการตรวจสอบ</div>
+      <div class="type-selector">
+        <div class="type-btn active" data-type="all" onclick="selectTypeFilter('all', this)"><i class="fas fa-list"></i>ทั้งหมด</div>
+        <div class="type-btn" data-type="จป.ว" onclick="selectTypeFilter('จป.ว', this)"><i class="fas fa-hard-hat"></i>จป.ว</div>
+        <div class="type-btn" data-type="คปอ." onclick="selectTypeFilter('คปอ.', this)"><i class="fas fa-users-cog"></i>คปอ.</div>
+        <div class="type-btn" data-type="Foreman/Mgr." onclick="selectTypeFilter('Foreman/Mgr.', this)"><i class="fas fa-user-tie"></i>Foreman</div>
+        <div class="type-btn" data-type="Audit" onclick="selectTypeFilter('Audit', this)"><i class="fas fa-search"></i>Audit</div>
+        <div class="type-btn" data-type="Accident/Fire" onclick="selectTypeFilter('Accident/Fire', this)"><i class="fas fa-fire-extinguisher"></i>Accident</div>
+        <div class="type-btn" data-type="5S" onclick="selectTypeFilter('5S', this)"><i class="fas fa-broom"></i>5S</div>
       </div>
     </div>
     
-    <div class="grid grid-cols-3 gap-3 md:gap-6">
-      <div class="stat-card bg-white rounded-2xl shadow-sm border border-slate-200 p-4 text-center cursor-pointer transition transform hover:-translate-y-1 border-b-4 border-b-primary" id="card-all" onclick="updateStatusFilter('all')">
-        <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wide">ทั้งหมด</p>
-        <h2 class="text-2xl md:text-4xl font-bold text-blue-600 mt-1" id="countTotal">0</h2>
-      </div>
-      <div class="stat-card bg-white rounded-2xl shadow-sm border border-slate-200 p-4 text-center cursor-pointer transition transform hover:-translate-y-1 border-b-4 border-b-slate-200" id="card-good" onclick="updateStatusFilter('good')">
-        <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wide">ปกติ</p>
-        <h2 class="text-2xl md:text-4xl font-bold text-green-500 mt-1" id="countGood">0</h2>
-      </div>
-      <div class="stat-card bg-white rounded-2xl shadow-sm border border-slate-200 p-4 text-center cursor-pointer transition transform hover:-translate-y-1 border-b-4 border-b-slate-200" id="card-bad" onclick="updateStatusFilter('bad')">
-        <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wide">พบปัญหา</p>
-        <h2 class="text-2xl md:text-4xl font-bold text-red-500 mt-1" id="countBad">0</h2>
-      </div>
+    <div class="stats">
+      <div class="stat-card active" id="card-all" onclick="updateStatusFilter('all')"><small>ทั้งหมดในตาราง</small><div class="value" id="countTotal" style="font-size:2.2rem; color:#3498db;">0</div></div>
+      <div class="stat-card" id="card-good" onclick="updateStatusFilter('good')"><small>ปกติ</small><div class="value" id="countGood" style="font-size:2.2rem; color:var(--success);">0</div></div>
+      <div class="stat-card" id="card-bad" onclick="updateStatusFilter('bad')"><small>พบปัญหา</small><div class="value" id="countBad" style="font-size:2.2rem; color:var(--danger);">0</div></div>
     </div>
     
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-      <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-        <h3 class="font-bold text-slate-700 text-sm"><i class="fas fa-clipboard-list text-primary mr-2"></i> รายการตรวจประเมิน</h3>
-      </div>
-      <div class="overflow-x-auto w-full">
-        <table class="w-full text-left whitespace-nowrap responsive-table min-w-[800px] md:min-w-full">
-          <thead class="bg-slate-100 text-slate-500 text-xs uppercase font-semibold">
-            <tr>
-              <th class="p-4">เวลา</th>
-              <th class="p-4">ประเภท</th>
-              <th class="p-4">พื้นที่</th>
-              <th class="p-4">ผู้ตรวจ</th>
-              <th class="p-4">สถานะรวม</th>
-              <th class="p-4 text-center">รูปถ่าย</th>
-              <th class="p-4 text-right">รายละเอียด</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody" class="divide-y divide-slate-100 text-sm">
-            </tbody>
-        </table>
-      </div>
+    <div class="table-box">
+      <table>
+        <thead><tr><th>เวลา</th><th>ประเภท</th><th>พื้นที่</th><th>ผู้ตรวจ</th><th>สถานะรวม</th><th>รูปถ่าย</th><th>รายละเอียด</th></tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
     </div>
-
-  </main>
-
-  <nav class="lg:hidden fixed bottom-0 left-0 right-0 h-[60px] bg-slate-900 border-t border-slate-800 flex justify-around items-center z-50 pb-safe">
-    <a href="index.html" class="flex flex-col items-center gap-1 text-primary"><i class="fas fa-chart-pie text-lg"></i><span class="text-[10px] font-bold">แดชบอร์ด</span></a>
-    <a href="check.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary"><i class="fas fa-clipboard-check text-lg"></i><span class="text-[10px] font-bold">ตรวจพื้นที่</span></a>
-    <a href="report.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary"><i class="fas fa-list text-lg"></i><span class="text-[10px] font-bold">รายงาน</span></a>
-    <a href="admin.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary"><i class="fas fa-cog text-lg"></i><span class="text-[10px] font-bold">ตั้งค่า</span></a>
-  </nav>
+  </div>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
 
-    // อัปเดตชื่อระบบตอนโหลดหน้า
-    document.addEventListener("DOMContentLoaded", () => {
-      const appName = localStorage.getItem('appName');
-      if (appName) document.getElementById('dynamicAppName').textContent = appName;
-    });
-
     // ===================================================================
-    // CHECKLISTS DATA (คงไว้เหมือนเดิมเป๊ะๆ เพื่อไม่ให้กระทบ Logic)
+    // ✅ SAFETY CHECKLISTS — อัปเดต 8 หมวดตามรายการใหม่
     // ===================================================================
     const SAFETY_CHECKLIST_FACTORY = {
       s1: { title: "1. สถานที่ทำงาน", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "การจัดเก็บ และกองวัสดุมีการกำหนดสูงไม่เกิน กองวัสดุมีความปลอดภัย", "Water Mist"] },
@@ -165,6 +176,7 @@
       s7: { title: "7. การกำจัดของเสีย", questions: ["มีการแยกประเภทขยะ, การปิดฝาถังขยะ, ถังขยะไม่มีชำรุด แตกหัก"] },
       s8: { title: "8. Other", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
+
     const SAFETY_CHECKLIST_OFFICE = {
       s1: { title: "1. สภาพแวดล้อมสำนักงาน", questions: ["พื้นที่ทำงานสะอาด เป็นระเบียบ ไม่มีสิ่งของวางเกะกะ", "แสงสว่างเพียงพอต่อการทำงาน", "ระบบปรับอากาศ/อากาศถ่ายเทสะดวก", "เฟอร์นิเจอร์อยู่ในสภาพปลอดภัยมั่นคง", "ไม่มีการจัดวางของหนักบนที่สูงเกินระดับปลอดภัย"] },
       s2: { title: "2. ท่านั่งทำงานและ Ergonomics", questions: ["ท่านั่งทำงานถูกต้อง จอคอมพิวเตอร์ระดับสายตา", "มีการพักสายตา/ยืดเหยียดร่างกายตามความเหมาะสม", "การหยิบเอกสารไม่มีการบิดเอี้ยวหรือก้มเงยมากเกินไป"] },
@@ -174,6 +186,7 @@
       s6: { title: "6. การกำจัดขยะ", questions: ["มีการแยกขยะ (ทั่วไป/รีไซเคิล/อันตราย) ถูกต้อง", "ถังขยะมีฝาปิดมิดชิด และอยู่ในสภาพไม่ชำรุด", "ไม่มีการทิ้งขยะเกลื่อนกลาดหรือวางกองไว้เกินกำหนด"] },
       s7: { title: "7. Other (ไม่บังคับ)", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
+
     const SAFETY_CHECKLIST_OUTSIDE = {
       s1: { title: "1. พื้นที่โดยรอบ", questions: ["ไม่มีเศษขยะ/เศษวัสดุตกหล่นตามทางเดินและที่จอดรถ", "หญ้า/พืชพรรณไม่ขึ้นรกสูงเกินไป", "สายยาง/ท่อต่างๆ เก็บเป็นระเบียบเรียบร้อย", "อุปกรณ์กำจัดสัตว์พาหะอยู่ในสภาพพร้อมใช้งาน", "รั้วโรงงานไม่มีรอยชำรุดเสียหาย"] },
       s2: { title: "2. โรงเก็บขยะ", questions: ["มีการจัดเรียงถังเป็นระเบียบ", "แยกชนิดขยะให้ชัดเจนและมีป้ายชี้บ่ง", "ขยะไม่ล้นออกมา / ปิดฝาสนิท", "ถังเก็บสารเคมีอันตรายไม่ล้นและอยู่ในสภาพปลอดภัย"] },
@@ -183,6 +196,7 @@
       s6: { title: "6. โรงจอดรถ", questions: ["จอดรถเป็นระเบียบไม่มีความเสี่ยงอุบัติเหตุ", "หลังคา/พื้น/ที่กั้น มีสภาพปกติไม่เสียหาย"] },
       s7: { title: "7. Other (ไม่บังคับ)", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
+
     const SAFETY_CHECKLIST_MAP = {
       "PRINT": "FACTORY", "LAMINATE": "FACTORY", "SOLVENT": "FACTORY",
       "REWINDER/SLITTER/PACKING": "FACTORY", "BAG MAKING": "FACTORY",
@@ -198,6 +212,9 @@
       return SAFETY_CHECKLIST_FACTORY;
     }
 
+    // ===================================================================
+    // ✅ 5S CHECKLISTS
+    // ===================================================================
     const FACTORY_5S_SECTIONS = [
       { title: "1. เครื่องจักร", questions: ["ทำความสะอาดเครื่องจักรทุกครั้งก่อน – หลังเลิกงานพร้อมระบุผู้รับผิดชอบป้ายผู้รับผิดชอบต้องเป็นปัจจุบัน", "ตีเส้นกำหนดจุดที่ตั้ง (ตีเส้นรอบเครื่องจักรด้วยสีเหลือง)", "ก่อนทำงานกับเครื่องจักรต้องแต่งกายให้รัดกุมและต้องสวมอุปกรณ์ป้องกันส่วนบุคคล"] },
       { title: "2. เครื่องมือ", questions: ["กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน", "หลังจากนำเครื่องมือและอุปกรณ์ไปใช้ให้เก็บเข้าที่เสมอ", "เก็บวางเครื่องมืออย่างเป็นระเบียบในพื้นที่ที่กำหนด", "กำหนดผู้รับผิดชอบให้ชัดเจน"] },
@@ -238,24 +255,31 @@
       return url;
     }
 
-    function calculate5SScore(checklist, areaStr) {
-      const areaData = CHECKLIST_5S[areaStr] || CHECKLIST_5S["OFFICE"];
-      const sections = areaData?.sections || [];
-      let total = 0, max = 0;
-      sections.forEach((sec, sIdx) => {
-        const questions = sec.questions || sec.qs || [];
-        questions.forEach((_, qIdx) => {
-          const val = checklist?.[`5s_s${sIdx}_q${qIdx}`];
-          max += 2;
-          if (val === "ดี") total += 2;
-          else if (val === "พอใช้") total += 1;
-        });
-      });
-      return max > 0 ? Math.round((total / max) * 100) : 0;
-    }
+   /**
+ * คำนวณคะแนน 5S แบบไดนามิก (รองรับจำนวนข้อที่เปลี่ยนแปลง)
+ */
+function calculate5SScore(checklist, areaStr) {
+  const areaData = CHECKLIST_5S[areaStr] || CHECKLIST_5S["OFFICE"];
+  const sections = areaData?.sections || [];
+  
+  let total = 0, max = 0;
+  
+  sections.forEach((sec, sIdx) => {
+    const questions = sec.questions || sec.qs || [];
+    questions.forEach((_, qIdx) => {
+      const val = checklist?.[`5s_s${sIdx}_q${qIdx}`];
+      max += 2; // Max 2 คะแนนต่อข้อ
+      if (val === "ดี") total += 2;
+      else if (val === "พอใช้") total += 1;
+      // "ปรับปรุง" = 0 คะแนน
+    });
+  });
+  
+  return max > 0 ? Math.round((total / max) * 100) : 0;
+}
 
     function loadData() {
-      const loader = document.getElementById('loader'); loader.classList.remove('hidden'); loader.classList.add('flex');
+      const loader = document.getElementById('loader'); loader.classList.add('show');
       fetch(API_URL + "?action=getDashboardData")
       .then(r => r.json()).then(data => {
         rawData = data.details || [];
@@ -265,39 +289,12 @@
             d.hasBad = Object.values(d.fullChecklist).includes("ปรับปรุง") || Object.values(d.fullChecklist).includes("ไม่ดี");
           }
         });
-        renderTable(); 
-        loader.classList.add('hidden'); loader.classList.remove('flex');
-      }).catch(err => { 
-        loader.classList.add('hidden'); loader.classList.remove('flex'); 
-        console.error("Error:", err); 
-      });
+        renderTable(); loader.classList.remove('show');
+      }).catch(err => { loader.classList.remove('show'); console.error("Error:", err); });
     }
 
-    function selectTypeFilter(type, el) { 
-      currentType = type; 
-      document.querySelectorAll('.type-btn').forEach(b => {
-        b.classList.remove('border-primary', 'bg-primary/10', 'text-primary', 'border-green-500', 'text-green-500', 'border-blue-500', 'text-blue-500');
-        b.classList.add('border-slate-100', 'bg-slate-50', 'text-slate-500');
-      }); 
-      
-      el.classList.remove('border-slate-100', 'bg-slate-50', 'text-slate-500');
-      if(type === '5S') el.classList.add('border-green-500', 'bg-green-50', 'text-green-600');
-      else if(type === 'Audit') el.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-600');
-      else el.classList.add('border-primary', 'bg-primary/10', 'text-primary');
-      
-      renderTable(); 
-    }
-    
-    function updateStatusFilter(status) { 
-      currentStatus = status; 
-      document.querySelectorAll('.stat-card').forEach(c => {
-        c.classList.remove('border-b-primary');
-        c.classList.add('border-b-slate-200');
-      }); 
-      document.getElementById('card-' + status).classList.remove('border-b-slate-200');
-      document.getElementById('card-' + status).classList.add('border-b-primary');
-      renderTable(); 
-    }
+    function selectTypeFilter(type, el) { currentType = type; document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); renderTable(); }
+    function updateStatusFilter(status) { currentStatus = status; document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active')); document.getElementById('card-' + status).classList.add('active'); renderTable(); }
 
     function renderTable() {
       let filtered = [...rawData];
@@ -306,114 +303,77 @@
       if (currentType !== 'all') filtered = filtered.filter(d => d.inspectionType?.toUpperCase() === currentType.toUpperCase());
       
       const t = filtered.length, b = filtered.filter(d => d.hasBad).length, g = t - b;
-      document.getElementById('countTotal').innerText = t; 
-      document.getElementById('countGood').innerText = g; 
-      document.getElementById('countBad').innerText = b;
+      document.getElementById('countTotal').innerText = t; document.getElementById('countGood').innerText = g; document.getElementById('countBad').innerText = b;
       
       if (currentStatus === 'good') filtered = filtered.filter(d => !d.hasBad);
       if (currentStatus === 'bad') filtered = filtered.filter(d => d.hasBad);
 
       const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
-      if(filtered.length === 0) { 
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-12 text-slate-400"><i class="fas fa-folder-open text-4xl opacity-30 mb-3 block"></i> <p class="font-semibold text-slate-600">ไม่พบข้อมูลตามเงื่อนไขที่เลือก</p></td></tr>`; 
-        return; 
-      }
+      if(filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px; color:#95a5a6;"><i class="fas fa-folder-open fa-3x" style="opacity:0.3; margin-bottom:15px; display:block;"></i> ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`; return; }
 
       filtered.forEach(d => {
         const is5S = d.inspectionType?.toUpperCase() === "5S";
-        let photoDisplay = '<span class="text-slate-300">-</span>';
-        
+        let photoDisplay = '-';
         if (typeof d.photo === 'object' && d.photo !== null) {
           let photoCount = Object.values(d.photo).filter(url => url && url !== "ไม่มีรูปถ่าย" && url.trim() !== "").length;
-          if(photoCount > 0) photoDisplay = `<span class="text-primary text-xs font-bold bg-primary/10 px-2 py-1 rounded"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
+          if(photoCount > 0) photoDisplay = `<span style="color:var(--primary); font-size:0.9rem; font-weight:600;"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
         } else if (typeof d.photo === 'string' && d.photo !== "ไม่มีรูปถ่าย" && d.photo.trim() !== "") {
-          photoDisplay = `<a href="${d.photo}" target="_blank" class="text-primary hover:text-primary/80"><i class="fas fa-image fa-lg"></i></a>`;
+          photoDisplay = `<a href="${d.photo}" target="_blank" style="color:var(--primary)"><i class="fas fa-image fa-lg"></i></a>`;
         }
 
         let statusHtml = '';
-        if (is5S) {
-           const percent = calculate5SScore(d.fullChecklist, d.area);
-           const colorClass = percent >= 80 ? 'text-green-600 bg-green-100' : percent >= 50 ? 'text-orange-600 bg-orange-100' : 'text-red-600 bg-red-100';
-           statusHtml = `<span class="${colorClass} px-2.5 py-1 rounded-full text-[10px] font-bold"><i class="fas fa-chart-pie"></i> ${percent}%</span>`;
-        } else {
-           const statusText = d.hasBad ? 'พบปัญหา' : 'ปกติ';
-           const statusClass = d.hasBad ? 'bg-red-500 text-white' : 'bg-green-500 text-white';
-           statusHtml = `<span class="${statusClass} px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm">${statusText}</span>`;
-        }
+if (is5S) {
+   // ✅ 5S: แสดงคะแนน %
+   const percent = calculate5SScore(d.fullChecklist, d.area);
+   const color = percent >= 80 ? 'var(--success)' : percent >= 50 ? '#f39c12' : 'var(--danger)';
+   statusHtml = `<span style="background:${color}20;color:${color};padding:5px 12px;border-radius:18px;font-size:0.8rem;font-weight:600;white-space:nowrap;"><i class="fas fa-chart-pie"></i> ${percent}%</span>`;
+} else {
+   // ✅ Safety: แสดงแค่สถานะ "ปกติ/พบปัญหา" (ไม่มีคะแนน %)
+   const statusText = d.hasBad ? 'พบปัญหา' : 'ปกติ';
+   const statusColor = d.hasBad ? 'var(--danger)' : 'var(--success)';
+   statusHtml = `<span class="badge" style="background:${statusColor}">${statusText}</span>`;
+}
+  
 
-        let typeBadgeCls = is5S ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-primary to-orange-600';
+
+        let typeBadgeCls = is5S ? 'badge-5s' : '';
         let typeIcon = is5S ? 'fa-broom' : 'fa-hard-hat';
-        if(d.inspectionType === 'Audit') { typeIcon = 'fa-search'; typeBadgeCls = 'bg-gradient-to-r from-blue-500 to-blue-600'; }
-        if(d.inspectionType?.includes('Accident')) { typeIcon = 'fa-fire-extinguisher'; typeBadgeCls = 'bg-gradient-to-r from-red-500 to-red-600'; }
+        if(d.inspectionType === 'Audit') typeIcon = 'fa-search';
+        if(d.inspectionType?.includes('Accident')) typeIcon = 'fa-fire-extinguisher';
 
-        // Main Row
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition border-b border-slate-100 group";
-        tr.innerHTML = `
-          <td data-label="เวลา" class="p-3 md:p-4 whitespace-nowrap text-slate-500">${d.timestamp || '-'}</td>
-          <td data-label="ประเภท" class="p-3 md:p-4"><span class="${typeBadgeCls} text-white px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm inline-flex items-center gap-1"><i class="fas ${typeIcon}"></i> ${d.inspectionType}</span></td>
-          <td data-label="พื้นที่" class="p-3 md:p-4 font-bold text-slate-700">${d.area || '-'}</td>
-          <td data-label="ผู้ตรวจ" class="p-3 md:p-4 text-slate-600">${d.inspector || '-'}</td>
-          <td data-label="สถานะรวม" class="p-3 md:p-4">${statusHtml}</td>
-          <td data-label="รูปถ่าย" class="p-3 md:p-4 text-center md:text-left">${photoDisplay}</td>
-          <td data-label="รายละเอียด" class="p-3 md:p-4 text-right">
-            <button class="bg-white border border-slate-200 hover:border-primary hover:text-primary text-slate-600 px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-sm" onclick="toggleDetail('${d.id}')">
-              <i class="fas fa-chevron-down mr-1" id="icon-${d.id}"></i> ดูผล
-            </button>
-          </td>
-        `;
+        tr.innerHTML = `<td data-label="เวลา">${d.timestamp || '-'}</td><td data-label="ประเภท"><span class="type-badge ${typeBadgeCls}"><i class="fas ${typeIcon}"></i> ${d.inspectionType}</span></td><td data-label="พื้นที่"><strong>${d.area || '-'}</strong></td><td data-label="ผู้ตรวจ">${d.inspector || '-'}</td><td data-label="สถานะรวม">${statusHtml}</td><td data-label="รูปถ่าย">${photoDisplay}</td><td data-label="รายละเอียด"><button class="btn-view" onclick="toggleDetail('${d.id}')"><i class="fas fa-chevron-down" id="icon-${d.id}"></i> ดูผลตรวจ</button></td>`;
         tbody.appendChild(tr);
 
-        // Detail Row
-        const detailTr = document.createElement('tr'); 
-        detailTr.id = `detail-${d.id}`; 
-        detailTr.className = 'hidden bg-slate-50/50';
-        
-        let detailHtml = `<div class="p-4 md:p-6 w-full">
-          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <h4 class="bg-slate-100 p-3 border-b border-slate-200 font-bold text-slate-700 text-sm flex items-center gap-2">
-              <i class="fas fa-clipboard-check text-primary"></i> รายละเอียดผลการตรวจสอบ
-            </h4>
-            <div class="p-4 space-y-4">`;
+        const detailTr = document.createElement('tr'); detailTr.id = `detail-${d.id}`; detailTr.className = 'detail-row';
+        let detailHtml = `<div class="inner-detail"><h4 style="margin:0 0 15px 0; color:var(--dark); border-bottom:3px solid var(--primary); padding-bottom:8px;"><i class="fas fa-clipboard-check"></i> รายละเอียดผลการตรวจสอบ</h4>`;
         
         if (is5S) {
           const sections = (CHECKLIST_5S[d.area] || CHECKLIST_5S["OFFICE"])?.sections || [];
           sections.forEach((sec, sIdx) => {
-            detailHtml += `<div class="border border-slate-200 rounded-lg overflow-hidden"><div class="bg-slate-50 p-2.5 font-bold text-slate-700 text-xs border-b border-slate-200">${sec.title}</div><div class="divide-y divide-slate-100">`;
+            detailHtml += `<div class="section-group"><div class="section-head"><span>${sec.title}</span></div>`;
             sec.questions.forEach((qText, qIdx) => {
               const res = d.fullChecklist?.[`5s_s${sIdx}_q${qIdx}`];
               const remark = d.fullChecklist?.[`5s_remark_s${sIdx}_q${qIdx}`] || "";
               let statusText = '-', statusClass = '', scoreBadge = '';
-              
-              if (res === "ดี") { statusText = '✔ ดี'; statusClass = 'bg-green-50 text-green-700 border-green-200'; scoreBadge = '<span class="bg-green-600 text-white px-1.5 py-0.5 rounded text-[9px] ml-2 font-bold">+2</span>'; }
-              else if (res === "พอใช้") { statusText = '🔶 พอใช้'; statusClass = 'bg-orange-50 text-orange-700 border-orange-200'; scoreBadge = '<span class="bg-orange-500 text-white px-1.5 py-0.5 rounded text-[9px] ml-2 font-bold">+1</span>'; }
-              else if (res === "ปรับปรุง") { statusText = '✘ ปรับปรุง'; statusClass = 'bg-red-50 text-red-700 border-red-200'; scoreBadge = '<span class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] ml-2 font-bold">0</span>'; }
-              
-              detailHtml += `<div class="p-3 flex flex-col md:flex-row md:items-start justify-between gap-3 hover:bg-slate-50 transition">
-                <div class="text-xs text-slate-700 leading-relaxed flex-1">
-                  <span class="font-semibold">&bull; ${qText}</span> ${scoreBadge}
-                  ${remark ? `<div class="mt-2 bg-orange-50 border-l-2 border-primary text-orange-800 p-2 rounded text-[10px]"><i class="fas fa-comment-dots opacity-50 mr-1"></i> ${remark}</div>` : ''}
-                </div>
-                <div class="border ${statusClass} px-3 py-1 rounded-md text-[10px] font-bold text-center shrink-0 self-start">${statusText}</div>
-              </div>`;
+              if (res === "ดี") { statusText = '✔ ดี'; statusClass = 'status-5s-good'; scoreBadge = '<span class="score-badge good">+2</span>'; }
+              else if (res === "พอใช้") { statusText = '🔶 พอใช้'; statusClass = 'status-5s-fair'; scoreBadge = '<span class="score-badge fair">+1</span>'; }
+              else if (res === "ปรับปรุง") { statusText = '✘ ปรับปรุง'; statusClass = 'status-5s-improve'; scoreBadge = '<span class="score-badge improve">0</span>'; }
+              detailHtml += `<div class="sub-item"><div class="sub-item-text">• ${qText} ${scoreBadge} ${remark ? `<div class="remark-box"><i class="fas fa-comment-dots"></i> ${remark}</div>` : ''}</div><div class="status-pill ${statusClass}">${statusText}</div></div>`;
             });
-            detailHtml += `</div></div>`;
+            detailHtml += `</div>`;
           });
         } else {
           const checklist = getSafetyChecklist(d.area);
           for(let secKey in checklist) {
             const section = checklist[secKey]; const sNum = secKey.replace('s', '');
-            detailHtml += `<div class="border border-slate-200 rounded-lg overflow-hidden"><div class="bg-slate-50 p-2.5 font-bold text-slate-700 text-xs border-b border-slate-200">${section.title}</div><div class="divide-y divide-slate-100">`;
-            
+            detailHtml += `<div class="section-group"><div class="section-head"><span>${section.title}</span></div>`;
             section.questions.forEach((qText, idx) => {
               const res = d.fullChecklist?.[`section${sNum}_q${idx}`];
               const remark = d.fullChecklist?.[`section${sNum}_remark${idx}`];
               const isBad = res === "ไม่ดี";
               let displayQText = qText;
-              
-              if(secKey === 's1' && qText === 'Water Mist' && d.fullChecklist?.['water_val']) {
-                displayQText += ` <span class="text-orange-600 font-bold bg-orange-100 px-1.5 py-0.5 rounded text-[10px] ml-1">(${d.fullChecklist['water_val']}%)</span>`;
-              }
+              if(secKey === 's1' && qText === 'Water Mist' && d.fullChecklist?.['water_val']) displayQText += ` <span style="color:#e67e22; font-weight:bold;">(${d.fullChecklist['water_val']}%)</span>`;
               
               let qPhotoPreviews = "";
               if(typeof d.photo === 'object' && d.photo !== null) {
@@ -422,44 +382,70 @@
                     if(d.photo[pKey] && d.photo[pKey] !== "") {
                        let thumbUrl = getDriveThumbnailUrl(d.photo[pKey]);
                        let imgCaption = d.fullChecklist?.[`caption_${pKey}`] || "";
-                       qPhotoPreviews += `<div class="mt-2 inline-flex flex-col items-center mr-2"><a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="w-16 h-16 object-cover rounded-lg border border-slate-300 hover:scale-110 transition bg-slate-100"></a>${imgCaption ? `<span class="text-[9px] text-slate-500 mt-1 max-w-[64px] truncate">${imgCaption}</span>` : ''}</div>`;
+                       qPhotoPreviews += `<div style="display:flex; flex-direction:column; align-items:center; width:90px; margin-right:10px; margin-top:8px;"><a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="img-preview-large"></a>${imgCaption ? `<span style="font-size:0.7rem; color:#555; text-align:center; margin-top:4px;">${imgCaption}</span>` : ''}</div>`;
                     }
                  }
               }
-              
-              detailHtml += `<div class="p-3 flex flex-col md:flex-row md:items-start justify-between gap-3 hover:bg-slate-50 transition">
-                <div class="text-xs text-slate-700 leading-relaxed flex-1">
-                  <span class="font-medium">- ${displayQText}</span>
-                  ${remark ? `<div class="mt-2 bg-red-50 border-l-2 border-red-500 text-red-800 p-2 rounded text-[10px]"><b>หมายเหตุ:</b> ${remark}</div>` : ''}
-                  ${qPhotoPreviews !== "" ? `<div class="flex flex-wrap">${qPhotoPreviews}</div>` : ''}
-                </div>
-                <div class="${isBad ? 'bg-red-100 text-red-700' : (res === 'ดี' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500')} px-3 py-1 rounded-md text-[10px] font-bold text-center shrink-0 self-start">
-                  ${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}
-                </div>
-              </div>`;
+              detailHtml += `<div class="sub-item"><div class="sub-item-text">- ${displayQText} ${remark ? `<div class="remark-box"><b>หมายเหตุ:</b> ${remark}</div>` : ''} ${qPhotoPreviews !== "" ? `<div style="display:flex; flex-wrap:wrap;">${qPhotoPreviews}</div>` : ''}</div><div class="status-pill ${isBad ? 'status-bad' : (res === "ดี" ? 'status-good' : '')}">${isBad ? '✘ ไม่ปกติ' : (res === "ดี" ? '✔ ปกติ' : '-')}</div></div>`;
             });
-            detailHtml += `</div></div>`;
+            detailHtml += `</div>`;
           }
         }
-        detailHtml += `</div></div></div>`;
-        detailTr.innerHTML = `<td colspan="7" class="p-0 border-b border-slate-200">${detailHtml}</td>`;
+        detailHtml += `</div>`;
+        detailTr.innerHTML = `<td colspan="7" style="padding:0;">${detailHtml}</td>`;
         tbody.appendChild(detailTr);
       });
     }
 
     function toggleDetail(id) {
-      const row = document.getElementById('detail-' + id);
-      const icon = document.getElementById('icon-' + id);
-      const isVisible = !row.classList.contains('hidden');
-      
-      if(isVisible) {
-        row.classList.add('hidden');
-        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-      } else {
-        row.classList.remove('hidden');
-        icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-      }
+      const row = document.getElementById('detail-' + id), icon = document.getElementById('icon-' + id);
+      const isVisible = row.style.display === 'table-row' || row.style.display === 'block';
+      if (window.innerWidth <= 768) row.style.display = isVisible ? 'none' : 'block'; else row.style.display = isVisible ? 'none' : 'table-row';
+      icon.className = isVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
     }
+    /**
+ * ✅ คำนวณคะแนน Safety แบบไดนามิก (รองรับจำนวนข้อที่เปลี่ยนแปลง)
+ * @param {Object} details - ข้อมูล JSON จากรายการตรวจสอบ
+ * @param {Object} checklistConfig - ตัวแปรโครงสร้าง Checklist
+ * @param {string} area - พื้นที่ที่ตรวจ
+ * @returns {Object} { total, good, percent }
+ */
+function calculateSafetyScore(details, checklistConfig, area) {
+  let totalQuestions = 0;
+  let passedQuestions = 0;
+  
+  for (let sKey in checklistConfig) {
+    const section = checklistConfig[sKey];
+    const questions = section.questions || section.qs || [];
+    const sNum = sKey.replace('s', '');
+    
+    questions.forEach((q, qIdx) => {
+      const qKey = `section${sNum}_q${qIdx}`;
+      const answer = details[qKey];
+      
+      // ✅ Water Mist Logic เฉพาะบางพื้นที่
+      if (sKey === 's1' && q === 'Water Mist' && (area === 'PRINT' || area === 'LAMINATE')) {
+        const waterVal = parseFloat(details['water_val']);
+        if (!isNaN(waterVal)) {
+          totalQuestions++;
+          if (waterVal >= 50) passedQuestions++;
+        }
+      }
+      // ✅ ข้อปกติ: นับเฉพาะที่มีคำตอบ
+      else if (answer) {
+        totalQuestions++;
+        if (answer === 'ดี' || answer === 'ปกติ') {
+          passedQuestions++;
+        }
+      }
+    });
+  }
+  
+  if (totalQuestions === 0) return { total: 0, good: 0, percent: 0 };
+  
+  const percent = Math.round((passedQuestions / totalQuestions) * 100);
+  return { total: totalQuestions, good: passedQuestions, percent: percent };
+}
   </script>
 </body>
 </html>
