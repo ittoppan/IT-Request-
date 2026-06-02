@@ -16,9 +16,45 @@
     .type-btn.active { border-color: #003566 !important; background-color: #e6f0fa !important; color: #003566 !important; }
     .dark .type-btn.active { border-color: #38bdf8 !important; background-color: #0c4a6e !important; color: #38bdf8 !important; }
     
-    /* Transition สำหรับข้อความยาวๆ */
+    /* Transition สำหรับข้อความยาวๆ บน Desktop */
     .hover-expand { transition: all 0.3s ease; }
     .hover-expand:hover { -webkit-line-clamp: unset !important; line-clamp: unset !important; }
+
+    /* 📱 ระบบ Card Layout สำหรับมือถือ (หน้าจอเล็กกว่า 768px) */
+    @media (max-width: 767px) {
+      .responsive-table thead { display: none; /* ซ่อนหัวตาราง */ }
+      .responsive-table tbody, .responsive-table tr, .responsive-table td { display: block; width: 100%; }
+      .responsive-table tr { 
+        margin-bottom: 1.25rem; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 0.75rem; 
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
+        background-color: #fff; 
+        overflow: hidden;
+      }
+      .dark .responsive-table tr { background-color: #1e293b; border-color: #334155; }
+      .responsive-table td { 
+        display: flex; 
+        flex-direction: column; 
+        padding: 0.75rem 1rem; 
+        border-bottom: 1px solid #f1f5f9; 
+        text-align: left !important;
+      }
+      .dark .responsive-table td { border-bottom-color: #334155; }
+      .responsive-table td:last-child { border-bottom: none; }
+      /* เสก Label ขึ้นมาแสดงด้านบนของแต่ละฟิลด์ */
+      .responsive-table td::before { 
+        content: attr(data-label); 
+        font-weight: 700; 
+        color: #003566; 
+        font-size: 0.75rem;
+        margin-bottom: 0.25rem;
+      }
+      .dark .responsive-table td::before { color: #38bdf8; }
+      /* ปรับขนาดรูปภาพบนมือถือให้ใหญ่เต็มตาขึ้น */
+      .responsive-table td img { width: 100% !important; max-width: 250px; height: auto !important; margin: 0; }
+      .responsive-table td a, .responsive-table td span.inline-flex { margin-left: 0; max-width: fit-content; }
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 p-2 md:p-6 min-h-screen">
@@ -33,7 +69,7 @@
         <a href="DashNew.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition flex items-center gap-1"><i class="fas fa-list-check"></i> รายการตรวจ</a>
         <a href="dashboard.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition flex items-center gap-1"><i class="fas fa-chart-pie"></i> ศูนย์ควบคุม</a>
         <a href="reportnew.html" class="px-3 py-1.5 bg-sky-600 rounded font-semibold flex items-center gap-1"><i class="fas fa-business-time"></i> Action Plan</a>
-        <a href="safety.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition flex items-center gap-1"><i class="fas fa-plus-circle"></i> ตรวจพื้นที่</a>
+        <a href="check.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition flex items-center gap-1"><i class="fas fa-plus-circle"></i> ตรวจพื้นที่</a>
       </div>
     </div>
   </nav>
@@ -115,23 +151,23 @@
         <button id="toggleDarkMode" class="bg-white border text-slate-500 w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center shadow-2xs hover:bg-slate-50 transition" onclick="toggleDarkMode()"><i class="fas fa-moon text-[10px] md:text-xs"></i></button>
       </div>
 
-      <div class="w-full rounded-xl border border-slate-200 overflow-hidden">
-        <table class="w-full text-[9px] md:text-xs text-left border-collapse table-fixed break-words">
-          <thead>
+      <div class="w-full md:rounded-xl md:border md:border-slate-200">
+        <table class="responsive-table w-full text-[11px] md:text-xs text-left border-collapse md:table-fixed break-words">
+          <thead class="hidden md:table-header-group">
             <tr class="bg-gradient-to-r from-[#002548] to-[#003566] text-white">
-              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[4%] cursor-pointer" onclick="sortTable('jobId')">ลำดับ</th>
-              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[5%]">ประเภท</th>
-              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[6%]">Before</th>
-              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[6%]">After</th>
-              <th class="p-1 md:p-2 font-bold border border-slate-700 w-[8%] cursor-pointer" onclick="sortTable('area')">พื้นที่</th>
-              <th class="p-1 md:p-2 font-bold border border-slate-700 w-[8%] cursor-pointer" onclick="sortTable('jobId')">Job No.</th>
-              <th class="p-1 md:p-2 font-bold border border-slate-700 w-[16%]">ปัญหาที่ตรวจพบ</th>
-              <th class="p-1 md:p-2 font-bold border border-slate-700 w-[16%]">แนวทางแก้ไขปัญหา</th>
-              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[7%]">ผู้รับผิดชอบ</th>
-              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('dateFound')">วันที่พบ</th>
-              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('dueDate')">กำหนดเสร็จ</th>
-              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('finishDate')">ปิดงาน</th>
-              <th class="p-1 md:p-2 font-bold border border-slate-700 w-[6%]">หมายเหตุ</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[4%] cursor-pointer" onclick="sortTable('jobId')">ลำดับ</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[5%]">ประเภท</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[6%]">Before</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[6%]">After</th>
+              <th class="p-2 font-bold border border-slate-700 w-[8%] cursor-pointer" onclick="sortTable('area')">พื้นที่</th>
+              <th class="p-2 font-bold border border-slate-700 w-[8%] cursor-pointer" onclick="sortTable('jobId')">Job No.</th>
+              <th class="p-2 font-bold border border-slate-700 w-[16%]">ปัญหาที่ตรวจพบ</th>
+              <th class="p-2 font-bold border border-slate-700 w-[16%]">แนวทางแก้ไขปัญหา</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[7%]">ผู้รับผิดชอบ</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('dateFound')">วันที่พบ</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('dueDate')">กำหนดเสร็จ</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('finishDate')">ปิดงาน</th>
+              <th class="p-2 font-bold border border-slate-700 w-[6%]">หมายเหตุ</th>
             </tr>
           </thead>
           <tbody id="reportContent" class="divide-y divide-slate-200 bg-white"></tbody>
@@ -293,34 +329,35 @@
         const isClosed = item.status === 'Closed';
         
         const actionBtn = !isClosed 
-          ? `<a href="resolveNew.html?jobid=${encodeURIComponent(item.jobId)}" class="flex items-center justify-center gap-1 bg-rose-500 hover:bg-rose-600 text-white font-bold px-1 py-1 md:px-2 md:py-1.5 rounded text-[8px] md:text-[10px] shadow-sm transition w-full mx-auto"><i class="fas fa-wrench"></i> <span class="hidden md:inline">แก้ไข</span></a>`
-          : `<span class="flex items-center justify-center gap-1 text-emerald-600 bg-emerald-50 border border-emerald-200 px-1 py-1 md:px-2 md:py-1.5 rounded text-[8px] md:text-[10px] font-bold w-full mx-auto"><i class="fas fa-check"></i> <span class="hidden md:inline">ปิดแล้ว</span></span>`;
+          ? `<a href="resolveNew.html?jobid=${encodeURIComponent(item.jobId)}" class="flex items-center justify-center gap-1 bg-rose-500 hover:bg-rose-600 text-white font-bold px-2 py-1.5 md:px-2 md:py-1.5 rounded text-[10px] md:text-[10px] shadow-sm transition w-full md:mx-auto"><i class="fas fa-wrench"></i> แก้ไข</a>`
+          : `<span class="flex items-center justify-center gap-1 text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-1.5 md:px-2 md:py-1.5 rounded text-[10px] md:text-[10px] font-bold w-full md:mx-auto"><i class="fas fa-check"></i> ปิดแล้ว</span>`;
         
         const imgBefore = item.picBefore && item.picBefore !== "-" 
-          ? `<img src="${getDriveThumb(item.picBefore)}" class="w-[30px] h-[25px] md:w-[50px] md:h-[40px] mx-auto rounded object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picBefore)}')">`
-          : `<span class="text-slate-400 italic text-[8px] md:text-[10px]">ไม่มีรูป</span>`;
+          ? `<img src="${getDriveThumb(item.picBefore)}" class="w-[50px] h-[40px] md:mx-auto rounded object-cover cursor-pointer hover:scale-105 md:border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picBefore)}')">`
+          : `<span class="text-slate-400 italic text-[10px] md:text-[10px]">ไม่มีรูป</span>`;
         
         const imgAfter = item.picAfter && item.picAfter !== "-"
-          ? `<img src="${getDriveThumb(item.picAfter)}" class="w-[30px] h-[25px] md:w-[50px] md:h-[40px] mx-auto rounded object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picAfter)}')">`
-          : (isClosed ? `<span class="text-slate-400 italic text-[8px] md:text-[10px]">-</span>` : actionBtn);
+          ? `<img src="${getDriveThumb(item.picAfter)}" class="w-[50px] h-[40px] md:mx-auto rounded object-cover cursor-pointer hover:scale-105 md:border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picAfter)}')">`
+          : (isClosed ? `<span class="text-slate-400 italic text-[10px] md:text-[10px]">-</span>` : actionBtn);
         
         const typeColor = item.inspectionType === '5S' ? 'bg-emerald-600' : item.inspectionType === 'Audit' ? 'bg-sky-600' : 'bg-[#003566]';
 
+        // 🌟 ใส่ data-label สำหรับ Card Layout บนมือถือ 🌟
         return `
           <tr class="${!isClosed ? 'bg-rose-50/40 hover:bg-rose-50/70' : 'hover:bg-slate-50/70'} transition">
-            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle font-semibold text-slate-700 border border-slate-200">${start + index + 1}</td>
-            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle border border-slate-200"><span class="px-1 py-0.5 md:px-2 md:py-1 text-[8px] md:text-[10px] font-bold rounded-full text-white ${typeColor}">${escapeHtml(item.inspectionType)}</span></td>
-            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle border border-slate-200">${imgBefore}</td>
-            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle border border-slate-200">${imgAfter}</td>
-            <td class="px-1 py-2 md:px-2 md:py-3 align-middle font-bold text-slate-700 border border-slate-200">${escapeHtml(CONFIG.AREA_DISPLAY_MAP[CONFIG.AREA_ALIAS[item.area] || item.area] || item.area || '-')}</td>
-            <td class="px-1 py-2 md:px-2 md:py-3 align-middle font-semibold text-sky-700 border border-slate-200 font-mono">${escapeHtml(item.jobId)}</td>
-            <td class="px-1 py-2 md:px-2 md:py-3 align-middle font-medium text-slate-800 border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${escapeHtml(item.remark || item.problem || '-')}</div></td>
-            <td class="px-1 py-2 md:px-2 md:py-3 align-middle text-slate-600 border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span class="text-slate-300">-</span>'}</div></td>
-            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle font-medium border border-slate-200">${item.picName ? escapeHtml(item.picName) : '<span class="text-slate-300">-</span>'}</td>
-            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle text-slate-500 border border-slate-200">${item.dateFound || '-'}</td>
-            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle font-bold text-rose-600 border border-slate-200">${item.dueDate || '-'}</td>
-            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle font-semibold border border-slate-200">${item.finishDate && item.finishDate !== "-" ? `<span class="text-emerald-600">${item.finishDate}</span>` : '<span class="text-slate-300">-</span>'}</td>
-            <td class="px-1 py-2 md:px-2 md:py-3 align-middle text-slate-500 border border-slate-200 text-[8px] md:text-[10px] leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${item.problemNote ? escapeHtml(item.problemNote) : (item.problem && item.problem !== item.remark ? escapeHtml(item.problem) : '<span class="text-slate-300">-</span>')}</div></td>
+            <td data-label="ลำดับ" class="md:p-2 md:text-center align-middle font-semibold text-slate-700 md:border border-slate-200">${start + index + 1}</td>
+            <td data-label="ประเภท" class="md:p-2 md:text-center align-middle md:border border-slate-200"><span class="px-2 py-1 text-[10px] md:text-[10px] font-bold rounded-full text-white ${typeColor}">${escapeHtml(item.inspectionType)}</span></td>
+            <td data-label="ภาพ Before" class="md:p-2 md:text-center align-middle md:border border-slate-200">${imgBefore}</td>
+            <td data-label="ภาพ After" class="md:p-2 md:text-center align-middle md:border border-slate-200">${imgAfter}</td>
+            <td data-label="พื้นที่/แผนก" class="md:p-2 align-middle font-bold text-slate-700 md:border border-slate-200">${escapeHtml(CONFIG.AREA_DISPLAY_MAP[CONFIG.AREA_ALIAS[item.area] || item.area] || item.area || '-')}</td>
+            <td data-label="Job No." class="md:p-2 align-middle font-semibold text-sky-700 md:border border-slate-200 font-mono">${escapeHtml(item.jobId)}</td>
+            <td data-label="ปัญหาที่ตรวจพบ" class="md:p-2 align-middle font-medium text-slate-800 md:border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${escapeHtml(item.remark || item.problem || '-')}</div></td>
+            <td data-label="แนวทางแก้ไข" class="md:p-2 align-middle text-slate-600 md:border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span class="text-slate-300">-</span>'}</div></td>
+            <td data-label="ผู้รับผิดชอบ" class="md:p-2 md:text-center align-middle font-medium md:border border-slate-200">${item.picName ? escapeHtml(item.picName) : '<span class="text-slate-300">-</span>'}</td>
+            <td data-label="วันที่พบ" class="md:p-2 md:text-center align-middle text-slate-500 md:border border-slate-200">${item.dateFound || '-'}</td>
+            <td data-label="กำหนดเสร็จ" class="md:p-2 md:text-center align-middle font-bold text-rose-600 md:border border-slate-200">${item.dueDate || '-'}</td>
+            <td data-label="ปิดงาน" class="md:p-2 md:text-center align-middle font-semibold md:border border-slate-200">${item.finishDate && item.finishDate !== "-" ? `<span class="text-emerald-600">${item.finishDate}</span>` : '<span class="text-slate-300">-</span>'}</td>
+            <td data-label="หมายเหตุเพิ่มเติม" class="md:p-2 align-middle text-slate-500 md:border border-slate-200 text-[10px] md:text-[10px] leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${item.problemNote ? escapeHtml(item.problemNote) : (item.problem && item.problem !== item.remark ? escapeHtml(item.problem) : '<span class="text-slate-300">-</span>')}</div></td>
           </tr>
         `;
       }).join('');
