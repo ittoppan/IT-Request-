@@ -47,12 +47,12 @@
         <label class="font-semibold text-sm text-slate-700 block mb-3"><i class="fas fa-clipboard-check text-[#003566] mr-1"></i> ประเภทการตรวจสอบ</label>
         
         <div class="grid grid-cols-3 gap-2 mb-4" id="typeSelector">
-          <div class="p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 active shadow-sm" data-type="จป.ว" onclick="selectType('จป.ว', this)"><i class="fas fa-hard-hat text-base text-slate-400"></i>จป.ว</div>
-          <div class="p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 shadow-sm" data-type="คปอ." onclick="selectType('คปอ.', this)"><i class="fas fa-users-cog text-base text-slate-400"></i>คปอ.</div>
-          <div class="p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 shadow-sm" data-type="Foreman/Mgr." onclick="selectType('Foreman/Mgr.', this)"><i class="fas fa-user-tie text-base text-slate-400"></i>Foreman/Mgr.</div>
-          <div class="p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 shadow-sm" data-type="Audit" onclick="selectType('Audit', this)"><i class="fas fa-search text-base text-slate-400"></i>Audit</div>
-          <div class="p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 shadow-sm" data-type="Accident/Fire" onclick="selectType('Accident/Fire', this)"><i class="fas fa-fire-extinguisher text-base text-slate-400"></i>Accident/Fire</div>
-          <div class="p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 shadow-sm" data-type="5S" onclick="selectType('5S', this)"><i class="fas fa-broom text-base text-slate-400"></i>5S</div>
+          <div class="type-btn p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 active shadow-sm" data-type="จป.ว" onclick="selectType('จป.ว', this)"><i class="fas fa-hard-hat text-base text-slate-400"></i>จป.ว</div>
+          <div class="type-btn p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 shadow-sm" data-type="คปอ." onclick="selectType('คปอ.', this)"><i class="fas fa-users-cog text-base text-slate-400"></i>คปอ.</div>
+          <div class="type-btn p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 shadow-sm" data-type="Foreman/Mgr." onclick="selectType('Foreman/Mgr.', this)"><i class="fas fa-user-tie text-base text-slate-400"></i>Foreman/Mgr.</div>
+          <div class="type-btn p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 shadow-sm" data-type="Audit" onclick="selectType('Audit', this)"><i class="fas fa-search text-base text-slate-400"></i>Audit</div>
+          <div class="type-btn p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 shadow-sm" data-type="Accident/Fire" onclick="selectType('Accident/Fire', this)"><i class="fas fa-fire-extinguisher text-base text-slate-400"></i>Accident/Fire</div>
+          <div class="type-btn p-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#003566] transition flex flex-col items-center gap-1 font-semibold text-xs text-slate-600 shadow-sm" data-type="5S" onclick="selectType('5S', this)"><i class="fas fa-broom text-base text-slate-400"></i>5S</div>
         </div>
         <input type="hidden" id="inspectionType" value="จป.ว">
 
@@ -146,10 +146,20 @@
       s7: { title: "7. Other (ไม่บังคับ)", qs: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
 
+    const SAFETY_CHECKLIST_WAREHOUSE = {
+      s1: { title: "1. สถานที่ทำงาน", qs: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "-ไม่วางสินค้า หรือพาเลทเกินมาตรฐานที่กำหนด"] },
+      s2: { title: "2. ท่าทางการทำงาน", qs: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การยกของอย่างถูกต้องและปลอดภัย"] },
+      s3: { title: "3. โฟล์คลิฟท์", qs: ["พนักงานผ่านการอบรม และมีใบรับรอง", "ขับตามเส้นทางที่กำหนด", "ไม่ขับเร็วเกินมาตรฐานที่กำหนด"] },
+      s4: { title: "4. สารเคมี", qs: ["การสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงาน", "ไม่มีสารเคมีหกรั่วไหล", "ภาชนะปิดสนิท", "อากาสถ่ายเท", "มีอุปกรณ์ Spill Kit พร้อมใช้งาน", "มีขั้นตอนการปฎิบัติงาน", "บันทึกการตรวจสายกราวด์", "มีฉลากระบุสารเคมี และมี MSDS"] },
+      s5: { title: "5. ไฟฟ้า", qs: ["ตรวจสอบอุปกรณ์ไฟฟ้าเช่น สายไฟ ปลั๊กไฟ ต้องไม่ชำรุดเสียหาย", "ปล๊กไฟ/เต้าเสียบไม่หลวม", "ไม่มีการต่ออุปกรณ์พวงไฟฟ้าแบบชั่วคราว", "อุปกรณ์ไฟฟ้าต้องมีการต่อสายดิน", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย, ไม่มีสายไฟโผล่, ไม่มีสิ่งกีดขวางหน้าตู้"] },
+      s6: { title: "6. อื่นๆ", qs: ["ทางหนีไฟไม่มีสิ่งกีขวาง", "ป้าย EXIT และ Layout ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน (เข็มอยู่ตำแหน่งสีเขียว)"] },
+      s7: { title: "7. Other (ไม่บังคับ)", qs: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
+    };
+
     const SAFETY_CHECKLIST_MAP = {
       "PRINT": "FACTORY", "LAMINATE": "FACTORY", "SOLVENT": "FACTORY",
       "REWINDER/SLITTER/PACKING": "FACTORY", "BAG MAKING": "FACTORY",
-      "QA&QC": "FACTORY", "WAREHOUSE": "FACTORY",
+      "QA&QC": "FACTORY", "WAREHOUSE": "WAREHOUSE",
       "OFFICE": "OFFICE", "OUTSIDE": "OUTSIDE", "DEFAULT": "FACTORY"
     };
 
@@ -158,6 +168,7 @@
       const key = SAFETY_CHECKLIST_MAP[normalized] || SAFETY_CHECKLIST_MAP["DEFAULT"];
       if (key === "OFFICE") return SAFETY_CHECKLIST_OFFICE;
       if (key === "OUTSIDE") return SAFETY_CHECKLIST_OUTSIDE;
+      if (key === "WAREHOUSE") return SAFETY_CHECKLIST_WAREHOUSE;
       return SAFETY_CHECKLIST_FACTORY;
     }
 
@@ -465,7 +476,7 @@
     async function fetchWithRetry(url, options, retries = 3) { for (let i=0; i<retries; i++) { try { const res = await fetch(url, options); return await res.json(); } catch(e) { if(i===retries-1) throw e; await new Promise(r=>setTimeout(r, 1000*(i+1))); } } }
 
     function setupAutoSave() { setInterval(() => { localStorage.setItem(CONFIG.DRAFT_KEY, JSON.stringify({ type: state.type, area: state.area, area5S: state.area5S, inspector: document.getElementById('inspectorName').value, timestamp: Date.now() })); }, 30000); }
-    function loadDraft() { const raw = localStorage.getItem(CONFIG.DRAFT_KEY); if (!raw) return; try { const d = JSON.parse(raw); if (Date.now() - d.timestamp < 86400000) { document.getElementById('inspectorName').value = d.inspector || ''; if (d.type) selectType(d.type, document.querySelector(`[data-type="${d.type}"]`)); state.area = d.area || 'PRINT'; state.area5S = d.area5S || 'PRINT'; populateDropdowns(); buildChecklist(); showToast('📥 โหลดข้อมูลล่าสุดจากเครื่อง', 'success'); } } catch {} }
+    function loadDraft() { const raw = localStorage.getItem(CONFIG.DRAFT_KEY); if (!raw) return; try { const d = JSON.parse(raw); if (Date.now() - d.timestamp < 86400000) { document.getElementById('inspectorName').value = d.inspector || ''; if (d.type) selectType(d.type, document.querySelector(`.type-btn[data-type="${d.type}"]`)); state.area = d.area || 'PRINT'; state.area5S = d.area5S || 'PRINT'; populateDropdowns(); buildChecklist(); showToast('📥 โหลดข้อมูลล่าสุดจากเครื่อง', 'success'); } } catch {} }
     function escapeHtml(t) { return t ? t.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])) : ''; }
     
     function showToast(msg, type='info') {
@@ -479,3 +490,5 @@
   </script>
 </body>
 </html>
+
+ตอนเลือก 5ส แล้วมาเลือก WAREHOUSE ทำไมไม่มีลิสรายงานเลย แต่ในโค๊ตยังมีอยู่นะ
