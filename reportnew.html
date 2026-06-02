@@ -15,12 +15,13 @@
     .dark select, .dark input { background-color: #334155 !important; color: white !important; border-color: #475569 !important; }
     .type-btn.active { border-color: #003566 !important; background-color: #e6f0fa !important; color: #003566 !important; }
     .dark .type-btn.active { border-color: #38bdf8 !important; background-color: #0c4a6e !important; color: #38bdf8 !important; }
-    /* เพิ่ม Transition เวลานำเมาส์ไปชี้ข้อความยาวๆ ให้ขยายออก */
+    
+    /* Transition สำหรับข้อความยาวๆ */
     .hover-expand { transition: all 0.3s ease; }
     .hover-expand:hover { -webkit-line-clamp: unset !important; line-clamp: unset !important; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 p-3 md:p-6 min-h-screen">
+<body class="bg-slate-50 text-slate-800 p-2 md:p-6 min-h-screen">
 
   <nav class="bg-[#003566] text-white fixed top-0 left-0 right-0 z-50 shadow-md">
     <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between py-3 gap-3">
@@ -32,7 +33,7 @@
         <a href="DashNew.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition flex items-center gap-1"><i class="fas fa-list-check"></i> รายการตรวจ</a>
         <a href="dashboard.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition flex items-center gap-1"><i class="fas fa-chart-pie"></i> ศูนย์ควบคุม</a>
         <a href="reportnew.html" class="px-3 py-1.5 bg-sky-600 rounded font-semibold flex items-center gap-1"><i class="fas fa-business-time"></i> Action Plan</a>
-        <a href="check.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition flex items-center gap-1"><i class="fas fa-plus-circle"></i> ตรวจพื้นที่</a>
+        <a href="safety.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition flex items-center gap-1"><i class="fas fa-plus-circle"></i> ตรวจพื้นที่</a>
       </div>
     </div>
   </nav>
@@ -87,56 +88,57 @@
       <div class="mt-3 pt-2 border-t border-dashed border-slate-100 flex flex-wrap gap-1.5" id="activeFilters"></div>
     </div>
 
-    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 overflow-hidden">
-      <div class="overflow-x-auto border rounded-xl bg-slate-50 mb-3 p-4">
-        <div class="min-w-[600px] flex items-center justify-between">
+    <div class="bg-white rounded-2xl p-2 md:p-4 shadow-sm border border-slate-200 overflow-hidden w-full">
+      
+      <div class="border rounded-xl bg-slate-50 mb-3 p-4">
+        <div class="flex flex-wrap md:flex-nowrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
-            <img src="https://itrequests.netlify.app/logo.png" class="h-10 w-auto opacity-90 object-contain" alt="LOGO" onerror="this.style.display='none'">
+            <img src="https://itrequests.netlify.app/logo.png" class="h-8 md:h-10 w-auto opacity-90 object-contain" alt="LOGO" onerror="this.style.display='none'">
             <div>
-              <h1 class="text-base font-bold text-slate-800 leading-tight">รายงานติดตามสถานะการแก้ไขปัญหา (Action Plan)</h1>
-              <p class="text-[11px] text-slate-500 uppercase font-medium">Safety Patrol & 5S Inspection Tracking System</p>
+              <h1 class="text-sm md:text-base font-bold text-slate-800 leading-tight">รายงานติดตามสถานะการแก้ไขปัญหา</h1>
+              <p class="text-[10px] md:text-[11px] text-slate-500 uppercase font-medium">Safety Patrol & 5S Tracking</p>
             </div>
           </div>
           <div class="text-right border-l pl-4 border-slate-300">
-            <span class="text-xs font-semibold text-slate-400 block uppercase">ประจำเดือน</span>
-            <span id="displayMonth" class="text-sm font-bold text-[#003566]">-</span>
+            <span class="text-[10px] md:text-xs font-semibold text-slate-400 block uppercase">ประจำเดือน</span>
+            <span id="displayMonth" class="text-xs md:text-sm font-bold text-[#003566]">-</span>
           </div>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center justify-between gap-2 mb-4 bg-slate-50/50 p-2 rounded-xl border border-slate-100">
-        <div class="flex gap-1.5">
-          <button class="bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="exportCSV()"><i class="fas fa-file-csv text-teal-600"></i> Export CSV</button>
-          <button class="bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="exportExcel()"><i class="fas fa-file-excel text-emerald-600"></i> Export Excel</button>
-          <button class="bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="printReport()"><i class="fas fa-print text-indigo-600"></i> พิมพ์เอกสาร</button>
+        <div class="flex flex-wrap gap-1.5">
+          <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="exportCSV()"><i class="fas fa-file-csv text-teal-600"></i> Export CSV</button>
+          <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="exportExcel()"><i class="fas fa-file-excel text-emerald-600"></i> Export Excel</button>
+          <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="printReport()"><i class="fas fa-print text-indigo-600"></i> พิมพ์</button>
         </div>
-        <button id="toggleDarkMode" class="bg-white border text-slate-500 w-8 h-8 rounded-lg flex items-center justify-center shadow-2xs hover:bg-slate-50 transition" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+        <button id="toggleDarkMode" class="bg-white border text-slate-500 w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center shadow-2xs hover:bg-slate-50 transition" onclick="toggleDarkMode()"><i class="fas fa-moon text-[10px] md:text-xs"></i></button>
       </div>
 
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
-        <table class="w-full text-xs text-left border-collapse min-w-max">
+      <div class="w-full rounded-xl border border-slate-200 overflow-hidden">
+        <table class="w-full text-[9px] md:text-xs text-left border-collapse table-fixed break-words">
           <thead>
-            <tr class="bg-gradient-to-r from-[#002548] to-[#003566] text-white whitespace-nowrap">
-              <th class="px-4 py-4 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('jobId')">ลำดับ <i class="fas fa-sort text-[10px] ml-1 opacity-50"></i></th>
-              <th class="px-4 py-4 text-center font-bold border border-slate-700">ประเภท</th>
-              <th class="px-4 py-4 text-center font-bold border border-slate-700 w-28">ภาพ Before</th>
-              <th class="px-4 py-4 text-center font-bold border border-slate-700 w-28">ภาพ After</th>
-              <th class="px-4 py-4 font-bold border border-slate-700 cursor-pointer" onclick="sortTable('area')">พื้นที่/แผนก <i class="fas fa-sort text-[10px] ml-1 opacity-50"></i></th>
-              <th class="px-4 py-4 font-bold border border-slate-700 cursor-pointer" onclick="sortTable('jobId')">Job No. <i class="fas fa-sort text-[10px] ml-1 opacity-50"></i></th>
-              <th class="px-4 py-4 font-bold border border-slate-700 min-w-[250px]">ปัญหาที่ตรวจพบ</th>
-              <th class="px-4 py-4 font-bold border border-slate-700 min-w-[250px]">แนวทางแก้ไขปัญหา</th>
-              <th class="px-4 py-4 text-center font-bold border border-slate-700">ผู้รับผิดชอบ</th>
-              <th class="px-4 py-4 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('dateFound')">วันที่พบ</th>
-              <th class="px-4 py-4 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('dueDate')">กำหนดเสร็จ</th>
-              <th class="px-4 py-4 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('finishDate')">วันที่ปิดงาน</th>
-              <th class="px-4 py-4 font-bold border border-slate-700 min-w-[180px]">หมายเหตุเพิ่มเติม</th>
+            <tr class="bg-gradient-to-r from-[#002548] to-[#003566] text-white">
+              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[4%] cursor-pointer" onclick="sortTable('jobId')">ลำดับ</th>
+              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[5%]">ประเภท</th>
+              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[6%]">Before</th>
+              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[6%]">After</th>
+              <th class="p-1 md:p-2 font-bold border border-slate-700 w-[8%] cursor-pointer" onclick="sortTable('area')">พื้นที่</th>
+              <th class="p-1 md:p-2 font-bold border border-slate-700 w-[8%] cursor-pointer" onclick="sortTable('jobId')">Job No.</th>
+              <th class="p-1 md:p-2 font-bold border border-slate-700 w-[16%]">ปัญหาที่ตรวจพบ</th>
+              <th class="p-1 md:p-2 font-bold border border-slate-700 w-[16%]">แนวทางแก้ไขปัญหา</th>
+              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[7%]">ผู้รับผิดชอบ</th>
+              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('dateFound')">วันที่พบ</th>
+              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('dueDate')">กำหนดเสร็จ</th>
+              <th class="p-1 md:p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('finishDate')">ปิดงาน</th>
+              <th class="p-1 md:p-2 font-bold border border-slate-700 w-[6%]">หมายเหตุ</th>
             </tr>
           </thead>
-          <tbody id="reportContent" class="divide-y divide-slate-200"></tbody>
+          <tbody id="reportContent" class="divide-y divide-slate-200 bg-white"></tbody>
         </table>
       </div>
 
-      <div id="pagination" class="mt-5 flex flex-wrap items-center justify-center gap-1.5"></div>
+      <div id="pagination" class="mt-4 flex flex-wrap items-center justify-center gap-1.5"></div>
     </div>
   </div>
 
@@ -290,38 +292,35 @@
       reportContent.innerHTML = pageData.map((item, index) => {
         const isClosed = item.status === 'Closed';
         
-        // 🚀 เพิ่ม Padding ให้ปุ่มนิดหน่อย
         const actionBtn = !isClosed 
-          ? `<a href="resolveNew.html?jobid=${encodeURIComponent(item.jobId)}" class="flex items-center justify-center gap-1.5 bg-rose-500 hover:bg-rose-600 text-white font-bold px-3 py-2 rounded-lg text-[11px] shadow-sm transition w-full max-w-[90px] mx-auto"><i class="fas fa-wrench"></i> แก้ไข</a>`
-          : `<span class="flex items-center justify-center gap-1.5 text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-lg text-[11px] font-bold w-full max-w-[90px] mx-auto"><i class="fas fa-check"></i> ปิดแล้ว</span>`;
+          ? `<a href="resolveNew.html?jobid=${encodeURIComponent(item.jobId)}" class="flex items-center justify-center gap-1 bg-rose-500 hover:bg-rose-600 text-white font-bold px-1 py-1 md:px-2 md:py-1.5 rounded text-[8px] md:text-[10px] shadow-sm transition w-full mx-auto"><i class="fas fa-wrench"></i> <span class="hidden md:inline">แก้ไข</span></a>`
+          : `<span class="flex items-center justify-center gap-1 text-emerald-600 bg-emerald-50 border border-emerald-200 px-1 py-1 md:px-2 md:py-1.5 rounded text-[8px] md:text-[10px] font-bold w-full mx-auto"><i class="fas fa-check"></i> <span class="hidden md:inline">ปิดแล้ว</span></span>`;
         
-        // 🚀 ขยายรูปเป็น 80x60
         const imgBefore = item.picBefore && item.picBefore !== "-" 
-          ? `<img src="${getDriveThumb(item.picBefore)}" class="w-[80px] h-[60px] mx-auto rounded-lg object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picBefore)}')">`
-          : `<span class="text-slate-400 italic text-xs">ไม่มีรูป</span>`;
+          ? `<img src="${getDriveThumb(item.picBefore)}" class="w-[30px] h-[25px] md:w-[50px] md:h-[40px] mx-auto rounded object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picBefore)}')">`
+          : `<span class="text-slate-400 italic text-[8px] md:text-[10px]">ไม่มีรูป</span>`;
         
         const imgAfter = item.picAfter && item.picAfter !== "-"
-          ? `<img src="${getDriveThumb(item.picAfter)}" class="w-[80px] h-[60px] mx-auto rounded-lg object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picAfter)}')">`
-          : (isClosed ? `<span class="text-slate-400 italic text-xs">-</span>` : actionBtn);
+          ? `<img src="${getDriveThumb(item.picAfter)}" class="w-[30px] h-[25px] md:w-[50px] md:h-[40px] mx-auto rounded object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picAfter)}')">`
+          : (isClosed ? `<span class="text-slate-400 italic text-[8px] md:text-[10px]">-</span>` : actionBtn);
         
         const typeColor = item.inspectionType === '5S' ? 'bg-emerald-600' : item.inspectionType === 'Audit' ? 'bg-sky-600' : 'bg-[#003566]';
 
-        // 🚀 ใช้คลาส p-4 เพื่อให้มี Padding กว้างขึ้น 16px สบายตา
         return `
           <tr class="${!isClosed ? 'bg-rose-50/40 hover:bg-rose-50/70' : 'hover:bg-slate-50/70'} transition">
-            <td class="p-4 text-center align-middle font-semibold text-slate-700 border border-slate-200">${start + index + 1}</td>
-            <td class="p-4 text-center align-middle border border-slate-200"><span class="px-3 py-1 text-[11px] font-bold rounded-full text-white ${typeColor}">${escapeHtml(item.inspectionType)}</span></td>
-            <td class="p-4 text-center align-middle border border-slate-200 w-28">${imgBefore}</td>
-            <td class="p-4 text-center align-middle border border-slate-200 w-28">${imgAfter}</td>
-            <td class="p-4 align-middle font-bold text-slate-700 border border-slate-200 whitespace-nowrap">${escapeHtml(CONFIG.AREA_DISPLAY_MAP[CONFIG.AREA_ALIAS[item.area] || item.area] || item.area || '-')}</td>
-            <td class="p-4 align-middle font-semibold text-sky-700 border border-slate-200 font-mono whitespace-nowrap">${escapeHtml(item.jobId)}</td>
-            <td class="p-4 align-middle font-medium text-slate-800 border border-slate-200 leading-relaxed"><div class="line-clamp-2 hover-expand min-w-[200px] cursor-default">${escapeHtml(item.remark || item.problem || '-')}</div></td>
-            <td class="p-4 align-middle text-slate-600 border border-slate-200 leading-relaxed"><div class="line-clamp-2 hover-expand min-w-[200px] cursor-default">${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span class="text-slate-300">-</span>'}</div></td>
-            <td class="p-4 text-center align-middle font-medium border border-slate-200 whitespace-nowrap">${item.picName ? escapeHtml(item.picName) : '<span class="text-slate-300">-</span>'}</td>
-            <td class="p-4 text-center align-middle text-slate-500 border border-slate-200 whitespace-nowrap">${item.dateFound || '-'}</td>
-            <td class="p-4 text-center align-middle font-bold text-rose-600 border border-slate-200 whitespace-nowrap">${item.dueDate || '-'}</td>
-            <td class="p-4 text-center align-middle font-semibold border border-slate-200 whitespace-nowrap">${item.finishDate && item.finishDate !== "-" ? `<span class="text-emerald-600 font-bold">${item.finishDate}</span>` : '<span class="text-slate-300">-</span>'}</td>
-            <td class="p-4 align-middle text-slate-500 border border-slate-200 text-xs leading-relaxed"><div class="line-clamp-2 hover-expand min-w-[150px] cursor-default">${item.problemNote ? escapeHtml(item.problemNote) : (item.problem && item.problem !== item.remark ? escapeHtml(item.problem) : '<span class="text-slate-300">-</span>')}</div></td>
+            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle font-semibold text-slate-700 border border-slate-200">${start + index + 1}</td>
+            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle border border-slate-200"><span class="px-1 py-0.5 md:px-2 md:py-1 text-[8px] md:text-[10px] font-bold rounded-full text-white ${typeColor}">${escapeHtml(item.inspectionType)}</span></td>
+            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle border border-slate-200">${imgBefore}</td>
+            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle border border-slate-200">${imgAfter}</td>
+            <td class="px-1 py-2 md:px-2 md:py-3 align-middle font-bold text-slate-700 border border-slate-200">${escapeHtml(CONFIG.AREA_DISPLAY_MAP[CONFIG.AREA_ALIAS[item.area] || item.area] || item.area || '-')}</td>
+            <td class="px-1 py-2 md:px-2 md:py-3 align-middle font-semibold text-sky-700 border border-slate-200 font-mono">${escapeHtml(item.jobId)}</td>
+            <td class="px-1 py-2 md:px-2 md:py-3 align-middle font-medium text-slate-800 border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${escapeHtml(item.remark || item.problem || '-')}</div></td>
+            <td class="px-1 py-2 md:px-2 md:py-3 align-middle text-slate-600 border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span class="text-slate-300">-</span>'}</div></td>
+            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle font-medium border border-slate-200">${item.picName ? escapeHtml(item.picName) : '<span class="text-slate-300">-</span>'}</td>
+            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle text-slate-500 border border-slate-200">${item.dateFound || '-'}</td>
+            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle font-bold text-rose-600 border border-slate-200">${item.dueDate || '-'}</td>
+            <td class="px-1 py-2 md:px-2 md:py-3 text-center align-middle font-semibold border border-slate-200">${item.finishDate && item.finishDate !== "-" ? `<span class="text-emerald-600">${item.finishDate}</span>` : '<span class="text-slate-300">-</span>'}</td>
+            <td class="px-1 py-2 md:px-2 md:py-3 align-middle text-slate-500 border border-slate-200 text-[8px] md:text-[10px] leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${item.problemNote ? escapeHtml(item.problemNote) : (item.problem && item.problem !== item.remark ? escapeHtml(item.problem) : '<span class="text-slate-300">-</span>')}</div></td>
           </tr>
         `;
       }).join('');
@@ -330,11 +329,11 @@
 
     function renderPagination(totalPages) {
       const container = document.getElementById('pagination'); if (totalPages <= 1) { container.innerHTML = ''; return; }
-      let html = `<button onclick="goToPage(1)" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-medium border transition disabled:opacity-40" ${currentPage === 1 ? 'disabled' : ''}>« ก่อนหน้า</button>`;
+      let html = `<button onclick="goToPage(1)" class="px-2 py-1 md:px-3 md:py-1.5 text-[10px] md:text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-medium border transition disabled:opacity-40" ${currentPage === 1 ? 'disabled' : ''}>«</button>`;
       for (let p = Math.max(1, currentPage - 2); p <= Math.min(totalPages, currentPage + 2); p++) {
-        html += `<button onclick="goToPage(${p})" class="px-3.5 py-1.5 text-xs border rounded-lg font-bold transition ${p === currentPage ? 'bg-[#003566] text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}">${p}</button>`;
+        html += `<button onclick="goToPage(${p})" class="px-2.5 py-1 md:px-3.5 md:py-1.5 text-[10px] md:text-xs border rounded-lg font-bold transition ${p === currentPage ? 'bg-[#003566] text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}">${p}</button>`;
       }
-      html += `<button onclick="goToPage(${totalPages})" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-medium border transition disabled:opacity-40" ${currentPage === totalPages ? 'disabled' : ''}>ถัดไป »</button>`;
+      html += `<button onclick="goToPage(${totalPages})" class="px-2 py-1 md:px-3 md:py-1.5 text-[10px] md:text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-medium border transition disabled:opacity-40" ${currentPage === totalPages ? 'disabled' : ''}>»</button>`;
       container.innerHTML = html;
     }
     function goToPage(page) { currentPage = page; renderTable(); }
