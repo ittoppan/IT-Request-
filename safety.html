@@ -479,5 +479,25 @@
     }
     init();
   </script>
+  <script>
+  // โค้ดดักจับว่าเปิดผ่านเบราว์เซอร์ของ LINE หรือไม่
+  window.addEventListener('load', function() {
+    if (navigator.userAgent.indexOf("Line") > -1) {
+      // สร้างแถบแจ้งเตือนสีแดงด้านบนสุดของจอ
+      const lineAlert = document.createElement('div');
+      lineAlert.style.cssText = "position:fixed; top:0; left:0; width:100%; background:#ef4444; color:white; padding:15px; text-align:center; z-index:99999; font-family:'Prompt', sans-serif; font-size:14px; font-weight:600; box-shadow:0 4px 6px rgba(0,0,0,0.1);";
+      lineAlert.innerHTML = `
+        <div style="font-size:16px; margin-bottom:5px;"><i class="fas fa-exclamation-triangle"></i> คุณกำลังเปิดผ่านแอป LINE</div>
+        เพื่อป้องกันปัญหากล้องค้างหรือไม่บันทึกภาพ<br>
+        กรุณากดไอคอน <b style="background:rgba(0,0,0,0.2); padding:2px 6px; border-radius:4px;">[ จุด 3 จุด ]</b> หรือ <b style="background:rgba(0,0,0,0.2); padding:2px 6px; border-radius:4px;">[ แชร์ ]</b> มุมขวาบน<br>
+        แล้วเลือก <b>"เปิดในเบราว์เซอร์เริ่มต้น"</b> (Open in Browser)
+        <div style="margin-top:10px;">
+          <button onclick="this.parentElement.parentElement.remove()" style="background:white; color:#ef4444; padding:5px 15px; border-radius:6px; border:none; font-weight:bold;">เข้าใจแล้ว ปิดหน้าต่างนี้</button>
+        </div>
+      `;
+      document.body.appendChild(lineAlert);
+    }
+  });
+</script>
 </body>
 </html>
