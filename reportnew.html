@@ -117,26 +117,26 @@
         <table class="w-full text-xs text-left border-collapse min-w-max">
           <thead>
             <tr class="bg-gradient-to-r from-[#002548] to-[#003566] text-white whitespace-nowrap">
-              <th class="px-3 py-3 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('jobId')">ลำดับ <i class="fas fa-sort text-[10px] ml-1 opacity-50"></i></th>
-              <th class="px-3 py-3 text-center font-bold border border-slate-700">ประเภท</th>
-              <th class="px-3 py-3 text-center font-bold border border-slate-700 w-24">ภาพ Before</th>
-              <th class="px-3 py-3 text-center font-bold border border-slate-700 w-24">ภาพ After</th>
-              <th class="px-3 py-3 font-bold border border-slate-700 cursor-pointer" onclick="sortTable('area')">พื้นที่/แผนก <i class="fas fa-sort text-[10px] ml-1 opacity-50"></i></th>
-              <th class="px-3 py-3 font-bold border border-slate-700 cursor-pointer" onclick="sortTable('jobId')">Job No. <i class="fas fa-sort text-[10px] ml-1 opacity-50"></i></th>
-              <th class="px-3 py-3 font-bold border border-slate-700 min-w-[200px]">ปัญหาที่ตรวจพบ</th>
-              <th class="px-3 py-3 font-bold border border-slate-700 min-w-[200px]">แนวทางแก้ไขปัญหา</th>
-              <th class="px-3 py-3 text-center font-bold border border-slate-700">ผู้รับผิดชอบ</th>
-              <th class="px-3 py-3 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('dateFound')">วันที่พบ</th>
-              <th class="px-3 py-3 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('dueDate')">กำหนดเสร็จ</th>
-              <th class="px-3 py-3 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('finishDate')">วันที่ปิดงาน</th>
-              <th class="px-3 py-3 font-bold border border-slate-700 min-w-[150px]">หมายเหตุเพิ่มเติม</th>
+              <th class="px-4 py-4 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('jobId')">ลำดับ <i class="fas fa-sort text-[10px] ml-1 opacity-50"></i></th>
+              <th class="px-4 py-4 text-center font-bold border border-slate-700">ประเภท</th>
+              <th class="px-4 py-4 text-center font-bold border border-slate-700 w-28">ภาพ Before</th>
+              <th class="px-4 py-4 text-center font-bold border border-slate-700 w-28">ภาพ After</th>
+              <th class="px-4 py-4 font-bold border border-slate-700 cursor-pointer" onclick="sortTable('area')">พื้นที่/แผนก <i class="fas fa-sort text-[10px] ml-1 opacity-50"></i></th>
+              <th class="px-4 py-4 font-bold border border-slate-700 cursor-pointer" onclick="sortTable('jobId')">Job No. <i class="fas fa-sort text-[10px] ml-1 opacity-50"></i></th>
+              <th class="px-4 py-4 font-bold border border-slate-700 min-w-[250px]">ปัญหาที่ตรวจพบ</th>
+              <th class="px-4 py-4 font-bold border border-slate-700 min-w-[250px]">แนวทางแก้ไขปัญหา</th>
+              <th class="px-4 py-4 text-center font-bold border border-slate-700">ผู้รับผิดชอบ</th>
+              <th class="px-4 py-4 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('dateFound')">วันที่พบ</th>
+              <th class="px-4 py-4 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('dueDate')">กำหนดเสร็จ</th>
+              <th class="px-4 py-4 text-center font-bold border border-slate-700 cursor-pointer" onclick="sortTable('finishDate')">วันที่ปิดงาน</th>
+              <th class="px-4 py-4 font-bold border border-slate-700 min-w-[180px]">หมายเหตุเพิ่มเติม</th>
             </tr>
           </thead>
           <tbody id="reportContent" class="divide-y divide-slate-200"></tbody>
         </table>
       </div>
 
-      <div id="pagination" class="mt-4 flex flex-wrap items-center justify-center gap-1"></div>
+      <div id="pagination" class="mt-5 flex flex-wrap items-center justify-center gap-1.5"></div>
     </div>
   </div>
 
@@ -290,38 +290,38 @@
       reportContent.innerHTML = pageData.map((item, index) => {
         const isClosed = item.status === 'Closed';
         
-        // 🚀 จัดปุ่ม Action ให้มีขนาดกว้างเท่ากัน และอยู่กึ่งกลาง
+        // 🚀 เพิ่ม Padding ให้ปุ่มนิดหน่อย
         const actionBtn = !isClosed 
-          ? `<a href="resolveNew.html?jobid=${encodeURIComponent(item.jobId)}" class="flex items-center justify-center gap-1 bg-rose-500 hover:bg-rose-600 text-white font-bold px-2 py-1.5 rounded text-[10px] shadow-sm transition w-full max-w-[80px] mx-auto"><i class="fas fa-wrench"></i> แก้ไข</a>`
-          : `<span class="flex items-center justify-center gap-1 text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded text-[10px] font-bold w-full max-w-[80px] mx-auto"><i class="fas fa-check"></i> ปิดแล้ว</span>`;
+          ? `<a href="resolveNew.html?jobid=${encodeURIComponent(item.jobId)}" class="flex items-center justify-center gap-1.5 bg-rose-500 hover:bg-rose-600 text-white font-bold px-3 py-2 rounded-lg text-[11px] shadow-sm transition w-full max-w-[90px] mx-auto"><i class="fas fa-wrench"></i> แก้ไข</a>`
+          : `<span class="flex items-center justify-center gap-1.5 text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-lg text-[11px] font-bold w-full max-w-[90px] mx-auto"><i class="fas fa-check"></i> ปิดแล้ว</span>`;
         
-        // 🚀 จัดรูปภาพให้อยู่กึ่งกลางเป๊ะๆ ด้วย mx-auto
+        // 🚀 ขยายรูปเป็น 80x60
         const imgBefore = item.picBefore && item.picBefore !== "-" 
-          ? `<img src="${getDriveThumb(item.picBefore)}" class="w-[60px] h-[45px] mx-auto rounded object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picBefore)}')">`
-          : `<span class="text-slate-400 italic text-[10px]">ไม่มีรูป</span>`;
+          ? `<img src="${getDriveThumb(item.picBefore)}" class="w-[80px] h-[60px] mx-auto rounded-lg object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picBefore)}')">`
+          : `<span class="text-slate-400 italic text-xs">ไม่มีรูป</span>`;
         
         const imgAfter = item.picAfter && item.picAfter !== "-"
-          ? `<img src="${getDriveThumb(item.picAfter)}" class="w-[60px] h-[45px] mx-auto rounded object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picAfter)}')">`
-          : (isClosed ? `<span class="text-slate-400 italic text-[10px]">-</span>` : actionBtn);
+          ? `<img src="${getDriveThumb(item.picAfter)}" class="w-[80px] h-[60px] mx-auto rounded-lg object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picAfter)}')">`
+          : (isClosed ? `<span class="text-slate-400 italic text-xs">-</span>` : actionBtn);
         
         const typeColor = item.inspectionType === '5S' ? 'bg-emerald-600' : item.inspectionType === 'Audit' ? 'bg-sky-600' : 'bg-[#003566]';
 
-        // 🚀 นำ align-middle มาใส่ในทุกคอลัมน์ให้อยู่กึ่งกลางแนวตั้ง และปรับการแสดงผลข้อความยาวๆ ให้ตัด (line-clamp)
+        // 🚀 ใช้คลาส p-4 เพื่อให้มี Padding กว้างขึ้น 16px สบายตา
         return `
           <tr class="${!isClosed ? 'bg-rose-50/40 hover:bg-rose-50/70' : 'hover:bg-slate-50/70'} transition">
-            <td class="p-2.5 text-center align-middle font-semibold text-slate-700 border border-slate-200">${start + index + 1}</td>
-            <td class="p-2.5 text-center align-middle border border-slate-200"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full text-white ${typeColor}">${escapeHtml(item.inspectionType)}</span></td>
-            <td class="p-2.5 text-center align-middle border border-slate-200 w-24">${imgBefore}</td>
-            <td class="p-2.5 text-center align-middle border border-slate-200 w-24">${imgAfter}</td>
-            <td class="p-2.5 align-middle font-bold text-slate-700 border border-slate-200 whitespace-nowrap">${escapeHtml(CONFIG.AREA_DISPLAY_MAP[CONFIG.AREA_ALIAS[item.area] || item.area] || item.area || '-')}</td>
-            <td class="p-2.5 align-middle font-semibold text-sky-700 border border-slate-200 font-mono whitespace-nowrap">${escapeHtml(item.jobId)}</td>
-            <td class="p-2.5 align-middle font-medium text-slate-800 border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand min-w-[150px] cursor-default">${escapeHtml(item.remark || item.problem || '-')}</div></td>
-            <td class="p-2.5 align-middle text-slate-600 border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand min-w-[150px] cursor-default">${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span class="text-slate-300">-</span>'}</div></td>
-            <td class="p-2.5 text-center align-middle font-medium border border-slate-200 whitespace-nowrap">${item.picName ? escapeHtml(item.picName) : '<span class="text-slate-300">-</span>'}</td>
-            <td class="p-2.5 text-center align-middle text-slate-500 border border-slate-200 whitespace-nowrap">${item.dateFound || '-'}</td>
-            <td class="p-2.5 text-center align-middle font-bold text-rose-600 border border-slate-200 whitespace-nowrap">${item.dueDate || '-'}</td>
-            <td class="p-2.5 text-center align-middle font-semibold border border-slate-200 whitespace-nowrap">${item.finishDate && item.finishDate !== "-" ? `<span class="text-emerald-600 font-bold">${item.finishDate}</span>` : '<span class="text-slate-300">-</span>'}</td>
-            <td class="p-2.5 align-middle text-slate-500 border border-slate-200 text-[11px] leading-tight"><div class="line-clamp-2 hover-expand min-w-[120px] cursor-default">${item.problemNote ? escapeHtml(item.problemNote) : (item.problem && item.problem !== item.remark ? escapeHtml(item.problem) : '<span class="text-slate-300">-</span>')}</div></td>
+            <td class="p-4 text-center align-middle font-semibold text-slate-700 border border-slate-200">${start + index + 1}</td>
+            <td class="p-4 text-center align-middle border border-slate-200"><span class="px-3 py-1 text-[11px] font-bold rounded-full text-white ${typeColor}">${escapeHtml(item.inspectionType)}</span></td>
+            <td class="p-4 text-center align-middle border border-slate-200 w-28">${imgBefore}</td>
+            <td class="p-4 text-center align-middle border border-slate-200 w-28">${imgAfter}</td>
+            <td class="p-4 align-middle font-bold text-slate-700 border border-slate-200 whitespace-nowrap">${escapeHtml(CONFIG.AREA_DISPLAY_MAP[CONFIG.AREA_ALIAS[item.area] || item.area] || item.area || '-')}</td>
+            <td class="p-4 align-middle font-semibold text-sky-700 border border-slate-200 font-mono whitespace-nowrap">${escapeHtml(item.jobId)}</td>
+            <td class="p-4 align-middle font-medium text-slate-800 border border-slate-200 leading-relaxed"><div class="line-clamp-2 hover-expand min-w-[200px] cursor-default">${escapeHtml(item.remark || item.problem || '-')}</div></td>
+            <td class="p-4 align-middle text-slate-600 border border-slate-200 leading-relaxed"><div class="line-clamp-2 hover-expand min-w-[200px] cursor-default">${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span class="text-slate-300">-</span>'}</div></td>
+            <td class="p-4 text-center align-middle font-medium border border-slate-200 whitespace-nowrap">${item.picName ? escapeHtml(item.picName) : '<span class="text-slate-300">-</span>'}</td>
+            <td class="p-4 text-center align-middle text-slate-500 border border-slate-200 whitespace-nowrap">${item.dateFound || '-'}</td>
+            <td class="p-4 text-center align-middle font-bold text-rose-600 border border-slate-200 whitespace-nowrap">${item.dueDate || '-'}</td>
+            <td class="p-4 text-center align-middle font-semibold border border-slate-200 whitespace-nowrap">${item.finishDate && item.finishDate !== "-" ? `<span class="text-emerald-600 font-bold">${item.finishDate}</span>` : '<span class="text-slate-300">-</span>'}</td>
+            <td class="p-4 align-middle text-slate-500 border border-slate-200 text-xs leading-relaxed"><div class="line-clamp-2 hover-expand min-w-[150px] cursor-default">${item.problemNote ? escapeHtml(item.problemNote) : (item.problem && item.problem !== item.remark ? escapeHtml(item.problem) : '<span class="text-slate-300">-</span>')}</div></td>
           </tr>
         `;
       }).join('');
@@ -330,11 +330,11 @@
 
     function renderPagination(totalPages) {
       const container = document.getElementById('pagination'); if (totalPages <= 1) { container.innerHTML = ''; return; }
-      let html = `<button onclick="goToPage(1)" class="px-2.5 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded font-medium border transition disabled:opacity-40" ${currentPage === 1 ? 'disabled' : ''}>«</button>`;
+      let html = `<button onclick="goToPage(1)" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-medium border transition disabled:opacity-40" ${currentPage === 1 ? 'disabled' : ''}>« ก่อนหน้า</button>`;
       for (let p = Math.max(1, currentPage - 2); p <= Math.min(totalPages, currentPage + 2); p++) {
-        html += `<button onclick="goToPage(${p})" class="px-2.5 py-1 text-xs border rounded font-bold transition ${p === currentPage ? 'bg-[#003566] text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}">${p}</button>`;
+        html += `<button onclick="goToPage(${p})" class="px-3.5 py-1.5 text-xs border rounded-lg font-bold transition ${p === currentPage ? 'bg-[#003566] text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}">${p}</button>`;
       }
-      html += `<button onclick="goToPage(${totalPages})" class="px-2.5 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded font-medium border transition disabled:opacity-40" ${currentPage === totalPages ? 'disabled' : ''}>»</button>`;
+      html += `<button onclick="goToPage(${totalPages})" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-medium border transition disabled:opacity-40" ${currentPage === totalPages ? 'disabled' : ''}>ถัดไป »</button>`;
       container.innerHTML = html;
     }
     function goToPage(page) { currentPage = page; renderTable(); }
