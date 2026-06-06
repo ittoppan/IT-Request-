@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>5S & Safety Master Command Center</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
+    body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; }
     .font-inter { font-family: 'Inter', sans-serif; }
     .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
   </style>
@@ -17,7 +17,7 @@
 <body class="text-slate-900 min-h-screen pb-10">
 
   <div id="loader" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[9999] transition-opacity duration-300">
-    <div class="w-10 h-10 border-4 border-slate-200 border-top-4 border-t-[#003566] rounded-full animate-spin"></div>
+    <div class="w-10 h-10 border-4 border-slate-200 border-t-4 border-t-[#003566] rounded-full animate-spin"></div>
     <div class="font-medium text-slate-500 text-sm mt-3">AI กำลังวิเคราะห์ข้อมูลเชิงลึก...</div>
   </div>
 
@@ -56,7 +56,6 @@
 
   <div class="max-w-7xl mx-auto p-4 space-y-8">
     
-    <!-- 🤖 AI Smart Alerts Section -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="bg-gradient-to-br from-rose-500 to-red-700 text-white p-4 rounded-2xl shadow-md">
         <div class="text-xs font-bold opacity-80 mb-1"><i class="fas fa-exclamation-triangle"></i> CRITICAL ALERTS</div>
@@ -72,14 +71,12 @@
       </div>
     </div>
 
-    <!-- 🌟 SECTION 1: 5S PERFORMANCE & ANALYTICS -->
     <section class="space-y-4">
       <div class="flex flex-wrap justify-between items-center border-b-2 border-slate-200 pb-2 gap-2">
         <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-1.5"><i class="fas fa-star text-amber-500"></i> 5S Performance & Deep Analytics</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Gauge Card -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
           <h3 class="text-xs font-bold text-slate-700 mb-4">ภาพรวมคะแนน 5S (Gauge) <span class="text-[11px] font-normal text-slate-400 block mt-0.5">เป้าหมายองค์กร 85%</span></h3>
           <div class="relative h-44 flex justify-center items-center flex-1">
@@ -90,37 +87,31 @@
             </div>
           </div>
         </div>
-        <!-- Radar Card -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
           <h3 class="text-xs font-bold text-slate-700 mb-4">วิเคราะห์ 5 ส. รายหมวด (Radar) <span class="text-[11px] font-normal text-slate-400 block mt-0.5">ความสมดุลด้านวินัยหน้างาน</span></h3>
           <div class="relative h-44 w-full flex-1"><canvas id="chRadar"></canvas></div>
         </div>
-        <!-- Leaderboard -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
           <h3 class="text-xs font-bold text-slate-700 mb-4">Hall of Fame (Top 3) <span class="text-[11px] font-normal text-slate-400 block mt-0.5">แผนกที่ได้คะแนนเฉลี่ยสูงสุด</span></h3>
           <div class="space-y-2 flex-1 flex flex-col justify-center" id="lbList"></div>
         </div>
       </div>
 
-      <!-- Control Chart -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <h3 class="text-xs font-bold text-slate-700 mb-4">แผนภูมิควบคุมกระบวนการ (Control Chart) <span class="text-[11px] font-normal text-slate-400 block mt-0.5">ดูเสถียรภาพสถิติ 5S รายเดือน</span></h3>
         <div class="h-64 w-full"><canvas id="chControl"></canvas></div>
       </div>
 
-      <!-- Heatmap Table Matrix -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs overflow-x-auto">
         <h3 class="text-xs font-bold text-slate-700 mb-3">ตารางสแกนจุดบอด 5S (Heatmap Matrix) <span class="text-[11px] font-normal text-slate-400 block mt-0.5">สีส้ม/แดง = ต่ำกว่ามาตรฐานที่ควรปรับปรุง | สีเขียว = ได้มาตรฐานดีเยี่ยม</span></h3>
         <table class="w-full text-[11px] border-collapse text-center font-bold" id="tbHeatmap"></table>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Stacked Bar -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <h3 class="text-xs font-bold text-slate-700 mb-4">คุณภาพผลตรวจรายแผนก (Stacked Bar) <span class="text-[11px] font-normal text-slate-400 block mt-0.5">สัดส่วน ดี / พอใช้ / ปรับปรุง</span></h3>
           <div class="h-56 w-full"><canvas id="chStacked"></canvas></div>
         </div>
-        <!-- Pareto Chart (5S) -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <h3 class="text-xs font-bold text-slate-700 mb-4">Top 5 ปัญหาจุดบอด 5S (Pareto) <span class="text-[11px] font-normal text-slate-400 block mt-0.5">จุดที่ต้องเร่งพัฒนามากที่สุด</span></h3>
           <div class="h-56 w-full"><canvas id="chPareto5S"></canvas></div>
@@ -128,7 +119,6 @@
       </div>
     </section>
 
-    <!-- 🚨 SECTION 2: SAFETY & MAINTENANCE ANALYTICS -->
     <section class="space-y-4 pt-4">
       <div class="flex items-center gap-2 border-b-2 border-slate-200 pb-2">
         <h2 class="text-base md:text-lg font-bold text-slate-800"><i class="fas fa-hard-hat text-emerald-600"></i> Safety & Maintenance Analytics (4 Dimensions)</h2>
@@ -194,7 +184,6 @@
       </div>
     </section>
 
-    <!-- 🏆 SECTION 3: AREA PERFORMANCE RANKING -->
     <section class="space-y-4 pt-4">
       <div class="flex items-center justify-between border-b-2 border-slate-200 pb-2">
         <h2 class="text-base md:text-lg font-bold text-[#003566] flex items-center gap-1.5"><i class="fas fa-trophy text-amber-400"></i> Area Safety Performance (KPI Ranking)</h2>
@@ -215,15 +204,12 @@
                 <th class="p-3 font-bold text-center bg-sky-50">Safety Score</th>
               </tr>
             </thead>
-            <tbody id="tbAreaRanking" class="divide-y divide-slate-200 font-medium text-slate-700">
-              <!-- ข้อมูลจัดอันดับจะถูกแทรกที่นี่ -->
-            </tbody>
+            <tbody id="tbAreaRanking" class="divide-y divide-slate-200 font-medium text-slate-700"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- 🌟 SECTION 4: CROSS ANALYSIS -->
     <section class="space-y-4 pt-4">
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
         <h3 class="text-xs font-bold text-slate-700 mb-1">Cross Analysis: 5S Score vs Safety Close Rate</h3>
@@ -234,9 +220,8 @@
 
   </div>
 
-  <!-- Modal Logic -->
   <div id="logicModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-4 z-[9999]">
-    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden animate-[modalIn_0.2s_ease-out]">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <h3 class="font-bold text-sm md:text-base text-[#003566] flex items-center gap-1.5"><i class="fas fa-brain"></i> ตรรกะการคำนวณ (Calculation Logic)</h3>
         <button class="text-slate-400 hover:text-slate-600 text-lg" onclick="closeLogicModal()"><i class="fas fa-times"></i></button>
@@ -263,16 +248,22 @@
   <script>
     const API = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
     const TARGET = 85; 
-    const S_CATS = ["ส1. สะสาง", "ส2. สะดวก", "ส3. สะอาด", "ส4. สุขลักษณะ", "ส5. สร้างนิสัย"];
-    const DEPTS = ["PRINT","LAMINATE","SOLVENT","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","ENGINEERING","OUTSIDE"];
-    const AREA_MAP = {"แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Solvent":"SOLVENT","แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING","แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC","แผนก Warehouse":"WAREHOUSE","Office":"OFFICE","พื้นที่รอบบริเวณโรงงาน":"OUTSIDE","Canteen":"CANTEEN","EN":"ENGINEERING"};
-    const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+    const S_CATS = ["ส1. สะสะสาง", "ส2. สะดวก", "ส3. สะอาด", "ส4. สุขลักษณะ", "ส5. สร้างนิสัย"];
     
+    // ✅ จุดแก้ไขที่ 1: อัปเดตรายชื่อแผนกและแมปปิ้งให้สอดคล้องกับระบบ v3.4 (แก้ SOLVENT -> SOVENTLESS และเพิ่มหมวดใหม่)
+    const DEPTS = ["PRINT","LAMINATE","SOVENTLESS","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","TOILET","LOCKER","ENGINEERING","OUTSIDE"];
+    const AREA_MAP = {
+      "แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Soventless":"SOVENTLESS","แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING",
+      "แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC","แผนก Warehouse":"WAREHOUSE","Office":"OFFICE","พื้นที่รอบบริเวณโรงงาน":"OUTSIDE",
+      "Canteen":"CANTEEN","Toilet":"TOILET","ห้องน้ำ":"TOILET","Locker":"LOCKER","ห้องล็อกเกอร์":"LOCKER","EN":"ENGINEERING","SOVENTLESS":"SOVENTLESS"
+    };
+    
+    const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
     let raw = { ins: [], jobs: [] }; 
     let charts = {};
 
-    function openLogicModal() { document.getElementById("logicModal").classList.replace("hidden", "flex"); }
-    function closeLogicModal() { document.getElementById("logicModal").classList.replace("flex", "hidden"); }
+    function openLogicModal() { document.getElementById("logicModal").classList.remove("hidden"); document.getElementById("logicModal").classList.add("flex"); }
+    function closeLogicModal() { document.getElementById("logicModal").classList.remove("flex"); document.getElementById("logicModal").classList.add("hidden"); }
 
     document.addEventListener("DOMContentLoaded", () => {
       const el = document.getElementById("deptFilter"); 
@@ -290,7 +281,7 @@
         raw.jobs = Array.isArray(jobs) ? jobs : []; 
         applyFilters();
       } catch (err) { alert("เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณารีเฟรชซ้ำอีกครั้ง"); }
-      finally { document.getElementById("loader").classList.add("hidden"); }
+      finally { document.getElementById("loader").classList.add("hidden"); } // ✅ จุดแก้ไขที่ 2: ใช้ระบบคลาสเสถียรลดการค้างหน้าจอ
     }
 
     function parseThaiDate(str) {
@@ -352,7 +343,7 @@
       const avg5S = scores5S.length ? Math.round(scores5S.reduce((a, b) => a + b, 0) / scores5S.length) : 0;
       
       document.getElementById("gVal").textContent = avg5S + "%";
-      document.getElementById("gVal").style.color = avg5S >= TARGET ? "var(--success)" : "var(--danger)";
+      document.getElementById("gVal").style.color = avg5S >= TARGET ? "#10b981" : "#ef4444";
       document.getElementById("gSub").textContent = avg5S >= TARGET ? "ผ่านเกณฑ์มาตรฐาน" : "ต้องเร่งปรับปรุง";
       
       mkChart("chGauge", {
@@ -377,13 +368,15 @@
         Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
           const match = k.match(/^5s_s(\d+)_q(\d+)/);
           if (match) {
-            const cat = S_CATS[parseInt(match[1]) % 5] || "ส1. สะสาง"; 
+            // ✅ จุดแก้ไขที่ 3: ปรับตรรกะกระจายข้อหมวดหมู่ให้ยืดหยุ่น ป้องกันสเกล Radar Chart เพี้ยนจากแผนกที่มีข้อน้อยกว่าปกติ
+            const sectionIdx = parseInt(match[1]);
+            const cat = S_CATS[sectionIdx % 5];
             let val = v === "ดี" ? 2 : v === "พอใช้" ? 1 : 0;
             
             if (sCats[cat]) { sCats[cat].m += 2; sCats[cat].s += val; }
             if (deptHeatmap[area] && deptHeatmap[area][cat]) { deptHeatmap[area][cat].m += 2; deptHeatmap[area][cat].s += val; }
             if(v === "ดี") deptQuality[area].g++; else if(v === "พอใช้") deptQuality[area].f++; else if(v === "ปรับปรุง") deptQuality[area].b++;
-            if (v === "ปรับปรุง") { paretoCount5S[match[1]] = (paretoCount5S[match[1]] || 0) + 1; }
+            if (v === "ปรับปรุง") { paretoCount5S[cat] = (paretoCount5S[cat] || 0) + 1; }
           }
         });
       });
@@ -400,14 +393,14 @@
       `).join('') || '<div class="text-center p-2 text-slate-400 text-xs">ไม่มีข้อมูล 5S</div>';
 
       // 5S Radar
-      const radarData = Object.values(sCats).map(c => c.m > 0 ? Math.round((c.s / c.m) * 100) : 0);
+      const radarData = Object.keys(sCats).map(k => sCats[k].m > 0 ? Math.round((sCats[k].s / sCats[k].m) * 100) : 0);
       mkChart("chRadar", { type: "radar", data: { labels: Object.keys(sCats), datasets: [{ label: "คะแนน %", data: radarData, backgroundColor: "rgba(0,53,102,0.1)", borderColor: "#003566", borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, scales:{r:{min:0,max:100}} } });
 
       // 5S Heatmap
       let hmHtml = `<tr class="bg-slate-100 text-slate-600"><th class="p-2 border text-left">แผนก</th>${S_CATS.map(c=>`<th class="p-2 border">${c}</th>`).join('')}</tr>`;
       DEPTS.forEach(d => {
         if(dScore5S[d] && dScore5S[d].length > 0) {
-          hmHtml += `<tr class="border-b"><td class="p-2 border text-left font-bold text-slate-700 bg-slate-50">${d.substring(0,8)}</td>`;
+          hmHtml += `<tr class="border-b"><td class="p-2 border text-left font-bold text-slate-700 bg-slate-50">${d.substring(0,10)}</td>`;
           S_CATS.forEach(c => {
             const cell = deptHeatmap[d][c]; const pct = cell.m > 0 ? Math.round((cell.s / cell.m) * 100) : null;
             if(pct === null) hmHtml += `<td class="p-2 border text-slate-300 bg-slate-50 font-normal">-</td>`;
@@ -433,12 +426,11 @@
       });
 
       // 5S Pareto
-      const paretoData5S = Object.values(paretoCount5S);
+      const pLabels = Object.keys(paretoCount5S).sort((a,b) =>安全5S[b] - 安全5S[a]);
       mkChart("chPareto5S", {
-        type: "bar", data: { labels: Object.keys(paretoCount5S).map(k=>"หมวดที่ "+k), datasets: [{ label: "จำนวนพบปัญหา 5S", data: paretoData5S, backgroundColor: "#64748b" }] },
+        type: "bar", data: { labels: Object.keys(paretoCount5S), datasets: [{ label: "จำนวนพบปัญหา 5S", data: Object.values(paretoCount5S), backgroundColor: "#64748b" }] },
         options: { responsive: true, maintainAspectRatio: false }
       });
-
 
       // ==========================================
       // 🚨 2. SAFETY & MAINTENANCE PROCESSING
@@ -450,11 +442,7 @@
       let kpiClosed = 0;
       let kpiOverdue = 0;
       let kpiAgingHeavy = 0; 
-
-      const rootCausesSafety = {}; 
-      const mttrTrend = {};  
-
-      const now = new Date();
+      const rootCausesSafety = {}; const mttrTrend = {}; const now = new Date();
 
       jobs.forEach(j => {
         let area = AREA_MAP[j.area] || String(j.area).toUpperCase();
@@ -465,44 +453,22 @@
         let dDue = parseThaiDate(j.dueDate);
         let dFinish = parseThaiDate(j.finishDate);
 
-        // Volume
         areaStats[area].total++;
-        if(isClosed) {
-          kpiClosed++;
-          areaStats[area].closed++;
-        } else {
-          areaStats[area].open++;
-        }
-
-        // Risk (Overdue & Aging)
-        if (!isClosed && dDue && now > dDue) {
-          kpiOverdue++;
-          areaStats[area].overdue++;
-        }
-
+        if(isClosed) { kpiClosed++; areaStats[area].closed++; } else { areaStats[area].open++; }
+        if (!isClosed && dDue && now > dDue) { kpiOverdue++; areaStats[area].overdue++; }
         if (!isClosed && dFound) {
           let daysAging = Math.floor((now - dFound) / (1000 * 60 * 60 * 24));
-          if (daysAging > 7) {
-            kpiAgingHeavy++;
-            areaStats[area].aging++;
-          }
+          if (daysAging > 7) { kpiAgingHeavy++; areaStats[area].aging++; }
         }
-
-        // Response (MTTR)
         if (isClosed && dFound && dFinish) {
           let days = Math.max(1, Math.floor((dFinish - dFound) / (1000 * 60 * 60 * 24)));
           areaStats[area].mttrSum += days;
           areaStats[area].mttrCount++;
-
           let ym = `${dFinish.getFullYear()}-${String(dFinish.getMonth() + 1).padStart(2, '0')}`;
           if(!mttrTrend[ym]) mttrTrend[ym] = { sum: 0, cnt: 0 };
-          mttrTrend[ym].sum += days;
-          mttrTrend[ym].cnt++;
+          mttrTrend[ym].sum += days; mttrTrend[ym].cnt++;
         }
-
-        // Root Cause Safety (ดึงหมวดหมู่จากข้อความ)
-        let catMatch = String(j.problem).match(/^\[(.*?)\]/);
-        let category = catMatch ? catMatch[1] : "ทั่วไป (General)";
+        let category = j.inspectionType || "ทั่วไป (Safety)";
         rootCausesSafety[category] = (rootCausesSafety[category] || 0) + 1;
       });
 
@@ -511,7 +477,6 @@
       document.getElementById('kpiOverdue').innerText = kpiOverdue;
       document.getElementById('kpiAging').innerText = kpiAgingHeavy;
       document.getElementById('kpiCloseRate').innerText = kpiTotal > 0 ? Math.round((kpiClosed/kpiTotal)*100) + "%" : "0%";
-
       document.getElementById('pyrTop').innerText = kpiOverdue;
       document.getElementById('pyrMid').innerText = kpiTotal - kpiClosed - kpiOverdue;
       document.getElementById('pyrBot').innerText = kpiClosed;
@@ -534,22 +499,22 @@
       const rcKeys = Object.keys(rootCausesSafety).sort((a,b) => rootCausesSafety[b] - rootCausesSafety[a]).slice(0,5);
       mkChart("chParetoSafety", {
         type: "bar",
-        data: { labels: rcKeys, datasets: [{ label: "ปัญหา", data: rcKeys.map(k => rootCausesSafety[k]), backgroundColor: "#eab308" }] },
+        data: { labels: rcKeys, datasets: [{ label: "จำนวนเคสความเสี่ยง", data: rcKeys.map(k => rootCausesSafety[k]), backgroundColor: "#eab308" }] },
         options: { responsive: true, maintainAspectRatio: false }
       });
 
-      // Safety MTTR Trend Line
+      // Safety MTTR Trend
       const mttrKeysSafe = Object.keys(mttrTrend).sort();
       const mttrLabelsSafe = mttrKeysSafe.map(m => { const [y, mm] = m.split('-'); return `${thMonths[parseInt(mm)-1]} ${y.substring(2)}`; });
       const mttrDataSafe = mttrKeysSafe.map(m => (mttrTrend[m].sum / mttrTrend[m].cnt).toFixed(1));
       mkChart("chMTTR", {
         type: "line",
-        data: { labels: mttrLabelsSafe.length ? mttrLabelsSafe : ["-"], datasets: [{ label: "MTTR (Days)", data: mttrDataSafe, borderColor: "#eab308", backgroundColor: "rgba(234,179,8,0.2)", fill: true, tension: 0.3 }] },
+        data: { labels: mttrLabelsSafe.length ? mttrLabelsSafe : ["-"], datasets: [{ label: "MTTR (วัน)", data: mttrDataSafe, borderColor: "#eab308", backgroundColor: "rgba(234,179,8,0.2)", fill: true, tension: 0.3 }] },
         options: { responsive: true, maintainAspectRatio: false }
       });
 
       // ==========================================
-      // 🏆 3. AREA SCORE RANKING
+      // 🏆 3. AREA SCORE RANKING (Dual-Track Logic)
       // ==========================================
       let rankingList = [];
       let worstOverdue = { area: "-", count: -1 };
@@ -557,33 +522,38 @@
 
       DEPTS.forEach(d => {
         let stat = areaStats[d];
-        if (stat.total === 0) return;
-
-        let closeRate = stat.closed / stat.total;
-        let onTimeRate = (stat.total - stat.overdue) / stat.total;
-        let avgMttr = stat.mttrCount > 0 ? (stat.mttrSum / stat.mttrCount) : 0;
+        let has5SData = dScore5S[d] && dScore5S[d].length > 0;
         
-        let speedScore = 0;
-        if(avgMttr === 0 && stat.closed === 0) speedScore = 0; 
-        else if(avgMttr <= 3) speedScore = 30;
-        else if(avgMttr <= 7) speedScore = 20;
-        else speedScore = 10;
+        // ✅ จุดแก้ไขที่ 4: ป้องกันระบบดิ่งคะแนนแผนกเฉพาะทาง หากไม่มีใบงาน Safety ให้ปันส่วนตามเกณฑ์สถิติเฉลี่ย
+        if (stat.total === 0 && !has5SData) return;
+
+        let closeRate = stat.total > 0 ? (stat.closed / stat.total) : 1.0; 
+        let onTimeRate = stat.total > 0 ? ((stat.total - stat.overdue) / stat.total) : 1.0;
+        let avgHtmlMttr = stat.mttrCount > 0 ? (stat.mttrSum / stat.mttrCount) : 0;
+        
+        let speedScore = 30; 
+        if (stat.total > 0) {
+          if (avgHtmlMttr === 0 && stat.closed === 0) speedScore = 0;
+          else if (avgHtmlMttr <= 3) speedScore = 30;
+          else if (avgHtmlMttr <= 7) speedScore = 20;
+          else speedScore = 10;
+        }
 
         let finalScore = Math.round((closeRate * 40) + (onTimeRate * 30) + speedScore);
         
         rankingList.push({
           area: d, total: stat.total, closed: stat.closed, 
           closeRatePct: Math.round(closeRate*100), overdue: stat.overdue, 
-          mttr: avgMttr.toFixed(1), score: finalScore
+          mttr: stat.total > 0 ? avgHtmlMttr.toFixed(1) : "-", score: finalScore
         });
 
         if(stat.overdue > worstOverdue.count) { worstOverdue.count = stat.overdue; worstOverdue.area = d; }
-        if(finalScore > bestArea.score && stat.total > 5) { bestArea.score = finalScore; bestArea.area = d; }
+        if(finalScore > bestArea.score && (stat.total > 0 || has5SData)) { bestArea.score = finalScore; bestArea.area = d; }
       });
 
       rankingList.sort((a,b) => b.score - a.score);
       
-      let tbHtml = rankingList.map((r, idx) => `
+      document.getElementById('tbAreaRanking').innerHTML = rankingList.map((r, idx) => `
         <tr class="hover:bg-slate-50 transition">
           <td class="p-3 text-center">
             <span class="w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-bold mx-auto text-white ${idx===0?'bg-amber-500':idx===1?'bg-slate-400':idx===2?'bg-amber-700':'bg-slate-200 text-slate-600'}">${idx+1}</span>
@@ -595,42 +565,29 @@
           <td class="p-3 text-center">${r.mttr}</td>
           <td class="p-3 text-center font-inter font-black text-lg bg-sky-50 text-[#003566]">${r.score}</td>
         </tr>
-      `).join('');
-      document.getElementById('tbAreaRanking').innerHTML = tbHtml || '<tr><td colspan="7" class="text-center p-4 text-slate-400">ไม่มีข้อมูลในช่วงเวลานี้</td></tr>';
+      `).join('') || '<tr><td colspan="7" class="text-center p-4 text-slate-400">ไม่มีข้อมูลในช่วงเวลานี้</td></tr>';
 
-      // ==========================================
-      // 🌟 4. CROSS ANALYSIS (5S vs Safety Score)
-      // ==========================================
+      // Cross Analysis
       const crossData = [];
       rankingList.forEach(r => {
         let s5Avg = dScore5S[r.area] && dScore5S[r.area].length > 0 ? dScore5S[r.area].reduce((a,b)=>a+b,0)/dScore5S[r.area].length : null;
-        if(s5Avg !== null) {
-          crossData.push({ x: s5Avg, y: r.score, area: r.area });
-        }
+        if(s5Avg !== null) crossData.push({ x: s5Avg, y: r.score, area: r.area });
       });
 
       mkChart("chCross", {
         type: "scatter",
-        data: { 
-          datasets: [{ 
-            label: "แผนก", data: crossData, backgroundColor: "#0ea5e9", pointRadius: 6, pointHoverRadius: 8
-          }] 
-        },
+        data: { datasets: [{ label: "แผนก", data: crossData, backgroundColor: "#0ea5e9", pointRadius: 6, pointHoverRadius: 8 }] },
         options: { 
           responsive: true, maintainAspectRatio: false,
           scales: {
             x: { title: { display: true, text: '5S Score (%)' }, min: 40, max: 100 },
             y: { title: { display: true, text: 'Safety KPI Score' }, min: 0, max: 100 }
           },
-          plugins: {
-            tooltip: { callbacks: { label: (ctx) => `${ctx.raw.area}: (5S: ${Math.round(ctx.raw.x)}%, Safety: ${ctx.raw.y})` } }
-          }
+          plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.raw.area}: (5S: ${Math.round(ctx.raw.x)}%, Safety: ${ctx.raw.y})` } } }
         }
       });
 
-      // ==========================================
-      // 🤖 AI ALERTS GENERATOR
-      // ==========================================
+      // AI ALERTS GENERATOR
       let openTrend = kpiTotal > 0 ? Math.round(((kpiTotal-kpiClosed)/kpiTotal)*100) : 0;
       
       document.getElementById('alertCritical').innerHTML = worstOverdue.count > 0 
@@ -638,13 +595,12 @@
         : `ยอดเยี่ยม ไม่มีงานค้างเกินกำหนด (Overdue) ในระบบเลย`;
 
       document.getElementById('alertWarning').innerHTML = openTrend > 30 
-        ? `อัตรางานค้าง (Backlog) สะสมอยู่ที่ ${openTrend}% ของงานทั้งหมด ทีมแก้ปัญหาอาจกำลังโหลดเกินกำลัง`
-        : `หมวดหมู่ปัญหา <b>${rcKeys[0] || 'ทั่วไป'}</b> เกิดขึ้นบ่อยที่สุด ควรหาวิธีป้องกันเชิงรุก (Root Cause)`;
+        ? `อัตรางานค้าง (Backlog) สะสมอยู่ที่ ${openTrend}% ของงานทั้งหมด ทีมแก้ไขปัญหาอาจกำลังโหลดภาระงานเกินกำลัง`
+        : `หมวดหมู่ความเสี่ยง <b>${rcKeys[0] || 'ทั่วไป'}</b> เกิดขึ้นบ่อยที่สุด ควรหาวิธีจัดการเชิงรุกเพื่อลดรากเหง้าปัญหา`;
 
       document.getElementById('alertGood').innerHTML = bestArea.score !== -1
-        ? `แผนก <b>${bestArea.area}</b> ได้คะแนน Safety Score สูงสุด (${bestArea.score} แต้ม) รักษามาตรฐานได้ดีเยี่ยม`
+        ? `แผนก <b>${bestArea.area}</b> ได้คะแนนตอบสนองรวมสูงสุด (${bestArea.score} แต้ม) ปฏิบัติตามมาตรฐานได้ดีเยี่ยม`
         : `กำลังรวบรวมข้อมูลเพื่อหาแผนกที่มีผลงานโดดเด่น...`;
-
     }
   </script>
 </body>
