@@ -50,6 +50,15 @@
         <div class="type-btn p-2 border rounded-xl bg-slate-50 text-center cursor-pointer font-bold text-[11px] text-slate-600 hover:bg-slate-100 transition flex flex-col items-center gap-1 shadow-2xs" data-type="Accident/Fire" onclick="selectTypeFilter('Accident/Fire', this)"><i class="fas fa-fire-extinguisher text-slate-400"></i>Accident</div>
         <div class="type-btn p-2 border rounded-xl bg-slate-50 text-center cursor-pointer font-bold text-[11px] text-slate-600 hover:bg-slate-100 transition flex flex-col items-center gap-1 shadow-2xs" data-type="5S" onclick="selectTypeFilter('5S', this)"><i class="fas fa-broom text-slate-400"></i>5S</div>
       </div>
+
+      <div class="mt-4 flex flex-col gap-1 relative area-selector-wrapper">
+        <label class="text-xs font-bold text-slate-500">📍 พื้นที่/แผนกที่เกี่ยวข้อง</label>
+        <div class="w-48 p-2 text-xs border rounded-lg bg-slate-50 flex items-center justify-between cursor-pointer border-slate-200" id="areaDisplay" onclick="toggleAreaDropdown()">
+          <span id="areaDisplayText" class="font-medium">-- ทั้งหมด --</span><i class="fas fa-chevron-down text-slate-400 text-[10px]"></i>
+        </div>
+        <div class="absolute top-full left-0 w-64 bg-white border rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto hidden p-1 mt-1 space-y-0.5" id="areaOptions"></div>
+        <input type="hidden" id="areaFilter" value="">
+      </div>
     </div>
 
     <div class="grid grid-cols-3 gap-3">
@@ -97,6 +106,7 @@
 
     const API_URL = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
 
+    // 📋 โครงสร้างข้อกำหนดคำถามแยกตามประเภทและพื้นที่ (Sync ตรงกับหลังบ้าน)
     const SAFETY_CHECKLIST_FACTORY = {
       s1: { title: "1. สถานที่ทำงาน", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "การจัดเก็บ และกองวัสดุมีการกำหนดสูงไม่เกิน กองวัสดุมีความปลอดภัย", "Water Mist"] },
       s2: { title: "2. ท่าทางการทำงาน", questions: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์, หรืออุปกรณ์ที่มีล้อในการเคลื่อนย้ายสิ่งของ", "การยกของอย่างถูกต้องและปลอดภัย"] },
@@ -118,16 +128,6 @@
       s7: { title: "7. Other (ไม่บังคับ)", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
 
-    const SAFETY_CHECKLIST_OUTSIDE = {
-      s1: { title: "1. พื้นที่โดยรอบ", questions: ["ไม่มีเศษขยะ/เศษวัสดุตกหล่นตามทางเดินและที่จอดรถ", "หญ้า/พืชพรรณไม่ขึ้นรกสูงเกินไป", "สายยาง/ท่อต่างๆ เก็บเป็นระเบียบเรียบร้อย", "อุปกรณ์กำจัดสัตว์พาหะอยู่ในสภาพพร้อมใช้งาน", "รั้วโรงงานไม่มีรอยชำรุดเสียหาย"] },
-      s2: { title: "2. โรงเก็บขยะ", questions: ["มีการจัดเรียงถังเป็นระเบียบ", "แยกชนิดขยะให้ชัดเจนและมีป้ายชี้บ่ง", "ขยะไม่ล้นออกมา / ปิดฝาสนิท", "ถังเก็บสารเคมีอันตรายไม่ล้นและอยู่ในสภาพปลอดภัย"] },
-      s3: { title: "3. ป้อมยาม", questions: ["จัดเก็บเอกสารเรียบร้อยและทำความสะอาดสม่ำเสมอ", "อุปกรณ์ต่างๆ สามารถหยิบใช้ได้สะดวก", "การกำหนดจำนวนอุปกรณ์บนโต๊ะทำงานให้เหมาะสม"] },
-      s4: { title: "4. ห้องสุขา (ป้อมรปภ.)", questions: ["ทำความสะอาดกระจก/พื้น/โถชักโครก/ผนัง ด้วยน้ำให้สะอาด", "กระดาษชำระ/สบู่/ผ้าเช็ดมือ ดูแลอย่าให้ขาด"] },
-      s5: { title: "5. ถังแก๊ส/ถังก๊าซ", questions: ["ระบุป้ายชี้บ่งให้ชัดเจน", "เก็บถังในลักษณะตั้งตรงและมีเครื่องป้องกันการล้ม", "ไม่วางสิ่งของที่ไม่จำเป็นรอบๆ บริเวณที่เก็บก๊าซ"] },
-      s6: { title: "6. โรงจอดรถ", questions: ["จอดรถเป็นระเบียบไม่มีความเสี่ยงอุบัติเหตุ", "หลังคา/พื้น/ที่กั้น มีสภาพปกติไม่เสียหาย"] },
-      s7: { title: "7. Other (ไม่บังคับ)", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
-    };
-
     const SAFETY_CHECKLIST_WAREHOUSE = {
       s1: { title: "1. สถานที่ทำงาน", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "ไม่วางสินค้า หรือพาเลทเกินมาตรฐานที่กำหนด"] },
       s2: { title: "2. ท่าทางการทำงาน", questions: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การยกของอย่างถูกต้องและปลอดภัย"] },
@@ -136,6 +136,15 @@
       s5: { title: "5. ไฟฟ้า", questions: ["ตรวจสอบอุปกรณ์ไฟฟ้าเช่น สายไฟ ปลั๊กไฟ ต้องไม่ชำรุดเสียหาย", "ปลั๊กไฟ/เต้าเสียบไม่หลวม", "ไม่มีการต่ออุปกรณ์พวงไฟฟ้าแบบชั่วคราว", "อุปกรณ์ไฟฟ้าต้องมีการต่อสายดิน", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย, ไม่มีสายไฟโผล่, ไม่มีสิ่งกีดขวางหน้าตู้"] },
       s6: { title: "6. อื่นๆ", questions: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT และ Layout ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน (เข็มอยู่ตำแหน่งสีเขียว)"] },
       s7: { title: "7. Other (ไม่บังคับ)", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
+    };
+
+    const SAFETY_CHECKLIST_OUTSIDE = {
+      s1: { title: "1. สถานที่รอบโรงงาน", questions: ["ประตูเข้า-ออกใช้งานได้ปกติ", "รั้วรอบโรงงานอยู่ในสภาพดี ไม่ชำรุดเสียหาย", "ป้ายจราจร และจุดรวมพลชัดเจน", "แบ่งพื้นที่ทางเดิน และทางเดินรถชัดเจน", "รางระบายน้ำไม่มีขยะ และไม่อุดตัน", "Pest Control ไม่มีร่องรอยสัตว์หรือแมลงที่ผิดปกติ", "อุปกรณ์ชะลอความเร็วไม่ชำรุดเสียหาย", "ไฟส่องสว่างเพียงพอตอนกลางคืน", "พื้นที่สูบบุหรี่มีอุปกรณ์ดับเพลิง", "ถังใส่ขยะปิดมิดชิด และไม่รั่ว"] },
+      s2: { title: "2. โฟล์คลิฟท์ และรถส่งของ", questions: ["พนักงานผ่านการอบรม และมีใบรับรอง", "ขับตามเส้นทางที่กำหนด", "ไม่ขับเร็วเกินมาตรฐานที่กำหนด", "รถส่งของจอดโดยมีอุปกรณ์รองรับล้อเพื่อกันการเคลื่อนที่"] },
+      s3: { title: "3. สารเคมี", questions: ["การสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงาน", "ไม่มีสารเคมีหกรั่วไหล, ภาชนะปิดสนิท", "อากาศถ่ายเท, อุณหภูมิไม่เกิน 40 องศาเซลเซียส", "มีอุปกรณ์ Spill Kit พร้อมใช้งาน", "มีขั้นตอนการปฎิบัติงาน", "บันทึกการตรวจสายกราวด์", "มีฉลากระบุสารเคมี และมี MSDS"] },
+      s4: { title: "4. ไฟฟ้า", questions: ["ตรวจสอบอุปกรณ์ไฟฟ้าเช่น สายไฟ ปลั๊กไฟ ต้องไม่ชำรุดเสียหาย", "ปลั๊กไฟ/เต้าเสียบไม่หลวม", "ไม่มีการต่ออุปกรณ์พวงไฟฟ้าแบบชั่วคราว", "อุปกรณ์ไฟฟ้าต้องมีการต่อสายดิน", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย, ไม่มีสายไฟโผล่, ไม่มีสิ่งกีดขวางหน้าตู้"] },
+      s5: { title: "5. อื่นๆ", questions: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT และ Layout ชัดเจน", "อุปกรณ์ดับเพลิงและถังดับเพลิงพร้อมใช้งาน (เข็มอยู่ตำแหน่งสีเขียว)"] },
+      s6: { title: "6. Other (ไม่บังคับ)", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
     };
 
     const SAFETY_CHECKLIST_MAP = {
@@ -162,11 +171,11 @@
       { title: "5. การจัดเก็บเอกสาร", questions: ["ในตู้เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน", "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"] },
       { title: "6. พื้น / ผนังห้อง/ฝ้า/เพดาน", questions: ["ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น", "ไม่มีคราบสี, Solvent / น้ำนองพื้น", "กำหนดเวลาการทำความสะอาดประจำ ตามความเหมาะสม"] },
       { title: "7. สภาพแวดล้อมทั่วไป", questions: ["มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมในแผนกหรือไม่", "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก", "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดและกำหนดผู้รับผิดชอบ"] },
-      { title: "8. การตรวจสุขลักษณะส่วนบุคคล", questions: ["พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
+      { title: "8. การตรวจสุขลักษณะส่วนบุคคล", questions: ["แต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
       { title: "9. ความตระหนัก ความสำเร็จ ผลงาน", questions: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
     ];
 
-    // 🌟 แก้ไขรวมชุดโครงสร้าง 5S ให้ตรงกับหลังบ้านและลบ SOVENTLESS ออก 🌟
+    // 🌟 โครงสร้าง Object 5S Master (ไม่มี SOVENTLESS ตามตรรกะหน้าฟอร์ม) 🌟
     const CHECKLIST_5S = {
       "PRINT": { sections: FACTORY_5S_SECTIONS },
       "LAMINATE": { sections: FACTORY_5S_SECTIONS },
@@ -209,12 +218,36 @@
       ]}
     };
 
+    // 🌟 ระบบ Dual-Track Area สำหรับตัวกรองของหน้าบ้าน (แยกเด็ดขาดระหว่าง Safety กับ 5S) 🌟
+    const DEPT_PER_TYPE = {
+      all: [
+        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
+        { value: "PRINT", label: "🖨️ PRINT", icon: "fas fa-print" }, { value: "LAMINATE", label: "📦 LAMINATE", icon: "fas fa-layer-group" }, { value: "SOVENTLESS", label: "🧪 SOVENTLESS", icon: "fas fa-flask" },
+        { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER", icon: "fas fa-box-open" }, { value: "BAG MAKING", label: "🛍️ BAG MAKING", icon: "fas fa-shopping-bag" }, { value: "QA&QC", label: "🔬 QA & QC", icon: "fas fa-vial" },
+        { value: "WAREHOUSE", label: "🏭 WAREHOUSE", icon: "fas fa-warehouse" }, { value: "OFFICE", label: "🏢 OFFICE", icon: "fas fa-building" }, { value: "CANTEEN", label: "🍽️ CANTEEN", icon: "fas fa-utensils" },
+        { value: "LOCKER", label: "🔐 LOCKER", icon: "fas fa-lock" }, { value: "TOILET", label: "🚽 TOILET", icon: "fas fa-restroom" }, { value: "ENGINEERING", label: "🔧 ENGINEERING", icon: "fas fa-tools" }, { value: "OUTSIDE", label: "🌳 OUTSIDE", icon: "fas fa-tree" }
+      ],
+      safety: [
+        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
+        { value: "PRINT", label: "🖨️ PRINT", icon: "fas fa-print" }, { value: "LAMINATE", label: "📦 LAMINATE", icon: "fas fa-layer-group" }, { value: "SOVENTLESS", label: "🧪 SOVENTLESS", icon: "fas fa-flask" },
+        { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER", icon: "fas fa-box-open" }, { value: "BAG MAKING", label: "🛍️ BAG MAKING", icon: "fas fa-shopping-bag" }, { value: "QA&QC", label: "🔬 QA&QC", icon: "fas fa-vial" },
+        { value: "WAREHOUSE", label: "🏭 WAREHOUSE", icon: "fas fa-warehouse" }, { value: "OFFICE", label: "🏢 OFFICE", icon: "fas fa-building" }, { value: "OUTSIDE", label: "🌳 OUTSIDE", icon: "fas fa-tree" }
+      ],
+      "5S": [
+        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
+        { value: "PRINT", label: "🖨️ PRINT", icon: "fas fa-print" }, { value: "LAMINATE", label: "📦 LAMINATE", icon: "fas fa-layer-group" }, { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER", icon: "fas fa-box-open" },
+        { value: "BAG MAKING", label: "🛍️ BAG MAKING", icon: "fas fa-shopping-bag" }, { value: "WAREHOUSE", label: "🏭 WAREHOUSE", icon: "fas fa-warehouse" }, { value: "OFFICE", label: "🖥️ OFFICE", icon: "fas fa-desktop" },
+        { value: "CANTEEN", label: "🍽️ CANTEEN", icon: "fas fa-utensils" }, { value: "TOILET", label: "🚽 TOILET", icon: "fas fa-restroom" }, { value: "LOCKER", label: "🔐 LOCKER", icon: "fas fa-lock" },
+        { value: "QA&QC", label: "🔬 QA&QC", icon: "fas fa-microscope" }, { value: "ENGINEERING", label: "🔧 ENGINEERING", icon: "fas fa-tools" }, { value: "OUTSIDE", label: "🌳 OUTSIDE", icon: "fas fa-tree" }
+      ]
+    };
+
     let rawData = [], currentType = 'all', currentStatus = 'all';
 
-    window.onload = function() { document.getElementById('dateFilter').valueAsDate = new Date(); loadData(); };
+    window.onload = function() { document.getElementById('dateFilter').value = ""; loadData(); };
     function clearDateFilter() { document.getElementById('dateFilter').value = ""; renderTable(); }
 
-    function getDriveThumbnailUrl(url) { if(!url) return ""; let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/); if(match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=500`; return url; }
+    function getDriveThumbnailUrl(url) { if(!url || url === "-") return ""; let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/); if(match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=500`; return url; }
 
     function calculate5SScore(checklist, areaStr) {
       const areaData = CHECKLIST_5S[areaStr] || CHECKLIST_5S["OFFICE"]; const sections = areaData?.sections || [];
@@ -233,20 +266,52 @@
           if (!d.inspectionType) d.inspectionType = "Safety";
           if (d.inspectionType.toUpperCase() === "5S" && d.fullChecklist) { d.hasBad = Object.values(d.fullChecklist).includes("ปรับปรุง") || Object.values(d.fullChecklist).includes("ไม่ดี"); }
         });
-        renderTable(); loader.classList.add('hidden'); loader.classList.remove('flex');
+        updateAreaOptions('all'); renderTable(); loader.classList.add('hidden'); loader.classList.remove('flex');
       }).catch(err => { loader.classList.add('hidden'); console.error("Error:", err); });
     }
 
-    function selectTypeFilter(type, el) { currentType = type; document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); renderTable(); }
+    function selectTypeFilter(type, el) { 
+      currentType = type; 
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active')); 
+      el.classList.add('active'); 
+      updateAreaOptions(type); 
+      document.getElementById('areaFilter').value = ""; 
+      document.getElementById('areaDisplayText').textContent = "-- ทั้งหมด --";
+      renderTable(); 
+    }
+    
     function updateStatusFilter(status) { currentStatus = status; document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active')); document.getElementById('card-' + status).classList.add('active'); renderTable(); }
 
+    function updateAreaOptions(type) {
+      const container = document.getElementById('areaOptions');
+      let areaKey = type;
+      if (type !== 'all' && type !== '5S') areaKey = 'safety';
+      const areas = DEPT_PER_TYPE[areaKey];
+      container.innerHTML = areas.map(area => `
+        <div class="px-3 py-2 text-xs font-semibold cursor-pointer rounded-md flex items-center gap-2 text-slate-700 hover:bg-slate-100 transition" onclick="selectArea('${area.value}', '${area.label}', this)">
+          <i class="${area.icon} text-slate-400 w-4"></i><span>${area.label}</span>
+        </div>
+      `).join('');
+    }
+
+    function toggleAreaDropdown() { document.getElementById('areaOptions').classList.toggle('hidden'); }
+    function selectArea(value, label, el) { document.getElementById('areaFilter').value = value; document.getElementById('areaDisplayText').textContent = label; document.getElementById('areaOptions').classList.add('hidden'); renderTable(); }
+
     function renderTable() {
-      let filtered = [...rawData]; const dateVal = document.getElementById('dateFilter').value;
+      let filtered = [...rawData]; 
+      const dateVal = document.getElementById('dateFilter').value;
+      const areaVal = document.getElementById('areaFilter').value;
+
       if (dateVal) filtered = filtered.filter(d => d.timestamp?.startsWith(dateVal));
       if (currentType !== 'all') filtered = filtered.filter(d => d.inspectionType?.toUpperCase() === currentType.toUpperCase());
+      if (areaVal) filtered = filtered.filter(d => d.area === areaVal);
+
       const t = filtered.length, b = filtered.filter(d => d.hasBad).length, g = t - b;
       document.getElementById('countTotal').innerText = t; document.getElementById('countGood').innerText = g; document.getElementById('countBad').innerText = b;
-      if (currentStatus === 'good') filtered = filtered.filter(d => !d.hasBad); if (currentStatus === 'bad') filtered = filtered.filter(d => d.hasBad);
+      
+      if (currentStatus === 'good') filtered = filtered.filter(d => !d.hasBad); 
+      if (currentStatus === 'bad') filtered = filtered.filter(d => d.hasBad);
+      
       const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
       if(filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 font-semibold"><i class="fas fa-folder-open text-xl mb-1 block"></i> ไม่พบข้อมูลบันทึกรายการตรวจ</td></tr>`; return; }
 
@@ -255,26 +320,28 @@
         if (typeof d.photo === 'object' && d.photo !== null) {
           let photoCount = Object.values(d.photo).filter(url => url && url !== "ไม่มีรูปถ่าย" && url.trim() !== "").length;
           if(photoCount > 0) photoDisplay = `<span class="text-xs font-bold text-[#003566]"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
-        } else if (typeof d.photo === 'string' && d.photo !== "ไม่มีรูปถ่าย" && d.photo.trim() !== "") {
-          photoDisplay = `<a href="${d.photo}" target="_blank" class="text-sky-600"><i class="fas fa-image text-base"></i></a>`;
         }
+        
         let statusHtml = '';
         if (is5S) {
-           const percent = calculate5SScore(d.fullChecklist, d.area); const color = percent >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : percent >= 50 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+           const percent = calculate5SScore(d.fullChecklist, d.area); 
+           const color = percent >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : percent >= 50 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
            statusHtml = `<span class="px-2 py-0.5 border rounded-full text-xs font-bold ${color}">${percent}%</span>`;
         } else {
            statusHtml = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${d.hasBad ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}">${d.hasBad ? 'พบปัญหา' : 'ปกติ'}</span>`;
         }
+        
         const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 transition text-slate-700 font-medium";
         tr.innerHTML = `<td class="p-3 font-mono text-xs">${d.timestamp || '-'}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold text-white ${is5S ? 'bg-emerald-600' : 'bg-[#003566]'}">${d.inspectionType}</span></td><td class="p-3 font-bold text-slate-800">${d.area || '-'}</td><td class="p-3">${d.inspector || '-'}</td><td class="p-3 text-center">${statusHtml}</td><td class="p-3 text-center">${photoDisplay}</td><td class="p-3 text-center"><button class="bg-slate-100 border text-slate-600 px-2 py-1 rounded text-xs font-bold hover:bg-slate-200 transition" onclick="toggleDetail('${d.id}')">ผลตรวจ <i class="fas fa-chevron-down ml-0.5" id="icon-${d.id}"></i></button></td>`;
         tbody.appendChild(tr);
 
         const detailTr = document.createElement('tr'); detailTr.id = `detail-${d.id}`; detailTr.className = 'hidden bg-slate-50/70';
         let detailHtml = `<div class="p-4 space-y-3"><h4 class="text-xs md:text-sm font-bold text-[#003566] border-b pb-1.5"><i class="fas fa-clipboard-check"></i> รายละเอียดผลการตรวจสอบ</h4>`;
+        
         if (is5S) {
           const sections = (CHECKLIST_5S[d.area] || CHECKLIST_5S["OFFICE"])?.sections || [];
           sections.forEach((sec, sIdx) => {
-            detailHtml += `<div class="border rounded-xl bg-white overflow-hidden shadow-2xs"><div class="bg-slate-100/80 px-3 py-2 text-xs font-bold text-slate-700">${sec.title}</div><div class="divide-y text-xs">`;
+            detailHtml += `<div class="border rounded-xl bg-white overflow-hidden shadow-2xs mb-3"><div class="bg-slate-100/80 px-3 py-2 text-xs font-bold text-slate-700">${sec.title}</div><div class="divide-y text-xs">`;
             sec.questions.forEach((qText, qIdx) => {
               const res = d.fullChecklist?.[`5s_s${sIdx}_q${qIdx}`]; const remark = d.fullChecklist?.[`5s_remark_s${sIdx}_q${qIdx}`] || "";
               let pill = 'text-slate-400', txt = '-'; if (res === "ดี") { pill = 'bg-emerald-50 text-emerald-700'; txt = 'ดี'; } else if (res === "พอใช้") { pill = 'bg-amber-50 text-amber-700'; txt = 'พอใช้'; } else if (res === "ปรับปรุง") { pill = 'bg-rose-50 text-rose-700 font-bold'; txt = 'ปรับปรุง'; }
@@ -285,7 +352,7 @@
           const checklist = getSafetyChecklist(d.area);
           for(let secKey in checklist) {
             const section = checklist[secKey]; const sNum = secKey.replace('s', '');
-            detailHtml += `<div class="border rounded-xl bg-white overflow-hidden shadow-2xs"><div class="bg-slate-100/80 px-3 py-2 text-xs font-bold text-slate-700">${section.title}</div><div class="divide-y text-xs">`;
+            detailHtml += `<div class="border rounded-xl bg-white overflow-hidden shadow-2xs mb-3"><div class="bg-slate-100/80 px-3 py-2 text-xs font-bold text-slate-700">${section.title}</div><div class="divide-y text-xs">`;
             section.questions.forEach((qText, idx) => {
               const res = d.fullChecklist?.[`section${sNum}_q${idx}`]; const remark = d.fullChecklist?.[`section${sNum}_remark${idx}`]; const isBad = res === "ไม่ดี";
               let displayQText = qText; if(secKey === 's1' && qText === 'Water Mist' && d.fullChecklist?.['water_val']) displayQText += ` <span class="text-amber-600 font-bold">(${d.fullChecklist['water_val']}%)</span>`;
@@ -294,8 +361,8 @@
                  for(let p = 0; p < 3; p++) {
                     let pKey = `${secKey}_q${idx}_${p}`;
                     if(d.photo[pKey] && d.photo[pKey] !== "") {
-                       let thumbUrl = getDriveThumbnailUrl(d.photo[pKey]); let imgCaption = d.fullChecklist?.[`caption_${pKey}`] || "";
-                       qPhotoPreviews += `<div class="flex flex-col items-center w-16 mt-2 mr-2"><a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="w-16 h-16 object-cover rounded border"></a>${imgCaption ? `<span class="text-[10px] text-slate-500 text-center truncate w-full">${imgCaption}</span>` : ''}</div>`;
+                       let thumbUrl = getDriveThumbnailUrl(d.photo[pKey]);
+                       qPhotoPreviews += `<div class="flex flex-col items-center w-16 mt-2 mr-2"><a href="${d.photo[pKey]}" target="_blank"><img src="${thumbUrl}" class="w-16 h-16 object-cover rounded border"></a></div>`;
                     }
                  }
               }
