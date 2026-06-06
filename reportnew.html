@@ -9,116 +9,389 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body { font-family: 'Sarabun', sans-serif; }
+    .dark { background-color: #0f172a; color: #f8fafc; }
+    .dark .bg-white { background-color: #1e293b !important; color: #f8fafc !important; }
+    .dark .border { border-color: #334155 !important; }
+    .dark select, .dark input { background-color: #334155 !important; color: white !important; border-color: #475569 !important; }
     .type-btn.active { border-color: #003566 !important; background-color: #e6f0fa !important; color: #003566 !important; }
+    .dark .type-btn.active { border-color: #38bdf8 !important; background-color: #0c4a6e !important; color: #38bdf8 !important; }
+    
+    /* Transition สำหรับข้อความยาวๆ บน Desktop */
+    .hover-expand { transition: all 0.3s ease; }
+    .hover-expand:hover { -webkit-line-clamp: unset !important; line-clamp: unset !important; }
+
+    /* 📱 ระบบ Card Layout สำหรับมือถือ (หน้าจอเล็กกว่า 768px) */
     @media (max-width: 767px) {
-      .responsive-table thead { display: none; }
+      .responsive-table thead { display: none; /* ซ่อนหัวตาราง */ }
       .responsive-table tbody, .responsive-table tr, .responsive-table td { display: block; width: 100%; }
-      .responsive-table tr { margin-bottom: 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #fff; padding: 0.5rem; }
-      .responsive-table td { display: flex; flex-direction: row; justify-content: space-between; padding: 0.25rem 0.5rem; border: none; }
-      .responsive-table td::before { content: attr(data-label); font-weight: 700; color: #64748b; font-size: 0.75rem; }
+      .responsive-table tr { 
+        margin-bottom: 1.25rem; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 0.75rem; 
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
+        background-color: #fff; 
+        overflow: hidden;
+      }
+      .dark .responsive-table tr { background-color: #1e293b; border-color: #334155; }
+      .responsive-table td { 
+        display: flex; 
+        flex-direction: column; 
+        padding: 0.75rem 1rem; 
+        border-bottom: 1px solid #f1f5f9; 
+        text-align: left !important;
+      }
+      .dark .responsive-table td { border-bottom-color: #334155; }
+      .responsive-table td:last-child { border-bottom: none; }
+      /* เสก Label ขึ้นมาแสดงด้านบนของแต่ละฟิลด์ */
+      .responsive-table td::before { 
+        content: attr(data-label); 
+        font-weight: 700; 
+        color: #003566; 
+        font-size: 0.75rem;
+        margin-bottom: 0.25rem;
+      }
+      .dark .responsive-table td::before { color: #38bdf8; }
+      /* ปรับขนาดรูปภาพบนมือถือให้ใหญ่เต็มตาขึ้น */
+      .responsive-table td img { width: 100% !important; max-width: 250px; height: auto !important; margin: 0; }
+      .responsive-table td a, .responsive-table td span.inline-flex { margin-left: 0; max-width: fit-content; }
     }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 p-2 md:p-6 min-h-screen">
 
   <nav class="bg-[#003566] text-white fixed top-0 left-0 right-0 z-50 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between py-3">
-      <div class="flex items-center gap-2 font-bold"><i class="fas fa-shield-halved text-sky-400"></i> TOPPAN SAFETY & 5S</div>
-      <div class="flex items-center gap-4 text-xs md:text-sm">
-        <a href="DashNew.html" class="hover:text-sky-300"><i class="fas fa-list-check"></i> รายการ</a>
-        <a href="reportnew.html" class="text-sky-300 font-bold"><i class="fas fa-business-time"></i> Action Plan</a>
+    <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between py-3 gap-3">
+      <div class="flex items-center gap-2">
+        <i class="fas fa-shield-halved text-xl text-sky-400"></i>
+        <span class="font-bold tracking-wide text-sm md:text-base">TOPPAN SAFETY & 5S</span>
+      </div>
+      <div class="flex items-center gap-2 overflow-x-auto text-xs md:text-sm">
+        <a href="DashNew.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition flex items-center gap-1"><i class="fas fa-list-check"></i> รายการตรวจ</a>
+        <a href="dashboard.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition flex items-center gap-1"><i class="fas fa-chart-pie"></i> ศูนย์ควบคุม</a>
+        <a href="reportnew.html" class="px-3 py-1.5 bg-sky-600 rounded font-semibold flex items-center gap-1"><i class="fas fa-business-time"></i> Action Plan</a>
+        <a href="safety.html" class="px-3 py-1.5 rounded hover:bg-white/10 transition flex items-center gap-1"><i class="fas fa-plus-circle"></i> ตรวจพื้นที่</a>
       </div>
     </div>
   </nav>
 
-  <div class="max-w-7xl mx-auto mt-16 space-y-4">
+  <div class="max-w-7xl mx-auto mt-14 space-y-4">
     <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-      <h3 class="font-bold text-sm mb-3 flex items-center gap-2"><i class="fas fa-filter text-[#003566]"></i> ตัวกรองข้อมูล</h3>
-      
-      <div class="grid grid-cols-4 sm:grid-cols-7 gap-1.5 mb-4">
-        <div class="type-btn p-2 rounded-lg border text-center cursor-pointer font-bold text-[10px] active shadow-sm" data-type="all" onclick="selectTypeFilter('all', this)">ทั้งหมด</div>
-        <div class="type-btn p-2 rounded-lg border text-center cursor-pointer font-bold text-[10px] shadow-sm" data-type="จป.ว" onclick="selectTypeFilter('จป.ว', this)">จป.ว</div>
-        <div class="type-btn p-2 rounded-lg border text-center cursor-pointer font-bold text-[10px] shadow-sm" data-type="คปอ." onclick="selectTypeFilter('คปอ.', this)">คปอ.</div>
-        <div class="type-btn p-2 rounded-lg border text-center cursor-pointer font-bold text-[10px] shadow-sm" data-type="Foreman/Mgr." onclick="selectTypeFilter('Foreman/Mgr.', this)">Foreman</div>
-        <div class="type-btn p-2 rounded-lg border text-center cursor-pointer font-bold text-[10px] shadow-sm" data-type="Audit" onclick="selectTypeFilter('Audit', this)">Audit</div>
-        <div class="type-btn p-2 rounded-lg border text-center cursor-pointer font-bold text-[10px] shadow-sm" data-type="Accident/Fire" onclick="selectTypeFilter('Accident/Fire', this)">Accident</div>
-        <div class="type-btn p-2 rounded-lg border text-center cursor-pointer font-bold text-[10px] shadow-sm" data-type="5S" onclick="selectTypeFilter('5S', this)">5S</div>
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100 mb-3">
+        <h3 class="font-bold text-sm md:text-base text-slate-800 flex items-center gap-1"><i class="fas fa-sliders-h text-[#003566]"></i> ตัวกรองข้อมูล</h3>
+        <button class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition" onclick="clearFilters()"><i class="fas fa-rotate-left"></i> ล้างค่า</button>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div>
-          <label class="text-[10px] font-bold text-slate-500">พื้นที่/แผนก</label>
-          <select id="areaFilter" onchange="renderTable()" class="w-full p-2 text-xs border rounded-lg bg-slate-50">
-            <option value="">-- ทั้งหมด --</option>
-            <option value="PRINT">PRINT</option><option value="LAMINATE">LAMINATE</option>
-            <option value="SOVENTLESS">SOVENTLESS</option><option value="QA&QC">QA & QC</option>
-            <option value="WAREHOUSE">WAREHOUSE</option><option value="OFFICE">OFFICE</option>
-            <option value="CANTEEN">CANTEEN</option><option value="TOILET">TOILET</option>
-            <option value="LOCKER">LOCKER</option><option value="ENGINEERING">ENGINEERING</option>
-            <option value="OUTSIDE">OUTSIDE</option>
-          </select>
+      <div class="text-xs font-bold text-slate-500 mb-1.5 flex items-center gap-1"><i class="fas fa-tags text-sky-600"></i> เลือกประเภทการตรวจสอบ</div>
+      <div class="grid grid-cols-4 sm:grid-cols-7 gap-1.5 mb-4">
+        <div class="type-btn p-2 rounded-xl border bg-slate-50 text-center cursor-pointer font-bold text-[11px] text-slate-600 hover:bg-slate-100 flex flex-col items-center gap-0.5 active shadow-xs" data-type="all" onclick="selectTypeFilter('all', this)"><i class="fas fa-list text-slate-400"></i>ทั้งหมด</div>
+        <div class="type-btn p-2 rounded-xl border bg-slate-50 text-center cursor-pointer font-bold text-[11px] text-slate-600 hover:bg-slate-100 flex flex-col items-center gap-0.5 shadow-xs" data-type="จป.ว" onclick="selectTypeFilter('จป.ว', this)"><i class="fas fa-hard-hat text-slate-400"></i>จป.ว</div>
+        <div class="type-btn p-2 rounded-xl border bg-slate-50 text-center cursor-pointer font-bold text-[11px] text-slate-600 hover:bg-slate-100 flex flex-col items-center gap-0.5 shadow-xs" data-type="คปอ." onclick="selectTypeFilter('คปอ.', this)"><i class="fas fa-users-cog text-slate-400"></i>คปอ.</div>
+        <div class="type-btn p-2 rounded-xl border bg-slate-50 text-center cursor-pointer font-bold text-[11px] text-slate-600 hover:bg-slate-100 flex flex-col items-center gap-0.5 shadow-xs" data-type="Foreman/Mgr." onclick="selectTypeFilter('Foreman/Mgr.', this)"><i class="fas fa-user-tie text-slate-400"></i>Foreman</div>
+        <div class="type-btn p-2 rounded-xl border bg-slate-50 text-center cursor-pointer font-bold text-[11px] text-slate-600 hover:bg-slate-100 flex flex-col items-center gap-0.5 shadow-xs" data-type="Audit" onclick="selectTypeFilter('Audit', this)"><i class="fas fa-search text-slate-400"></i>Audit</div>
+        <div class="type-btn p-2 rounded-xl border bg-slate-50 text-center cursor-pointer font-bold text-[11px] text-slate-600 hover:bg-slate-100 flex flex-col items-center gap-0.5 shadow-xs" data-type="Accident/Fire" onclick="selectTypeFilter('Accident/Fire', this)"><i class="fas fa-fire-extinguisher text-slate-400"></i>Accident</div>
+        <div class="type-btn p-2 rounded-xl border bg-slate-50 text-center cursor-pointer font-bold text-[11px] text-slate-600 hover:bg-slate-100 flex flex-col items-center gap-0.5 shadow-xs" data-type="5S" onclick="selectTypeFilter('5S', this)"><i class="fas fa-broom text-slate-400"></i>5S</div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <div class="relative flex flex-col gap-1">
+          <label class="text-xs font-bold text-slate-500">🔍 ค้นหาคีย์เวิร์ด</label>
+          <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="searchFilter" class="w-full pl-8 pr-3 py-2 text-xs border rounded-lg outline-none bg-slate-50 focus:border-[#003566]" placeholder="Job ID / ปัญหา..." oninput="debouncedRender()">
+          </div>
         </div>
-        <div>
-          <label class="text-[10px] font-bold text-slate-500">สถานะ</label>
-          <select id="statusFilter" onchange="renderTable()" class="w-full p-2 text-xs border rounded-lg bg-slate-50">
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-slate-500">📅 ประจำเดือน</label>
+          <input type="month" id="monthFilter" onchange="loadReport()" class="w-full p-2 text-xs border rounded-lg outline-none bg-slate-50 focus:border-[#003566]">
+        </div>
+        <div class="flex flex-col gap-1 relative area-selector-wrapper">
+          <label class="text-xs font-bold text-slate-500">📍 พื้นที่/แผนก</label>
+          <div class="w-full p-2 text-xs border rounded-lg bg-slate-50 flex items-center justify-between cursor-pointer border-slate-200" id="areaDisplay" onclick="toggleAreaDropdown()">
+            <span id="areaDisplayText" class="font-medium">-- ทั้งหมด --</span><i class="fas fa-chevron-down text-slate-400 text-[10px]"></i>
+          </div>
+          <div class="absolute top-full left-0 right-0 bg-white border rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto hidden p-1 mt-1 space-y-0.5" id="areaOptions"></div>
+          <input type="hidden" id="areaFilter" value="">
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-bold text-slate-500">🟢 สถานะดำเนินงาน</label>
+          <select id="statusFilter" onchange="renderTable()" class="w-full p-2 text-xs border rounded-lg outline-none bg-slate-50 focus:border-[#003566] cursor-pointer">
             <option value="">-- ทั้งหมด --</option>
-            <option value="Open">Open</option><option value="Closed">Closed</option>
+            <option value="Open">🔴 Open</option>
+            <option value="Closed">🟢 Closed</option>
           </select>
         </div>
       </div>
+      <div class="mt-3 pt-2 border-t border-dashed border-slate-100 flex flex-wrap gap-1.5" id="activeFilters"></div>
     </div>
 
-    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-      <table class="responsive-table w-full text-xs text-left">
-        <thead>
-          <tr class="bg-slate-100 text-slate-600">
-            <th class="p-2">Job No.</th><th class="p-2">พื้นที่</th><th class="p-2">ปัญหา</th><th class="p-2">สถานะ</th>
-          </tr>
-        </thead>
-        <tbody id="reportContent" class="divide-y"></tbody>
-      </table>
+    <div class="bg-white rounded-2xl p-2 md:p-4 shadow-sm border border-slate-200 overflow-hidden w-full">
+      
+      <div class="border rounded-xl bg-slate-50 mb-3 p-4">
+        <div class="flex flex-wrap md:flex-nowrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <img src="https://itrequests.netlify.app/logo.png" class="h-8 md:h-10 w-auto opacity-90 object-contain" alt="LOGO" onerror="this.style.display='none'">
+            <div>
+              <h1 class="text-sm md:text-base font-bold text-slate-800 leading-tight">รายงานติดตามสถานะการแก้ไขปัญหา</h1>
+              <p class="text-[10px] md:text-[11px] text-slate-500 uppercase font-medium">Safety Patrol & 5S Tracking</p>
+            </div>
+          </div>
+          <div class="text-right border-l pl-4 border-slate-300">
+            <span class="text-[10px] md:text-xs font-semibold text-slate-400 block uppercase">ประจำเดือน</span>
+            <span id="displayMonth" class="text-xs md:text-sm font-bold text-[#003566]">-</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-4 bg-slate-50/50 p-2 rounded-xl border border-slate-100">
+        <div class="flex flex-wrap gap-1.5">
+          <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="exportCSV()"><i class="fas fa-file-csv text-teal-600"></i> Export CSV</button>
+          <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="exportExcel()"><i class="fas fa-file-excel text-emerald-600"></i> Export Excel</button>
+          <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="printReport()"><i class="fas fa-print text-indigo-600"></i> พิมพ์</button>
+        </div>
+        <button id="toggleDarkMode" class="bg-white border text-slate-500 w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center shadow-2xs hover:bg-slate-50 transition" onclick="toggleDarkMode()"><i class="fas fa-moon text-[10px] md:text-xs"></i></button>
+      </div>
+
+      <div class="w-full md:rounded-xl md:border md:border-slate-200">
+        <table class="responsive-table w-full text-[11px] md:text-xs text-left border-collapse md:table-fixed break-words">
+          <thead class="hidden md:table-header-group">
+            <tr class="bg-gradient-to-r from-[#002548] to-[#003566] text-white">
+              <th class="p-2 text-center font-bold border border-slate-700 w-[4%] cursor-pointer" onclick="sortTable('jobId')">ลำดับ</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[5%]">ประเภท</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[6%]">Before</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[6%]">After</th>
+              <th class="p-2 font-bold border border-slate-700 w-[8%] cursor-pointer" onclick="sortTable('area')">พื้นที่</th>
+              <th class="p-2 font-bold border border-slate-700 w-[8%] cursor-pointer" onclick="sortTable('jobId')">Job No.</th>
+              <th class="p-2 font-bold border border-slate-700 w-[16%]">ปัญหาที่ตรวจพบ</th>
+              <th class="p-2 font-bold border border-slate-700 w-[16%]">แนวทางแก้ไขปัญหา</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[7%]">ผู้รับผิดชอบ</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('dateFound')">วันที่พบ</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('dueDate')">กำหนดเสร็จ</th>
+              <th class="p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('finishDate')">ปิดงาน</th>
+              <th class="p-2 font-bold border border-slate-700 w-[6%]">หมายเหตุ</th>
+            </tr>
+          </thead>
+          <tbody id="reportContent" class="divide-y divide-slate-200 bg-white"></tbody>
+        </table>
+      </div>
+
+      <div id="pagination" class="mt-4 flex flex-wrap items-center justify-center gap-1.5"></div>
     </div>
   </div>
 
   <script>
-    const CONFIG = { API_URL: "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec" };
-    let allReportData = []; let currentTypeFilter = 'all';
+    const CONFIG = {
+      API_URL: "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec", TZ: "GMT+7",
+      SAFETY_TYPES: ["จป.ว", "คปอ.", "Foreman/Mgr.", "Audit", "Accident/Fire"], TYPE_5S: "5S",
+      AREA_DISPLAY_MAP: { "PRINT": "PRINT", "LAMINATE": "LAMINATE", "SOLVENT": "SOLVENT", "REWINDER/SLITTER/PACKING": "REWINDER/SLITTER/PACKING", "BAG MAKING": "BAG MAKING", "QA&QC": "QA&QC", "WAREHOUSE": "WAREHOUSE", "OFFICE": "OFFICE", "CANTEEN": "CANTEEN", "FACTORY": "FACTORY", "ENGINEERING": "ENGINEERING", "OUTSIDE": "OUTSIDE" },
+      AREA_ALIAS: { "แผนก Print": "PRINT", "แผนก Laminate": "LAMINATE", "แผนก Solvent": "SOLVENT", "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING", "แผนก BAG MAKING": "BAG MAKING", "แผนก QA & QC": "QA&QC", "แผนก Warehouse": "WAREHOUSE", "Office": "OFFICE", "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE" }
+    };
 
-    window.onload = loadReport;
+    const AREA_DATA = {
+      all: [
+        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" }, { value: "OFFICE_ALL", label: "🏢 OFFICE (รวม)", icon: "fas fa-building" }, { value: "QA_ALL", label: "🔬 QA & QC (รวม)", icon: "fas fa-vial" }, { value: "OUTSIDE_ALL", label: "🌳 OUTSIDE (รวม)", icon: "fas fa-tree" },
+        { value: "PRINT", label: "🖨️ PRINT", icon: "fas fa-print" }, { value: "LAMINATE", label: "📦 LAMINATE", icon: "fas fa-layer-group" }, { value: "SOLVENT", label: "🧪 SOLVENT", icon: "fas fa-flask" }, { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER", icon: "fas fa-box-open" },
+        { value: "BAG MAKING", label: "🛍️ BAG MAKING", icon: "fas fa-shopping-bag" }, { value: "WAREHOUSE", label: "🏭 WAREHOUSE", icon: "fas fa-warehouse" }, { value: "CANTEEN", label: "🍽️ CANTEEN", icon: "fas fa-utensils" }, { value: "ENGINEERING", label: "🔧 ENGINEERING", icon: "fas fa-tools" }
+      ],
+      safety: [
+        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" }, { value: "PRINT", label: "🖨️ PRINT", icon: "fas fa-print" }, { value: "LAMINATE", label: "📦 LAMINATE", icon: "fas fa-layer-group" }, { value: "SOLVENT", label: "🧪 SOLVENT", icon: "fas fa-flask" },
+        { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER", icon: "fas fa-box-open" }, { value: "BAG MAKING", label: "🛍️ BAG MAKING", icon: "fas fa-shopping-bag" }, { value: "QA&QC", label: "🔬 QA&QC", icon: "fas fa-vial" }, { value: "WAREHOUSE", label: "🏭 WAREHOUSE", icon: "fas fa-warehouse" },
+        { value: "OFFICE", label: "🏢 OFFICE", icon: "fas fa-building" }, { value: "OUTSIDE", label: "🌳 OUTSIDE", icon: "fas fa-tree" }
+      ],
+      "5S": [
+        { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" }, { value: "OFFICE", label: "🖥️ OFFICE", icon: "fas fa-desktop" }, { value: "CANTEEN", label: "🍽️ CANTEEN", icon: "fas fa-utensils" }, { value: "QA&QC", label: "🔬 QA&QC", icon: "fas fa-microscope" },
+        { value: "ENGINEERING", label: "🔧 ENGINEERING", icon: "fas fa-tools" }, { value: "OUTSIDE", label: "🌳 OUTSIDE", icon: "fas fa-tree" }, { value: "PRINT", label: "🖨️ PRINT", icon: "fas fa-print" }, { value: "LAMINATE", label: "📦 LAMINATE", icon: "fas fa-layer-group" },
+        { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER", icon: "fas fa-box-open" }, { value: "BAG MAKING", label: "🛍️ BAG MAKING", icon: "fas fa-shopping-bag" }, { value: "WAREHOUSE", label: "🏭 WAREHOUSE", icon: "fas fa-warehouse" }
+      ]
+    };
 
-    async function loadReport() {
-      try {
-        const res = await fetch(CONFIG.API_URL + "?action=getReport");
-        allReportData = await res.json();
-        renderTable();
-      } catch(e) { console.error(e); }
-    }
+    let allReportData = []; let currentTypeFilter = 'all'; let currentPage = 1; const itemsPerPage = 50; let isLoading = false; 
+    
+    // 🌟 1. เปลี่ยนการเรียงเริ่มต้นเป็น jobId เรียงจากมากไปน้อย (ล่าสุดขึ้นก่อน) 🌟
+    let currentSort = { key: 'jobId', dir: 'desc' }; 
+    let searchTimeout = null;
+
+    window.onload = function() {
+      // 🌟 2. เซ็ตค่าเดือนเป็น "ค่าว่าง" เพื่อโหลดข้อมูลทั้งหมดตั้งแต่ต้น 🌟
+      document.getElementById('monthFilter').value = ""; 
+      
+      updateAreaOptions('all'); loadReport();
+      document.addEventListener('click', function(e) {
+        const wrapper = document.querySelector('.area-selector-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) { document.getElementById('areaOptions').classList.add('hidden'); }
+      });
+      if (localStorage.getItem('darkMode') === 'true') { document.documentElement.classList.add('dark'); }
+    };
 
     function selectTypeFilter(type, el) {
-      currentTypeFilter = type;
-      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active')); 
-      el.classList.add('active');
-      renderTable();
+      if (currentTypeFilter === type) return; currentTypeFilter = type;
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active')); el.classList.add('active');
+      updateAreaOptions(type); document.getElementById('areaFilter').value = ""; document.getElementById('areaDisplayText').textContent = "-- ทั้งหมด --";
+      currentPage = 1; renderTable(); updateActiveFilterTags();
+    }
+
+    function updateAreaOptions(type) {
+      const container = document.getElementById('areaOptions'); let areaKey = type;
+      if (type !== 'all' && type !== CONFIG.TYPE_5S) areaKey = 'safety';
+      const areas = AREA_DATA[areaKey];
+      container.innerHTML = areas.map(area => `
+        <div class="px-3 py-2 text-xs font-semibold cursor-pointer rounded-md flex items-center gap-2 text-slate-700 hover:bg-slate-100 transition" onclick="selectArea('${area.value}', '${area.label}', this)">
+          <i class="${area.icon} text-slate-400 w-4"></i><span>${area.label}</span>
+        </div>
+      `).join('');
+    }
+
+    function toggleAreaDropdown() { document.getElementById('areaOptions').classList.toggle('hidden'); }
+
+    function selectArea(value, label, el) {
+      document.getElementById('areaFilter').value = value; document.getElementById('areaDisplayText').textContent = label;
+      document.getElementById('areaOptions').classList.add('hidden');
+      currentPage = 1; renderTable(); updateActiveFilterTags();
+    }
+
+    function clearFilters() {
+      currentTypeFilter = 'all'; document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.type-btn[data-type="all"]').classList.add('active');
+      document.getElementById('areaFilter').value = ""; document.getElementById('areaDisplayText').textContent = "-- ทั้งหมด --";
+      updateAreaOptions('all'); document.getElementById('statusFilter').value = ""; document.getElementById('searchFilter').value = "";
+      
+      // 🌟 เซ็ตค่าเดือนเป็น "ค่าว่าง" เมื่อกดปุ่มล้างค่า 🌟
+      document.getElementById('monthFilter').value = ""; 
+      
+      currentSort = { key: 'jobId', dir: 'desc' }; currentPage = 1; loadReport(); updateActiveFilterTags();
+    }
+
+    function debouncedRender() { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { currentPage = 1; renderTable(); updateActiveFilterTags(); }, 300); }
+
+    function updateActiveFilterTags() {
+      const container = document.getElementById('activeFilters'); const tags = [];
+      if (currentTypeFilter !== 'all') tags.push(`<span class="inline-flex items-center gap-1 bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 font-bold px-2 py-0.5 rounded text-[10px]">ประเภท: ${currentTypeFilter}</span>`);
+      if (document.getElementById('areaFilter').value) tags.push(`<span class="inline-flex items-center gap-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold px-2 py-0.5 rounded text-[10px]">พื้นที่: ${document.getElementById('areaDisplayText').textContent}</span>`);
+      if (document.getElementById('statusFilter').value) tags.push(`<span class="inline-flex items-center gap-1 bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 font-bold px-2 py-0.5 rounded text-[10px]">สถานะ: ${document.getElementById('statusFilter').value}</span>`);
+      container.innerHTML = tags.length > 0 ? tags.join('') : '<span class="text-slate-400 font-medium text-[11px]">ไม่มีตัวกรองเพิ่มเติม</span>';
+    }
+
+    async function loadReport() {
+      if (isLoading) return; isLoading = true;
+      const reportContent = document.getElementById('reportContent'); const monthInput = document.getElementById('monthFilter').value;
+      reportContent.innerHTML = `<tr><td colspan="13" class="p-10 text-center text-slate-500 font-semibold"><i class="fas fa-circle-notch fa-spin text-xl text-[#003566] mr-1"></i> กำลังโหลดข้อมูล...</td></tr>`;
+      let fetchUrl = `${CONFIG.API_URL}?action=getReport`;
+      if (monthInput) {
+        const d = new Date(monthInput); const mStr = d.toLocaleString('en-us', { month: 'short', year: 'numeric' });
+        fetchUrl += `&month=${encodeURIComponent(mStr)}`; document.getElementById('displayMonth').innerText = mStr;
+      } else { document.getElementById('displayMonth').innerText = "ทั้งหมด"; }
+      try {
+        const response = await fetch(fetchUrl); if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json(); allReportData = Array.isArray(data) ? data : [];
+        currentPage = 1; renderTable(); updateActiveFilterTags();
+      } catch (err) {
+        reportContent.innerHTML = `<tr><td colspan="13" class="p-8 text-center text-rose-500 font-bold"><i class="fas fa-exclamation-triangle mr-1"></i> ดึงข้อมูลล้มเหลว (${err.message})</td></tr>`;
+      } finally { isLoading = false; }
+    }
+
+    function parseThaiDate(dateStr) {
+      if (!dateStr || dateStr === "-" || dateStr === "ทั้งหมด") return 0; if (typeof dateStr === 'number') return dateStr;
+      const parts = dateStr.split('/'); if (parts.length === 3) { return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)).getTime(); }
+      const d = new Date(dateStr); return isNaN(d.getTime()) ? 0 : d.getTime();
+    }
+
+    // 🌟 3. แก้บักฟังก์ชันการเรียงข้อมูล (ให้เปรียบเทียบ string แทนการตัด string .pop() ทำให้ SF-YYMMDD-XXX เรียงได้แม่นยำ) 🌟
+    function compareValues(a, b, key, dir) {
+      let valA, valB;
+      if (key === 'dateFound' || key === 'dueDate' || key === 'finishDate') { 
+        valA = parseThaiDate(a[key]); valB = parseThaiDate(b[key]); 
+      } else { 
+        valA = (a[key] || '').toString().toLowerCase(); 
+        valB = (b[key] || '').toString().toLowerCase(); 
+      }
+      return dir === 'desc' ? (valA > valB ? -1 : 1) : (valA > valB ? 1 : -1);
+    }
+
+    function sortTable(key) {
+      currentSort.dir = (currentSort.key === key && currentSort.dir === 'asc') ? 'desc' : 'asc'; currentSort.key = key;
+      currentPage = 1; renderTable();
     }
 
     function renderTable() {
-      const areaVal = document.getElementById('areaFilter').value;
-      const statusVal = document.getElementById('statusFilter').value;
-      let filtered = allReportData.filter(item => 
-        (currentTypeFilter === 'all' || item.inspectionType === currentTypeFilter) &&
-        (areaVal === "" || item.area === areaVal) &&
-        (statusVal === "" || item.status === statusVal)
-      );
-      
-      document.getElementById('reportContent').innerHTML = filtered.map(item => `
-        <tr>
-          <td data-label="Job No.">${item.jobId}</td>
-          <td data-label="พื้นที่">${item.area}</td>
-          <td data-label="ปัญหา">${item.problem}</td>
-          <td data-label="สถานะ">${item.status}</td>
-        </tr>
-      `).join('');
+      const areaVal = document.getElementById('areaFilter').value; const statusVal = document.getElementById('statusFilter').value;
+      const searchVal = document.getElementById('searchFilter').value.trim().toLowerCase(); const reportContent = document.getElementById('reportContent');
+      let filtered = [...allReportData];
+      if (currentTypeFilter !== 'all') filtered = filtered.filter(item => item.inspectionType === currentTypeFilter);
+      if (areaVal !== "") {
+        filtered = filtered.filter(item => {
+          const norm = CONFIG.AREA_ALIAS[item.area] || item.area;
+          if (areaVal === "OFFICE_ALL") return norm === "OFFICE"; if (areaVal === "QA_ALL") return norm === "QA&QC"; if (areaVal === "OUTSIDE_ALL") return norm === "OUTSIDE";
+          return norm === areaVal;
+        });
+      }
+      if (statusVal !== "") filtered = filtered.filter(item => item.status === statusVal);
+      if (searchVal) {
+        filtered = filtered.filter(item => 
+          (item.jobId && item.jobId.toLowerCase().includes(searchVal)) || (item.problem && item.problem.toLowerCase().includes(searchVal)) ||
+          (item.remark && item.remark.toLowerCase().includes(searchVal)) || (item.inspector && item.inspector.toLowerCase().includes(searchVal)) || (item.picName && item.picName.toLowerCase().includes(searchVal))
+        );
+      }
+      filtered.sort((a, b) => compareValues(a, b, currentSort.key, currentSort.dir));
+      if (filtered.length === 0) {
+        reportContent.innerHTML = `<tr><td colspan="13" class="p-8 text-center text-slate-400 font-medium"><i class="fas fa-search mb-1 text-base block"></i> ไม่พบข้อมูลที่สอดคล้อง</td></tr>`;
+        document.getElementById('pagination').innerHTML = ''; return;
+      }
+      const totalPages = Math.ceil(filtered.length / itemsPerPage); const start = (currentPage - 1) * itemsPerPage;
+      const pageData = filtered.slice(start, start + itemsPerPage);
+
+      reportContent.innerHTML = pageData.map((item, index) => {
+        const isClosed = item.status === 'Closed';
+        
+        const actionBtn = !isClosed 
+          ? `<a href="resolveNew.html?jobid=${encodeURIComponent(item.jobId)}" class="flex items-center justify-center gap-1 bg-rose-500 hover:bg-rose-600 text-white font-bold px-1 py-1 md:px-2 md:py-1.5 rounded text-[8px] md:text-[10px] shadow-sm transition w-full mx-auto"><i class="fas fa-wrench"></i> <span class="hidden md:inline">แก้ไข</span></a>`
+          : `<span class="flex items-center justify-center gap-1 text-emerald-600 bg-emerald-50 border border-emerald-200 px-1 py-1 md:px-2 md:py-1.5 rounded text-[8px] md:text-[10px] font-bold w-full mx-auto"><i class="fas fa-check"></i> <span class="hidden md:inline">ปิดแล้ว</span></span>`;
+        
+        const imgBefore = item.picBefore && item.picBefore !== "-" 
+          ? `<img src="${getDriveThumb(item.picBefore)}" class="w-[30px] h-[25px] md:w-[50px] md:h-[40px] mx-auto rounded object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picBefore)}')">`
+          : `<span class="text-slate-400 italic text-[8px] md:text-[10px]">ไม่มีรูป</span>`;
+        
+        const imgAfter = item.picAfter && item.picAfter !== "-"
+          ? `<img src="${getDriveThumb(item.picAfter)}" class="w-[30px] h-[25px] md:w-[50px] md:h-[40px] mx-auto rounded object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picAfter)}')">`
+          : (isClosed ? `<span class="text-slate-400 italic text-[8px] md:text-[10px]">-</span>` : actionBtn);
+        
+        const typeColor = item.inspectionType === '5S' ? 'bg-emerald-600' : item.inspectionType === 'Audit' ? 'bg-sky-600' : 'bg-[#003566]';
+
+        return `
+          <tr class="${!isClosed ? 'bg-rose-50/40 hover:bg-rose-50/70' : 'hover:bg-slate-50/70'} transition">
+            <td data-label="ลำดับ" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle font-semibold text-slate-700 md:border border-slate-200">${start + index + 1}</td>
+            <td data-label="ประเภท" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle md:border border-slate-200"><span class="px-1 py-0.5 md:px-2 md:py-1 text-[8px] md:text-[10px] font-bold rounded-full text-white ${typeColor}">${escapeHtml(item.inspectionType)}</span></td>
+            <td data-label="ภาพ Before" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle md:border border-slate-200">${imgBefore}</td>
+            <td data-label="ภาพ After" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle md:border border-slate-200">${imgAfter}</td>
+            <td data-label="พื้นที่/แผนก" class="px-1 py-2 md:px-2 md:py-3 align-middle font-bold text-slate-700 md:border border-slate-200">${escapeHtml(CONFIG.AREA_DISPLAY_MAP[CONFIG.AREA_ALIAS[item.area] || item.area] || item.area || '-')}</td>
+            <td data-label="Job No." class="px-1 py-2 md:px-2 md:py-3 align-middle font-semibold text-sky-700 md:border border-slate-200 font-mono">${escapeHtml(item.jobId)}</td>
+            <td data-label="ปัญหาที่ตรวจพบ" class="px-1 py-2 md:px-2 md:py-3 align-middle font-medium text-slate-800 md:border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${escapeHtml(item.remark || item.problem || '-')}</div></td>
+            <td data-label="แนวทางแก้ไข" class="px-1 py-2 md:px-2 md:py-3 align-middle text-slate-600 md:border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span class="text-slate-300">-</span>'}</div></td>
+            <td data-label="ผู้รับผิดชอบ" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle font-medium md:border border-slate-200">${item.picName ? escapeHtml(item.picName) : '<span class="text-slate-300">-</span>'}</td>
+            <td data-label="วันที่พบ" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle text-slate-500 md:border border-slate-200">${item.dateFound || '-'}</td>
+            <td data-label="กำหนดเสร็จ" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle font-bold text-rose-600 md:border border-slate-200">${item.dueDate || '-'}</td>
+            <td data-label="ปิดงาน" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle font-semibold md:border border-slate-200">${item.finishDate && item.finishDate !== "-" ? `<span class="text-emerald-600">${item.finishDate}</span>` : '<span class="text-slate-300">-</span>'}</td>
+            <td data-label="หมายเหตุเพิ่มเติม" class="px-1 py-2 md:px-2 md:py-3 align-middle text-slate-500 md:border border-slate-200 text-[8px] md:text-[10px] leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${item.problemNote ? escapeHtml(item.problemNote) : (item.problem && item.problem !== item.remark ? escapeHtml(item.problem) : '<span class="text-slate-300">-</span>')}</div></td>
+          </tr>
+        `;
+      }).join('');
+      renderPagination(totalPages);
     }
+
+    function renderPagination(totalPages) {
+      const container = document.getElementById('pagination'); if (totalPages <= 1) { container.innerHTML = ''; return; }
+      let html = `<button onclick="goToPage(1)" class="px-2 py-1 md:px-3 md:py-1.5 text-[10px] md:text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-medium border transition disabled:opacity-40" ${currentPage === 1 ? 'disabled' : ''}>«</button>`;
+      for (let p = Math.max(1, currentPage - 2); p <= Math.min(totalPages, currentPage + 2); p++) {
+        html += `<button onclick="goToPage(${p})" class="px-2.5 py-1 md:px-3.5 md:py-1.5 text-[10px] md:text-xs border rounded-lg font-bold transition ${p === currentPage ? 'bg-[#003566] text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}">${p}</button>`;
+      }
+      html += `<button onclick="goToPage(${totalPages})" class="px-2 py-1 md:px-3 md:py-1.5 text-[10px] md:text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-medium border transition disabled:opacity-40" ${currentPage === totalPages ? 'disabled' : ''}>»</button>`;
+      container.innerHTML = html;
+    }
+    function goToPage(page) { currentPage = page; renderTable(); }
+    function getDriveThumb(url) { if (!url || url === "-") return ""; const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/); return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=400` : url; }
+    function escapeHtml(text) { if (!text) return ''; const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return text.toString().replace(/[&<>"']/g, m => map[m]); }
+    function toggleDarkMode() { const isDark = document.documentElement.classList.toggle('dark'); localStorage.setItem('darkMode', isDark); }
+    function exportCSV() { if (!allReportData.length) return; const headers = ['ลำดับ','ประเภท','พื้นที่','JOB NO.','ปัญหา','แก้ไข','ผู้รับผิดชอบ','พบ','ครบกำหนด','เสร็จ','สถานะ']; const rows = allReportData.map((item, idx) => [idx+1, item.inspectionType, item.area, item.jobId, item.remark||item.problem, item.correctiveAction, item.picName, item.dateFound, item.dueDate, item.finishDate, item.status]); const csv = [headers.join(','), ...rows.map(row => row.map(cell => `"${String(cell||'').replace(/"/g, '""')}"`).join(','))].join('\n'); const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `Report-${new Date().toISOString().slice(0,10)}.csv`; a.click(); }
+    function exportExcel() { if (!allReportData.length) return; window.location.href = CONFIG.API_URL + "?action=getReport"; }
+    function printReport() { window.print(); }
   </script>
 </body>
 </html>
