@@ -100,16 +100,18 @@
       DRAFT_KEY: 'safety_form_draft'
     };
 
-    const UNIFIED_AREAS = [
+ const UNIFIED_AREAS = [
       { value: "PRINT", label: "🖨️ PRINT", has5S: true, hasSafety: true },
       { value: "LAMINATE", label: "📦 LAMINATE", has5S: true, hasSafety: true },
-      { value: "SOLVENT", label: "🧪 SOLVENT", has5S: false, hasSafety: true },
+      { value: "SOVENTLESS", label: "🧪 SOVENTLESS", has5S: false, hasSafety: true }, // ✅ เปลี่ยนที่นี่
       { value: "REWINDER/SLITTER/PACKING", label: "🔄 REWINDER/SLITTER/PACKING", has5S: true, hasSafety: true },
       { value: "BAG MAKING", label: "🛍️ BAG MAKING", has5S: true, hasSafety: true },
       { value: "QA&QC", label: "🔬 QA & QC", has5S: true, hasSafety: true },
       { value: "WAREHOUSE", label: "🏭 WAREHOUSE", has5S: true, hasSafety: true },
       { value: "OFFICE", label: "🏢 OFFICE", has5S: true, hasSafety: true },
       { value: "CANTEEN", label: "🍽️ CANTEEN", has5S: true, hasSafety: false },
+      { value: "LOCKER", label: "🔐 LOCKER", has5S: true, hasSafety: false },
+      { value: "TOILET", label: "🚽 TOILET", has5S: true, hasSafety: false },
       { value: "ENGINEERING", label: "🔧 ENGINEERING", has5S: true, hasSafety: false },
       { value: "OUTSIDE", label: "🌳 OUTSIDE", has5S: true, hasSafety: true }
     ];
