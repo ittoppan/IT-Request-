@@ -247,23 +247,32 @@
     }
 
     function handleAreaChange(val) { state.area = val; document.getElementById('areaSafetyVal').value = val; buildChecklist(); }
-    function handle5SAreaChange(val) { state.area5S = val; document.getElementById('area5SVal').value = val; buildChecklist(); }
-
-    function selectType(type, el) {
-      state.type = type; document.getElementById('inspectionType').value = type;
+   function handle5SAreaChange(val) { 
+      state.area5S = val; // ✅ อัปเดต state ทันที
+      document.getElementById('area5SVal').value = val; 
+      buildChecklist(); // ✅ สั่งสร้าง Checklist ใหม่ตามพื้นที่ที่เลือก
+    }
+function selectType(type, el) {
+      state.type = type; 
+      document.getElementById('inspectionType').value = type;
       document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active', 'active-5s'));
       el.classList.add(type === '5S' ? 'active-5s' : 'active');
+      
       const is5S = type === '5S';
       document.getElementById('areaSafety').style.display = is5S ? 'none' : 'block';
       document.getElementById('area5S').style.display = is5S ? 'block' : 'none';
-      populateDropdowns();
-      if (is5S) { state.area5S = "PRINT"; document.getElementById('area5SSelect').value = "PRINT"; }
-      else { state.area = "PRINT"; document.getElementById('areaSafetySelect').value = "PRINT"; }
+      
+      // ✅ เพิ่มการ Reset ค่าพื้นที่เมื่อเปลี่ยนโหมด
+      if (is5S) {
+        state.area5S = document.getElementById('area5SSelect').value;
+      } else {
+        state.area = document.getElementById('areaSafetySelect').value;
+      }
+      
       document.getElementById('headerTitle').textContent = is5S ? 'การตรวจ 5ส' : 'SAFETY PATROL';
       document.getElementById('headerSub').textContent = is5S ? 'กิจกรรม 5 ส' : 'ระบบตรวจสอบความปลอดภัย';
       buildChecklist();
     }
-
     function buildChecklist() {
       const container = document.getElementById('checklistContainer'); container.innerHTML = ''; state.responses = {}; state.images = {};
       if (state.type === '5S') render5SChecklist(container); else renderSafetyChecklist(container);
