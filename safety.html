@@ -320,7 +320,8 @@ function selectType(type, el) {
     }
 
     function render5SChecklist(container) {
-      const areaData = CHECKLIST_5S[state.area5S];
+  // ✅ เพิ่มตัวแปรกันเหนียว ถ้าไม่เจอพื้นที่ ให้ใช้ OFFICE เป็นค่าเริ่มต้น
+const areaData = CHECKLIST_5S[state.area5S] || CHECKLIST_5S["OFFICE"];
       if (!areaData || !areaData.sections || areaData.sections.length === 0) {
         container.innerHTML = `<div class="bg-white p-6 rounded-2xl shadow-sm border text-center text-slate-500"><i class="fas fa-info-circle text-2xl text-amber-500 mb-2"></i><p>ยังไม่ได้กำหนดแบบประเมิน 5S สำหรับพื้นที่นี้</p></div>`;
         return;
