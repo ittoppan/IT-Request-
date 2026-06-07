@@ -11,17 +11,12 @@
   <style>
     body { font-family: 'Prompt', sans-serif; background-color: #f4f7f6; color: #1e293b; }
     .font-inter { font-family: 'Inter', sans-serif; }
-    
-    /* Modern Dashboard Cards */
     .metric-card { background: #ffffff; border-radius: 1.25rem; border: 1px solid #e2e8f0; padding: 1.5rem; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); transition: all 0.3s ease; }
     .metric-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.08); }
-    
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    
     .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid #e2e8f0; }
   </style>
 </head>
@@ -67,7 +62,7 @@
       <div class="relative flex-1 sm:w-48 group">
         <i class="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs group-focus-within:text-[#003566] transition"></i>
         <input type="month" id="monthFilter" onchange="applyFilters()" class="w-full pl-8 pr-8 py-2 border border-slate-300 rounded-lg text-xs md:text-sm font-bold bg-white outline-none focus:ring-2 focus:ring-sky-500 transition cursor-pointer shadow-sm">
-        <button onclick="clearMonth()" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-300 hover:text-rose-500 transition"><i class="fas fa-times-circle"></i></button>
+        <button onclick="clearMonth()" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-300 hover:text-rose-500 transition" title="ล้างตัวกรองเดือน"><i class="fas fa-times-circle"></i></button>
       </div>
       
       <div class="relative flex-1 sm:w-48 group">
@@ -152,7 +147,7 @@
 
     <div>
       <div class="flex items-center justify-between border-b-2 border-slate-200 pb-2 pt-6 mb-4">
-        <h2 class="text-lg md:text-xl font-bold text-[#003566] flex items-center gap-2"><i class="fas fa-hard-hat text-rose-500"></i> Safety & Maintenance Tracking</h2>
+        <h2 class="text-lg md:text-xl font-bold text-[#003566] flex items-center gap-2"><i class="fas fa-hard-hat text-rose-500"></i> Safety & Action Plan Tracking</h2>
       </div>
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -210,8 +205,7 @@
   </div>
 
   <div id="logicModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-[9999] transition-opacity">
-    <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-[modalIn_0.2s_ease-out]">
-      
+    <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
       <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-start bg-gradient-to-r from-slate-50 to-white">
         <div class="flex items-center gap-3 text-[#003566]">
           <div class="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center shadow-sm"><i class="fas fa-brain text-sky-600 text-xl"></i></div>
@@ -224,11 +218,9 @@
       </div>
       
       <div class="p-5 md:p-6 overflow-y-auto space-y-6 text-sm text-slate-700 bg-white">
-        
         <div class="border border-slate-200 rounded-2xl p-5 shadow-sm">
           <h4 class="font-bold text-[#003566] text-base mb-3 flex items-center gap-2"><i class="fas fa-sitemap text-amber-500"></i> 1. ที่มาของการให้คะแนน 5ส (5S Mapping)</h4>
           <p class="text-xs text-slate-500 mb-4">ระบบแปลงผลการตรวจจากหน้างาน (ดี=2, พอใช้=1, ปรับปรุง=0) โดยจัดกลุ่มคำถาม 9 ข้อ เข้าสู่หมวด 5ส. หลัก ดังนี้:</p>
-          
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
               <h5 class="font-bold text-sky-700 text-sm mb-2 border-b border-slate-200 pb-2">ส1. สะสาง (Seiri)</h5>
@@ -270,13 +262,12 @@
         <div class="border border-slate-200 rounded-2xl p-5 shadow-sm">
           <h4 class="font-bold text-[#003566] text-base mb-3 flex items-center gap-2"><i class="fas fa-hard-hat text-rose-500"></i> 2. การคิดคะแนนความปลอดภัย (Safety Score)</h4>
           <p class="text-xs mb-4 text-slate-500">คะแนนเต็ม 100 คะแนน คำนวณจาก 3 มิติเชิงรุก เพื่อประเมินความรับผิดชอบในการแก้ปัญหา:</p>
-          
           <div class="space-y-3">
             <div class="flex items-start gap-4 p-4 bg-emerald-50 rounded-xl">
               <div class="w-10 h-10 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-700 font-black shrink-0">40%</div>
               <div>
                 <h5 class="text-sm font-bold text-emerald-800 mb-1">อัตราการปิดงาน (Close Rate)</h5>
-                <p class="text-xs text-emerald-700">สะท้อนความรับผิดชอบ: <code>(จำนวนงานที่แก้เสร็จ ÷ งานที่ได้รับมอบหมายทั้งหมด) × 40</code></p>
+                <p class="text-xs text-emerald-700">สะท้อนความรับผิดชอบ: <code>(จำนวนงานที่แก้เสร็จ ÷ งานทั้งหมด) × 40</code></p>
               </div>
             </div>
             <div class="flex items-start gap-4 p-4 bg-amber-50 rounded-xl">
@@ -290,7 +281,7 @@
               <div class="w-10 h-10 rounded-full bg-sky-200 flex items-center justify-center text-sky-700 font-black shrink-0">30%</div>
               <div>
                 <h5 class="text-sm font-bold text-sky-800 mb-1">ความเร็วในการแก้ไข (MTTR Speed)</h5>
-                <p class="text-xs text-sky-700 leading-relaxed">สะท้อนความตื่นตัวต่อความเสี่ยง:<br>
+                <p class="text-xs text-sky-700 leading-relaxed">สะท้อนความตื่นตัว:<br>
                 • แก้เสร็จเฉลี่ย <b>≤ 3 วัน</b> = ได้เต็ม 30 คะแนน<br>
                 • แก้เสร็จเฉลี่ย <b>4-7 วัน</b> = ได้ 20 คะแนน<br>
                 • แก้เสร็จเฉลี่ย <b>> 7 วัน</b> = ได้เพียง 10 คะแนน</p>
@@ -298,7 +289,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -308,13 +298,33 @@
     const TARGET = 85; 
     const S_CATS = ["ส1. สะสาง", "ส2. สะดวก", "ส3. สะอาด", "ส4. สุขลักษณะ", "ส5. สร้างนิสัย"];
     
-    // Master Area List
+    // 🌟 ระบบจับคู่แผนก (Auto-Correction Mapping) สำคัญมาก! ห้ามลบ!
     const DEPTS = ["PRINT","LAMINATE","SOVENTLESS","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","TOILET","LOCKER","ENGINEERING","OUTSIDE"];
     const AREA_MAP = {
-      "แผนก Print":"PRINT","แผนก Laminate":"LAMINATE","แผนก Soventless":"SOVENTLESS","แผนก Rewinder / Slitter / Packing":"REWINDER/SLITTER/PACKING",
-      "แผนก BAG MAKING":"BAG MAKING","แผนก QA & QC":"QA&QC","แผนก Warehouse":"WAREHOUSE","Office":"OFFICE","พื้นที่รอบบริเวณโรงงาน":"OUTSIDE",
-      "Canteen":"CANTEEN","Toilet":"TOILET","ห้องน้ำ":"TOILET","Locker":"LOCKER","ห้องล็อกเกอร์":"LOCKER","EN":"ENGINEERING","SOVENTLESS":"SOVENTLESS"
+      "แผนก Print": "PRINT", "PRINT": "PRINT",
+      "แผนก Laminate": "LAMINATE", "LAMINATE": "LAMINATE",
+      "แผนก Soventless": "SOVENTLESS", "SOVENTLESS": "SOVENTLESS",
+      "แผนก Solvent": "SOVENTLESS", "SOLVENT": "SOVENTLESS",
+      "แผนก Dry": "LAMINATE", 
+      "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING",
+      "แผนก Rewinder / Slitter": "REWINDER/SLITTER/PACKING",
+      "REWINDER/SLITTER/PACKING": "REWINDER/SLITTER/PACKING",
+      "แผนก BAG MAKING": "BAG MAKING", "แผนก BAG": "BAG MAKING", "BAG MAKING": "BAG MAKING",
+      "แผนก QA & QC": "QA&QC", "QA&QC": "QA&QC",
+      "แผนก Warehouse": "WAREHOUSE", "WAREHOUSE": "WAREHOUSE",
+      "Office": "OFFICE", "OFFICE": "OFFICE", "Office ": "OFFICE", 
+      "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE", "OUTSIDE": "OUTSIDE",
+      "Canteen": "CANTEEN", "CANTEEN": "CANTEEN",
+      "Toilet": "TOILET", "ห้องน้ำ": "TOILET", "TOILET": "TOILET",
+      "Locker": "LOCKER", "ห้องล็อกเกอร์": "LOCKER", "LOCKER": "LOCKER",
+      "EN": "ENGINEERING", "ENGINEERING": "ENGINEERING"
     };
+
+    function normalizeArea(areaName) {
+      if(!areaName) return "OFFICE";
+      let cleanArea = String(areaName).trim();
+      return AREA_MAP[cleanArea] || cleanArea.toUpperCase();
+    }
     
     let raw = { ins: [], jobs: [] }; 
     let charts = {};
@@ -326,7 +336,6 @@
       const el = document.getElementById("deptFilter"); 
       DEPTS.forEach(d => el.add(new Option(d, d))); 
       
-      // ✅ 1. ตั้งค่า Default Month Picker เป็นเดือนปัจจุบัน
       const now = new Date();
       const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       document.getElementById("monthFilter").value = currentMonth;
@@ -334,7 +343,6 @@
       loadAll();
     });
 
-    // ปุ่มล้างค่าเดือน เพื่อดูข้อมูลทั้งหมด (All Time)
     function clearMonth() {
       document.getElementById("monthFilter").value = "";
       applyFilters();
@@ -346,12 +354,14 @@
           fetch(`${API}?action=getDashboardData`).then(r => r.json()),
           fetch(`${API}?action=getReport`).then(r => r.json())
         ]);
-        raw.ins = (dash.details || []).map(d => ({ ...d, area: AREA_MAP[d.area] || String(d.area||"OFFICE").toUpperCase() }));
-        raw.jobs = Array.isArray(jobs) ? jobs : []; 
+        
+        raw.ins = (dash.details || []).map(d => ({ ...d, area: normalizeArea(d.area) }));
+        raw.jobs = Array.isArray(jobs) ? jobs.map(j => ({ ...j, area: normalizeArea(j.area) })) : []; 
+        
         applyFilters();
       } catch (err) { 
-        console.error("Data Load Error:", err);
-        alert("เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณารีเฟรชหน้าเว็บซ้ำอีกครั้ง\nหากยังไม่หาย โปรดตรวจสอบการ Deploy Google Apps Script"); 
+        console.error("🔥 รายละเอียด Error:", err);
+        alert(`เกิดข้อผิดพลาด: ${err.message}\nโปรดตรวจสอบการ Deploy Google Apps Script ว่าเป็นเวอร์ชันล่าสุด หรือเช็คการเชื่อมต่ออินเทอร์เน็ต`); 
       }
       finally { 
         document.getElementById("loader").style.opacity = "0"; 
@@ -359,37 +369,34 @@
       }
     }
 
-    function parseThaiDate(str) {
+    function parseToValidDate(str) {
       if(!str || str === "-") return null;
-      let parts = str.split('/');
+      let d = new Date(str);
+      if (!isNaN(d.getTime())) return d;
+      
+      let parts = str.split(' ')[0].split('/');
       if(parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]);
-      return new Date(str);
+      return null;
     }
 
     function applyFilters() {
       const dept = document.getElementById("deptFilter").value; 
-      const monthVal = document.getElementById("monthFilter").value; // ค่าจะเป็น YYYY-MM
-      const now = new Date(); 
+      const monthVal = document.getElementById("monthFilter").value;
       
       let ins = raw.ins.filter(i => {
         if (dept !== "all" && i.area !== dept) return false; 
-        if (!monthVal) return true; // ถ้าไม่มีการเลือกเดือน ให้ดึงทั้งหมด
-        
+        if (!monthVal) return true; 
         const d = new Date((i.timestamp || "").replace(" ", "T")); 
         if (isNaN(d.getTime())) return true;
-        
         const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         return ym === monthVal;
       });
 
       let filteredJobs = raw.jobs.filter(j => {
-        let jArea = AREA_MAP[j.area] || String(j.area).toUpperCase();
-        if (dept !== "all" && jArea !== dept) return false;
+        if (dept !== "all" && j.area !== dept) return false;
         if (!monthVal) return true;
-        
-        const d = parseThaiDate(j.dateFound);
+        const d = parseToValidDate(j.dateFound);
         if (!d) return true;
-        
         const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         return ym === monthVal;
       });
@@ -434,7 +441,6 @@
         Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
           const match = k.match(/^5s_s(\d+)_q(\d+)/);
           if (match) {
-            // ✅ จับคู่ข้อ 1-9 ลงหมวด 5ส ให้ตรงตาม Logic Modal
             const sectionIdx = parseInt(match[1]);
             const cat = S_CATS[sectionIdx % 5]; 
             let val = v === "ดี" ? 2 : v === "พอใช้" ? 1 : 0;
@@ -491,7 +497,7 @@
       });
 
       // ==========================================
-      // 🚨 2. SAFETY & MAINTENANCE PROCESSING
+      // 🚨 2. SAFETY PROCESSING
       // ==========================================
       const areaStats = {};
       DEPTS.forEach(d => areaStats[d] = { total: 0, open: 0, closed: 0, overdue: 0, aging: 0, mttrSum: 0, mttrCount: 0 });
@@ -501,13 +507,13 @@
       const now = new Date();
 
       jobs.forEach(j => {
-        let area = AREA_MAP[j.area] || String(j.area).toUpperCase();
+        let area = j.area;
         if(!areaStats[area]) return;
         
         let isClosed = j.status === 'Closed';
-        let dFound = parseThaiDate(j.dateFound);
-        let dDue = parseThaiDate(j.dueDate);
-        let dFinish = parseThaiDate(j.finishDate);
+        let dFound = parseToValidDate(j.dateFound);
+        let dDue = parseToValidDate(j.dueDate);
+        let dFinish = parseToValidDate(j.finishDate);
 
         areaStats[area].total++;
         if(isClosed) { kpiClosed++; areaStats[area].closed++; } else { areaStats[area].open++; }
@@ -541,7 +547,7 @@
       });
 
       // ==========================================
-      // 🏆 3. AREA SCORE RANKING & CROSS ANALYSIS
+      // 🏆 3. AREA SCORE RANKING
       // ==========================================
       let rankingList = [];
       let worstOverdue = { area: "-", count: -1 };
@@ -581,7 +587,7 @@
       document.getElementById('tbAreaRanking').innerHTML = rankingList.map((r, idx) => `
         <tr class="hover:bg-slate-50 transition border-b border-slate-100 last:border-0">
           <td class="p-3 text-center">
-            <span class="w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-bold mx-auto text-white ${idx===0?'bg-amber-500 shadow-md shadow-amber-200':idx===1?'bg-slate-400 shadow-md shadow-slate-200':idx===2?'bg-amber-700 shadow-md shadow-amber-200':'bg-slate-100 text-slate-500'}">${idx+1}</span>
+            <span class="w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-bold mx-auto text-white ${idx===0?'bg-yellow-500 shadow-md shadow-yellow-200':idx===1?'bg-slate-400 shadow-md shadow-slate-200':idx===2?'bg-amber-700 shadow-md shadow-amber-200':'bg-slate-100 text-slate-500'}">${idx+1}</span>
           </td>
           <td class="p-3 font-bold text-[#003566]">${r.area}</td>
           <td class="p-3 text-center font-inter">${r.total}</td>
