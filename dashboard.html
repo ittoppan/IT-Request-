@@ -40,11 +40,23 @@
     .tab-btn.active-5s { border-color: #3b82f6; color: #3b82f6; }
     .tab-btn.active-exec { border-color: #8b5cf6; color: #8b5cf6; }
     
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     .dark ::-webkit-scrollbar-thumb { background: #475569; }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    .pulse-dot::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: pulse-ring 1.5s infinite;
+    }
   </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden">
@@ -53,7 +65,7 @@
     <div class="bg-white dark:bg-darkCard p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-[90%] text-center border dark:border-slate-700">
       <div class="w-16 h-16 border-4 border-slate-100 dark:border-slate-700 border-t-sky-500 rounded-full animate-spin"></div>
       <div class="font-bold text-slate-800 dark:text-white text-lg mt-5">Loading Dashboard...</div>
-      <div class="text-xs text-slate-500 dark:text-slate-400 mt-2">Connecting to Data Center</div>
+      <div class="text-xs text-slate-500 dark:text-slate-400 mt-2" id="loaderStatus">Connecting to Data Center</div>
     </div>
   </div>
 
@@ -106,6 +118,7 @@
         </div>
       </div>
       <div class="mt-auto p-4 border-t border-slate-200 dark:border-slate-700 text-[10px] text-slate-400 text-center">
+        <div class="relative inline-block w-2 h-2 rounded-full bg-emerald-500 pulse-dot mb-1"></div>
         Data Last Synced:<br><span id="syncTime" class="font-bold text-slate-500 dark:text-slate-300">Just Now</span>
       </div>
     </aside>
@@ -120,6 +133,7 @@
 
       <div class="flex-1 overflow-y-auto p-4 sm:p-6" id="tabContent">
         
+        <!-- 🔴 TAB: SAFETY -->
         <div id="tab-safety" class="space-y-6">
           <div class="flex justify-between items-end">
             <div>
@@ -164,6 +178,7 @@
           </div>
         </div>
 
+        <!-- 🔵 TAB: 5S -->
         <div id="tab-5s" class="space-y-6 hidden">
           <div class="flex justify-between items-end">
             <div>
@@ -193,7 +208,7 @@
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="kpi-card flex flex-col">
-              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">5S Category Radar</h3>
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">5S Category Radar (By Checklist Section)</h3>
               <div class="relative flex-1 min-h-[250px] w-full"><canvas id="f_chRadar"></canvas></div>
             </div>
             <div class="kpi-card lg:col-span-2 flex flex-col">
@@ -203,13 +218,14 @@
           </div>
 
           <div class="kpi-card overflow-hidden">
-            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">5S Heatmap Matrix</h3>
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">5S Heatmap Matrix (Area × Section)</h3>
             <div class="overflow-x-auto">
               <table class="w-full text-xs border-collapse text-center" id="f_tbHeatmap"></table>
             </div>
           </div>
         </div>
 
+        <!-- 🟣 TAB: EXEC SUMMARY -->
         <div id="tab-exec" class="space-y-6 hidden">
           <div class="flex justify-between items-end">
             <div>
@@ -251,78 +267,163 @@
   <script>
     const API = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
     
-    // Master Mapping
+    // ✅ Master Mapping - ตรงกับ Code.gs v3.6 AREA_MAPPING
     const DEPTS = ["PRINT","LAMINATE","SOVENTLESS","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","TOILET","LOCKER","ENGINEERING","OUTSIDE"];
+    
     const AREA_MAP = {
-      "แผนก Print": "PRINT", "PRINT": "PRINT",
+      "แผนก Print": "PRINT", "PRINT": "PRINT", "Factory": "PRINT",
       "แผนก Laminate": "LAMINATE", "LAMINATE": "LAMINATE",
-      "แผนก Soventless": "SOVENTLESS", "SOVENTLESS": "SOVENTLESS", "แผนก Solvent": "SOVENTLESS", "SOLVENT": "SOVENTLESS",
-      "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING", "แผนก Rewinder / Slitter": "REWINDER/SLITTER/PACKING", "REWINDER/SLITTER/PACKING": "REWINDER/SLITTER/PACKING",
-      "แผนก BAG MAKING": "BAG MAKING", "แผนก BAG": "BAG MAKING", "BAG MAKING": "BAG MAKING",
+      "แผนก Soventless": "SOVENTLESS", "SOVENTLESS": "SOVENTLESS", 
+      "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING", 
+      "REWINDER/SLITTER/PACKING": "REWINDER/SLITTER/PACKING",
+      "แผนก BAG MAKING": "BAG MAKING", "BAG MAKING": "BAG MAKING",
       "แผนก QA & QC": "QA&QC", "QA&QC": "QA&QC",
       "แผนก Warehouse": "WAREHOUSE", "WAREHOUSE": "WAREHOUSE",
-      "Office": "OFFICE", "OFFICE": "OFFICE", "Office ": "OFFICE", 
-      "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE", "OUTSIDE": "OUTSIDE",
+      "Office": "OFFICE", "OFFICE": "OFFICE",
+      "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE", "OUTSIDE": "OUTSIDE", "Outside": "OUTSIDE",
       "Canteen": "CANTEEN", "CANTEEN": "CANTEEN",
       "Toilet": "TOILET", "ห้องน้ำ": "TOILET", "TOILET": "TOILET",
       "Locker": "LOCKER", "ห้องล็อกเกอร์": "LOCKER", "LOCKER": "LOCKER",
-      "EN": "ENGINEERING", "ENGINEERING": "ENGINEERING", "แผนก Dry": "LAMINATE"
+      "EN": "ENGINEERING", "ENGINEERING": "ENGINEERING"
     };
-    const S_CATS = ["ส1. สะสาง", "ส2. สะดวก", "ส3. สะอาด", "ส4. สุขลักษณะ", "ส5. สร้างนิสัย"];
     
     let globalRaw = { ins: [], jobs: [] }; 
     let filteredData = { ins: [], jobs: [] };
     let currentTab = 'safety';
     let charts = {};
+    let isDarkMode = false;
+
+    // ✅ Helper: Normalize area
+    function normalizeArea(area) {
+      if (!area) return "OFFICE";
+      const trimmed = String(area).trim();
+      return AREA_MAP[trimmed] || AREA_MAP[trimmed.toUpperCase()] || trimmed.toUpperCase();
+    }
+
+    // ✅ Helper: Check if inspection is 5S
+    function is5SType(type) {
+      const t = String(type || "").toUpperCase().trim();
+      return t === "5S" || t === "5ส";
+    }
+
+    // ✅ Helper: Get chart colors based on theme
+    function getChartColors() {
+      return {
+        text: isDarkMode ? '#94a3b8' : '#64748b',
+        grid: isDarkMode ? '#334155' : '#e2e8f0',
+        bg: isDarkMode ? '#1e293b' : '#ffffff'
+      };
+    }
 
     function toggleDarkMode() {
       document.documentElement.classList.toggle('dark');
-      const isDark = document.documentElement.classList.contains('dark');
-      document.getElementById('themeIcon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-      Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
-      Chart.defaults.borderColor = isDark ? '#334155' : '#e2e8f0';
-      renderCurrentTab(); // Re-render charts for new colors
+      isDarkMode = document.documentElement.classList.contains('dark');
+      document.getElementById('themeIcon').className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+      Chart.defaults.color = isDarkMode ? '#94a3b8' : '#64748b';
+      Chart.defaults.borderColor = isDarkMode ? '#334155' : '#e2e8f0';
+      renderCurrentTab();
     }
 
-    // 🚀 Robust Date Parser
+    // 🚀 Robust Date Parser (แก้ timezone bug)
     function parseDateObj(dateStr) {
-      if(!dateStr || dateStr === "-") return null;
-      let d = new Date(dateStr);
+      if (!dateStr || dateStr === "-") return null;
+      
+      // ถ้าเป็น Date object แล้ว
+      if (dateStr instanceof Date && !isNaN(dateStr.getTime())) return dateStr;
+      
+      // ถ้าเป็น timestamp number
+      if (typeof dateStr === 'number') {
+        const d = new Date(dateStr);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      
+      const str = String(dateStr).trim();
+      
+      // ลอง parse ตรงๆ ก่อน
+      let d = new Date(str);
       if (!isNaN(d.getTime())) return d;
-      let parts = dateStr.split(/[\/\-\s:]+/);
-      if(parts.length >= 3) {
+      
+      // แยก DD/MM/YYYY หรือ YYYY-MM-DD
+      const parts = str.split(/[\/\-\sT:]+/).filter(p => p);
+      if (parts.length >= 3) {
         let p0 = parseInt(parts[0]), p1 = parseInt(parts[1]), p2 = parseInt(parts[2]);
-        if (p0 > 12) return new Date(p2, p1-1, p0); // DD/MM/YYYY
-        return new Date(p2, p0-1, p1); // MM/DD/YYYY
+        
+        // ถ้า p0 > 31 แสดงว่าเป็น year (YYYY-MM-DD)
+        if (p0 > 31) {
+          return new Date(p0, p1 - 1, p2);
+        }
+        // ถ้า p2 > 31 แสดงว่าเป็น year (DD/MM/YYYY)
+        if (p2 > 31) {
+          return new Date(p2, p1 - 1, p0);
+        }
+        // ถ้า p0 > 12 แสดงว่าเป็นวัน (DD/MM/YYYY)
+        if (p0 > 12) {
+          return new Date(p2, p1 - 1, p0);
+        }
+        // default MM/DD/YYYY
+        return new Date(p2, p0 - 1, p1);
       }
       return null;
     }
 
+    // ✅ Format date to YYYY-MM for month comparison
+    function toYearMonth(d) {
+      if (!d) return null;
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       Chart.defaults.font.family = "'Prompt', sans-serif";
+      
+      // Sync initial dark mode
+      isDarkMode = document.documentElement.classList.contains('dark');
+      document.getElementById('themeIcon').className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+      Chart.defaults.color = isDarkMode ? '#94a3b8' : '#64748b';
+      Chart.defaults.borderColor = isDarkMode ? '#334155' : '#e2e8f0';
+      
       const el = document.getElementById("deptFilter"); 
       DEPTS.forEach(d => el.add(new Option(d, d))); 
       
       const now = new Date();
-      document.getElementById("monthFilter").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      document.getElementById("monthFilter").value = toYearMonth(now);
       
       loadData();
     });
 
     async function loadData() {
+      const loaderStatus = document.getElementById('loaderStatus');
       try {
-        const [dash, jobs] = await Promise.all([
-          fetch(`${API}?action=getDashboardData`).then(r => r.json()),
-          fetch(`${API}?action=getReport`).then(r => r.json())
-        ]);
+        loaderStatus.textContent = "Fetching Inspection Data...";
+        const dashRes = await fetch(`${API}?action=getDashboardData`);
+        if (!dashRes.ok) throw new Error(`Dashboard API HTTP ${dashRes.status}`);
+        const dash = await dashRes.json();
         
-        globalRaw.ins = (dash.details || []).map(d => ({ ...d, area: (AREA_MAP[d.area.trim()] || String(d.area).toUpperCase()) }));
-        globalRaw.jobs = Array.isArray(jobs) ? jobs.map(j => ({ ...j, area: (AREA_MAP[j.area.trim()] || String(j.area).toUpperCase()) })) : []; 
+        loaderStatus.textContent = "Fetching Action Plan...";
+        const jobsRes = await fetch(`${API}?action=getReport`);
+        if (!jobsRes.ok) throw new Error(`Report API HTTP ${jobsRes.status}`);
+        const jobs = await jobsRes.json();
+        
+        // ✅ Normalize data
+        const rawIns = (dash.details || []);
+        const rawJobs = Array.isArray(jobs) ? jobs : (jobs.data || jobs.report || []);
+        
+        globalRaw.ins = rawIns.map(d => ({ 
+          ...d, 
+          area: normalizeArea(d.area),
+          inspectionType: d.inspectionType || "Safety"
+        }));
+        
+        globalRaw.jobs = rawJobs.map(j => ({ 
+          ...j, 
+          area: normalizeArea(j.area),
+          inspectionType: j.inspectionType || j.type || "จป.ว"
+        })); 
         
         applyFilters();
+        document.getElementById('syncTime').textContent = new Date().toLocaleTimeString('th-TH');
       } catch (err) { 
         console.error("Fetch Error:", err);
-        alert("เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณารีเฟรชหน้าเว็บ"); 
+        alert("❌ เกิดข้อผิดพลาดในการโหลดข้อมูล: " + err.message + "\nกรุณารีเฟรชหน้าเว็บ"); 
       } finally { 
         document.getElementById("loader").style.opacity = "0"; 
         setTimeout(() => document.getElementById("loader").classList.add("hidden"), 300); 
@@ -338,10 +439,7 @@
         if (dept !== "all" && i.area !== dept) return false; 
         if (monthVal) {
           const d = parseDateObj(i.timestamp);
-          if (d) {
-            const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            if (ym !== monthVal) return false;
-          }
+          if (d && toYearMonth(d) !== monthVal) return false;
         }
         return true;
       });
@@ -351,10 +449,7 @@
         if (statusVal !== "all" && j.status !== statusVal) return false;
         if (monthVal) {
           const d = parseDateObj(j.dateFound);
-          if (d) {
-            const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            if (ym !== monthVal) return false;
-          }
+          if (d && toYearMonth(d) !== monthVal) return false;
         }
         return true;
       });
@@ -367,7 +462,6 @@
       ['safety', '5s', 'exec'].forEach(id => {
         document.getElementById(`tab-${id}`).classList.add('hidden');
         document.getElementById(`btn-${id}`).classList.remove(`active-${id}`);
-        document.getElementById(`btn-${id}`).classList.remove('border-b-2', 'border-[#003566]', 'dark:border-white');
       });
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
       document.getElementById(`btn-${tabId}`).classList.add(`active-${tabId}`);
@@ -391,74 +485,144 @@
     // =====================================
     function processSafetyTab() {
       let kpiTotal = filteredData.jobs.length;
-      let kpiClosed = 0; let kpiOverdue = 0; 
-      let mttrSum = 0; let mttrCount = 0;
+      let kpiClosed = 0, kpiOverdue = 0; 
+      let mttrSum = 0, mttrCount = 0;
       
-      const deptData = {}; DEPTS.forEach(d => deptData[d] = { open:0, closed:0, overdue:0 });
+      const deptData = {}; 
+      DEPTS.forEach(d => deptData[d] = { open:0, closed:0, overdue:0 });
       const catData = {};
       const mttrTrend = {};
       const now = new Date();
 
       filteredData.jobs.forEach(j => {
         const area = j.area;
-        if(!deptData[area]) return;
+        if (!deptData[area]) return;
         
-        let isClosed = j.status === 'Closed';
-        let dFound = parseDateObj(j.dateFound);
-        let dDue = parseDateObj(j.dueDate);
-        let dFinish = parseDateObj(j.finishDate);
+        const isClosed = j.status === 'Closed';
+        const dFound = parseDateObj(j.dateFound);
+        const dDue = parseDateObj(j.dueDate);
+        const dFinish = parseDateObj(j.finishDate);
 
-        if(isClosed) { kpiClosed++; deptData[area].closed++; } 
-        else { deptData[area].open++; }
+        if (isClosed) { 
+          kpiClosed++; 
+          deptData[area].closed++; 
+        } else { 
+          deptData[area].open++; 
+        }
         
-        if (!isClosed && dDue && now > dDue) { kpiOverdue++; deptData[area].overdue++; }
+        // Overdue = Open + ผ่าน due date
+        if (!isClosed && dDue && now > dDue) { 
+          kpiOverdue++; 
+          deptData[area].overdue++; 
+        }
         
+        // MTTR = Average days from Found to Finish (เฉพาะงานที่ปิดแล้ว)
         if (isClosed && dFound && dFinish) {
-          let days = Math.max(1, Math.floor((dFinish - dFound) / 86400000));
-          mttrSum += days; mttrCount++;
-          let ym = `${dFinish.getFullYear()}-${String(dFinish.getMonth() + 1).padStart(2, '0')}`;
-          if(!mttrTrend[ym]) mttrTrend[ym] = { s:0, c:0 };
-          mttrTrend[ym].s += days; mttrTrend[ym].c++;
+          const days = Math.max(1, Math.floor((dFinish.getTime() - dFound.getTime()) / 86400000));
+          mttrSum += days; 
+          mttrCount++;
+          const ym = toYearMonth(dFinish);
+          if (!mttrTrend[ym]) mttrTrend[ym] = { s:0, c:0 };
+          mttrTrend[ym].s += days; 
+          mttrTrend[ym].c++;
         }
 
-        let catMatch = String(j.problem).match(/^\[(.*?)\]/);
-        let cat = catMatch ? catMatch[1] : "General Risk";
+        // Categorize by section title (จากปัญหา เช่น "[5S] 1. เครื่องจักร: ...")
+        let cat = "General Risk";
+        const prob = String(j.problem || "");
+        const matchBracket = prob.match(/^\[([^\]]+)\]/);
+        if (matchBracket) {
+          cat = matchBracket[1];
+        } else {
+          // ลองจับ section title เช่น "1. สถานที่ทำงาน"
+          const matchSection = prob.match(/^(\d+\.\s*[^\d:]+)/);
+          if (matchSection) cat = matchSection[1].trim();
+        }
         catData[cat] = (catData[cat] || 0) + 1;
       });
 
+      const openOnly = kpiTotal - kpiClosed - kpiOverdue;
       document.getElementById('s_kpiTotal').innerText = kpiTotal;
-      document.getElementById('s_kpiOpen').innerText = kpiTotal - kpiClosed;
+      document.getElementById('s_kpiOpen').innerText = Math.max(0, openOnly);
       document.getElementById('s_kpiOverdue').innerText = kpiOverdue;
       document.getElementById('s_kpiCloseRate').innerText = kpiTotal > 0 ? Math.round((kpiClosed/kpiTotal)*100) + "%" : "0%";
 
-      // Chart: Dept Volume
+      // Chart: Dept Volume (Stacked Bar)
       mkChart("s_chDept", {
         type: "bar",
         data: {
-          labels: DEPTS.map(d => d.substring(0,8)),
+          labels: DEPTS.map(d => d.length > 10 ? d.substring(0,10) + '…' : d),
           datasets: [
             { label: "Closed", data: DEPTS.map(d => deptData[d].closed), backgroundColor: "#10b981" },
-            { label: "Open", data: DEPTS.map(d => deptData[d].open - deptData[d].overdue), backgroundColor: "#f59e0b" },
+            { label: "Open (On Time)", data: DEPTS.map(d => Math.max(0, deptData[d].open - deptData[d].overdue)), backgroundColor: "#f59e0b" },
             { label: "Overdue", data: DEPTS.map(d => deptData[d].overdue), backgroundColor: "#ef4444" }
           ]
         },
-        options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          plugins: { legend: { position: 'top' } },
+          scales: { 
+            x: { stacked: true, grid: { color: getChartColors().grid } }, 
+            y: { stacked: true, grid: { color: getChartColors().grid }, beginAtZero: true } 
+          } 
+        }
       });
 
-      // Chart: Categories
-      const cKeys = Object.keys(catData).sort((a,b)=>catData[b]-catData[a]).slice(0,5);
+      // Chart: Categories (Doughnut)
+      const cKeys = Object.keys(catData).sort((a,b)=>catData[b]-catData[a]).slice(0,6);
       mkChart("s_chCat", {
         type: "doughnut",
-        data: { labels: cKeys, datasets: [{ data: cKeys.map(k=>catData[k]), backgroundColor: ["#f43f5e", "#f97316", "#eab308", "#84cc16", "#06b6d4"] }] },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right', labels:{boxWidth:12, font:{size:10}} } } }
+        data: { 
+          labels: cKeys, 
+          datasets: [{ 
+            data: cKeys.map(k => catData[k]), 
+            backgroundColor: ["#f43f5e", "#f97316", "#eab308", "#84cc16", "#06b6d4", "#8b5cf6"] 
+          }] 
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          cutout: '70%', 
+          plugins: { 
+            legend: { 
+              position: 'right', 
+              labels: { boxWidth: 12, font: { size: 10 } } 
+            } 
+          } 
+        }
       });
 
-      // Chart: MTTR Trend
+      // Chart: MTTR Trend (Line)
       const mKeys = Object.keys(mttrTrend).sort();
       mkChart("s_chMTTR", {
         type: "line",
-        data: { labels: mKeys.length ? mKeys : ["No Data"], datasets: [{ label: "Avg Days to Close", data: mKeys.map(k=>(mttrTrend[k].s/mttrTrend[k].c).toFixed(1)), borderColor: "#0ea5e9", backgroundColor: "rgba(14, 165, 233, 0.1)", fill: true, tension: 0.4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins:{ legend:{display:false} } }
+        data: { 
+          labels: mKeys.length ? mKeys : ["No Data"], 
+          datasets: [{ 
+            label: "Avg Days to Close", 
+            data: mKeys.map(k => parseFloat((mttrTrend[k].s / mttrTrend[k].c).toFixed(1))), 
+            borderColor: "#0ea5e9", 
+            backgroundColor: "rgba(14, 165, 233, 0.1)", 
+            fill: true, 
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }] 
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { 
+              beginAtZero: true, 
+              grid: { color: getChartColors().grid },
+              title: { display: true, text: 'Days' }
+            },
+            x: { grid: { color: getChartColors().grid } }
+          }
+        }
       });
     }
 
@@ -466,120 +630,315 @@
     // 🔵 TAB: 5S
     // =====================================
     function process5STab() {
-      const data5S = filteredData.ins.filter(i => String(i.inspectionType).toUpperCase() === "5S");
+      // ✅ Filter เฉพาะ 5S
+      const data5S = filteredData.ins.filter(i => is5SType(i.inspectionType));
       const scores5S = data5S.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
       const avg5S = scores5S.length ? Math.round(scores5S.reduce((a, b) => a + b, 0) / scores5S.length) : 0;
       
       document.getElementById("f_kpiAvg").textContent = avg5S + "%";
       document.getElementById("f_kpiCount").textContent = data5S.length;
 
-      const sCats = { "ส1. สะสาง": { s:0, m:0 }, "ส2. สะดวก": { s:0, m:0 }, "ส3. สะอาด": { s:0, m:0 }, "ส4. สุขลักษณะ": { s:0, m:0 }, "ส5. สร้างนิสัย": { s:0, m:0 } };
-      const dScore = {}; DEPTS.forEach(d => dScore[d] = []);
-      const deptHm = {}; DEPTS.forEach(d => { deptHm[d] = {}; S_CATS.forEach(c => deptHm[d][c] = {s:0, m:0}); });
+      // ✅ Group by Area
+      const dScore = {}; 
+      DEPTS.forEach(d => dScore[d] = []);
+      
+      // ✅ Collect unique section titles จาก fullChecklist (ไม่ต้องใช้ modulo)
+      const sectionStats = {}; // { "1. เครื่องจักร": { s: 0, m: 0 } }
+      const deptHm = {}; // { area: { "1. เครื่องจักร": { s:0, m:0 } } }
+      
+      DEPTS.forEach(d => { 
+        deptHm[d] = {}; 
+      });
 
       data5S.forEach(i => {
         const area = i.area; 
-        if(dScore[area]) dScore[area].push(parseFloat(i.score?.percent||0));
+        if (dScore[area]) dScore[area].push(parseFloat(i.score?.percent || 0));
         
-        Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
-          const match = k.match(/^5s_s(\d+)_q(\d+)/);
-          if (match) {
-            const cat = S_CATS[parseInt(match[1]) % 5]; 
-            let val = v === "ดี" ? 2 : v === "พอใช้" ? 1 : 0;
-            if (sCats[cat]) { sCats[cat].m += 2; sCats[cat].s += val; }
-            if (deptHm[area] && deptHm[area][cat]) { deptHm[area][cat].m += 2; deptHm[area][cat].s += val; }
-          }
-        });
+        // อ่าน section titles จาก fullChecklist (เก็บในรูปแบบ { sections: [...] } หลังบ้าน)
+        const sections = i.sectionsScore || i.fullChecklist?.sections;
+        
+        if (Array.isArray(sections)) {
+          sections.forEach(sec => {
+            const title = String(sec.title || "").trim();
+            if (!title) return;
+            
+            // Aggregate overall per section title
+            if (!sectionStats[title]) sectionStats[title] = { s: 0, m: 0 };
+            sectionStats[title].s += (sec.earned || 0);
+            sectionStats[title].m += (sec.max || 0);
+            
+            // Aggregate per area × section
+            if (deptHm[area]) {
+              if (!deptHm[area][title]) deptHm[area][title] = { s: 0, m: 0 };
+              deptHm[area][title].s += (sec.earned || 0);
+              deptHm[area][title].m += (sec.max || 0);
+            }
+          });
+        } else if (i.fullChecklist && typeof i.fullChecklist === 'object') {
+          // Fallback: parse จาก key `5s_s0_q0`, `5s_s1_q0` โดยนับตาม section index
+          Object.entries(i.fullChecklist).forEach(([k, v]) => {
+            const match = k.match(/^5s_s(\d+)_q(\d+)$/);
+            if (match) {
+              const sIdx = parseInt(match[1]);
+              const sectionTitle = `Section ${sIdx + 1}`;
+              
+              if (!sectionStats[sectionTitle]) sectionStats[sectionTitle] = { s: 0, m: 0 };
+              let val = v === "ดี" ? 2 : v === "พอใช้" ? 1 : 0;
+              sectionStats[sectionTitle].m += 2;
+              sectionStats[sectionTitle].s += val;
+              
+              if (deptHm[area]) {
+                if (!deptHm[area][sectionTitle]) deptHm[area][sectionTitle] = { s: 0, m: 0 };
+                deptHm[area][sectionTitle].m += 2;
+                deptHm[area][sectionTitle].s += val;
+              }
+            }
+          });
+        }
       });
 
+      // Rank departments
       const lbData = []; 
       Object.keys(dScore).forEach(d => { 
-        if(dScore[d].length > 0) lbData.push({ name: d, score: Math.round(dScore[d].reduce((a,b)=>a+b,0)/dScore[d].length) }); 
+        if (dScore[d].length > 0) {
+          lbData.push({ 
+            name: d, 
+            score: Math.round(dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length) 
+          }); 
+        }
       });
       lbData.sort((a,b) => b.score - a.score);
       
       document.getElementById("f_kpiBest").textContent = lbData.length > 0 ? lbData[0].name : "-";
-      document.getElementById("f_kpiWorst").textContent = lbData.length > 0 ? lbData[lbData.length-1].name : "-";
+      document.getElementById("f_kpiWorst").textContent = lbData.length > 0 ? lbData[lbData.length - 1].name : "-";
 
-      // Radar
-      const radarData = Object.keys(sCats).map(k => sCats[k].m > 0 ? Math.round((sCats[k].s / sCats[k].m) * 100) : 0);
-      mkChart("f_chRadar", { type: "radar", data: { labels: Object.keys(sCats).map(s=>s.split('.')[1].trim()), datasets: [{ label: "Score %", data: radarData, backgroundColor: "rgba(59, 130, 246, 0.2)", borderColor: "#3b82f6" }] }, options: { responsive: true, maintainAspectRatio: false, scales:{r:{min:0,max:100}} } });
+      // ✅ Radar Chart: ใช้ section titles จริง (ไม่เกิน 10 หมวด)
+      const sortedSections = Object.entries(sectionStats)
+        .filter(([k, v]) => v.m > 0)
+        .map(([k, v]) => ({ title: k, pct: Math.round((v.s / v.m) * 100) }))
+        .slice(0, 10); // Limit to 10 for readability
+      
+      mkChart("f_chRadar", { 
+        type: "radar", 
+        data: { 
+          labels: sortedSections.map(s => {
+            // ตัดชื่อให้สั้นลง (เอาแค่ส่วนหลัง . ถ้ามี)
+            const parts = s.title.split('.');
+            return parts.length > 1 ? parts.slice(1).join('.').trim().substring(0, 20) : s.title.substring(0, 20);
+          }), 
+          datasets: [{ 
+            label: "Score %", 
+            data: sortedSections.map(s => s.pct), 
+            backgroundColor: "rgba(59, 130, 246, 0.2)", 
+            borderColor: "#3b82f6",
+            pointBackgroundColor: "#3b82f6"
+          }] 
+        }, 
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          scales: {
+            r: { 
+              min: 0, 
+              max: 100,
+              grid: { color: getChartColors().grid },
+              angleLines: { color: getChartColors().grid },
+              pointLabels: { font: { size: 9 } }
+            }
+          },
+          plugins: { legend: { display: false } }
+        } 
+      });
 
       // Rank Bar
       mkChart("f_chRank", {
         type: "bar",
-        data: { labels: lbData.map(l=>l.name.substring(0,8)), datasets: [{ label: "Avg Score %", data: lbData.map(l=>l.score), backgroundColor: "#3b82f6", borderRadius: 4 }] },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } }, plugins:{legend:{display:false}} }
+        data: { 
+          labels: lbData.map(l => l.name.length > 12 ? l.name.substring(0,12) + '…' : l.name), 
+          datasets: [{ 
+            label: "Avg Score %", 
+            data: lbData.map(l => l.score), 
+            backgroundColor: lbData.map(l => l.score >= 85 ? '#10b981' : l.score >= 70 ? '#f59e0b' : '#ef4444'),
+            borderRadius: 4 
+          }] 
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          indexAxis: 'y',
+          scales: { 
+            x: { min: 0, max: 100, grid: { color: getChartColors().grid } },
+            y: { grid: { display: false } }
+          }, 
+          plugins: { legend: { display: false } } 
+        }
       });
 
-      // Heatmap
-      let hmHtml = `<tr class="bg-slate-100 dark:bg-slate-800"><th class="p-2 border-b dark:border-slate-700 text-left">Area</th>${S_CATS.map(c=>`<th class="p-2 border-b dark:border-slate-700">${c.split('.')[1]}</th>`).join('')}</tr>`;
+      // Heatmap Table
+      const sectionTitles = Object.keys(sectionStats).sort();
+      let hmHtml = `<tr class="bg-slate-100 dark:bg-slate-800"><th class="p-2 border-b dark:border-slate-700 text-left sticky left-0 bg-slate-100 dark:bg-slate-800">Area</th>${sectionTitles.map(t => {
+        const parts = t.split('.');
+        const shortTitle = parts.length > 1 ? parts.slice(1).join('.').trim() : t;
+        return `<th class="p-2 border-b dark:border-slate-700 text-[10px] whitespace-nowrap">${shortTitle.substring(0, 25)}</th>`;
+      }).join('')}</tr>`;
+      
       DEPTS.forEach(d => {
-        if(dScore[d].length > 0) {
-          hmHtml += `<tr class="border-b dark:border-slate-700"><td class="p-2 font-bold text-slate-700 dark:text-slate-300 truncate max-w-[80px]">${d}</td>`;
-          S_CATS.forEach(c => {
-            const cell = deptHm[d][c]; const pct = cell.m > 0 ? Math.round((cell.s / cell.m) * 100) : null;
-            if(pct === null) hmHtml += `<td class="p-2 text-slate-300">-</td>`;
-            else { 
-              const bg = pct >= 85 ? '#dcfce7' : pct >= 60 ? '#fef3c7' : '#fee2e2'; 
-              const tc = pct >= 85 ? '#065f46' : pct >= 60 ? '#92400e' : '#991b1b'; 
-              hmHtml += `<td class="p-2 font-inter text-[10px]" style="background:${bg}; color:${tc};"><b>${pct}%</b></td>`; 
+        if (dScore[d] && dScore[d].length > 0) {
+          hmHtml += `<tr class="border-b dark:border-slate-700"><td class="p-2 font-bold text-slate-700 dark:text-slate-300 truncate max-w-[100px] sticky left-0 bg-white dark:bg-darkCard">${d}</td>`;
+          sectionTitles.forEach(title => {
+            const cell = (deptHm[d] && deptHm[d][title]) || { s: 0, m: 0 };
+            const pct = cell.m > 0 ? Math.round((cell.s / cell.m) * 100) : null;
+            if (pct === null) {
+              hmHtml += `<td class="p-2 text-slate-300">-</td>`;
+            } else { 
+              const bg = pct >= 85 ? '#dcfce7' : pct >= 70 ? '#fef3c7' : '#fee2e2'; 
+              const tc = pct >= 85 ? '#065f46' : pct >= 70 ? '#92400e' : '#991b1b'; 
+              hmHtml += `<td class="p-2 font-inter text-[10px] font-bold" style="background:${bg}; color:${tc};">${pct}%</td>`; 
             }
-          }); hmHtml += `</tr>`;
+          }); 
+          hmHtml += `</tr>`;
         }
-      }); document.getElementById("f_tbHeatmap").innerHTML = hmHtml || '<tr><td colspan="6" class="p-4 text-slate-400">ไม่มีข้อมูล</td></tr>';
+      }); 
+      
+      document.getElementById("f_tbHeatmap").innerHTML = sectionTitles.length === 0 
+        ? '<tr><td colspan="10" class="p-4 text-center text-slate-400">ไม่มีข้อมูล 5S</td></tr>' 
+        : hmHtml;
     }
 
     // =====================================
     // 🟣 TAB: EXEC SUMMARY
     // =====================================
     function processExecTab() {
-      // 1. Cross Trend (Safety Open vs 5S Score by Month)
-      // Needs global unfiltered by month to show trend, so we use globalRaw
+      // 1. Cross Trend (ใช้ globalRaw เพื่อแสดงแนวโน้มไม่จำกัด filter เดือน)
       const tMonths = {};
-      globalRaw.ins.filter(i=>i.inspectionType==="5S").forEach(i => {
-        let d = parseDateObj(i.timestamp);
-        if(d) { let ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; if(!tMonths[ym]) tMonths[ym]={s5:[], sOpen:0}; tMonths[ym].s5.push(parseFloat(i.score?.percent||0)); }
+      
+      globalRaw.ins.filter(i => is5SType(i.inspectionType)).forEach(i => {
+        const d = parseDateObj(i.timestamp);
+        if (d) { 
+          const ym = toYearMonth(d); 
+          if (!tMonths[ym]) tMonths[ym] = { s5: [], sOpen: 0, total: 0 }; 
+          tMonths[ym].s5.push(parseFloat(i.score?.percent || 0)); 
+          tMonths[ym].total++;
+        }
       });
-      globalRaw.jobs.filter(j=>j.status!=="Closed").forEach(j => {
-        let d = parseDateObj(j.dateFound);
-        if(d) { let ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; if(!tMonths[ym]) tMonths[ym]={s5:[], sOpen:0}; tMonths[ym].sOpen++; }
+      
+      globalRaw.jobs.forEach(j => {
+        const d = parseDateObj(j.dateFound);
+        if (d) { 
+          const ym = toYearMonth(d); 
+          if (!tMonths[ym]) tMonths[ym] = { s5: [], sOpen: 0, total: 0 }; 
+          if (j.status !== 'Closed') tMonths[ym].sOpen++; 
+        }
       });
 
-      const mKeys = Object.keys(tMonths).sort().slice(-6); // Last 6 months
+      const mKeys = Object.keys(tMonths).sort().slice(-6);
+      
       mkChart("e_chTrend", {
-        type: "line",
+        type: "bar",
         data: {
-          labels: mKeys,
+          labels: mKeys.length ? mKeys : ["No Data"],
           datasets: [
-            { label: "5S Avg Score %", data: mKeys.map(m => tMonths[m].s5.length ? (tMonths[m].s5.reduce((a,b)=>a+b,0)/tMonths[m].s5.length).toFixed(1) : 0), borderColor: "#3b82f6", backgroundColor: "#3b82f6", yAxisID: 'y' },
-            { label: "Safety Open Issues", data: mKeys.map(m => tMonths[m].sOpen), borderColor: "#ef4444", backgroundColor: "#ef4444", type: 'bar', yAxisID: 'y1' }
+            { 
+              label: "5S Avg Score %", 
+              type: 'line',
+              data: mKeys.map(m => tMonths[m].s5.length ? parseFloat((tMonths[m].s5.reduce((a,b)=>a+b,0) / tMonths[m].s5.length).toFixed(1)) : 0), 
+              borderColor: "#3b82f6", 
+              backgroundColor: "#3b82f6", 
+              yAxisID: 'y',
+              tension: 0.4,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            },
+            { 
+              label: "Safety Open Issues", 
+              data: mKeys.map(m => tMonths[m].sOpen), 
+              backgroundColor: "#ef4444", 
+              yAxisID: 'y1',
+              borderRadius: 4
+            }
           ]
         },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: 'linear', position: 'left', min:0, max:100 }, y1: { type: 'linear', position: 'right', grid:{drawOnChartArea:false} } } }
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          plugins: { legend: { position: 'top' } },
+          scales: { 
+            y: { 
+              type: 'linear', 
+              position: 'left', 
+              min: 0, 
+              max: 100,
+              grid: { color: getChartColors().grid },
+              title: { display: true, text: '5S Score (%)', color: '#3b82f6' }
+            }, 
+            y1: { 
+              type: 'linear', 
+              position: 'right', 
+              grid: { drawOnChartArea: false },
+              title: { display: true, text: 'Open Issues', color: '#ef4444' },
+              beginAtZero: true
+            },
+            x: { grid: { color: getChartColors().grid } }
+          } 
+        }
       });
 
       // 2. Top Critical Overdue (Table)
-      const overdues = filteredData.jobs.filter(j => j.status !== 'Closed' && parseDateObj(j.dueDate) < new Date()).sort((a,b) => parseDateObj(a.dueDate) - parseDateObj(b.dueDate)).slice(0,5);
+      const overdues = filteredData.jobs
+        .filter(j => j.status !== 'Closed' && parseDateObj(j.dueDate) && parseDateObj(j.dueDate) < new Date())
+        .sort((a,b) => parseDateObj(a.dueDate) - parseDateObj(b.dueDate))
+        .slice(0, 5);
+      
       document.getElementById("e_tbOverdue").innerHTML = `
-        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500"><tr><th class="p-2">Job</th><th class="p-2">Area</th><th class="p-2">Due</th></tr></thead>
+        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500">
+          <tr><th class="p-2">Job ID</th><th class="p-2">Area</th><th class="p-2">Due Date</th><th class="p-2">Days Over</th></tr>
+        </thead>
         <tbody class="divide-y dark:divide-slate-700">
-          ${overdues.map(o => `<tr><td class="p-2 font-mono text-rose-600 font-bold">${o.jobId}</td><td class="p-2 font-bold">${o.area}</td><td class="p-2 text-rose-500">${o.dueDate}</td></tr>`).join('') || '<tr><td colspan="3" class="p-4 text-center text-slate-400">No Overdue</td></tr>'}
+          ${overdues.length ? overdues.map(o => {
+            const due = parseDateObj(o.dueDate);
+            const daysOver = Math.floor((new Date() - due) / 86400000);
+            return `<tr class="hover:bg-rose-50 dark:hover:bg-rose-900/20">
+              <td class="p-2 font-mono text-rose-600 font-bold text-[10px]">${o.jobId}</td>
+              <td class="p-2 font-bold text-[11px]">${o.area}</td>
+              <td class="p-2 text-rose-500 text-[11px]">${o.dueDate}</td>
+              <td class="p-2 font-bold text-rose-700 text-[11px]">+${daysOver} วัน</td>
+            </tr>`;
+          }).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400">✅ No Overdue Issues</td></tr>'}
         </tbody>
       `;
 
       // 3. Worst 5S Areas (Table)
       const dScore = {};
-      filteredData.ins.filter(i=>i.inspectionType==="5S").forEach(i => {
-        if(!dScore[i.area]) dScore[i.area] = []; dScore[i.area].push(parseFloat(i.score?.percent||0));
+      filteredData.ins.filter(i => is5SType(i.inspectionType)).forEach(i => {
+        if (!dScore[i.area]) dScore[i.area] = []; 
+        dScore[i.area].push(parseFloat(i.score?.percent || 0));
       });
-      const bList = []; Object.keys(dScore).forEach(d => { if(dScore[d].length > 0) bList.push({ name: d, score: Math.round(dScore[d].reduce((a,b)=>a+b,0)/dScore[d].length) }); });
+      
+      const bList = []; 
+      Object.keys(dScore).forEach(d => { 
+        if (dScore[d].length > 0) {
+          bList.push({ 
+            name: d, 
+            score: Math.round(dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length),
+            count: dScore[d].length
+          }); 
+        }
+      });
       bList.sort((a,b) => a.score - b.score);
       
       document.getElementById("e_tbWorst5S").innerHTML = `
-        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500"><tr><th class="p-2">Rank</th><th class="p-2">Area</th><th class="p-2 text-right">Score</th></tr></thead>
+        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500">
+          <tr><th class="p-2">Rank</th><th class="p-2">Area</th><th class="p-2">Audits</th><th class="p-2 text-right">Score</th></tr>
+        </thead>
         <tbody class="divide-y dark:divide-slate-700">
-          ${bList.slice(0,5).map((o,i) => `<tr><td class="p-2 font-bold text-slate-400">#${i+1}</td><td class="p-2 font-bold">${o.name}</td><td class="p-2 text-right font-inter font-bold ${o.score<85?'text-rose-600':'text-emerald-600'}">${o.score}%</td></tr>`).join('') || '<tr><td colspan="3" class="p-4 text-center text-slate-400">No Data</td></tr>'}
+          ${bList.length ? bList.slice(0,5).map((o,i) => `
+            <tr class="hover:bg-amber-50 dark:hover:bg-amber-900/20">
+              <td class="p-2 font-bold text-slate-400">#${i+1}</td>
+              <td class="p-2 font-bold text-[11px]">${o.name}</td>
+              <td class="p-2 text-[11px]">${o.count}</td>
+              <td class="p-2 text-right font-inter font-bold ${o.score < 70 ? 'text-rose-600' : o.score < 85 ? 'text-amber-600' : 'text-emerald-600'}">${o.score}%</td>
+            </tr>
+          `).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400">No 5S Data</td></tr>'}
         </tbody>
       `;
     }
