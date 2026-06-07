@@ -3,301 +3,300 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Executive Dashboard | Safety & 5S</title>
+  <title>5S & Safety Executive Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    body { font-family: 'Prompt', sans-serif; background-color: #f1f5f9; }
+    body { font-family: 'Prompt', sans-serif; background-color: #f4f7f6; color: #1e293b; }
     .font-inter { font-family: 'Inter', sans-serif; }
-    .bento-card { background: #ffffff; border-radius: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); padding: 1.25rem; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    .bento-card:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08); transform: translateY(-2px); }
-    .gradient-text { background: linear-gradient(90deg, #003566, #0284c7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
-    /* Scrollbar ตกแต่งให้สวยงาม */
+    /* Modern Dashboard Cards */
+    .metric-card { background: #ffffff; border-radius: 1.25rem; border: 1px solid #e2e8f0; padding: 1.5rem; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); transition: all 0.3s ease; }
+    .metric-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.08); }
+    
+    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid #e2e8f0; }
   </style>
 </head>
-<body class="text-slate-800 min-h-screen pb-12">
+<body class="min-h-screen pb-12">
 
-  <div id="loader" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex flex-col items-center justify-center z-[9999] transition-opacity duration-300">
-    <div class="bg-white p-6 rounded-2xl shadow-2xl flex flex-col items-center">
-      <div class="w-12 h-12 border-4 border-slate-100 border-t-[#003566] rounded-full animate-spin"></div>
-      <div class="font-bold text-[#003566] mt-4">AI กำลังวิเคราะห์ข้อมูลเชิงลึก...</div>
-      <div class="text-xs text-slate-500 mt-1">ประมวลผล Safety & 5S Analytics</div>
+  <div id="loader" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex flex-col items-center justify-center z-[9999] transition-opacity duration-300">
+    <div class="bg-white p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-[90%] text-center">
+      <div class="relative w-16 h-16 flex items-center justify-center">
+        <div class="absolute inset-0 border-4 border-slate-100 border-t-[#003566] rounded-full animate-spin"></div>
+        <i class="fas fa-chart-pie text-[#003566] text-xl"></i>
+      </div>
+      <div class="font-bold text-[#003566] text-lg mt-5">กำลังวิเคราะห์ข้อมูล...</div>
+      <div class="text-xs text-slate-500 mt-2">ดึงสถิติ Safety & 5S ประจำเดือน</div>
     </div>
   </div>
 
-  <nav class="bg-[#003566] text-white sticky top-0 z-50 shadow-lg">
+  <nav class="bg-gradient-to-r from-[#002548] to-[#003566] text-white sticky top-0 z-50 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between py-3 gap-3">
-      <div class="flex items-center gap-2">
-        <i class="fas fa-chart-pie text-2xl text-sky-400"></i>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20">
+          <i class="fas fa-layer-group text-xl text-sky-300"></i>
+        </div>
         <div>
-          <div class="font-black tracking-wide text-sm md:text-base font-inter leading-none">EXECUTIVE DASHBOARD</div>
-          <div class="text-[10px] text-sky-200 font-medium">Toppan Safety & 5S Center</div>
+          <div class="font-black tracking-widest text-sm md:text-base font-inter leading-none">EXECUTIVE DASHBOARD</div>
+          <div class="text-[10px] text-sky-200 font-medium mt-1">Toppan Command Center</div>
         </div>
       </div>
-      <div class="flex items-center gap-1.5 overflow-x-auto text-xs md:text-sm font-semibold">
+      <div class="flex items-center gap-1 overflow-x-auto text-xs md:text-sm font-semibold pb-1 md:pb-0">
         <a href="DashNew.html" class="px-3 py-2 rounded-lg hover:bg-white/10 transition"><i class="fas fa-list-check"></i> รายการตรวจ</a>
         <a href="dashboard.html" class="px-3 py-2 bg-sky-500 text-white rounded-lg shadow-md"><i class="fas fa-chart-line"></i> ศูนย์ควบคุม</a>
         <a href="reportnew.html" class="px-3 py-2 rounded-lg hover:bg-white/10 transition"><i class="fas fa-business-time"></i> Action Plan</a>
-        <a href="check.html" class="px-3 py-2 rounded-lg hover:bg-white/10 transition"><i class="fas fa-plus-circle"></i> ตรวจพื้นที่</a>
       </div>
     </div>
   </nav>
 
-  <header class="bg-white border-b border-slate-200 py-3 px-4 sm:px-6 lg:px-8 sticky top-[56px] z-40 shadow-sm flex flex-wrap items-center justify-between gap-4">
+  <header class="glass-header py-3 px-4 sm:px-6 lg:px-8 sticky top-[64px] z-40 flex flex-wrap items-center justify-between gap-4">
     <div class="flex items-center gap-2">
-      <div class="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-sky-600"><i class="fas fa-filter"></i></div>
-      <span class="font-bold text-slate-700 text-sm md:text-base">ตัวกรองข้อมูลสถิติ</span>
+      <div class="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-sky-600"><i class="fas fa-filter text-xs"></i></div>
+      <span class="font-bold text-slate-700 text-sm">ตัวกรองข้อมูลสถิติ</span>
     </div>
+    
     <div class="flex items-center gap-3 w-full sm:w-auto">
-      <div class="relative flex-1 sm:w-48">
-        <i class="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-        <select id="timeRange" onchange="applyFilters()" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-xs md:text-sm font-semibold bg-slate-50 outline-none focus:ring-2 focus:ring-sky-500 transition appearance-none">
-          <option value="today">วันนี้ (Today)</option>
-          <option value="week">สัปดาห์นี้ (This Week)</option>
-          <option value="month" selected>เดือนนี้ (This Month)</option>
-          <option value="year">ปีนี้ (This Year)</option>
-          <option value="all">ทั้งหมด (All Time)</option>
-        </select>
+      <div class="relative flex-1 sm:w-48 group">
+        <i class="fas fa-calendar-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs group-focus-within:text-[#003566] transition"></i>
+        <input type="month" id="monthFilter" onchange="applyFilters()" class="w-full pl-8 pr-8 py-2 border border-slate-300 rounded-lg text-xs md:text-sm font-bold bg-white outline-none focus:ring-2 focus:ring-sky-500 transition cursor-pointer shadow-sm">
+        <button onclick="clearMonth()" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-300 hover:text-rose-500 transition"><i class="fas fa-times-circle"></i></button>
       </div>
-      <div class="relative flex-1 sm:w-48">
-        <i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-        <select id="deptFilter" onchange="applyFilters()" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-xs md:text-sm font-semibold bg-slate-50 outline-none focus:ring-2 focus:ring-sky-500 transition appearance-none">
+      
+      <div class="relative flex-1 sm:w-48 group">
+        <i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs group-focus-within:text-[#003566] transition"></i>
+        <select id="deptFilter" onchange="applyFilters()" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg text-xs md:text-sm font-bold bg-white outline-none focus:ring-2 focus:ring-sky-500 transition cursor-pointer appearance-none shadow-sm">
           <option value="all">ทุกพื้นที่ (All Areas)</option>
         </select>
       </div>
     </div>
   </header>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-8">
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="bg-white border-l-4 border-rose-500 p-4 rounded-xl shadow-sm flex items-start gap-3">
-        <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 shrink-0"><i class="fas fa-exclamation-triangle text-lg"></i></div>
+        <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 shrink-0"><i class="fas fa-exclamation-triangle text-lg"></i></div>
         <div>
-          <div class="text-[10px] font-bold text-slate-400 uppercase">Critical Alert</div>
-          <div class="text-sm font-semibold text-slate-700 leading-tight mt-0.5" id="alertCritical">กำลังประมวลผล...</div>
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Critical Alert</div>
+          <div class="text-sm font-bold text-slate-700 mt-1 leading-snug" id="alertCritical">กำลังประมวลผล...</div>
         </div>
       </div>
-      <div class="bg-white border-l-4 border-amber-500 p-4 rounded-xl shadow-sm flex items-start gap-3">
-        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0"><i class="fas fa-search-location text-lg"></i></div>
+      <div class="bg-white border-l-4 border-amber-400 p-4 rounded-xl shadow-sm flex items-start gap-3">
+        <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 shrink-0"><i class="fas fa-search-location text-lg"></i></div>
         <div>
-          <div class="text-[10px] font-bold text-slate-400 uppercase">Warning & Focus</div>
-          <div class="text-sm font-semibold text-slate-700 leading-tight mt-0.5" id="alertWarning">กำลังประมวลผล...</div>
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Warning & Focus</div>
+          <div class="text-sm font-bold text-slate-700 mt-1 leading-snug" id="alertWarning">กำลังประมวลผล...</div>
         </div>
       </div>
       <div class="bg-white border-l-4 border-emerald-500 p-4 rounded-xl shadow-sm flex items-start gap-3">
-        <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0"><i class="fas fa-award text-lg"></i></div>
+        <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0"><i class="fas fa-award text-lg"></i></div>
         <div>
-          <div class="text-[10px] font-bold text-slate-400 uppercase">Good Performance</div>
-          <div class="text-sm font-semibold text-slate-700 leading-tight mt-0.5" id="alertGood">กำลังประมวลผล...</div>
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Good Performance</div>
+          <div class="text-sm font-bold text-slate-700 mt-1 leading-snug" id="alertGood">กำลังประมวลผล...</div>
         </div>
       </div>
     </div>
 
-    <div class="flex items-center justify-between border-b-2 border-slate-200 pb-2 pt-4">
-      <h2 class="text-lg md:text-xl font-bold text-[#003566] flex items-center gap-2"><i class="fas fa-broom text-amber-500"></i> 5S Performance Analytics</h2>
-      <button class="text-[11px] md:text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-sm" onclick="openLogicModal()"><i class="fas fa-info-circle text-sky-600"></i> อธิบายหลักการคิด</button>
-    </div>
+    <div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg md:text-xl font-bold text-[#003566] flex items-center gap-2"><i class="fas fa-broom text-amber-500"></i> 5S Analytics Overview</h2>
+        <button class="text-xs font-bold bg-white border border-slate-300 text-slate-600 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition flex items-center gap-1.5 shadow-sm" onclick="openLogicModal()"><i class="fas fa-info-circle text-[#003566]"></i> หลักการประเมิน 5S</button>
+      </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      
-      <div class="bento-card flex flex-col items-center justify-center relative overflow-hidden">
-        <div class="absolute top-0 right-0 p-3"><i class="fas fa-tachometer-alt text-slate-100 text-4xl"></i></div>
-        <h3 class="text-xs font-bold text-slate-500 w-full text-left uppercase tracking-wider mb-2">ภาพรวมคะแนน 5ส (Average Score)</h3>
-        <div class="relative w-48 h-48 flex justify-center items-center">
-          <canvas id="chGauge" class="w-full h-full"></canvas>
-          <div class="absolute inset-0 flex flex-col items-center justify-center pt-8">
-            <div class="text-4xl font-black font-inter text-slate-800" id="gVal">0%</div>
-            <div class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full mt-1" id="gSub">Target: 85%</div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="metric-card flex flex-col items-center justify-center relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fas fa-tachometer-alt text-6xl"></i></div>
+          <h3 class="text-xs font-bold text-slate-500 w-full text-left uppercase tracking-wider mb-2">คะแนน 5ส (Average Score)</h3>
+          <div class="relative w-48 h-48 flex justify-center items-center">
+            <canvas id="chGauge" class="w-full h-full"></canvas>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pt-8">
+              <div class="text-4xl font-black font-inter text-slate-800" id="gVal">0%</div>
+              <div class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full mt-1" id="gSub">Target: 85%</div>
+            </div>
           </div>
         </div>
+
+        <div class="metric-card flex flex-col">
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex justify-between">ความสมดุล 5ส <span class="text-[10px] text-sky-500 capitalize bg-sky-50 px-1.5 rounded">(Radar)</span></h3>
+          <div class="relative flex-1 w-full min-h-[180px]"><canvas id="chRadar"></canvas></div>
+        </div>
+
+        <div class="metric-card flex flex-col bg-[#002548] text-white border-none relative overflow-hidden">
+          <div class="absolute -right-4 -bottom-4 text-white/5 text-9xl"><i class="fas fa-trophy"></i></div>
+          <h3 class="text-xs font-bold text-sky-200 uppercase tracking-wider mb-4 relative z-10">Hall of Fame (Top 3 5S)</h3>
+          <div class="flex-1 flex flex-col justify-center gap-3 relative z-10" id="lbList"></div>
+        </div>
       </div>
 
-      <div class="bento-card flex flex-col">
-        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex justify-between">วิเคราะห์ความสมดุล 5ส <span class="text-[10px] text-sky-500 lowercase">(Radar)</span></h3>
-        <div class="relative flex-1 w-full min-h-[180px]"><canvas id="chRadar"></canvas></div>
-      </div>
-
-      <div class="bento-card flex flex-col bg-gradient-to-br from-[#003566] to-[#0284c7] text-white border-none relative overflow-hidden">
-        <div class="absolute -right-6 -top-6 text-white/10 text-9xl"><i class="fas fa-trophy"></i></div>
-        <h3 class="text-xs font-bold text-sky-200 uppercase tracking-wider mb-4 relative z-10">Hall of Fame (Top 3)</h3>
-        <div class="flex-1 flex flex-col justify-center gap-3 relative z-10" id="lbList">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <div class="metric-card flex flex-col overflow-hidden">
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">จุดบอดรายแผนก <span class="text-[10px] text-sky-500 bg-sky-50 px-1.5 rounded capitalize">(Heatmap Matrix)</span></h3>
+          <div class="overflow-x-auto flex-1">
+            <table class="w-full text-[10px] sm:text-[11px] border-collapse text-center font-bold" id="tbHeatmap"></table>
           </div>
+        </div>
+        <div class="metric-card flex flex-col">
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">หมวด 5ส ที่ถูกสั่งแก้ไขมากที่สุด <span class="text-[10px] text-sky-500 bg-sky-50 px-1.5 rounded capitalize">(Pareto)</span></h3>
+          <div class="relative flex-1 w-full min-h-[220px]"><canvas id="chPareto5S"></canvas></div>
+        </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bento-card overflow-hidden flex flex-col">
-        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex justify-between">จุดบอดรายแผนก <span class="text-[10px] text-sky-500 lowercase">(Heatmap Matrix)</span></h3>
-        <div class="overflow-x-auto flex-1">
-          <table class="w-full text-[10px] sm:text-[11px] border-collapse text-center font-bold" id="tbHeatmap"></table>
+    <div>
+      <div class="flex items-center justify-between border-b-2 border-slate-200 pb-2 pt-6 mb-4">
+        <h2 class="text-lg md:text-xl font-bold text-[#003566] flex items-center gap-2"><i class="fas fa-hard-hat text-rose-500"></i> Safety & Maintenance Tracking</h2>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="metric-card !p-4 border-b-4 border-b-sky-500 flex items-center justify-between">
+          <div><div class="text-[10px] font-bold text-slate-400 uppercase">Total Findings</div><div class="text-3xl font-black font-inter text-slate-800 leading-none mt-1" id="kpiTotal">0</div></div>
+          <div class="w-10 h-10 rounded-full bg-sky-50 flex items-center justify-center text-sky-500"><i class="fas fa-clipboard-list text-xl"></i></div>
+        </div>
+        <div class="metric-card !p-4 border-b-4 border-b-rose-500 flex items-center justify-between">
+          <div><div class="text-[10px] font-bold text-slate-400 uppercase">Overdue Risk</div><div class="text-3xl font-black font-inter text-rose-600 leading-none mt-1" id="kpiOverdue">0</div></div>
+          <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500"><i class="fas fa-skull-crossbones text-xl"></i></div>
+        </div>
+        <div class="metric-card !p-4 border-b-4 border-b-amber-500 flex items-center justify-between">
+          <div><div class="text-[10px] font-bold text-slate-400 uppercase">Aging > 7 Days</div><div class="text-3xl font-black font-inter text-amber-500 leading-none mt-1" id="kpiAging">0</div></div>
+          <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-500"><i class="fas fa-clock text-xl"></i></div>
+        </div>
+        <div class="metric-card !p-4 border-b-4 border-b-emerald-500 flex items-center justify-between">
+          <div><div class="text-[10px] font-bold text-slate-400 uppercase">Close Rate</div><div class="text-3xl font-black font-inter text-emerald-600 leading-none mt-1" id="kpiCloseRate">0%</div></div>
+          <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500"><i class="fas fa-check-double text-xl"></i></div>
         </div>
       </div>
 
-      <div class="bento-card flex flex-col">
-        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex justify-between">หมวดที่ถูกสั่งแก้ไขมากที่สุด <span class="text-[10px] text-sky-500 lowercase">(Pareto)</span></h3>
-        <div class="relative flex-1 w-full min-h-[220px]"><canvas id="chPareto5S"></canvas></div>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between border-b-2 border-slate-200 pb-2 pt-6">
-      <h2 class="text-lg md:text-xl font-bold text-[#003566] flex items-center gap-2"><i class="fas fa-hard-hat text-rose-500"></i> Safety & Action Plan Tracking</h2>
-    </div>
-
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bento-card flex items-center justify-between !p-4 border-l-4 border-l-sky-500">
-        <div>
-          <div class="text-[10px] font-bold text-slate-400 uppercase">Total Findings</div>
-          <div class="text-2xl sm:text-3xl font-black font-inter text-slate-800 leading-none mt-1" id="kpiTotal">0</div>
+      <div class="metric-card overflow-hidden !p-0">
+        <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+          <h3 class="text-xs font-bold text-[#003566] uppercase tracking-wider flex items-center gap-2"><i class="fas fa-medal text-amber-500 text-lg"></i> Safety Score Ranking</h3>
         </div>
-        <div class="w-10 h-10 rounded-full bg-sky-50 flex items-center justify-center text-sky-500"><i class="fas fa-clipboard-list text-xl"></i></div>
-      </div>
-      <div class="bento-card flex items-center justify-between !p-4 border-l-4 border-l-rose-500">
-        <div>
-          <div class="text-[10px] font-bold text-slate-400 uppercase">Overdue Risk</div>
-          <div class="text-2xl sm:text-3xl font-black font-inter text-rose-600 leading-none mt-1" id="kpiOverdue">0</div>
+        <div class="overflow-x-auto p-4">
+          <table class="w-full text-xs text-left whitespace-nowrap">
+            <thead class="text-slate-500 border-b border-slate-200">
+              <tr>
+                <th class="pb-3 font-bold w-12 text-center">อันดับ</th>
+                <th class="pb-3 font-bold">แผนก (Area)</th>
+                <th class="pb-3 font-bold text-center">ใบงานรับผิดชอบ</th>
+                <th class="pb-3 font-bold text-center text-emerald-600">อัตราการปิดงาน</th>
+                <th class="pb-3 font-bold text-center text-rose-600">ค้างเกินกำหนด</th>
+                <th class="pb-3 font-bold text-center">ความเร็ว (MTTR)</th>
+                <th class="pb-3 font-bold text-center text-[#003566]">คะแนนสุทธิ</th>
+              </tr>
+            </thead>
+            <tbody id="tbAreaRanking" class="divide-y divide-slate-100 font-medium text-slate-700"></tbody>
+          </table>
         </div>
-        <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500"><i class="fas fa-skull-crossbones text-xl"></i></div>
       </div>
-      <div class="bento-card flex items-center justify-between !p-4 border-l-4 border-l-amber-500">
-        <div>
-          <div class="text-[10px] font-bold text-slate-400 uppercase">Aging > 7 Days</div>
-          <div class="text-2xl sm:text-3xl font-black font-inter text-amber-500 leading-none mt-1" id="kpiAging">0</div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div class="metric-card flex flex-col">
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">ปริมาณงานค้างแยกตามแผนก <span class="text-[10px] text-sky-500 bg-sky-50 px-1.5 rounded capitalize">(Stacked Bar)</span></h3>
+          <div class="h-64 w-full flex-1"><canvas id="chVolume"></canvas></div>
         </div>
-        <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-500"><i class="fas fa-clock text-xl"></i></div>
-      </div>
-      <div class="bento-card flex items-center justify-between !p-4 border-l-4 border-l-emerald-500">
-        <div>
-          <div class="text-[10px] font-bold text-slate-400 uppercase">Close Rate</div>
-          <div class="text-2xl sm:text-3xl font-black font-inter text-emerald-600 leading-none mt-1" id="kpiCloseRate">0%</div>
+        <div class="metric-card flex flex-col">
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Cross Analysis (5S vs Safety) <span class="text-[10px] text-sky-500 bg-sky-50 px-1.5 rounded capitalize">(Scatter)</span></h3>
+          <div class="h-64 w-full flex-1"><canvas id="chCross"></canvas></div>
         </div>
-        <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500"><i class="fas fa-check-double text-xl"></i></div>
       </div>
     </div>
-
-    <div class="bento-card overflow-hidden">
-      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2"><i class="fas fa-medal text-amber-500 text-lg"></i> ตารางจัดอันดับการจัดการความปลอดภัย (Safety Score Ranking)</h3>
-      <div class="overflow-x-auto">
-        <table class="w-full text-xs text-left whitespace-nowrap">
-          <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-            <tr>
-              <th class="p-3 font-bold w-12 text-center rounded-tl-lg">อันดับ</th>
-              <th class="p-3 font-bold">แผนก (Area)</th>
-              <th class="p-3 font-bold text-center">ใบงานรับผิดชอบ</th>
-              <th class="p-3 font-bold text-center text-emerald-600">อัตราการปิดงาน</th>
-              <th class="p-3 font-bold text-center text-rose-600">ค้างเกินกำหนด</th>
-              <th class="p-3 font-bold text-center">ความเร็ว (MTTR)</th>
-              <th class="p-3 font-bold text-center bg-sky-50 text-[#003566] rounded-tr-lg border-l border-sky-100">คะแนนสุทธิ</th>
-            </tr>
-          </thead>
-          <tbody id="tbAreaRanking" class="divide-y divide-slate-100 font-medium text-slate-700"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="bento-card flex flex-col">
-        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex justify-between">ปริมาณงานค้างแยกตามแผนก <span class="text-[10px] text-sky-500 lowercase">(Stacked Bar)</span></h3>
-        <div class="h-64 w-full flex-1"><canvas id="chVolume"></canvas></div>
-      </div>
-      <div class="bento-card flex flex-col">
-        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex justify-between">Cross Analysis (5S vs Safety) <span class="text-[10px] text-sky-500 lowercase">(Scatter)</span></h3>
-        <div class="h-64 w-full flex-1"><canvas id="chCross"></canvas></div>
-      </div>
-    </div>
-
   </div>
 
   <div id="logicModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-[9999] transition-opacity">
-    <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-[modalIn_0.2s_ease-out]">
+    <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-[modalIn_0.2s_ease-out]">
       
-      <div class="p-4 md:p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-        <div class="flex items-center gap-2 text-[#003566]">
-          <div class="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center"><i class="fas fa-brain text-sky-600"></i></div>
+      <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-start bg-gradient-to-r from-slate-50 to-white">
+        <div class="flex items-center gap-3 text-[#003566]">
+          <div class="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center shadow-sm"><i class="fas fa-brain text-sky-600 text-xl"></i></div>
           <div>
-            <h3 class="font-bold text-sm md:text-base leading-none">ตรรกะและที่มาของการคำนวณ</h3>
-            <div class="text-[10px] text-slate-500 font-medium mt-1">Calculation Logic & Methodology</div>
+            <h3 class="font-bold text-base md:text-lg leading-none">ตรรกะและที่มาของการคำนวณ</h3>
+            <div class="text-xs text-slate-500 font-medium mt-1">Calculation Logic & Methodology</div>
           </div>
         </div>
-        <button class="w-8 h-8 rounded-full bg-slate-200 hover:bg-rose-100 hover:text-rose-600 text-slate-500 transition flex items-center justify-center" onclick="closeLogicModal()"><i class="fas fa-times"></i></button>
+        <button class="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-100 hover:text-rose-600 text-slate-500 transition flex items-center justify-center" onclick="closeLogicModal()"><i class="fas fa-times"></i></button>
       </div>
       
-      <div class="p-5 md:p-6 overflow-y-auto space-y-6 text-sm text-slate-700 leading-relaxed bg-slate-50/50">
+      <div class="p-5 md:p-6 overflow-y-auto space-y-6 text-sm text-slate-700 bg-white">
         
-        <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-          <h4 class="font-bold text-[#003566] text-base mb-2 flex items-center gap-2"><i class="fas fa-star text-amber-500"></i> 1. หลักการคิดคะแนน 5ส (5S Score)</h4>
-          <p class="text-xs mb-3 text-slate-500">วิเคราะห์ข้อมูลจากแบบฟอร์มการตรวจประเมินหน้างานจริง โดยแปลงผลลัพธ์เป็นตัวเลข (Scoring System)</p>
+        <div class="border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <h4 class="font-bold text-[#003566] text-base mb-3 flex items-center gap-2"><i class="fas fa-sitemap text-amber-500"></i> 1. ที่มาของการให้คะแนน 5ส (5S Mapping)</h4>
+          <p class="text-xs text-slate-500 mb-4">ระบบแปลงผลการตรวจจากหน้างาน (ดี=2, พอใช้=1, ปรับปรุง=0) โดยจัดกลุ่มคำถาม 9 ข้อ เข้าสู่หมวด 5ส. หลัก ดังนี้:</p>
           
-          <div class="bg-slate-50 rounded-lg p-3 border border-slate-100 mb-4">
-            <h5 class="font-bold text-[11px] uppercase text-slate-500 mb-2 border-b pb-1">น้ำหนักคะแนนรายข้อ (Weight):</h5>
-            <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold">
-              <div class="bg-emerald-100 text-emerald-700 py-1.5 rounded-md border border-emerald-200">ดี = 2 คะแนน</div>
-              <div class="bg-amber-100 text-amber-700 py-1.5 rounded-md border border-amber-200">พอใช้ = 1 คะแนน</div>
-              <div class="bg-rose-100 text-rose-700 py-1.5 rounded-md border border-rose-200">ปรับปรุง = 0 คะแนน</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <h5 class="font-bold text-sky-700 text-sm mb-2 border-b border-slate-200 pb-2">ส1. สะสาง (Seiri)</h5>
+              <ul class="text-xs space-y-1.5 text-slate-600">
+                <li><i class="fas fa-check text-emerald-500 mr-1"></i> ข้อ 1. พื้นที่ปฏิบัติงาน / เครื่องจักร</li>
+                <li><i class="fas fa-check text-emerald-500 mr-1"></i> ข้อ 6. พื้น / ผนังห้อง / เพดาน</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <h5 class="font-bold text-sky-700 text-sm mb-2 border-b border-slate-200 pb-2">ส2. สะดวก (Seiton)</h5>
+              <ul class="text-xs space-y-1.5 text-slate-600">
+                <li><i class="fas fa-check text-emerald-500 mr-1"></i> ข้อ 2. เครื่องมือและอุปกรณ์</li>
+                <li><i class="fas fa-check text-emerald-500 mr-1"></i> ข้อ 7. สภาพแวดล้อมทั่วไป / ถังขยะ</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <h5 class="font-bold text-sky-700 text-sm mb-2 border-b border-slate-200 pb-2">ส3. สะอาด (Seiso)</h5>
+              <ul class="text-xs space-y-1.5 text-slate-600">
+                <li><i class="fas fa-check text-emerald-500 mr-1"></i> ข้อ 3. การจัดวางวัตถุดิบ / สารเคมี</li>
+                <li><i class="fas fa-check text-emerald-500 mr-1"></i> ข้อ 8. การตรวจสุขลักษณะส่วนบุคคล</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <h5 class="font-bold text-sky-700 text-sm mb-2 border-b border-slate-200 pb-2">ส4. สุขลักษณะ (Seiketsu)</h5>
+              <ul class="text-xs space-y-1.5 text-slate-600">
+                <li><i class="fas fa-check text-emerald-500 mr-1"></i> ข้อ 4. โต๊ะทำงาน / ลิ้นชัก</li>
+                <li><i class="fas fa-check text-emerald-500 mr-1"></i> ข้อ 9. ความตระหนัก / ห้องประชุม</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 md:col-span-2">
+              <h5 class="font-bold text-sky-700 text-sm mb-2 border-b border-slate-200 pb-2">ส5. สร้างนิสัย (Shitsuke)</h5>
+              <ul class="text-xs space-y-1.5 text-slate-600">
+                <li><i class="fas fa-check text-emerald-500 mr-1"></i> ข้อ 5. การจัดเก็บเอกสาร / ถังดับเพลิง</li>
+              </ul>
             </div>
           </div>
-
-          <p class="text-xs font-semibold mb-2">📌 ที่มาของการจัดหมวดหมู่ลง Radar Chart (ส1 - ส5):</p>
-          <p class="text-[11px] mb-2 leading-relaxed">เนื่องจากแบบฟอร์มประเมินในระบบมีทั้งหมด <b class="text-[#003566]">9 หัวข้อ</b> ระบบจึงใช้วิธีจัดสรร (Map) หัวข้อเหล่านี้กระจายเข้าสู่หมวด 5ส. สากลโดยอัตโนมัติ ดังนี้:</p>
-          <ul class="text-[11px] space-y-1 bg-slate-50 p-3 rounded-lg border border-slate-100 font-medium font-mono text-slate-600">
-            <li><span class="text-sky-600">ส1. สะสาง</span> = คำนวณจาก ข้อ 1 (เครื่องจักร/สภาพแวดล้อม) และ ข้อ 6 (พื้น/การกำจัดขยะ)</li>
-            <li><span class="text-sky-600">ส2. สะดวก</span> = คำนวณจาก ข้อ 2 (เครื่องมือ/ท่าทาง) และ ข้อ 7 (สภาพแวดล้อมทั่วไป)</li>
-            <li><span class="text-sky-600">ส3. สะอาด</span> = คำนวณจาก ข้อ 3 (วัตถุดิบ/ไฟฟ้า) และ ข้อ 8 (สุขลักษณะส่วนบุคคล)</li>
-            <li><span class="text-sky-600">ส4. สุขลักษณะ</span> = คำนวณจาก ข้อ 4 (โต๊ะทำงาน/สารเคมี) และ ข้อ 9 (ความตระหนัก/ห้องประชุม)</li>
-            <li><span class="text-sky-600">ส5. สร้างนิสัย</span> = คำนวณจาก ข้อ 5 (การจัดเก็บเอกสาร/ถังดับเพลิง)</li>
-          </ul>
         </div>
 
-        <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-          <h4 class="font-bold text-[#003566] text-base mb-2 flex items-center gap-2"><i class="fas fa-hard-hat text-rose-500"></i> 2. การคิดคะแนนความปลอดภัย (Safety KPI Score)</h4>
-          <p class="text-xs mb-3 text-slate-500">คะแนนเต็ม 100 คะแนน คำนวณจาก 3 มิติเชิงรุก เพื่อวัดประสิทธิภาพการจัดการปัญหาของแต่ละแผนก:</p>
+        <div class="border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <h4 class="font-bold text-[#003566] text-base mb-3 flex items-center gap-2"><i class="fas fa-hard-hat text-rose-500"></i> 2. การคิดคะแนนความปลอดภัย (Safety Score)</h4>
+          <p class="text-xs mb-4 text-slate-500">คะแนนเต็ม 100 คะแนน คำนวณจาก 3 มิติเชิงรุก เพื่อประเมินความรับผิดชอบในการแก้ปัญหา:</p>
           
           <div class="space-y-3">
-            <div class="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-lg">
-              <div class="w-8 h-8 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-700 font-black shrink-0">40%</div>
+            <div class="flex items-start gap-4 p-4 bg-emerald-50 rounded-xl">
+              <div class="w-10 h-10 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-700 font-black shrink-0">40%</div>
               <div>
-                <h5 class="text-xs font-bold text-emerald-800">อัตราการปิดงาน (Close Rate)</h5>
-                <p class="text-[10px] text-emerald-700 mt-0.5">สูตร: <code>(จำนวนงานที่แก้เสร็จ / งานที่ได้รับมอบหมายทั้งหมด) × 40</code></p>
+                <h5 class="text-sm font-bold text-emerald-800 mb-1">อัตราการปิดงาน (Close Rate)</h5>
+                <p class="text-xs text-emerald-700">สะท้อนความรับผิดชอบ: <code>(จำนวนงานที่แก้เสร็จ ÷ งานที่ได้รับมอบหมายทั้งหมด) × 40</code></p>
               </div>
             </div>
-            
-            <div class="flex items-start gap-3 p-3 bg-amber-50 border border-amber-100 rounded-lg">
-              <div class="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center text-amber-700 font-black shrink-0">30%</div>
+            <div class="flex items-start gap-4 p-4 bg-amber-50 rounded-xl">
+              <div class="w-10 h-10 rounded-full bg-amber-200 flex items-center justify-center text-amber-700 font-black shrink-0">30%</div>
               <div>
-                <h5 class="text-xs font-bold text-amber-800">ความตรงต่อเวลา (No Overdue)</h5>
-                <p class="text-[10px] text-amber-700 mt-0.5">สูตร: <code>((งานทั้งหมด - งานที่ค้างเกินกำหนด) / งานทั้งหมด) × 30</code></p>
+                <h5 class="text-sm font-bold text-amber-800 mb-1">ความตรงต่อเวลา (No Overdue)</h5>
+                <p class="text-xs text-amber-700">สะท้อนการรักษาสัญญา: <code>((งานทั้งหมด - งานค้างเกินกำหนด) ÷ งานทั้งหมด) × 30</code></p>
               </div>
             </div>
-
-            <div class="flex items-start gap-3 p-3 bg-sky-50 border border-sky-100 rounded-lg">
-              <div class="w-8 h-8 rounded-full bg-sky-200 flex items-center justify-center text-sky-700 font-black shrink-0">30%</div>
+            <div class="flex items-start gap-4 p-4 bg-sky-50 rounded-xl">
+              <div class="w-10 h-10 rounded-full bg-sky-200 flex items-center justify-center text-sky-700 font-black shrink-0">30%</div>
               <div>
-                <h5 class="text-xs font-bold text-sky-800">ความเร็วในการแก้ไข (MTTR Speed)</h5>
-                <p class="text-[10px] text-sky-700 mt-0.5">ระยะเวลาเฉลี่ยตั้งแต่พบปัญหาจนถึงวันปิดงาน (Mean Time to Resolution):<br>
-                • แก้เสร็จเฉลี่ย ≤ 3 วัน = ได้เต็ม <b>30 คะแนน</b><br>
-                • แก้เสร็จเฉลี่ย 4-7 วัน = ได้ <b>20 คะแนน</b><br>
-                • แก้เสร็จเฉลี่ย > 7 วัน = ได้ <b>10 คะแนน</b></p>
+                <h5 class="text-sm font-bold text-sky-800 mb-1">ความเร็วในการแก้ไข (MTTR Speed)</h5>
+                <p class="text-xs text-sky-700 leading-relaxed">สะท้อนความตื่นตัวต่อความเสี่ยง:<br>
+                • แก้เสร็จเฉลี่ย <b>≤ 3 วัน</b> = ได้เต็ม 30 คะแนน<br>
+                • แก้เสร็จเฉลี่ย <b>4-7 วัน</b> = ได้ 20 คะแนน<br>
+                • แก้เสร็จเฉลี่ย <b>> 7 วัน</b> = ได้เพียง 10 คะแนน</p>
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-          <h4 class="font-bold text-[#003566] text-base mb-1 flex items-center gap-2"><i class="fas fa-medal text-indigo-500"></i> 3. กฎเกณฑ์ Hall of Fame</h4>
-          <p class="text-[11px] text-slate-600 leading-relaxed">
-            เป็นการจัดอันดับ Top 3 แผนกที่มี <b>"คะแนน 5ส. เฉลี่ยสูงสุด"</b> โดยพิจารณาเปรียบเทียบข้าม <u>ทุกพื้นที่ทั้งหมดในองค์กร</u> 
-            ข้อมูลนี้จะถูกกรองอัตโนมัติตามช่วงเวลา (Time Filter) ที่ผู้บริหารเลือกด้านบน (เช่น หากเลือก "เดือนนี้" จะแสดงแชมป์ของเดือนนี้เท่านั้น)
-          </p>
         </div>
 
       </div>
@@ -317,7 +316,6 @@
       "Canteen":"CANTEEN","Toilet":"TOILET","ห้องน้ำ":"TOILET","Locker":"LOCKER","ห้องล็อกเกอร์":"LOCKER","EN":"ENGINEERING","SOVENTLESS":"SOVENTLESS"
     };
     
-    const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
     let raw = { ins: [], jobs: [] }; 
     let charts = {};
 
@@ -328,12 +326,19 @@
       const el = document.getElementById("deptFilter"); 
       DEPTS.forEach(d => el.add(new Option(d, d))); 
       
-      // ✅ 1. บังคับตั้งค่า Default เป็นรายเดือนทันทีที่เปิดหน้าเว็บ
+      // ✅ 1. ตั้งค่า Default Month Picker เป็นเดือนปัจจุบัน
       const now = new Date();
-      document.getElementById("timeRange").value = "month";
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      document.getElementById("monthFilter").value = currentMonth;
       
       loadAll();
     });
+
+    // ปุ่มล้างค่าเดือน เพื่อดูข้อมูลทั้งหมด (All Time)
+    function clearMonth() {
+      document.getElementById("monthFilter").value = "";
+      applyFilters();
+    }
 
     async function loadAll() {
       try {
@@ -344,7 +349,10 @@
         raw.ins = (dash.details || []).map(d => ({ ...d, area: AREA_MAP[d.area] || String(d.area||"OFFICE").toUpperCase() }));
         raw.jobs = Array.isArray(jobs) ? jobs : []; 
         applyFilters();
-      } catch (err) { alert("เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณารีเฟรชหน้าเว็บซ้ำอีกครั้ง"); }
+      } catch (err) { 
+        console.error("Data Load Error:", err);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณารีเฟรชหน้าเว็บซ้ำอีกครั้ง\nหากยังไม่หาย โปรดตรวจสอบการ Deploy Google Apps Script"); 
+      }
       finally { 
         document.getElementById("loader").style.opacity = "0"; 
         setTimeout(() => document.getElementById("loader").classList.add("hidden"), 300); 
@@ -360,36 +368,30 @@
 
     function applyFilters() {
       const dept = document.getElementById("deptFilter").value; 
-      const tr = document.getElementById("timeRange").value;
+      const monthVal = document.getElementById("monthFilter").value; // ค่าจะเป็น YYYY-MM
       const now = new Date(); 
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const weekAgo = new Date(today.getTime() - 7 * 864e5); 
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1); 
-      const yearStart = new Date(now.getFullYear(), 0, 1);
       
       let ins = raw.ins.filter(i => {
         if (dept !== "all" && i.area !== dept) return false; 
-        if (tr === "all") return true;
+        if (!monthVal) return true; // ถ้าไม่มีการเลือกเดือน ให้ดึงทั้งหมด
+        
         const d = new Date((i.timestamp || "").replace(" ", "T")); 
         if (isNaN(d.getTime())) return true;
-        if (tr === "today") return d >= today; 
-        if (tr === "week") return d >= weekAgo; 
-        if (tr === "month") return d >= monthStart; 
-        if (tr === "year") return d >= yearStart; 
-        return true;
+        
+        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        return ym === monthVal;
       });
 
       let filteredJobs = raw.jobs.filter(j => {
         let jArea = AREA_MAP[j.area] || String(j.area).toUpperCase();
         if (dept !== "all" && jArea !== dept) return false;
-        if (tr === "all") return true;
+        if (!monthVal) return true;
+        
         const d = parseThaiDate(j.dateFound);
         if (!d) return true;
-        if (tr === "today") return d >= today; 
-        if (tr === "week") return d >= weekAgo; 
-        if (tr === "month") return d >= monthStart; 
-        if (tr === "year") return d >= yearStart; 
-        return true;
+        
+        const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        return ym === monthVal;
       });
 
       processAllAnalytics(filteredJobs, ins);
@@ -432,7 +434,7 @@
         Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
           const match = k.match(/^5s_s(\d+)_q(\d+)/);
           if (match) {
-            // ✅ นำ 9 หมวด จัดกลุ่มลง 5ส หลัก (อิงตรรกะใน Modal)
+            // ✅ จับคู่ข้อ 1-9 ลงหมวด 5ส ให้ตรงตาม Logic Modal
             const sectionIdx = parseInt(match[1]);
             const cat = S_CATS[sectionIdx % 5]; 
             let val = v === "ดี" ? 2 : v === "พอใช้" ? 1 : 0;
@@ -444,7 +446,7 @@
         });
       });
 
-      // 🏆 5S Hall of Fame (Top 3 จากทุกแผนก)
+      // 🏆 5S Hall of Fame
       const lbData = []; 
       Object.keys(dScore5S).forEach(d => { 
         if(dScore5S[d].length > 0) lbData.push({ name: d, score: Math.round(dScore5S[d].reduce((a,b)=>a+b,0)/dScore5S[d].length) }); 
@@ -458,14 +460,14 @@
           <div class="flex-1 font-bold text-sm tracking-wide text-white truncate">${item.name}</div>
           <div class="font-black text-lg text-yellow-300 font-inter drop-shadow-md">${item.score}%</div>
         </div>
-      `).join('') || '<div class="text-center p-4 text-sky-200 text-sm font-medium border border-dashed border-sky-400/50 rounded-xl">ไม่มีข้อมูลในเดือนนี้</div>';
+      `).join('') || '<div class="text-center p-4 text-sky-200 text-sm font-medium border border-dashed border-sky-400/50 rounded-xl">ยังไม่มีการตรวจ 5S ในช่วงเวลานี้</div>';
 
       // 5S Radar
       const radarData = Object.keys(sCats).map(k => sCats[k].m > 0 ? Math.round((sCats[k].s / sCats[k].m) * 100) : 0);
-      mkChart("chRadar", { type: "radar", data: { labels: Object.keys(sCats), datasets: [{ label: "คะแนนเฉลี่ย (%)", data: radarData, backgroundColor: "rgba(14, 165, 233, 0.2)", borderColor: "#0ea5e9", pointBackgroundColor: "#0284c7", borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, scales:{r:{min:0,max:100, ticks:{stepSize:20}}} } });
+      mkChart("chRadar", { type: "radar", data: { labels: Object.keys(sCats).map(s=>s.split('.')[1].trim()), datasets: [{ label: "คะแนนเฉลี่ย (%)", data: radarData, backgroundColor: "rgba(14, 165, 233, 0.2)", borderColor: "#0ea5e9", pointBackgroundColor: "#0284c7", borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, scales:{r:{min:0,max:100, ticks:{stepSize:20}}} } });
 
       // 5S Heatmap
-      let hmHtml = `<tr class="bg-slate-100/80 text-slate-600"><th class="p-2 border-b border-r text-left sticky left-0 bg-slate-100/90 backdrop-blur z-10 w-24">Area</th>${S_CATS.map(c=>`<th class="p-2 border-b font-medium text-[10px] leading-tight">${c}</th>`).join('')}</tr>`;
+      let hmHtml = `<tr class="bg-slate-100/80 text-slate-600"><th class="p-2 border-b border-r text-left sticky left-0 bg-slate-100/90 backdrop-blur z-10 w-24">Area</th>${S_CATS.map(c=>`<th class="p-2 border-b font-medium text-[10px] leading-tight">${c.split('.')[1]}</th>`).join('')}</tr>`;
       DEPTS.forEach(d => {
         if(dScore5S[d] && dScore5S[d].length > 0) {
           hmHtml += `<tr class="border-b border-slate-100 hover:bg-slate-50 transition"><td class="p-2 border-r text-left font-bold text-[#003566] sticky left-0 bg-white z-10 truncate max-w-[80px]">${d}</td>`;
@@ -484,7 +486,7 @@
       // 5S Pareto
       const sortedParetoKeys = Object.keys(paretoCount5S).sort((a,b) => paretoCount5S[b] - paretoCount5S[a]);
       mkChart("chPareto5S", {
-        type: "bar", data: { labels: sortedParetoKeys, datasets: [{ label: "ความถี่ที่ถูกสั่งแก้ (ครั้ง)", data: sortedParetoKeys.map(k=>paretoCount5S[k]), backgroundColor: "#64748b", borderRadius: 4 }] },
+        type: "bar", data: { labels: sortedParetoKeys.map(s=>s.split('.')[1].trim()), datasets: [{ label: "ความถี่ที่ถูกสั่งแก้ (ครั้ง)", data: sortedParetoKeys.map(k=>paretoCount5S[k]), backgroundColor: "#64748b", borderRadius: 4 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
       });
 
@@ -496,6 +498,7 @@
 
       let kpiTotal = jobs.length;
       let kpiClosed = 0; let kpiOverdue = 0; let kpiAgingHeavy = 0; 
+      const now = new Date();
 
       jobs.forEach(j => {
         let area = AREA_MAP[j.area] || String(j.area).toUpperCase();
@@ -578,7 +581,7 @@
       document.getElementById('tbAreaRanking').innerHTML = rankingList.map((r, idx) => `
         <tr class="hover:bg-slate-50 transition border-b border-slate-100 last:border-0">
           <td class="p-3 text-center">
-            <span class="w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-bold mx-auto text-white ${idx===0?'bg-yellow-500 shadow-md shadow-yellow-200':idx===1?'bg-slate-400 shadow-md shadow-slate-200':idx===2?'bg-amber-700 shadow-md shadow-amber-200':'bg-slate-100 text-slate-500'}">${idx+1}</span>
+            <span class="w-6 h-6 flex items-center justify-center rounded-full text-[10px] font-bold mx-auto text-white ${idx===0?'bg-amber-500 shadow-md shadow-amber-200':idx===1?'bg-slate-400 shadow-md shadow-slate-200':idx===2?'bg-amber-700 shadow-md shadow-amber-200':'bg-slate-100 text-slate-500'}">${idx+1}</span>
           </td>
           <td class="p-3 font-bold text-[#003566]">${r.area}</td>
           <td class="p-3 text-center font-inter">${r.total}</td>
@@ -587,9 +590,9 @@
           <td class="p-3 text-center font-inter text-slate-600">${r.mttr}</td>
           <td class="p-3 text-center font-inter font-black text-lg bg-sky-50/50 text-sky-700">${r.score}</td>
         </tr>
-      `).join('') || '<tr><td colspan="7" class="text-center p-8 text-slate-400 font-medium">ไม่มีข้อมูลในช่วงเวลานี้</td></tr>';
+      `).join('') || '<tr><td colspan="7" class="text-center p-8 text-slate-400 font-medium">ไม่พบใบงาน Safety ในเดือนที่เลือก</td></tr>';
 
-      // Cross Scatter Chart (5S vs Safety)
+      // Cross Scatter Chart
       const crossData = [];
       rankingList.forEach(r => {
         let s5Avg = dScore5S[r.area] && dScore5S[r.area].length > 0 ? dScore5S[r.area].reduce((a,b)=>a+b,0)/dScore5S[r.area].length : null;
@@ -598,7 +601,7 @@
 
       mkChart("chCross", {
         type: "scatter",
-        data: { datasets: [{ label: "แผนก", data: crossData, backgroundColor: "#0284c7", pointRadius: 7, pointHoverRadius: 9, borderWidth: 2, borderColor: "#ffffff" }] },
+        data: { datasets: [{ label: "แผนก", data: crossData, backgroundColor: "#0ea5e9", pointRadius: 7, pointHoverRadius: 9, borderWidth: 2, borderColor: "#ffffff" }] },
         options: { 
           responsive: true, maintainAspectRatio: false,
           scales: {
@@ -616,14 +619,14 @@
       
       document.getElementById('alertCritical').innerHTML = worstOverdue.count > 0 
         ? `แผนก <span class="bg-white/20 px-1.5 py-0.5 rounded">${worstOverdue.area}</span> มีงาน Overdue ค้างวิกฤต <span class="text-xl underline">${worstOverdue.count} งาน</span>`
-        : `ยอดเยี่ยม! ไม่มีงานค้างเกินกำหนด (0 Overdue) ในระบบเลย`;
+        : `ยอดเยี่ยม! ไม่มีใบงานค้างเกินกำหนด (0 Overdue) ในระบบเลย`;
 
       document.getElementById('alertWarning').innerHTML = openTrend > 30 
         ? `อัตรางานค้าง (Backlog) สะสมอยู่ที่ <span class="text-xl underline">${openTrend}%</span> ของงานทั้งหมด ทีมแก้ไขอาจกำลังโหลดหนัก`
         : `ภาพรวมอัตราการตอบสนองปัญหาอยู่ในเกณฑ์ปกติ ควบคุมสถานการณ์ได้ดี`;
 
       document.getElementById('alertGood').innerHTML = bestArea.score !== -1
-        ? `แชมป์ Safety คือ <span class="bg-white/20 px-1.5 py-0.5 rounded">${bestArea.area}</span> ด้วยคะแนน <span class="text-xl underline">${bestArea.score} แต้ม</span>`
+        ? `แชมป์ Safety คือ <span class="bg-white/20 px-1.5 py-0.5 rounded">${bestArea.area}</span> ด้วยคะแนนความรับผิดชอบ <span class="text-xl underline">${bestArea.score} แต้ม</span>`
         : `ต้องการข้อมูลการแก้ไขงานที่มากกว่านี้เพื่อชี้วัดความสำเร็จ`;
     }
   </script>
