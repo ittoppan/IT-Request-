@@ -106,13 +106,15 @@
 
     const API_URL = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
 
-    // 📋 โครงสร้างข้อกำหนดคำถามแยกตามประเภทและพื้นที่ (Sync ตรงกับหลังบ้าน)
+    // =====================================================================
+    // 📋 SAFETY CHECKLISTS (ตรงตามหลังบ้าน v3.6)
+    // =====================================================================
     const SAFETY_CHECKLIST_FACTORY = {
       s1: { title: "1. สถานที่ทำงาน", questions: ["วางสิ่งของในเส้นที่กำหนด", "สถานที่ทำงานมีแสงสว่างเพียงพอ", "สถานที่ทำงาน อากาศ ถ่ายเทสะดวก", "การดูแลและทำความสะอาดของพื้นที่", "การจัดเก็บ และกองวัสดุมีการกำหนดสูงไม่เกิน กองวัสดุมีความปลอดภัย", "Water Mist"] },
       s2: { title: "2. ท่าทางการทำงาน", questions: ["พนักงานทำงานในท่าทางที่ถูกต้อง", "การใช้รถเข็น, แฮนด์ลิฟท์, หรืออุปกรณ์ที่มีล้อในการเคลื่อนย้ายสิ่งของ", "การยกของอย่างถูกต้องและปลอดภัย"] },
       s3: { title: "3. เครื่องจักร", questions: ["พนักงานสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงานตามที่กำหนด", "การปฏิบัติงานตามวิธีการทำงานหรือมาตรฐานการทำงานที่ปลอดภัย", "ไม่เปิดการ์ดป้องกันขณะทำงาน", "ปุ่มหยุดฉุกเฉินเข้าถึงได้ง่าย", "ไม่มีเสียง/สั่นผิดปกติ และไม่มีน้ำมันรั่วไหล"] },
       s4: { title: "4. สารเคมี", questions: ["การสวมใส่อุปกรณ์ป้องกันอันตรายขณะปฏิบัติงานตามที่กำหนด", "ไม่มีสารเคมีหกรั่วไหล, ไม่มีกลิ่นสารเคมีฟุ้งกระจายในอากาศ", "ภาชนะปิดสนิท, สภาพถังใส่สารเคมีแข็งแรงปลอดภัยและสะอาด, อุปกรณ์ใช้งานกับสารเคมีเช่น Valv/Flange/Pipe อยู่ในสภาพไม่ชำรุด รั่วซึม", "อากาศถ่ายเท", "มีอุปกรณ์ Spill Kit พร้อมใช้งาน", "มีขั้นตอนการปฏิบัติงาน", "บันทึกการตรวจสายกราวด์", "มีฉลากระบุสารเคมี และมี SDS"] },
-      s5: { title: "5. ไฟฟ้า", questions: ["ตรวจสอบอุปกรณ์ไฟฟ้าเช่น สายไฟ ปลั๊กไฟ ต้องไม่ชำรุดเสียหาย", "ปลั๊กไฟ/เต้าเสียบไม่หลวม", "ไม่มีการต่ออุปกรณ์พวงไฟฟ้าแบบชั่วคราว", "อุปกรณ์ไฟฟ้าต้องมีการต่อสายดิน", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย, ไม่มีสายไฟโผล่, ไม่มีสิ่งกีดขวางหน้าตู้", "ไม่มีสิ่งของต่างๆหรือฝุ่นละอองสะสมอยู่บนแผงควบคุมไฟฟ้า, ไม่มีกระดาษ,พลาสติกหรืออุปกรณ์ติดไฟง่าย อยู่ในตู้ไฟและติดหน้าตู้ไฟ"] },
+      s5: { title: "5. ไฟฟ้า", questions: ["ตรวจสอบอุปกรณ์ไฟฟ้าเช่น สายไฟ ปลั๊กไฟ ต้องไม่ชำรุดเสียหาย", "ปล๊กไฟ/เต้าเสียบไม่หลวม", "ไม่มีการต่ออุปกรณ์พวงไฟฟ้าแบบชั่วคราว", "อุปกรณ์ไฟฟ้าต้องมีการต่อสายดิน", "ตู้ควบคุมไฟฟ้าปิดเรียบร้อย, ไม่มีสายไฟโผล่, ไม่มีสิ่งกีดขวางหน้าตู้", "ไม่มีสิ่งของต่างๆหรือฝุ่นละอองสะสมอยู่บนแผงควบคุมไฟฟ้า, ไม่มีกระดาษ,พลาสติกหรืออุปกรณ์ติดไฟง่าย อยู่ในตู้ไฟและติดหน้าตู้ไฟ"] },
       s6: { title: "6. ระบบป้องกันอัคคีภัย", questions: ["ทางหนีไฟไม่มีสิ่งกีดขวาง", "ป้าย EXIT และ Layout ชัดเจน", "ถังดับเพลิงพร้อมใช้งาน (เข็มอยู่ตำแหน่งสีเขียว)", "พื้นที่สะอาด ไม่มีของวางเกะกะ"] },
       s7: { title: "7. การกำจัดของเสีย", questions: ["มีการแยกประเภทขยะ, การปิดฝาถังขยะ, ถังขยะไม่มีชำรุด แตกหัก"] },
       s8: { title: "8. Other", questions: ["ระบุรายการที่ 1 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 2 (พิมพ์รายละเอียดในหมายเหตุ)", "ระบุรายการที่ 3 (พิมพ์รายละเอียดในหมายเหตุ)"] }
@@ -163,6 +165,9 @@
       return SAFETY_CHECKLIST_FACTORY;
     }
 
+    // =====================================================================
+    // 🧹 5S CHECKLISTS — ✅ แก้ไขให้ตรงกับหลังบ้าน v3.6 ทุกพื้นที่
+    // =====================================================================
     const FACTORY_5S_SECTIONS = [
       { title: "1. เครื่องจักร", questions: ["ทำความสะอาดเครื่องจักรทุกครั้งก่อน – หลังเลิกงานพร้อมระบุผู้รับผิดชอบป้ายผู้รับผิดชอบต้องเป็นปัจจุบัน", "ตีเส้นกำหนดจุดที่ตั้ง (ตีเส้นรอบเครื่องจักรด้วยสีเหลือง)", "ก่อนทำงานกับเครื่องจักรต้องแต่งกายให้รัดกุมและต้องสวมอุปกรณ์ป้องกันส่วนบุคคล"] },
       { title: "2. เครื่องมือ", questions: ["กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน", "หลังจากนำเครื่องมือและอุปกรณ์ไปใช้ให้เก็บเข้าที่เสมอ", "เก็บวางเครื่องมืออย่างเป็นระเบียบในพื้นที่ที่กำหนด", "กำหนดผู้รับผิดชอบให้ชัดเจน"] },
@@ -171,17 +176,18 @@
       { title: "5. การจัดเก็บเอกสาร", questions: ["ในตู้เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน", "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"] },
       { title: "6. พื้น / ผนังห้อง/ฝ้า/เพดาน", questions: ["ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น", "ไม่มีคราบสี, Solvent / น้ำนองพื้น", "กำหนดเวลาการทำความสะอาดประจำ ตามความเหมาะสม"] },
       { title: "7. สภาพแวดล้อมทั่วไป", questions: ["มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมในแผนกหรือไม่", "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก", "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดและกำหนดผู้รับผิดชอบ"] },
-      { title: "8. การตรวจสุขลักษณะส่วนบุคคล", questions: ["แต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
+      { title: "8. การตรวจสุขลักษณะส่วนบุคคล", questions: ["พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
       { title: "9. ความตระหนัก ความสำเร็จ ผลงาน", questions: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
     ];
 
-    // 🌟 โครงสร้าง Object 5S Master (ไม่มี SOVENTLESS ตามตรรกะหน้าฟอร์ม) 🌟
     const CHECKLIST_5S = {
       "PRINT": { sections: FACTORY_5S_SECTIONS },
       "LAMINATE": { sections: FACTORY_5S_SECTIONS },
       "REWINDER/SLITTER/PACKING": { sections: FACTORY_5S_SECTIONS },
       "BAG MAKING": { sections: FACTORY_5S_SECTIONS },
       "WAREHOUSE": { sections: FACTORY_5S_SECTIONS },
+
+      // ✅ แก้ไข: เรียงลำดับหัวข้อใหม่ให้ตรงกับหลังบ้าน (7.ห้องประชุม → 8.สุขลักษณะ → 9.ความตระหนัก)
       "OFFICE": { sections: [
         { title: "1. โต๊ะทำงาน", questions: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน", "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงานให้สามารถหยิบใช้ได้อย่างสะดวกและปลอดภัย", "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงานให้เหมาะสมกับมาตรฐานของพื้นที่", "ตะกร้าเอกสารต้องระบุป้ายชี้บ่งให้ชัดเจนและจัดเก็บเอกสารให้เป็นระเบียบ"] },
         { title: "2. ลิ้นชัก", questions: ["ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน", "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO", "ลิ้นชักที่ 3 ใส่อุปกรณ์ส่วนตัว"] },
@@ -189,24 +195,50 @@
         { title: "4. เครื่องคอมพิวเตอร์", questions: ["จัดวางคอมพิวเตอร์ เครื่องแฟกซ์ในตำแหน่งที่เหมาะสมและสะดวกต่อการใช้งาน", "ไม่ติดกระดาษโน๊ตต่าง ๆ ไว้หน้าคอมพิวเตอร์", "จัดเก็บสายไฟคอมพิวเตอร์ให้เป็นระเบียบเรียบร้อย"] },
         { title: "5. พื้น / ผนังห้อง/ฝ้า/เพดาน", questions: ["ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น/ผนังห้องต้องไม่มีหยากไย่", "ไม่วางสิ่งกีดขวางทางเดิน", "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม", "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"] },
         { title: "6. สภาพแวดล้อมทั่วไป", questions: ["มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมใน Office หรือไม่", "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก", "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดและกำหนดผู้รับผิดชอบ", "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"] },
-        { title: "7. การตรวจสุขลักษณะส่วนบุคคล", questions: ["พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
-        { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", questions: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] },
-        { title: "9. ห้องประชุม", questions: ["เก็บโต๊ะและเก้าอี้ให้เป็นระเบียบเข้าที่ก่อน - หลังใช้งาน", "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น", "ห้องประชุมต้องพร้อมใช้งานอยู่เสมอ"] }
+        { title: "7. ห้องประชุม", questions: ["เก็บโต๊ะและเก้าอี้ให้เป็นระเบียบเข้าที่ก่อน - หลังใช้งาน", "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น", "ห้องประชุมต้องพร้อมใช้งานอยู่เสมอ"] },
+        { title: "8. การตรวจสุขลักษณะส่วนบุคคล", questions: ["พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
+        { title: "9. ความตระหนัก ความสำเร็จ ผลงาน", questions: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
       ]},
+
       "CANTEEN": { sections: [
         { title: "1. ห้องอาหาร (CANTEEN)", questions: ["โต๊ะอาหารและเก้าอี้ต้องสะอาดและพร้อมใช้งานอยู่เสมอไม่ทิ้งสิ่งของที่ไม่จำเป็นไว้บนโต๊ะอาหารและถังขยะเพียงพอต่อการใช้งาน", "ชั้นวางอาหารต้องสะอาดและจัดเก็บเรียบร้อยแยกแผนกให้ชัดเจน", "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น", "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอและมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก"] },
         { title: "2. ห้องกาแฟ", questions: ["ทำความสะอาดอ่างล้างภาชนะหลังใช้งานแล้ว / การแต่งกายของแม่ครัว", "แบ่งแยกอุปกรณ์เครื่องใช้ออกให้ชัดเจนและเป็นระเบียบ", "จัดวางสิ่งของ แยกตามชนิดและไม่วางสิ่งของปะปนกัน"] },
         { title: "3. ทางเข้า (AIR SHOWER)", questions: ["ทำความสะอาดอ่างล้างมือ / ที่เป่ามือ / กระจก / รางน้ำ", "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น", "ชั้นวางรองเท้าเซฟตี้ต้องวางให้ถูกช่อง / ช่องบนพื้นสีขาววางรองเท้าเซฟตี้ /ช่องล่างพื้นสีดำวางรองเท้าแตะต้องสะอาดไม่มีคราบฝุ่น"] }
       ]},
+
       "TOILET": { sections: [
         { title: "1. ห้องสุขา (ชาย,หญิง)", questions: ["ทำความสะอาดอ่างล้างหน้า / กระจก / พื้น / โถชักโครก / ผนัง ด้วยน้ำให้สะอาด", "กระดาษชำระ สบู่ ผ้าเช็ดมือ ดูแลอย่าให้ขาด"] }
       ]},
+
       "LOCKER": { sections: [
         { title: "1. LOCKER (เสื้อผ้าชาย,หญิง)", questions: ["ป้ายไม่ชำรุดและระบุชื่อของพนักงานให้ชัดเจน", "หลังตู้ต้องสะอาดไม่มีคราบฝุ่นหรือสิ่งของที่ไม่จำเป็นวางอยู่", "ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น"] },
         { title: "2. LOCKER (รองเท้า)", questions: ["ป้ายไม่ชำรุดและระบุชื่อของพนักงานให้ชัดเจน", "ห้ามนำอาหาร / เครื่องดื่มไปไว้ใน Locker รองเท้าและต้องไม่มีเศษขยะและคราบฝุ่น"] }
       ]},
-      "QA&QC": { sections: FACTORY_5S_SECTIONS },
-      "ENGINEERING": { sections: FACTORY_5S_SECTIONS },
+
+      // ✅ แก้ไข: เพิ่ม Checklist เฉพาะของ QA&QC (8 หัวข้อ) แทนที่จะใช้ FACTORY_5S_SECTIONS
+      "QA&QC": { sections: [
+        { title: "1. โต๊ะทำงาน", questions: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน", "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงานให้สามารถหยิบใช้ได้อย่างสะดวกและปลอดภัย", "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงานให้เหมาะสมกับมาตรฐานของพื้นที่"] },
+        { title: "2. ลิ้นชัก", questions: ["ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน", "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO", "ลิ้นชักที่ 3 ใส่อุปกรณ์ในการทำงาน", "ลิ้นชักกลางใส่เอกสาร"] },
+        { title: "3. การจัดเก็บเอกสาร", questions: ["ในตู้เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน", "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"] },
+        { title: "4. พื้น / ผนังห้อง/ฝ้า/เพดาน", questions: ["ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่/ ไม่มีฝุ่น", "ไม่วางสิ่งกีดขวางทางเดิน", "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม"] },
+        { title: "5. เครื่องคอมพิวเตอร์", questions: ["จัดวางคอมพิวเตอร์ เครื่องแฟกซ์ในตำแหน่งที่เหมาะสมและสะดวกต่อการใช้งาน", "ไม่ติดกระดาษโน๊ตต่าง ๆ ไว้หน้าคอมพิวเตอร์", "จัดเก็บสายไฟคอมพิวเตอร์ให้เป็นระเบียบเรียบร้อย", "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"] },
+        { title: "6. เครื่องมือและอุปกรณ์", questions: ["กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน", "หลังจากนำเครื่องมือและอุปกรณ์ไปใช้ให้เก็บเข้าที่เสมอ", "เก็บวางเครื่องมือและอุปกรณ์ต่างๆในพื้นที่ที่กำหนด", "กำหนดผู้รับผิดชอบให้ชัดเจน", "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"] },
+        { title: "7. การตรวจสุขลักษณะส่วนบุคคล", questions: ["พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
+        { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", questions: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
+      ]},
+
+      // ✅ แก้ไข: เพิ่ม Checklist เฉพาะของ ENGINEERING (8 หัวข้อ) แทนที่จะใช้ FACTORY_5S_SECTIONS
+      "ENGINEERING": { sections: [
+        { title: "1. โต๊ะทำงาน", questions: ["ความสะอาดของโต๊ะทำงาน/เก้าอี้และบริเวณใต้โต๊ะทำงาน", "ความเป็นระเบียบเรียบร้อยของการจัดอุปกรณ์ใช้งานบนโต๊ะทำงานให้สามารถหยิบใช้ได้อย่างสะดวกและปลอดภัย", "การกำหนดจำนวนอุปกรณ์ เครื่องมือ เครื่องใช้ บนโต๊ะทำงานให้เหมาะสมกับมาตรฐานของพื้นที่"] },
+        { title: "2. ลิ้นชัก", questions: ["ลิ้นชักที่ 1 ให้ใส่เฉพาะอุปกรณ์เครื่องเขียน / เครื่องใช้สำนักงาน", "ลิ้นชักที่ 2 ของใช้ที่ไม่ใช้ประจำ / สมุดโน๊ต / MEMO", "ลิ้นชักที่ 3 ใส่ของส่วนตัวพนักงาน"] },
+        { title: "3. การจัดเก็บเอกสาร", questions: ["แฟ้มเอกสารทุกแฟ้มสันแฟ้มจะต้องใช้ Font : TH Sarabun ทุกแฟ้มเอกสารจะต้องมีระบุเล่มที่แฟ้ม", "เอกสารต้องเรียงเป็นระเบียบเรียบร้อยไม่วางเอกสารซ้อนกัน", "หน้าตู้จะต้องระบุรายชื่อเอกสารแต่ละประเภทและติดป้ายหน้าตู้ว่าแผนกไหน"] },
+        { title: "4. เครื่องมือ", questions: ["กำหนดตำแหน่งวางของเครื่องมือต่าง ๆ เพื่อง่ายต่อการหยิบใช้และนำมาคืน", "หลังจากนำเครื่องมือไปใช้เก็บเข้าที่เสมอ", "เก็บวางอย่างเป็นระเบียบในที่ที่กำหนด และมีป้ายฉลากของชิ้นส่วน", "ส่วนประกอบ / ชิ้นส่วนขนาดเล็ก ควรหากล่องที่เหมาะสมใส่"] },
+        { title: "5. พื้น / ผนังห้อง/ฝ้า/เพดาน", questions: ["ไม่มีเศษขยะ / เศษกระดาษหล่นตามพื้น / ผนังห้องต้องไม่มีหยากไย่ / ไม่มีฝุ่น", "ไม่วางสิ่งของกีดขวางทางเดิน", "กำหนดเวลาทำความสะอาดประจำ ตามความเหมาะสม", "ไม่เปิดประตูค้างไว้ ไม่มีสิ่งกีดขวางเครื่องดักแมลง"] },
+        { title: "6. สภาพแวดล้อมทั่วไป", questions: ["มีสิ่งของที่ไม่จำเป็นวางอยู่ในจุดที่ไม่เหมาะสมในแผนกหรือไม่", "ถังขยะอยู่ในตำแหน่งที่เหมาะสมและเพียงพอ ดูแลความสะอาดสม่ำเสมอ", "และมีป้ายชี้บ่งที่ชัดเจนและไม่ชำรุดแตกหัก", "มีการกำหนดที่วางอุปกรณ์ที่ทำความสะอาดหรือไม่", "ควบคุมสิ่งแวดล้อมภายในแผนกที่ไม่ก่อให้เกิดแมลง"] },
+        { title: "7. การตรวจสุขลักษณะส่วนบุคคล", questions: ["พนักงานต้องแต่งกายให้ถูกต้องตามกฏระเบียบที่บริษัทฯ กำหนดไว้", "พนักงานต้องมีสุขลักษณะส่วนบุคคลที่สะอาด", "พนักงานต้องมีสุขภาพร่างกายที่แข็งแรงสมบูรณ์"] },
+        { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", questions: ["มีความตระหนักในการทำกิจกรรม 5ส เหมือนงานประจำวัน", "มีการนำเสนอเรื่องราวความสำเร็จ (เช่น ภาพก่อนและหลัง)", "นำ 3 ส แรกมาใช้อย่างเต็มรูปแบบและทำงานได้ดีหรือไม่?", "มีการแสดง KPI ด้านประสิทธิภาพให้ทุกคนเห็นหรือไม่?"] }
+      ]},
+
       "OUTSIDE": { sections: [
         { title: "1. พื้นที่โดยรอบบริษัท", questions: ["มีเศษตกหล่นตามทางเดินและที่จอดรถหรือไม่", "หญ้าขึ้นรกสูงเกินไปหรือไม่", "สายยางใช้แล้วเก็บเป็นระเบียบหรือไม่", "อุปกรณ์กำจัดสัตว์พาหะมีการชำรุดหรือไม่", "รอบรั้วโรงงานมีรอยชำรุดเสียหายหรือไม่"] },
         { title: "2. โรงเก็บขยะ", questions: ["มีการจัดเรียงถังเป็นระเบียบหรือไม่", "แยกชนิดขยะให้ชัดเจนและมีป้ายชี้บ่ง", "ขยะต้องไม่ล้นออกมา / ปิดฝาสนิท", "ถังเก็บสารเคมีอันตรายต้องไม่ล้น"] },
@@ -218,7 +250,7 @@
       ]}
     };
 
-    // 🌟 ระบบ Dual-Track Area สำหรับตัวกรองของหน้าบ้าน (แยกเด็ดขาดระหว่าง Safety กับ 5S) 🌟
+    // 🌟 ระบบ Dual-Track Area สำหรับตัวกรองของหน้าบ้าน
     const DEPT_PER_TYPE = {
       all: [
         { value: "", label: "-- ทั้งหมด --", icon: "fas fa-list" },
@@ -250,24 +282,51 @@
     function getDriveThumbnailUrl(url) { if(!url || url === "-") return ""; let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/); if(match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=500`; return url; }
 
     function calculate5SScore(checklist, areaStr) {
-      const areaData = CHECKLIST_5S[areaStr] || CHECKLIST_5S["OFFICE"]; const sections = areaData?.sections || [];
+      const areaData = CHECKLIST_5S[areaStr] || CHECKLIST_5S["OFFICE"]; 
+      const sections = areaData?.sections || [];
       let total = 0, max = 0;
       sections.forEach((sec, sIdx) => {
         const questions = sec.questions || [];
-        questions.forEach((_, qIdx) => { const val = checklist?.[`5s_s${sIdx}_q${qIdx}`]; max += 2; if (val === "ดี") total += 2; else if (val === "พอใช้") total += 1; });
-      }); return max > 0 ? Math.round((total / max) * 100) : 0;
+        questions.forEach((_, qIdx) => { 
+          const val = checklist?.[`5s_s${sIdx}_q${qIdx}`]; 
+          max += 2; 
+          if (val === "ดี") total += 2; 
+          else if (val === "พอใช้") total += 1; 
+        });
+      }); 
+      return max > 0 ? Math.round((total / max) * 100) : 0;
     }
 
     function loadData() {
-      const loader = document.getElementById('loader'); loader.classList.add('flex'); loader.classList.remove('hidden');
-      fetch(API_URL + "?action=getDashboardData").then(r => r.json()).then(data => {
-        rawData = data.details || [];
-        rawData.forEach(d => {
-          if (!d.inspectionType) d.inspectionType = "Safety";
-          if (d.inspectionType.toUpperCase() === "5S" && d.fullChecklist) { d.hasBad = Object.values(d.fullChecklist).includes("ปรับปรุง") || Object.values(d.fullChecklist).includes("ไม่ดี"); }
+      const loader = document.getElementById('loader'); 
+      loader.classList.add('flex'); 
+      loader.classList.remove('hidden');
+      
+      fetch(API_URL + "?action=getDashboardData")
+        .then(r => r.json())
+        .then(data => {
+          rawData = data.details || [];
+          rawData.forEach(d => {
+            if (!d.inspectionType) d.inspectionType = "Safety";
+            
+            // ✅ แก้ไข: คำนวณ hasBad ของ 5S ใหม่จากคะแนนจริง (ไม่ใช้ Object.values ที่อาจติด remark)
+            if (d.inspectionType.toUpperCase() === "5S" && d.fullChecklist) { 
+              const score = calculate5SScore(d.fullChecklist, d.area);
+              d.score = { percent: score };
+              // ใช้เกณฑ์เดียวกับหลังบ้าน: คะแนน < 80 = มีปัญหา
+              d.hasBad = score < 80;
+            }
+          });
+          updateAreaOptions('all'); 
+          renderTable(); 
+          loader.classList.add('hidden'); 
+          loader.classList.remove('flex');
+        })
+        .catch(err => { 
+          loader.classList.add('hidden'); 
+          console.error("Error:", err); 
+          alert("❌ โหลดข้อมูลไม่สำเร็จ: " + err.message);
         });
-        updateAreaOptions('all'); renderTable(); loader.classList.add('hidden'); loader.classList.remove('flex');
-      }).catch(err => { loader.classList.add('hidden'); console.error("Error:", err); });
     }
 
     function selectTypeFilter(type, el) { 
@@ -280,13 +339,18 @@
       renderTable(); 
     }
     
-    function updateStatusFilter(status) { currentStatus = status; document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active')); document.getElementById('card-' + status).classList.add('active'); renderTable(); }
+    function updateStatusFilter(status) { 
+      currentStatus = status; 
+      document.querySelectorAll('.stat-card, [id^="card-"]').forEach(c => c.classList.remove('active')); 
+      document.getElementById('card-' + status).classList.add('active'); 
+      renderTable(); 
+    }
 
     function updateAreaOptions(type) {
       const container = document.getElementById('areaOptions');
       let areaKey = type;
       if (type !== 'all' && type !== '5S') areaKey = 'safety';
-      const areas = DEPT_PER_TYPE[areaKey];
+      const areas = DEPT_PER_TYPE[areaKey] || DEPT_PER_TYPE['all'];
       container.innerHTML = areas.map(area => `
         <div class="px-3 py-2 text-xs font-semibold cursor-pointer rounded-md flex items-center gap-2 text-slate-700 hover:bg-slate-100 transition" onclick="selectArea('${area.value}', '${area.label}', this)">
           <i class="${area.icon} text-slate-400 w-4"></i><span>${area.label}</span>
@@ -295,47 +359,63 @@
     }
 
     function toggleAreaDropdown() { document.getElementById('areaOptions').classList.toggle('hidden'); }
-    function selectArea(value, label, el) { document.getElementById('areaFilter').value = value; document.getElementById('areaDisplayText').textContent = label; document.getElementById('areaOptions').classList.add('hidden'); renderTable(); }
+    function selectArea(value, label, el) { 
+      document.getElementById('areaFilter').value = value; 
+      document.getElementById('areaDisplayText').textContent = label; 
+      document.getElementById('areaOptions').classList.add('hidden'); 
+      renderTable(); 
+    }
 
     function renderTable() {
       let filtered = [...rawData]; 
       const dateVal = document.getElementById('dateFilter').value;
       const areaVal = document.getElementById('areaFilter').value;
 
-      if (dateVal) filtered = filtered.filter(d => d.timestamp?.startsWith(dateVal));
-      if (currentType !== 'all') filtered = filtered.filter(d => d.inspectionType?.toUpperCase() === currentType.toUpperCase());
+      if (dateVal) filtered = filtered.filter(d => String(d.timestamp || "").startsWith(dateVal));
+      if (currentType !== 'all') filtered = filtered.filter(d => String(d.inspectionType || "").toUpperCase() === currentType.toUpperCase());
       if (areaVal) filtered = filtered.filter(d => d.area === areaVal);
 
       const t = filtered.length, b = filtered.filter(d => d.hasBad).length, g = t - b;
-      document.getElementById('countTotal').innerText = t; document.getElementById('countGood').innerText = g; document.getElementById('countBad').innerText = b;
+      document.getElementById('countTotal').innerText = t; 
+      document.getElementById('countGood').innerText = g; 
+      document.getElementById('countBad').innerText = b;
       
       if (currentStatus === 'good') filtered = filtered.filter(d => !d.hasBad); 
       if (currentStatus === 'bad') filtered = filtered.filter(d => d.hasBad);
       
-      const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
-      if(filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 font-semibold"><i class="fas fa-folder-open text-xl mb-1 block"></i> ไม่พบข้อมูลบันทึกรายการตรวจ</td></tr>`; return; }
+      const tbody = document.getElementById('tableBody'); 
+      tbody.innerHTML = '';
+      
+      if(filtered.length === 0) { 
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 font-semibold"><i class="fas fa-folder-open text-xl mb-1 block"></i> ไม่พบข้อมูลบันทึกรายการตรวจ</td></tr>`; 
+        return; 
+      }
 
       filtered.forEach(d => {
-        const is5S = d.inspectionType?.toUpperCase() === "5S"; let photoDisplay = '-';
+        const is5S = String(d.inspectionType || "").toUpperCase() === "5S"; 
+        let photoDisplay = '-';
         if (typeof d.photo === 'object' && d.photo !== null) {
-          let photoCount = Object.values(d.photo).filter(url => url && url !== "ไม่มีรูปถ่าย" && url.trim() !== "").length;
+          let photoCount = Object.values(d.photo).filter(url => url && url !== "ไม่มีรูปถ่าย" && String(url).trim() !== "").length;
           if(photoCount > 0) photoDisplay = `<span class="text-xs font-bold text-[#003566]"><i class="fas fa-images"></i> ${photoCount} รูป</span>`;
         }
         
         let statusHtml = '';
         if (is5S) {
-           const percent = calculate5SScore(d.fullChecklist, d.area); 
+           const percent = d.score?.percent ?? calculate5SScore(d.fullChecklist, d.area); 
            const color = percent >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : percent >= 50 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
            statusHtml = `<span class="px-2 py-0.5 border rounded-full text-xs font-bold ${color}">${percent}%</span>`;
         } else {
            statusHtml = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${d.hasBad ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}">${d.hasBad ? 'พบปัญหา' : 'ปกติ'}</span>`;
         }
         
-        const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 transition text-slate-700 font-medium";
+        const tr = document.createElement('tr'); 
+        tr.className = "hover:bg-slate-50 transition text-slate-700 font-medium";
         tr.innerHTML = `<td class="p-3 font-mono text-xs">${d.timestamp || '-'}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold text-white ${is5S ? 'bg-emerald-600' : 'bg-[#003566]'}">${d.inspectionType}</span></td><td class="p-3 font-bold text-slate-800">${d.area || '-'}</td><td class="p-3">${d.inspector || '-'}</td><td class="p-3 text-center">${statusHtml}</td><td class="p-3 text-center">${photoDisplay}</td><td class="p-3 text-center"><button class="bg-slate-100 border text-slate-600 px-2 py-1 rounded text-xs font-bold hover:bg-slate-200 transition" onclick="toggleDetail('${d.id}')">ผลตรวจ <i class="fas fa-chevron-down ml-0.5" id="icon-${d.id}"></i></button></td>`;
         tbody.appendChild(tr);
 
-        const detailTr = document.createElement('tr'); detailTr.id = `detail-${d.id}`; detailTr.className = 'hidden bg-slate-50/70';
+        const detailTr = document.createElement('tr'); 
+        detailTr.id = `detail-${d.id}`; 
+        detailTr.className = 'hidden bg-slate-50/70';
         let detailHtml = `<div class="p-4 space-y-3"><h4 class="text-xs md:text-sm font-bold text-[#003566] border-b pb-1.5"><i class="fas fa-clipboard-check"></i> รายละเอียดผลการตรวจสอบ</h4>`;
         
         if (is5S) {
@@ -343,19 +423,30 @@
           sections.forEach((sec, sIdx) => {
             detailHtml += `<div class="border rounded-xl bg-white overflow-hidden shadow-2xs mb-3"><div class="bg-slate-100/80 px-3 py-2 text-xs font-bold text-slate-700">${sec.title}</div><div class="divide-y text-xs">`;
             sec.questions.forEach((qText, qIdx) => {
-              const res = d.fullChecklist?.[`5s_s${sIdx}_q${qIdx}`]; const remark = d.fullChecklist?.[`5s_remark_s${sIdx}_q${qIdx}`] || "";
-              let pill = 'text-slate-400', txt = '-'; if (res === "ดี") { pill = 'bg-emerald-50 text-emerald-700'; txt = 'ดี'; } else if (res === "พอใช้") { pill = 'bg-amber-50 text-amber-700'; txt = 'พอใช้'; } else if (res === "ปรับปรุง") { pill = 'bg-rose-50 text-rose-700 font-bold'; txt = 'ปรับปรุง'; }
+              const res = d.fullChecklist?.[`5s_s${sIdx}_q${qIdx}`]; 
+              const remark = d.fullChecklist?.[`5s_remark_s${sIdx}_q${qIdx}`] || d.fullChecklist?.[`5s_s${sIdx}_q${qIdx}_remark`] || "";
+              let pill = 'text-slate-400', txt = '-'; 
+              if (res === "ดี") { pill = 'bg-emerald-50 text-emerald-700'; txt = 'ดี'; } 
+              else if (res === "พอใช้") { pill = 'bg-amber-50 text-amber-700'; txt = 'พอใช้'; } 
+              else if (res === "ปรับปรุง") { pill = 'bg-rose-50 text-rose-700 font-bold'; txt = 'ปรับปรุง'; }
               detailHtml += `<div class="p-3 flex items-start justify-between gap-2"><div><span class="text-slate-600 font-medium">${qText}</span>${remark ? `<div class="mt-1 text-rose-600 font-semibold text-[11px]"><i class="fas fa-comment-dots"></i> ปัญหา: ${remark}</div>` : ''}</div><span class="px-2 py-0.5 rounded border text-[11px] font-bold shrink-0 ${pill}">${txt}</span></div>`;
-            }); detailHtml += `</div></div>`;
+            }); 
+            detailHtml += `</div></div>`;
           });
         } else {
           const checklist = getSafetyChecklist(d.area);
           for(let secKey in checklist) {
-            const section = checklist[secKey]; const sNum = secKey.replace('s', '');
+            const section = checklist[secKey]; 
+            const sNum = secKey.replace('s', '');
             detailHtml += `<div class="border rounded-xl bg-white overflow-hidden shadow-2xs mb-3"><div class="bg-slate-100/80 px-3 py-2 text-xs font-bold text-slate-700">${section.title}</div><div class="divide-y text-xs">`;
             section.questions.forEach((qText, idx) => {
-              const res = d.fullChecklist?.[`section${sNum}_q${idx}`]; const remark = d.fullChecklist?.[`section${sNum}_remark${idx}`]; const isBad = res === "ไม่ดี";
-              let displayQText = qText; if(secKey === 's1' && qText === 'Water Mist' && d.fullChecklist?.['water_val']) displayQText += ` <span class="text-amber-600 font-bold">(${d.fullChecklist['water_val']}%)</span>`;
+              const res = d.fullChecklist?.[`section${sNum}_q${idx}`]; 
+              const remark = d.fullChecklist?.[`section${sNum}_remark${idx}`]; 
+              const isBad = res === "ไม่ดี";
+              let displayQText = qText; 
+              if(secKey === 's1' && qText === 'Water Mist' && d.fullChecklist?.['water_val']) {
+                displayQText += ` <span class="text-amber-600 font-bold">(${d.fullChecklist['water_val']}%)</span>`;
+              }
               let qPhotoPreviews = "";
               if(typeof d.photo === 'object' && d.photo !== null) {
                  for(let p = 0; p < 3; p++) {
@@ -367,10 +458,13 @@
                  }
               }
               detailHtml += `<div class="p-3 flex items-start justify-between gap-2"><div><span class="text-slate-600 font-medium">${displayQText}</span>${remark ? `<div class="mt-1 text-rose-600 font-semibold text-[11px]"><b>รายละเอียด:</b> ${remark}</div>` : ''}${qPhotoPreviews !== "" ? `<div class="flex flex-wrap">${qPhotoPreviews}</div>` : ''}</div><span class="px-2 py-0.5 rounded text-[11px] font-bold shrink-0 ${isBad ? 'bg-rose-100 text-rose-700' : (res === 'ดี'?'bg-emerald-100 text-emerald-700':'text-slate-400')}">${isBad ? '✘ ไม่ปกติ' : (res==='ดี'?'✔ ปกติ':'-')}</span></div>`;
-            }); detailHtml += `</div></div>`;
+            }); 
+            detailHtml += `</div></div>`;
           }
         }
-        detailHtml += `</div>`; detailTr.innerHTML = `<td colspan="7" class="p-0">${detailHtml}</td>`; tbody.appendChild(detailTr);
+        detailHtml += `</div>`; 
+        detailTr.innerHTML = `<td colspan="7" class="p-0">${detailHtml}</td>`; 
+        tbody.appendChild(detailTr);
       });
     }
 
