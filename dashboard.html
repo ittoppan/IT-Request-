@@ -271,21 +271,43 @@
     const DEPTS = ["PRINT","LAMINATE","SOVENTLESS","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","TOILET","LOCKER","ENGINEERING","OUTSIDE"];
     
     const AREA_MAP = {
-      "แผนก Print": "PRINT", "PRINT": "PRINT", "Factory": "PRINT",
-      "แผนก Laminate": "LAMINATE", "LAMINATE": "LAMINATE",
-      "แผนก Soventless": "SOVENTLESS", "SOVENTLESS": "SOVENTLESS", 
-      "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING", 
-      "REWINDER/SLITTER/PACKING": "REWINDER/SLITTER/PACKING",
-      "แผนก BAG MAKING": "BAG MAKING", "BAG MAKING": "BAG MAKING",
-      "แผนก QA & QC": "QA&QC", "QA&QC": "QA&QC",
-      "แผนก Warehouse": "WAREHOUSE", "WAREHOUSE": "WAREHOUSE",
-      "Office": "OFFICE", "OFFICE": "OFFICE",
-      "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE", "OUTSIDE": "OUTSIDE", "Outside": "OUTSIDE",
-      "Canteen": "CANTEEN", "CANTEEN": "CANTEEN",
-      "Toilet": "TOILET", "ห้องน้ำ": "TOILET", "TOILET": "TOILET",
-      "Locker": "LOCKER", "ห้องล็อกเกอร์": "LOCKER", "LOCKER": "LOCKER",
-      "EN": "ENGINEERING", "ENGINEERING": "ENGINEERING"
-    };
+  // ✅ ชื่อภาษาไทยจาก Sheet
+  "แผนก Print": "PRINT",
+  "แผนก Laminate": "LAMINATE",
+  "แผนก Soventless": "SOVENTLESS",
+  "แผนก Solvent": "SOVENTLESS",        // ⚠️ เพิ่ม: ข้อมูลคุณใช้ "แผนก Solvent"
+  "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING",
+  "แผนก Rewinder / Slitter": "REWINDER/SLITTER/PACKING",
+  "แผนก BAG MAKING": "BAG MAKING",
+  "แผนก QA & QC": "QA&QC",
+  "แผนก QA&QC": "QA&QC",
+  "แผนก Warehouse": "WAREHOUSE",
+  "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE",
+  
+  // ✅ ชื่อภาษาอังกฤษ
+  "PRINT": "PRINT",
+  "LAMINATE": "LAMINATE",
+  "SOVENTLESS": "SOVENTLESS",
+  "SOLVENT": "SOVENTLESS",
+  "REWINDER/SLITTER/PACKING": "REWINDER/SLITTER/PACKING",
+  "BAG MAKING": "BAG MAKING",
+  "QA&QC": "QA&QC",
+  "WAREHOUSE": "WAREHOUSE",
+  "OFFICE": "OFFICE",
+  "Office": "OFFICE",
+  "CANTEEN": "CANTEEN",
+  "Canteen": "CANTEEN",
+  "TOILET": "TOILET",
+  "ห้องน้ำ": "TOILET",
+  "LOCKER": "LOCKER",
+  "Locker": "LOCKER",
+  "ห้องล็อกเกอร์": "LOCKER",
+  "ENGINEERING": "ENGINEERING",
+  "EN": "ENGINEERING",
+  "OUTSIDE": "OUTSIDE",
+  "Outside": "OUTSIDE",
+  "Factory": "PRINT"
+};
     
     let globalRaw = { ins: [], jobs: [] }; 
     let filteredData = { ins: [], jobs: [] };
@@ -325,46 +347,62 @@
     }
 
     // 🚀 Robust Date Parser (แก้ timezone bug)
-    function parseDateObj(dateStr) {
-      if (!dateStr || dateStr === "-") return null;
-      
-      // ถ้าเป็น Date object แล้ว
-      if (dateStr instanceof Date && !isNaN(dateStr.getTime())) return dateStr;
-      
-      // ถ้าเป็น timestamp number
-      if (typeof dateStr === 'number') {
-        const d = new Date(dateStr);
-        return isNaN(d.getTime()) ? null : d;
-      }
-      
-      const str = String(dateStr).trim();
-      
-      // ลอง parse ตรงๆ ก่อน
-      let d = new Date(str);
-      if (!isNaN(d.getTime())) return d;
-      
-      // แยก DD/MM/YYYY หรือ YYYY-MM-DD
-      const parts = str.split(/[\/\-\sT:]+/).filter(p => p);
-      if (parts.length >= 3) {
-        let p0 = parseInt(parts[0]), p1 = parseInt(parts[1]), p2 = parseInt(parts[2]);
-        
-        // ถ้า p0 > 31 แสดงว่าเป็น year (YYYY-MM-DD)
-        if (p0 > 31) {
-          return new Date(p0, p1 - 1, p2);
-        }
-        // ถ้า p2 > 31 แสดงว่าเป็น year (DD/MM/YYYY)
-        if (p2 > 31) {
-          return new Date(p2, p1 - 1, p0);
-        }
-        // ถ้า p0 > 12 แสดงว่าเป็นวัน (DD/MM/YYYY)
-        if (p0 > 12) {
-          return new Date(p2, p1 - 1, p0);
-        }
-        // default MM/DD/YYYY
-        return new Date(p2, p0 - 1, p1);
-      }
-      return null;
+ // 🚀 Robust Date Parser - รองรับทั้ง US (M/D/YYYY) และ EU (D/M/YYYY) format
+function parseDateObj(dateStr) {
+  if (!dateStr || dateStr === "-" || dateStr === "") return null;
+  
+  // Date object จาก API
+  if (dateStr instanceof Date) {
+    return isNaN(dateStr.getTime()) ? null : dateStr;
+  }
+  
+  // Timestamp number
+  if (typeof dateStr === 'number') {
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  
+  const str = String(dateStr).trim();
+  if (!str) return null;
+  
+  // ✅ รองรับ ISO format (YYYY-MM-DD) โดยตรง
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) return d;
+  }
+  
+  // ✅ รองรับ dd/MM/yyyy ที่ Code.gs v3.6 return
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+    const [d, m, y] = str.split('/').map(n => parseInt(n, 10));
+    return new Date(y, m - 1, d);
+  }
+  
+  // ✅ รองรับ M/D/YYYY H:MM:SS หรือ MM/DD/YYYY (US format จาก Sheet)
+  const parts = str.split(/[\/\-\sT:]+/).filter(p => p && p.length > 0);
+  if (parts.length >= 3) {
+    const nums = parts.slice(0, 3).map(p => parseInt(p, 10));
+    if (nums.some(n => isNaN(n))) return null;
+    const [p0, p1, p2] = nums;
+    
+    // YYYY-MM-DD (year อยู่หน้า)
+    if (p0 > 31) return new Date(p0, p1 - 1, p2);
+    
+    // DD/MM/YYYY หรือ MM/DD/YYYY (year อยู่หลัง)
+    if (p2 > 31) {
+      // ถ้า p0 > 12 → p0 เป็นวันแน่ๆ → DD/MM/YYYY
+      if (p0 > 12) return new Date(p2, p1 - 1, p0);
+      // ถ้า p1 > 12 → p1 เป็นวันแน่ๆ → MM/DD/YYYY
+      if (p1 > 12) return new Date(p2, p0 - 1, p1);
+      // ถ้าทั้งคู่ <= 12 → เดาเป็น MM/DD/YYYY (US format จาก Google Sheet)
+      return new Date(p2, p0 - 1, p1);
     }
+    
+    // ไม่มี year ชัดเจน (DD/MM/YY)
+    return new Date(p2 + 2000, p1 - 1, p0);
+  }
+  
+  return null;
+}
 
     // ✅ Format date to YYYY-MM for month comparison
     function toYearMonth(d) {
