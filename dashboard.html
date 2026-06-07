@@ -26,14 +26,25 @@
   <style>
     body { background-color: #f1f5f9; color: #334155; transition: background-color 0.3s, color 0.3s; }
     body.dark { background-color: #0f172a; color: #e2e8f0; }
+    
     .kpi-card { background: #fff; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s; }
     .dark .kpi-card { background: #1e293b; border-color: #334155; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
     .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    
     .tab-btn { padding: 0.75rem 1.5rem; font-weight: 600; font-size: 0.875rem; border-bottom: 3px solid transparent; color: #64748b; transition: all 0.2s; cursor: pointer; }
     .dark .tab-btn { color: #94a3b8; }
+    .tab-btn:hover { color: #0f172a; }
+    .dark .tab-btn:hover { color: #f8fafc; }
+    
     .tab-btn.active-safety { border-color: #ef4444; color: #ef4444; }
     .tab-btn.active-5s { border-color: #3b82f6; color: #3b82f6; }
     .tab-btn.active-exec { border-color: #8b5cf6; color: #8b5cf6; }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
   </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden">
@@ -58,6 +69,8 @@
         </div>
       </div>
       <div class="flex items-center gap-4 text-sm">
+        <a href="DashNew.html" class="hidden md:block hover:text-sky-300 transition"><i class="fas fa-list-check"></i> Audit List</a>
+        <a href="reportnew.html" class="hidden md:block hover:text-sky-300 transition"><i class="fas fa-tasks"></i> Tracker</a>
         <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center">
           <i class="fas fa-moon" id="themeIcon"></i>
         </button>
@@ -66,6 +79,7 @@
   </nav>
 
   <div class="flex flex-1 overflow-hidden">
+    
     <aside class="w-64 bg-white dark:bg-darkCard border-r border-slate-200 dark:border-slate-700 hidden md:flex flex-col shrink-0 overflow-y-auto">
       <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
         <h2 class="font-bold text-sm text-slate-700 dark:text-slate-200"><i class="fas fa-filter text-sky-500 mr-2"></i>Global Filters</h2>
@@ -74,6 +88,7 @@
         <div>
           <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">📅 Date Range (Month)</label>
           <input type="month" id="monthFilter" onchange="applyFilters()" class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
+          <button onclick="document.getElementById('monthFilter').value=''; applyFilters();" class="text-[10px] text-rose-500 mt-1 hover:underline"><i class="fas fa-times"></i> Clear Month (Show All)</button>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">📍 Department / Area</label>
@@ -81,66 +96,216 @@
             <option value="all">-- All Departments --</option>
           </select>
         </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">🟢 Safety Status</label>
+          <select id="statusFilter" onchange="applyFilters()" class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
+            <option value="all">-- All Status --</option>
+            <option value="Open">🔴 Open (Pending)</option>
+            <option value="Closed">🟢 Closed (Resolved)</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-auto p-4 border-t border-slate-200 dark:border-slate-700 text-[10px] text-slate-400 text-center">
+        Data Last Synced:<br><span id="syncTime" class="font-bold text-slate-500 dark:text-slate-300">Just Now</span>
       </div>
     </aside>
 
     <main class="flex-1 flex flex-col bg-slate-50 dark:bg-[#0f172a] overflow-hidden relative">
+      
       <div class="bg-white dark:bg-darkCard border-b border-slate-200 dark:border-slate-700 shrink-0 overflow-x-auto flex">
         <button onclick="switchTab('safety')" id="btn-safety" class="tab-btn active-safety flex items-center gap-2 whitespace-nowrap"><i class="fas fa-hard-hat"></i> Safety Dashboard</button>
         <button onclick="switchTab('5s')" id="btn-5s" class="tab-btn flex items-center gap-2 whitespace-nowrap"><i class="fas fa-broom"></i> 5S Dashboard</button>
+        <button onclick="switchTab('exec')" id="btn-exec" class="tab-btn flex items-center gap-2 whitespace-nowrap"><i class="fas fa-chart-line"></i> Executive Summary</button>
       </div>
 
       <div class="flex-1 overflow-y-auto p-4 sm:p-6" id="tabContent">
+        
         <div id="tab-safety" class="space-y-6">
+          <div class="flex justify-between items-end">
+            <div>
+              <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fas fa-hard-hat text-rose-500"></i> Safety Risk & Action Plan</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">วิเคราะห์ปัญหาความปลอดภัยและการตอบสนองต่อความเสี่ยง</p>
+            </div>
+          </div>
+
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="kpi-card border-l-4 border-l-slate-400 flex justify-between items-center">
               <div><div class="text-[10px] font-bold text-slate-400 uppercase">Total Findings</div><div class="text-3xl font-black font-inter text-slate-800 dark:text-white mt-1" id="s_kpiTotal">0</div></div>
+              <i class="fas fa-clipboard-list text-3xl text-slate-200 dark:text-slate-600"></i>
             </div>
             <div class="kpi-card border-l-4 border-l-amber-500 flex justify-between items-center">
               <div><div class="text-[10px] font-bold text-slate-400 uppercase">Open Issues</div><div class="text-3xl font-black font-inter text-amber-500 mt-1" id="s_kpiOpen">0</div></div>
+              <i class="fas fa-exclamation-circle text-3xl text-amber-100 dark:text-amber-900/50"></i>
+            </div>
+            <div class="kpi-card border-l-4 border-l-rose-500 flex justify-between items-center">
+              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Overdue Risk</div><div class="text-3xl font-black font-inter text-rose-600 mt-1" id="s_kpiOverdue">0</div></div>
+              <i class="fas fa-skull-crossbones text-3xl text-rose-100 dark:text-rose-900/50"></i>
+            </div>
+            <div class="kpi-card border-l-4 border-l-emerald-500 flex justify-between items-center">
+              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Closure Rate</div><div class="text-3xl font-black font-inter text-emerald-500 mt-1" id="s_kpiCloseRate">0%</div></div>
+              <i class="fas fa-check-double text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
             </div>
           </div>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="kpi-card min-h-[300px] relative"><canvas id="s_chDept"></canvas></div>
-            <div class="kpi-card min-h-[300px] relative"><canvas id="s_chCat"></canvas></div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="kpi-card lg:col-span-2 flex flex-col">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Volume & Overdue by Department</h3>
+              <div class="relative flex-1 min-h-[250px] w-full"><canvas id="s_chDept"></canvas></div>
+            </div>
+            <div class="kpi-card flex flex-col">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Finding Categories (Pareto)</h3>
+              <div class="relative flex-1 min-h-[250px] w-full"><canvas id="s_chCat"></canvas></div>
+            </div>
+          </div>
+
+          <div class="kpi-card flex flex-col">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">MTTR (Mean Time to Resolution) Trend</h3>
+            <div class="relative w-full h-64"><canvas id="s_chMTTR"></canvas></div>
           </div>
         </div>
 
         <div id="tab-5s" class="space-y-6 hidden">
-          <div class="grid grid-cols-2 lg:grid-cols-2 gap-4">
-            <div class="kpi-card border-l-4 border-l-blue-500 flex justify-between items-center">
-              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Average 5S Score</div><div class="text-3xl font-black font-inter text-blue-600 mt-1" id="f_kpiAvg">0%</div></div>
+          <div class="flex justify-between items-end">
+            <div>
+              <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fas fa-broom text-blue-500"></i> 5S Analytics Center</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">ติดตามมาตรฐานพื้นที่และจัดอันดับความเป็นเลิศ</p>
             </div>
           </div>
-          <div class="grid grid-cols-1 gap-6">
-            <div class="kpi-card min-h-[300px] relative"><canvas id="f_chRank"></canvas></div>
+
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="kpi-card border-l-4 border-l-blue-500 flex justify-between items-center">
+              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Average 5S Score</div><div class="text-3xl font-black font-inter text-blue-600 mt-1" id="f_kpiAvg">0%</div></div>
+              <i class="fas fa-star text-3xl text-blue-100 dark:text-blue-900/50"></i>
+            </div>
+            <div class="kpi-card border-l-4 border-l-emerald-500 flex justify-between items-center overflow-hidden">
+              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Best Department</div><div class="text-xl font-bold text-emerald-600 mt-2 truncate max-w-[120px]" id="f_kpiBest">-</div></div>
+              <i class="fas fa-trophy text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
+            </div>
+            <div class="kpi-card border-l-4 border-l-rose-500 flex justify-between items-center overflow-hidden">
+              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Needs Improvement</div><div class="text-xl font-bold text-rose-600 mt-2 truncate max-w-[120px]" id="f_kpiWorst">-</div></div>
+              <i class="fas fa-arrow-trend-down text-3xl text-rose-100 dark:text-rose-900/50"></i>
+            </div>
+            <div class="kpi-card border-l-4 border-l-indigo-500 flex justify-between items-center">
+              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Total Audits</div><div class="text-3xl font-black font-inter text-indigo-500 mt-1" id="f_kpiCount">0</div></div>
+              <i class="fas fa-file-signature text-3xl text-indigo-100 dark:text-indigo-900/50"></i>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="kpi-card flex flex-col">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">5S Category Radar</h3>
+              <div class="relative flex-1 min-h-[250px] w-full"><canvas id="f_chRadar"></canvas></div>
+            </div>
+            <div class="kpi-card lg:col-span-2 flex flex-col">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Department Ranking (Avg Score)</h3>
+              <div class="relative flex-1 min-h-[250px] w-full"><canvas id="f_chRank"></canvas></div>
+            </div>
+          </div>
+
+          <div class="kpi-card overflow-hidden">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">5S Heatmap Matrix</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs border-collapse text-center" id="f_tbHeatmap"></table>
+            </div>
           </div>
         </div>
+
+        <div id="tab-exec" class="space-y-6 hidden">
+          <div class="flex justify-between items-end">
+            <div>
+              <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fas fa-chart-line text-purple-500"></i> Executive Overview</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">สรุปภาพรวมและแนวโน้มระดับองค์กร (Cross Analysis)</p>
+            </div>
+          </div>
+
+          <div class="kpi-card flex flex-col">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Safety vs 5S Trend Analysis (MoM)</h3>
+            <div class="relative w-full h-72"><canvas id="e_chTrend"></canvas></div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="kpi-card overflow-hidden !p-0">
+              <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-rose-50 dark:bg-rose-900/20">
+                <h3 class="text-xs font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-fire"></i> Top 5 Critical Overdue</h3>
+              </div>
+              <div class="overflow-x-auto p-4">
+                <table class="w-full text-xs text-left" id="e_tbOverdue"></table>
+              </div>
+            </div>
+            
+            <div class="kpi-card overflow-hidden !p-0">
+              <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-amber-50 dark:bg-amber-900/20">
+                <h3 class="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-sort-amount-down"></i> Bottom 5 Departments (5S)</h3>
+              </div>
+              <div class="overflow-x-auto p-4">
+                <table class="w-full text-xs text-left" id="e_tbWorst5S"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </main>
   </div>
 
   <script>
-    // ดึง URL เว็บแอปของคุณโดยตรงจากสคริปต์หลังบ้าน
     const API = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
     
+    // Master Mapping
     const DEPTS = ["PRINT","LAMINATE","SOVENTLESS","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","TOILET","LOCKER","ENGINEERING","OUTSIDE"];
+    const AREA_MAP = {
+      "แผนก Print": "PRINT", "PRINT": "PRINT",
+      "แผนก Laminate": "LAMINATE", "LAMINATE": "LAMINATE",
+      "แผนก Soventless": "SOVENTLESS", "SOVENTLESS": "SOVENTLESS", "แผนก Solvent": "SOVENTLESS", "SOLVENT": "SOVENTLESS",
+      "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING", "แผนก Rewinder / Slitter": "REWINDER/SLITTER/PACKING", "REWINDER/SLITTER/PACKING": "REWINDER/SLITTER/PACKING",
+      "แผนก BAG MAKING": "BAG MAKING", "แผนก BAG": "BAG MAKING", "BAG MAKING": "BAG MAKING",
+      "แผนก QA & QC": "QA&QC", "QA&QC": "QA&QC",
+      "แผนก Warehouse": "WAREHOUSE", "WAREHOUSE": "WAREHOUSE",
+      "Office": "OFFICE", "OFFICE": "OFFICE", "Office ": "OFFICE", 
+      "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE", "OUTSIDE": "OUTSIDE",
+      "Canteen": "CANTEEN", "CANTEEN": "CANTEEN",
+      "Toilet": "TOILET", "ห้องน้ำ": "TOILET", "TOILET": "TOILET",
+      "Locker": "LOCKER", "ห้องล็อกเกอร์": "LOCKER", "LOCKER": "LOCKER",
+      "EN": "ENGINEERING", "ENGINEERING": "ENGINEERING", "แผนก Dry": "LAMINATE"
+    };
+    const S_CATS = ["ส1. สะสาง", "ส2. สะดวก", "ส3. สะอาด", "ส4. สุขลักษณะ", "ส5. สร้างนิสัย"];
     
     let globalRaw = { ins: [], jobs: [] }; 
     let filteredData = { ins: [], jobs: [] };
     let currentTab = 'safety';
     let charts = {};
 
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      document.getElementById('themeIcon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+      Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
+      Chart.defaults.borderColor = isDark ? '#334155' : '#e2e8f0';
+      renderCurrentTab(); // Re-render charts for new colors
+    }
+
+    // 🚀 Robust Date Parser
     function parseDateObj(dateStr) {
-      if(!dateStr) return null;
+      if(!dateStr || dateStr === "-") return null;
       let d = new Date(dateStr);
-      if(!isNaN(d.getTime())) return d;
+      if (!isNaN(d.getTime())) return d;
+      let parts = dateStr.split(/[\/\-\s:]+/);
+      if(parts.length >= 3) {
+        let p0 = parseInt(parts[0]), p1 = parseInt(parts[1]), p2 = parseInt(parts[2]);
+        if (p0 > 12) return new Date(p2, p1-1, p0); // DD/MM/YYYY
+        return new Date(p2, p0-1, p1); // MM/DD/YYYY
+      }
       return null;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+      Chart.defaults.font.family = "'Prompt', sans-serif";
       const el = document.getElementById("deptFilter"); 
-      DEPTS.forEach(d => el.add(new Option(d, d)));
+      DEPTS.forEach(d => el.add(new Option(d, d))); 
+      
+      const now = new Date();
+      document.getElementById("monthFilter").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      
       loadData();
     });
 
@@ -151,28 +316,58 @@
           fetch(`${API}?action=getReport`).then(r => r.json())
         ]);
         
-        globalRaw.ins = (dash.details || []);
-        globalRaw.jobs = Array.isArray(jobs) ? jobs : []; 
+        globalRaw.ins = (dash.details || []).map(d => ({ ...d, area: (AREA_MAP[d.area.trim()] || String(d.area).toUpperCase()) }));
+        globalRaw.jobs = Array.isArray(jobs) ? jobs.map(j => ({ ...j, area: (AREA_MAP[j.area.trim()] || String(j.area).toUpperCase()) })) : []; 
+        
         applyFilters();
       } catch (err) { 
-        console.error(err);
+        console.error("Fetch Error:", err);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณารีเฟรชหน้าเว็บ"); 
       } finally { 
-        document.getElementById("loader").classList.add("hidden"); 
+        document.getElementById("loader").style.opacity = "0"; 
+        setTimeout(() => document.getElementById("loader").classList.add("hidden"), 300); 
       }
     }
 
     function applyFilters() {
       const dept = document.getElementById("deptFilter").value; 
-      filteredData.jobs = globalRaw.jobs.filter(j => dept === "all" || j.area === dept);
-      filteredData.ins = globalRaw.ins.filter(i => dept === "all" || i.area === dept);
+      const monthVal = document.getElementById("monthFilter").value;
+      const statusVal = document.getElementById("statusFilter").value;
+      
+      filteredData.ins = globalRaw.ins.filter(i => {
+        if (dept !== "all" && i.area !== dept) return false; 
+        if (monthVal) {
+          const d = parseDateObj(i.timestamp);
+          if (d) {
+            const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            if (ym !== monthVal) return false;
+          }
+        }
+        return true;
+      });
+
+      filteredData.jobs = globalRaw.jobs.filter(j => {
+        if (dept !== "all" && j.area !== dept) return false;
+        if (statusVal !== "all" && j.status !== statusVal) return false;
+        if (monthVal) {
+          const d = parseDateObj(j.dateFound);
+          if (d) {
+            const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            if (ym !== monthVal) return false;
+          }
+        }
+        return true;
+      });
+
       renderCurrentTab();
     }
 
     function switchTab(tabId) {
       currentTab = tabId;
-      ['safety', '5s'].forEach(id => {
+      ['safety', '5s', 'exec'].forEach(id => {
         document.getElementById(`tab-${id}`).classList.add('hidden');
         document.getElementById(`btn-${id}`).classList.remove(`active-${id}`);
+        document.getElementById(`btn-${id}`).classList.remove('border-b-2', 'border-[#003566]', 'dark:border-white');
       });
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
       document.getElementById(`btn-${tabId}`).classList.add(`active-${tabId}`);
@@ -186,38 +381,207 @@
     }
 
     function renderCurrentTab() {
-      if (currentTab === 'safety') {
-        let kpiTotal = filteredData.jobs.length;
-        let kpiClosed = filteredData.jobs.filter(j => j.status === 'Closed').length;
-        document.getElementById('s_kpiTotal').innerText = kpiTotal;
-        document.getElementById('s_kpiOpen').innerText = kpiTotal - kpiClosed;
+      if (currentTab === 'safety') processSafetyTab();
+      else if (currentTab === '5s') process5STab();
+      else if (currentTab === 'exec') processExecTab();
+    }
 
-        mkChart("s_chDept", {
-          type: "bar",
-          data: {
-            labels: DEPTS,
-            datasets: [{ label: "Total Open Finder", data: DEPTS.map(d => filteredData.jobs.filter(j => j.area === d && j.status !== 'Closed').length), backgroundColor: "#ef4444" }]
-          },
-          options: { responsive: true, maintainAspectRatio: false }
-        });
-      } else if (currentTab === '5s') {
-        const data5S = filteredData.ins.filter(i => i.inspectionType === "5S");
-        const scores = data5S.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
-        const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b, 0) / scores.length) : 0;
-        document.getElementById("f_kpiAvg").innerText = avg + "%";
+    // =====================================
+    // 🔴 TAB: SAFETY
+    // =====================================
+    function processSafetyTab() {
+      let kpiTotal = filteredData.jobs.length;
+      let kpiClosed = 0; let kpiOverdue = 0; 
+      let mttrSum = 0; let mttrCount = 0;
+      
+      const deptData = {}; DEPTS.forEach(d => deptData[d] = { open:0, closed:0, overdue:0 });
+      const catData = {};
+      const mttrTrend = {};
+      const now = new Date();
 
-        mkChart("f_chRank", {
-          type: "bar",
-          data: {
-            labels: DEPTS,
-            datasets: [{ label: "5S Score Avg %", data: DEPTS.map(d => {
-              const dData = data5S.filter(i => i.area === d).map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
-              return dData.length ? Math.round(dData.reduce((a,b)=>a+b,0)/dData.length) : 0;
-            }), backgroundColor: "#3b82f6" }]
-          },
-          options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
+      filteredData.jobs.forEach(j => {
+        const area = j.area;
+        if(!deptData[area]) return;
+        
+        let isClosed = j.status === 'Closed';
+        let dFound = parseDateObj(j.dateFound);
+        let dDue = parseDateObj(j.dueDate);
+        let dFinish = parseDateObj(j.finishDate);
+
+        if(isClosed) { kpiClosed++; deptData[area].closed++; } 
+        else { deptData[area].open++; }
+        
+        if (!isClosed && dDue && now > dDue) { kpiOverdue++; deptData[area].overdue++; }
+        
+        if (isClosed && dFound && dFinish) {
+          let days = Math.max(1, Math.floor((dFinish - dFound) / 86400000));
+          mttrSum += days; mttrCount++;
+          let ym = `${dFinish.getFullYear()}-${String(dFinish.getMonth() + 1).padStart(2, '0')}`;
+          if(!mttrTrend[ym]) mttrTrend[ym] = { s:0, c:0 };
+          mttrTrend[ym].s += days; mttrTrend[ym].c++;
+        }
+
+        let catMatch = String(j.problem).match(/^\[(.*?)\]/);
+        let cat = catMatch ? catMatch[1] : "General Risk";
+        catData[cat] = (catData[cat] || 0) + 1;
+      });
+
+      document.getElementById('s_kpiTotal').innerText = kpiTotal;
+      document.getElementById('s_kpiOpen').innerText = kpiTotal - kpiClosed;
+      document.getElementById('s_kpiOverdue').innerText = kpiOverdue;
+      document.getElementById('s_kpiCloseRate').innerText = kpiTotal > 0 ? Math.round((kpiClosed/kpiTotal)*100) + "%" : "0%";
+
+      // Chart: Dept Volume
+      mkChart("s_chDept", {
+        type: "bar",
+        data: {
+          labels: DEPTS.map(d => d.substring(0,8)),
+          datasets: [
+            { label: "Closed", data: DEPTS.map(d => deptData[d].closed), backgroundColor: "#10b981" },
+            { label: "Open", data: DEPTS.map(d => deptData[d].open - deptData[d].overdue), backgroundColor: "#f59e0b" },
+            { label: "Overdue", data: DEPTS.map(d => deptData[d].overdue), backgroundColor: "#ef4444" }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+      });
+
+      // Chart: Categories
+      const cKeys = Object.keys(catData).sort((a,b)=>catData[b]-catData[a]).slice(0,5);
+      mkChart("s_chCat", {
+        type: "doughnut",
+        data: { labels: cKeys, datasets: [{ data: cKeys.map(k=>catData[k]), backgroundColor: ["#f43f5e", "#f97316", "#eab308", "#84cc16", "#06b6d4"] }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right', labels:{boxWidth:12, font:{size:10}} } } }
+      });
+
+      // Chart: MTTR Trend
+      const mKeys = Object.keys(mttrTrend).sort();
+      mkChart("s_chMTTR", {
+        type: "line",
+        data: { labels: mKeys.length ? mKeys : ["No Data"], datasets: [{ label: "Avg Days to Close", data: mKeys.map(k=>(mttrTrend[k].s/mttrTrend[k].c).toFixed(1)), borderColor: "#0ea5e9", backgroundColor: "rgba(14, 165, 233, 0.1)", fill: true, tension: 0.4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins:{ legend:{display:false} } }
+      });
+    }
+
+    // =====================================
+    // 🔵 TAB: 5S
+    // =====================================
+    function process5STab() {
+      const data5S = filteredData.ins.filter(i => String(i.inspectionType).toUpperCase() === "5S");
+      const scores5S = data5S.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
+      const avg5S = scores5S.length ? Math.round(scores5S.reduce((a, b) => a + b, 0) / scores5S.length) : 0;
+      
+      document.getElementById("f_kpiAvg").textContent = avg5S + "%";
+      document.getElementById("f_kpiCount").textContent = data5S.length;
+
+      const sCats = { "ส1. สะสาง": { s:0, m:0 }, "ส2. สะดวก": { s:0, m:0 }, "ส3. สะอาด": { s:0, m:0 }, "ส4. สุขลักษณะ": { s:0, m:0 }, "ส5. สร้างนิสัย": { s:0, m:0 } };
+      const dScore = {}; DEPTS.forEach(d => dScore[d] = []);
+      const deptHm = {}; DEPTS.forEach(d => { deptHm[d] = {}; S_CATS.forEach(c => deptHm[d][c] = {s:0, m:0}); });
+
+      data5S.forEach(i => {
+        const area = i.area; 
+        if(dScore[area]) dScore[area].push(parseFloat(i.score?.percent||0));
+        
+        Object.entries(i.fullChecklist || {}).forEach(([k, v]) => {
+          const match = k.match(/^5s_s(\d+)_q(\d+)/);
+          if (match) {
+            const cat = S_CATS[parseInt(match[1]) % 5]; 
+            let val = v === "ดี" ? 2 : v === "พอใช้" ? 1 : 0;
+            if (sCats[cat]) { sCats[cat].m += 2; sCats[cat].s += val; }
+            if (deptHm[area] && deptHm[area][cat]) { deptHm[area][cat].m += 2; deptHm[area][cat].s += val; }
+          }
         });
-      }
+      });
+
+      const lbData = []; 
+      Object.keys(dScore).forEach(d => { 
+        if(dScore[d].length > 0) lbData.push({ name: d, score: Math.round(dScore[d].reduce((a,b)=>a+b,0)/dScore[d].length) }); 
+      });
+      lbData.sort((a,b) => b.score - a.score);
+      
+      document.getElementById("f_kpiBest").textContent = lbData.length > 0 ? lbData[0].name : "-";
+      document.getElementById("f_kpiWorst").textContent = lbData.length > 0 ? lbData[lbData.length-1].name : "-";
+
+      // Radar
+      const radarData = Object.keys(sCats).map(k => sCats[k].m > 0 ? Math.round((sCats[k].s / sCats[k].m) * 100) : 0);
+      mkChart("f_chRadar", { type: "radar", data: { labels: Object.keys(sCats).map(s=>s.split('.')[1].trim()), datasets: [{ label: "Score %", data: radarData, backgroundColor: "rgba(59, 130, 246, 0.2)", borderColor: "#3b82f6" }] }, options: { responsive: true, maintainAspectRatio: false, scales:{r:{min:0,max:100}} } });
+
+      // Rank Bar
+      mkChart("f_chRank", {
+        type: "bar",
+        data: { labels: lbData.map(l=>l.name.substring(0,8)), datasets: [{ label: "Avg Score %", data: lbData.map(l=>l.score), backgroundColor: "#3b82f6", borderRadius: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } }, plugins:{legend:{display:false}} }
+      });
+
+      // Heatmap
+      let hmHtml = `<tr class="bg-slate-100 dark:bg-slate-800"><th class="p-2 border-b dark:border-slate-700 text-left">Area</th>${S_CATS.map(c=>`<th class="p-2 border-b dark:border-slate-700">${c.split('.')[1]}</th>`).join('')}</tr>`;
+      DEPTS.forEach(d => {
+        if(dScore[d].length > 0) {
+          hmHtml += `<tr class="border-b dark:border-slate-700"><td class="p-2 font-bold text-slate-700 dark:text-slate-300 truncate max-w-[80px]">${d}</td>`;
+          S_CATS.forEach(c => {
+            const cell = deptHm[d][c]; const pct = cell.m > 0 ? Math.round((cell.s / cell.m) * 100) : null;
+            if(pct === null) hmHtml += `<td class="p-2 text-slate-300">-</td>`;
+            else { 
+              const bg = pct >= 85 ? '#dcfce7' : pct >= 60 ? '#fef3c7' : '#fee2e2'; 
+              const tc = pct >= 85 ? '#065f46' : pct >= 60 ? '#92400e' : '#991b1b'; 
+              hmHtml += `<td class="p-2 font-inter text-[10px]" style="background:${bg}; color:${tc};"><b>${pct}%</b></td>`; 
+            }
+          }); hmHtml += `</tr>`;
+        }
+      }); document.getElementById("f_tbHeatmap").innerHTML = hmHtml || '<tr><td colspan="6" class="p-4 text-slate-400">ไม่มีข้อมูล</td></tr>';
+    }
+
+    // =====================================
+    // 🟣 TAB: EXEC SUMMARY
+    // =====================================
+    function processExecTab() {
+      // 1. Cross Trend (Safety Open vs 5S Score by Month)
+      // Needs global unfiltered by month to show trend, so we use globalRaw
+      const tMonths = {};
+      globalRaw.ins.filter(i=>i.inspectionType==="5S").forEach(i => {
+        let d = parseDateObj(i.timestamp);
+        if(d) { let ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; if(!tMonths[ym]) tMonths[ym]={s5:[], sOpen:0}; tMonths[ym].s5.push(parseFloat(i.score?.percent||0)); }
+      });
+      globalRaw.jobs.filter(j=>j.status!=="Closed").forEach(j => {
+        let d = parseDateObj(j.dateFound);
+        if(d) { let ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; if(!tMonths[ym]) tMonths[ym]={s5:[], sOpen:0}; tMonths[ym].sOpen++; }
+      });
+
+      const mKeys = Object.keys(tMonths).sort().slice(-6); // Last 6 months
+      mkChart("e_chTrend", {
+        type: "line",
+        data: {
+          labels: mKeys,
+          datasets: [
+            { label: "5S Avg Score %", data: mKeys.map(m => tMonths[m].s5.length ? (tMonths[m].s5.reduce((a,b)=>a+b,0)/tMonths[m].s5.length).toFixed(1) : 0), borderColor: "#3b82f6", backgroundColor: "#3b82f6", yAxisID: 'y' },
+            { label: "Safety Open Issues", data: mKeys.map(m => tMonths[m].sOpen), borderColor: "#ef4444", backgroundColor: "#ef4444", type: 'bar', yAxisID: 'y1' }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: 'linear', position: 'left', min:0, max:100 }, y1: { type: 'linear', position: 'right', grid:{drawOnChartArea:false} } } }
+      });
+
+      // 2. Top Critical Overdue (Table)
+      const overdues = filteredData.jobs.filter(j => j.status !== 'Closed' && parseDateObj(j.dueDate) < new Date()).sort((a,b) => parseDateObj(a.dueDate) - parseDateObj(b.dueDate)).slice(0,5);
+      document.getElementById("e_tbOverdue").innerHTML = `
+        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500"><tr><th class="p-2">Job</th><th class="p-2">Area</th><th class="p-2">Due</th></tr></thead>
+        <tbody class="divide-y dark:divide-slate-700">
+          ${overdues.map(o => `<tr><td class="p-2 font-mono text-rose-600 font-bold">${o.jobId}</td><td class="p-2 font-bold">${o.area}</td><td class="p-2 text-rose-500">${o.dueDate}</td></tr>`).join('') || '<tr><td colspan="3" class="p-4 text-center text-slate-400">No Overdue</td></tr>'}
+        </tbody>
+      `;
+
+      // 3. Worst 5S Areas (Table)
+      const dScore = {};
+      filteredData.ins.filter(i=>i.inspectionType==="5S").forEach(i => {
+        if(!dScore[i.area]) dScore[i.area] = []; dScore[i.area].push(parseFloat(i.score?.percent||0));
+      });
+      const bList = []; Object.keys(dScore).forEach(d => { if(dScore[d].length > 0) bList.push({ name: d, score: Math.round(dScore[d].reduce((a,b)=>a+b,0)/dScore[d].length) }); });
+      bList.sort((a,b) => a.score - b.score);
+      
+      document.getElementById("e_tbWorst5S").innerHTML = `
+        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500"><tr><th class="p-2">Rank</th><th class="p-2">Area</th><th class="p-2 text-right">Score</th></tr></thead>
+        <tbody class="divide-y dark:divide-slate-700">
+          ${bList.slice(0,5).map((o,i) => `<tr><td class="p-2 font-bold text-slate-400">#${i+1}</td><td class="p-2 font-bold">${o.name}</td><td class="p-2 text-right font-inter font-bold ${o.score<85?'text-rose-600':'text-emerald-600'}">${o.score}%</td></tr>`).join('') || '<tr><td colspan="3" class="p-4 text-center text-slate-400">No Data</td></tr>'}
+        </tbody>
+      `;
     }
   </script>
 </body>
