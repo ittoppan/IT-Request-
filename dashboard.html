@@ -21,9 +21,7 @@
             fiveS: { light: '#dbeafe', DEFAULT: '#3b82f6', dark: '#1d4ed8' },
             darkBg: '#0f172a', darkCard: '#1e293b'
           },
-          screens: {
-            'xs': '480px',
-          }
+          screens: { 'xs': '480px' }
         }
       }
     }
@@ -83,117 +81,63 @@
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     .dark ::-webkit-scrollbar-thumb { background: #475569; }
 
-    /* 📱 Mobile Filter Drawer */
     .drawer-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px);
-      z-index: 100;
-      opacity: 0;
-      pointer-events: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      z-index: 100; opacity: 0; pointer-events: none;
       transition: opacity 0.3s;
     }
-    .drawer-overlay.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
     
     .drawer-panel {
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 85%;
-      max-width: 320px;
-      background: white;
-      z-index: 101;
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: 85%; max-width: 320px;
+      background: white; z-index: 101;
       transform: translateX(-100%);
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       overflow-y: auto;
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
     .dark .drawer-panel { background: #1e293b; }
-    .drawer-panel.open {
-      transform: translateX(0);
-    }
+    .drawer-panel.open { transform: translateX(0); }
     
     @media (min-width: 768px) {
       .drawer-overlay, .drawer-panel { display: none; }
     }
 
-    /* Mobile bottom sheet alternative */
-    .bottom-sheet {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      border-radius: 1rem 1rem 0 0;
-      box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
-      transform: translateY(100%);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 101;
-      max-height: 85vh;
-      overflow-y: auto;
-    }
-    .dark .bottom-sheet { background: #1e293b; }
-    .bottom-sheet.open { transform: translateY(0); }
-    
-    .bottom-sheet-handle {
-      width: 40px;
-      height: 4px;
-      background: #cbd5e1;
-      border-radius: 2px;
-      margin: 8px auto 12px;
-    }
-
-    /* Touch-friendly buttons */
     .touch-btn {
-      min-height: 44px;
-      min-width: 44px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      min-height: 44px; min-width: 44px;
+      display: inline-flex; align-items: center; justify-content: center;
     }
 
-    /* Pulse animation */
     @keyframes pulse-ring {
       0% { transform: scale(0.8); opacity: 1; }
       100% { transform: scale(1.5); opacity: 0; }
     }
     .pulse-dot::before {
       content: '';
-      position: absolute;
-      inset: -4px;
+      position: absolute; inset: -4px;
       border-radius: 50%;
       background: #10b981;
       animation: pulse-ring 1.5s infinite;
     }
 
-    /* Safe area for iPhone notch */
     @supports (padding: max(0px)) {
       .safe-top { padding-top: max(0.75rem, env(safe-area-inset-top)); }
-      .safe-bottom { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
     }
 
-    /* Mobile KPI number animation */
     @keyframes count-up {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .kpi-value {
-      animation: count-up 0.5s ease-out;
-    }
+    .kpi-value { animation: count-up 0.5s ease-out; }
 
-    /* Hide scrollbar on mobile tabs */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden">
 
-  <!-- Loader -->
   <div id="loader" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-[9999] transition-opacity duration-300">
     <div class="bg-white dark:bg-darkCard p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-[90%] text-center border dark:border-slate-700">
       <div class="w-16 h-16 border-4 border-slate-100 dark:border-slate-700 border-t-sky-500 rounded-full animate-spin"></div>
@@ -202,18 +146,12 @@
     </div>
   </div>
 
-  <!-- 📱 Mobile Filter Drawer Overlay -->
   <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
   
-  <!-- 📱 Mobile Filter Drawer -->
   <div id="drawerPanel" class="drawer-panel">
     <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-[#002548] to-[#004080] text-white flex items-center justify-between">
-      <h2 class="font-bold text-base flex items-center gap-2">
-        <i class="fas fa-filter"></i> ตัวกรองข้อมูล
-      </h2>
-      <button onclick="closeDrawer()" class="touch-btn w-9 h-9 rounded-full bg-white/10 hover:bg-white/20">
-        <i class="fas fa-times"></i>
-      </button>
+      <h2 class="font-bold text-base flex items-center gap-2"><i class="fas fa-filter"></i> ตัวกรองข้อมูล</h2>
+      <button onclick="closeDrawer()" class="touch-btn w-9 h-9 rounded-full bg-white/10 hover:bg-white/20"><i class="fas fa-times"></i></button>
     </div>
     <div class="p-4 space-y-4">
       <div>
@@ -233,8 +171,8 @@
         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">🟢 สถานะ (Safety)</label>
         <select id="statusFilterMobile" onchange="syncMobileFilter('status')" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
           <option value="all">-- ทุกสถานะ --</option>
-          <option value="Open">🔴 Open (ค้างดำเนินการ)</option>
-          <option value="Closed">🟢 Closed (ปิดงานแล้ว)</option>
+          <option value="Open">🔴 Open</option>
+          <option value="Closed">🟢 Closed</option>
         </select>
       </div>
       <button onclick="applyMobileFilters()" class="w-full bg-gradient-to-r from-[#003566] to-[#00509d] text-white py-3 rounded-xl font-bold shadow-lg touch-btn">
@@ -250,11 +188,9 @@
     </div>
   </div>
 
-  <!-- Navigation -->
   <nav class="bg-[#002548] text-white shrink-0 shadow-lg z-50 safe-top">
     <div class="px-3 sm:px-6 flex items-center justify-between py-2.5 sm:py-3">
       <div class="flex items-center gap-2 sm:gap-3">
-        <!-- 📱 Mobile: Hamburger menu -->
         <button onclick="openDrawer()" class="md:hidden touch-btn w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center">
           <i class="fas fa-sliders-h text-sm"></i>
         </button>
@@ -281,7 +217,6 @@
 
   <div class="flex flex-1 overflow-hidden">
     
-    <!-- 💻 Desktop Sidebar (ซ่อนบนมือถือ) -->
     <aside class="w-64 bg-white dark:bg-darkCard border-r border-slate-200 dark:border-slate-700 hidden md:flex flex-col shrink-0 overflow-y-auto">
       <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
         <h2 class="font-bold text-sm text-slate-700 dark:text-slate-200"><i class="fas fa-filter text-sky-500 mr-2"></i>Global Filters</h2>
@@ -315,14 +250,12 @@
 
     <main class="flex-1 flex flex-col bg-slate-50 dark:bg-[#0f172a] overflow-hidden relative">
       
-      <!-- 📱 Mobile: Sticky Tabs -->
       <div class="bg-white dark:bg-darkCard border-b border-slate-200 dark:border-slate-700 shrink-0 overflow-x-auto flex hide-scrollbar sticky top-0 z-40">
         <button onclick="switchTab('safety')" id="btn-safety" class="tab-btn active-safety flex items-center justify-center gap-1.5"><i class="fas fa-hard-hat"></i> <span class="hidden xs:inline">Safety</span></button>
         <button onclick="switchTab('5s')" id="btn-5s" class="tab-btn flex items-center justify-center gap-1.5"><i class="fas fa-broom"></i> <span class="hidden xs:inline">5S</span></button>
         <button onclick="switchTab('exec')" id="btn-exec" class="tab-btn flex items-center justify-center gap-1.5"><i class="fas fa-chart-line"></i> <span class="hidden xs:inline">Executive</span></button>
       </div>
 
-      <!-- 📱 Mobile: Quick Filter Bar -->
       <div class="md:hidden bg-white dark:bg-darkCard border-b border-slate-200 dark:border-slate-700 px-3 py-2 flex items-center justify-between gap-2 shrink-0">
         <div class="flex items-center gap-2 flex-1 min-w-0">
           <button onclick="openDrawer()" class="flex items-center gap-1.5 bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 px-3 py-1.5 rounded-lg text-xs font-semibold border border-sky-200 dark:border-sky-800 touch-btn">
@@ -353,7 +286,6 @@
             </div>
           </div>
 
-          <!-- 📱 KPI Cards: 2x2 on mobile, 4x1 on desktop -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
             <div class="kpi-card border-l-4 border-l-slate-400 flex justify-between items-center">
               <div class="min-w-0 flex-1">
@@ -376,16 +308,16 @@
               </div>
               <i class="fas fa-skull-crossbones text-2xl sm:text-3xl text-rose-100 dark:text-rose-900/50"></i>
             </div>
+            <!-- ✅ แก้ไข: Closure Rate → Closed (จำนวน) -->
             <div class="kpi-card border-l-4 border-l-emerald-500 flex justify-between items-center">
               <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Closure Rate</div>
-                <div class="text-xl sm:text-3xl font-black font-inter text-emerald-500 mt-1 kpi-value" id="s_kpiCloseRate">0%</div>
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Closed</div>
+                <div class="text-xl sm:text-3xl font-black font-inter text-emerald-500 mt-1 kpi-value" id="s_kpiClosed">0</div>
               </div>
-              <i class="fas fa-check-double text-2xl sm:text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
+              <i class="fas fa-check-circle text-2xl sm:text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
             </div>
           </div>
 
-          <!-- Charts -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <div class="kpi-card lg:col-span-2 flex flex-col">
               <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Volume & Overdue by Department</h3>
@@ -448,7 +380,7 @@
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <div class="kpi-card flex flex-col">
-              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Category Radar</h3>
+              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Category Radar (Section จริง)</h3>
               <div class="relative w-full" style="height: 300px;"><canvas id="f_chRadar"></canvas></div>
             </div>
             <div class="kpi-card lg:col-span-2 flex flex-col">
@@ -458,7 +390,7 @@
           </div>
 
           <div class="kpi-card overflow-hidden">
-            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Heatmap Matrix</h3>
+            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Heatmap Matrix (Section จริง)</h3>
             <div class="overflow-x-auto -mx-3 sm:mx-0">
               <table class="w-full text-[10px] sm:text-xs border-collapse text-center min-w-[500px]" id="f_tbHeatmap"></table>
             </div>
@@ -509,7 +441,6 @@
 
       </div>
 
-      <!-- 📱 Mobile: Floating Refresh Button -->
       <button onclick="refreshData()" class="md:hidden fixed bottom-5 right-5 w-14 h-14 bg-gradient-to-br from-[#003566] to-[#00509d] text-white rounded-full shadow-2xl touch-btn z-40 active:scale-95 transition">
         <i class="fas fa-sync-alt text-lg"></i>
       </button>
@@ -546,13 +477,9 @@
     let isDarkMode = false;
     let isMobile = window.innerWidth < 768;
 
-    // ✅ Detect mobile
-    function updateMobileFlag() {
-      isMobile = window.innerWidth < 768;
-    }
+    function updateMobileFlag() { isMobile = window.innerWidth < 768; }
     window.addEventListener('resize', () => {
       updateMobileFlag();
-      // Re-render charts on resize for responsive
       clearTimeout(window._resizeTimer);
       window._resizeTimer = setTimeout(() => renderCurrentTab(), 300);
     });
@@ -623,6 +550,25 @@
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     }
 
+    // ✅ แก้ไข: parse sectionsScore จาก JSON string
+    function normalizeInspection(i) {
+      let sectionsScore = i.sectionsScore;
+      if (typeof sectionsScore === 'string') {
+        try { sectionsScore = JSON.parse(sectionsScore); } 
+        catch(e) { sectionsScore = []; }
+      }
+      if (!Array.isArray(sectionsScore)) sectionsScore = [];
+      
+      return {
+        ...i,
+        area: normalizeArea(i.area),
+        inspectionType: i.inspectionType || i.type || "Safety",
+        timestamp: i.timestamp || i.date || i.datetime || "",
+        score: i.score || { percent: 0 },
+        sectionsScore: sectionsScore
+      };
+    }
+
     function normalizeJob(j) {
       return {
         jobId: j.jobId || j.jobNo || j.id || "",
@@ -642,17 +588,6 @@
       };
     }
 
-    function normalizeInspection(i) {
-      return {
-        ...i,
-        area: normalizeArea(i.area),
-        inspectionType: i.inspectionType || i.type || "Safety",
-        timestamp: i.timestamp || i.date || i.datetime || "",
-        score: i.score || { percent: 0 }
-      };
-    }
-
-    // 📱 Mobile Drawer Functions
     function openDrawer() {
       document.getElementById('drawerOverlay').classList.add('open');
       document.getElementById('drawerPanel').classList.add('open');
@@ -666,23 +601,14 @@
     }
 
     function syncMobileFilter(type) {
-      // Sync mobile filter values to desktop filter values
-      if (type === 'month') {
-        document.getElementById('monthFilter').value = document.getElementById('monthFilterMobile').value;
-      } else if (type === 'dept') {
-        document.getElementById('deptFilter').value = document.getElementById('deptFilterMobile').value;
-      } else if (type === 'status') {
-        document.getElementById('statusFilter').value = document.getElementById('statusFilterMobile').value;
-      }
+      if (type === 'month') document.getElementById('monthFilter').value = document.getElementById('monthFilterMobile').value;
+      else if (type === 'dept') document.getElementById('deptFilter').value = document.getElementById('deptFilterMobile').value;
+      else if (type === 'status') document.getElementById('statusFilter').value = document.getElementById('statusFilterMobile').value;
     }
 
     function applyMobileFilters() {
-      syncMobileFilter('month');
-      syncMobileFilter('dept');
-      syncMobileFilter('status');
-      applyFilters();
-      updateMobileFilterSummary();
-      closeDrawer();
+      syncMobileFilter('month'); syncMobileFilter('dept'); syncMobileFilter('status');
+      applyFilters(); updateMobileFilterSummary(); closeDrawer();
     }
 
     function clearAllFilters() {
@@ -692,9 +618,7 @@
       document.getElementById('monthFilterMobile').value = "";
       document.getElementById('deptFilterMobile').value = "all";
       document.getElementById('statusFilterMobile').value = "all";
-      applyFilters();
-      updateMobileFilterSummary();
-      closeDrawer();
+      applyFilters(); updateMobileFilterSummary(); closeDrawer();
     }
 
     function updateMobileFilterSummary() {
@@ -730,7 +654,6 @@
       Chart.defaults.color = isDarkMode ? '#94a3b8' : '#64748b';
       Chart.defaults.borderColor = isDarkMode ? '#334155' : '#e2e8f0';
       
-      // Populate both desktop and mobile dropdowns
       const elDesktop = document.getElementById("deptFilter");
       const elMobile = document.getElementById("deptFilterMobile");
       DEPTS.forEach(d => {
@@ -738,7 +661,6 @@
         elMobile.add(new Option(d, d));
       });
       
-      // Default: no month filter (show all)
       document.getElementById("monthFilter").value = "";
       document.getElementById("monthFilterMobile").value = "";
       
@@ -766,6 +688,12 @@
         
         globalRaw.ins = rawIns.map(normalizeInspection);
         globalRaw.jobs = rawJobs.map(normalizeJob); 
+        
+        // ✅ Debug: ดู sectionsScore
+        const sample5S = globalRaw.ins.find(i => is5SType(i.inspectionType));
+        if (sample5S) {
+          console.log("📊 Sample 5S sectionsScore:", sample5S.sectionsScore);
+        }
         
         applyFilters();
         const now = new Date().toLocaleTimeString('th-TH');
@@ -818,7 +746,6 @@
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
       document.getElementById(`btn-${tabId}`).classList.add(`active-${tabId}`);
       renderCurrentTab();
-      // Scroll to top on tab change
       document.getElementById('tabContent').scrollTop = 0;
     }
 
@@ -889,7 +816,8 @@
       document.getElementById('s_kpiTotal').innerText = kpiTotal;
       document.getElementById('s_kpiOpen').innerText = openOnly;
       document.getElementById('s_kpiOverdue').innerText = kpiOverdue;
-      document.getElementById('s_kpiCloseRate').innerText = kpiTotal > 0 ? Math.round((kpiClosed/kpiTotal)*100) + "%" : "0%";
+      // ✅ แก้ไข: แสดงจำนวน Closed แทน %
+      document.getElementById('s_kpiClosed').innerText = kpiClosed;
 
       if (kpiTotal === 0) {
         showEmptyState('s_chDept', '📋 ไม่พบข้อมูล Action Plan');
@@ -898,7 +826,6 @@
         return;
       }
 
-      // 📱 Mobile: Short labels
       const labels = DEPTS.map(d => {
         if (isMobile) {
           const short = {
@@ -924,26 +851,11 @@
           ]
         },
         options: { 
-          responsive: true, 
-          maintainAspectRatio: false, 
-          plugins: { 
-            legend: { 
-              position: isMobile ? 'bottom' : 'top',
-              labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 11 } }
-            } 
-          },
+          responsive: true, maintainAspectRatio: false, 
+          plugins: { legend: { position: isMobile ? 'bottom' : 'top', labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 11 } } } },
           scales: { 
-            x: { 
-              stacked: true, 
-              grid: { display: false },
-              ticks: { font: { size: isMobile ? 8 : 10 }, maxRotation: isMobile ? 45 : 0 }
-            }, 
-            y: { 
-              stacked: true, 
-              grid: { color: getChartColors().grid }, 
-              beginAtZero: true,
-              ticks: { font: { size: isMobile ? 9 : 11 } }
-            } 
+            x: { stacked: true, grid: { display: false }, ticks: { font: { size: isMobile ? 8 : 10 }, maxRotation: isMobile ? 45 : 0 } }, 
+            y: { stacked: true, grid: { color: getChartColors().grid }, beginAtZero: true, ticks: { font: { size: isMobile ? 9 : 11 } } } 
           } 
         }
       });
@@ -953,21 +865,11 @@
         type: "doughnut",
         data: { 
           labels: cKeys.map(k => k.length > 20 ? k.substring(0, 20) + '…' : k), 
-          datasets: [{ 
-            data: cKeys.map(k => catData[k]), 
-            backgroundColor: ["#f43f5e", "#f97316", "#eab308", "#84cc16", "#06b6d4", "#8b5cf6"] 
-          }] 
+          datasets: [{ data: cKeys.map(k => catData[k]), backgroundColor: ["#f43f5e", "#f97316", "#eab308", "#84cc16", "#06b6d4", "#8b5cf6"] }] 
         },
         options: { 
-          responsive: true, 
-          maintainAspectRatio: false, 
-          cutout: isMobile ? '55%' : '70%', 
-          plugins: { 
-            legend: { 
-              position: isMobile ? 'bottom' : 'right', 
-              labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 10 }, padding: isMobile ? 8 : 5 } 
-            } 
-          } 
+          responsive: true, maintainAspectRatio: false, cutout: isMobile ? '55%' : '70%', 
+          plugins: { legend: { position: isMobile ? 'bottom' : 'right', labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 10 }, padding: isMobile ? 8 : 5 } } } 
         }
       });
 
@@ -979,31 +881,16 @@
           datasets: [{ 
             label: "Avg Days to Close", 
             data: mKeys.map(k => parseFloat((mttrTrend[k].s / mttrTrend[k].c).toFixed(1))), 
-            borderColor: "#0ea5e9", 
-            backgroundColor: "rgba(14, 165, 233, 0.1)", 
-            fill: true, 
-            tension: 0.4,
-            pointRadius: isMobile ? 3 : 4,
-            pointHoverRadius: 6
+            borderColor: "#0ea5e9", backgroundColor: "rgba(14, 165, 233, 0.1)", fill: true, tension: 0.4,
+            pointRadius: isMobile ? 3 : 4, pointHoverRadius: 6
           }] 
         },
         options: { 
-          responsive: true, 
-          maintainAspectRatio: false, 
-          plugins: { 
-            legend: { display: false },
-            tooltip: { enabled: true }
-          },
+          responsive: true, maintainAspectRatio: false, 
+          plugins: { legend: { display: false }, tooltip: { enabled: true } },
           scales: {
-            y: { 
-              beginAtZero: true, 
-              grid: { color: getChartColors().grid },
-              ticks: { font: { size: isMobile ? 9 : 11 } }
-            },
-            x: { 
-              grid: { display: false },
-              ticks: { font: { size: isMobile ? 9 : 11 } }
-            }
+            y: { beginAtZero: true, grid: { color: getChartColors().grid }, ticks: { font: { size: isMobile ? 9 : 11 } } },
+            x: { grid: { display: false }, ticks: { font: { size: isMobile ? 9 : 11 } } }
           }
         }
       });
@@ -1022,7 +909,7 @@
     }
 
     // =====================================
-    // 🔵 TAB: 5S
+    // 🔵 TAB: 5S (✅ ใช้ Section จริง)
     // =====================================
     function process5STab() {
       const data5S = filteredData.ins.filter(i => is5SType(i.inspectionType));
@@ -1034,6 +921,8 @@
 
       const dScore = {}; 
       DEPTS.forEach(d => dScore[d] = []);
+      
+      // ✅ เก็บ section stats ตามชื่อจริงจาก sectionsScore
       const sectionStats = {};
       const deptHm = {};
       DEPTS.forEach(d => { deptHm[d] = {}; });
@@ -1042,22 +931,30 @@
         const area = i.area; 
         if (dScore[area]) dScore[area].push(parseFloat(i.score?.percent || 0));
         
-        const sections = i.sectionsScore || i.fullChecklist?.sections;
+        // ✅ ใช้ sectionsScore จาก API (ที่มี title จริง เช่น "1. เครื่องจักร")
+        const sections = i.sectionsScore;
         
-        if (Array.isArray(sections)) {
+        if (Array.isArray(sections) && sections.length > 0) {
           sections.forEach(sec => {
             const title = String(sec.title || "").trim();
             if (!title) return;
+            
+            const earned = parseFloat(sec.earned) || 0;
+            const max = parseFloat(sec.max) || 0;
+            
             if (!sectionStats[title]) sectionStats[title] = { s: 0, m: 0 };
-            sectionStats[title].s += (sec.earned || 0);
-            sectionStats[title].m += (sec.max || 0);
+            sectionStats[title].s += earned;
+            sectionStats[title].m += max;
+            
             if (deptHm[area]) {
               if (!deptHm[area][title]) deptHm[area][title] = { s: 0, m: 0 };
-              deptHm[area][title].s += (sec.earned || 0);
-              deptHm[area][title].m += (sec.max || 0);
+              deptHm[area][title].s += earned;
+              deptHm[area][title].m += max;
             }
           });
-        } else if (i.fullChecklist && typeof i.fullChecklist === 'object') {
+        } 
+        // Fallback: อ่านจาก fullChecklist ถ้าไม่มี sectionsScore
+        else if (i.fullChecklist && typeof i.fullChecklist === 'object') {
           Object.entries(i.fullChecklist).forEach(([k, v]) => {
             const match = k.match(/^5s_s(\d+)_q(\d+)$/);
             if (match) {
@@ -1091,21 +988,24 @@
       document.getElementById("f_kpiBest").textContent = lbData.length > 0 ? lbData[0].name : "-";
       document.getElementById("f_kpiWorst").textContent = lbData.length > 0 ? lbData[lbData.length - 1].name : "-";
 
+      // ✅ Radar Chart: ใช้ชื่อ Section จริง
       const sortedSections = Object.entries(sectionStats)
         .filter(([k, v]) => v.m > 0)
         .map(([k, v]) => ({ title: k, pct: Math.round((v.s / v.m) * 100) }))
+        .sort((a, b) => b.pct - a.pct)
         .slice(0, isMobile ? 6 : 10);
       
       if (sortedSections.length === 0) {
-        showEmptyState('f_chRadar', 'ไม่มีข้อมูล 5S');
+        showEmptyState('f_chRadar', 'ไม่มีข้อมูล 5S<br><small class="text-[10px]">กรุณาตรวจสอบว่า Code.gs ถูก Deploy ใหม่แล้ว</small>');
       } else {
         mkChart("f_chRadar", { 
           type: "radar", 
           data: { 
             labels: sortedSections.map(s => {
+              // ตัดชื่อให้สั้น: "1. เครื่องจักร" → "เครื่องจักร"
               const parts = s.title.split('.');
               const short = parts.length > 1 ? parts.slice(1).join('.').trim() : s.title;
-              return short.substring(0, isMobile ? 12 : 20);
+              return short.substring(0, isMobile ? 15 : 25);
             }), 
             datasets: [{ 
               label: "Score %", 
@@ -1113,22 +1013,32 @@
               backgroundColor: "rgba(59, 130, 246, 0.2)", 
               borderColor: "#3b82f6",
               pointBackgroundColor: "#3b82f6",
-              pointRadius: isMobile ? 2 : 3
+              pointRadius: isMobile ? 2 : 3,
+              borderWidth: 2
             }] 
           }, 
           options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
+            responsive: true, maintainAspectRatio: false, 
             scales: {
               r: { 
                 min: 0, max: 100,
                 grid: { color: getChartColors().grid },
                 angleLines: { color: getChartColors().grid },
-                pointLabels: { font: { size: isMobile ? 8 : 10 } },
-                ticks: { font: { size: 8 }, stepSize: 25 }
+                pointLabels: { font: { size: isMobile ? 9 : 11 }, color: getChartColors().text },
+                ticks: { font: { size: 8 }, stepSize: 25, backdropColor: 'transparent' }
               }
             },
-            plugins: { legend: { display: false } }
+            plugins: { 
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => {
+                    const sec = sortedSections[ctx.dataIndex];
+                    return `${sec.title}: ${sec.pct}%`;
+                  }
+                }
+              }
+            }
           } 
         });
       }
@@ -1150,7 +1060,7 @@
                 };
                 return short[l.name] || l.name.substring(0, 5);
               }
-              return l.name.length > 12 ? l.name.substring(0,12) + '…' : l.name;
+              return l.name.length > 15 ? l.name.substring(0,15) + '…' : l.name;
             }), 
             datasets: [{ 
               label: "Avg Score %", 
@@ -1160,33 +1070,25 @@
             }] 
           },
           options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
+            responsive: true, maintainAspectRatio: false, 
             indexAxis: isMobile ? 'x' : 'y',
             scales: { 
-              x: { 
-                min: 0, max: 100, 
-                grid: { color: getChartColors().grid },
-                ticks: { font: { size: isMobile ? 8 : 10 }, maxRotation: isMobile ? 45 : 0 }
-              },
-              y: { 
-                grid: { display: !isMobile },
-                ticks: { font: { size: isMobile ? 9 : 11 } }
-              }
+              x: { min: 0, max: 100, grid: { color: getChartColors().grid }, ticks: { font: { size: isMobile ? 8 : 10 }, maxRotation: isMobile ? 45 : 0 } },
+              y: { grid: { display: !isMobile }, ticks: { font: { size: isMobile ? 9 : 11 } } }
             }, 
             plugins: { legend: { display: false } } 
           }
         });
       }
 
-      // Heatmap
+      // ✅ Heatmap: ใช้ชื่อ Section จริง
       const sectionTitles = Object.keys(sectionStats).sort();
       let hmHtml = `<tr class="bg-slate-100 dark:bg-slate-800">
         <th class="p-1.5 sm:p-2 border-b dark:border-slate-700 text-left sticky left-0 bg-slate-100 dark:bg-slate-800 text-[10px] sm:text-xs">Area</th>
         ${sectionTitles.map(t => {
           const parts = t.split('.');
           const shortTitle = parts.length > 1 ? parts.slice(1).join('.').trim() : t;
-          return `<th class="p-1.5 sm:p-2 border-b dark:border-slate-700 text-[9px] sm:text-[10px] whitespace-nowrap">${shortTitle.substring(0, isMobile ? 12 : 25)}</th>`;
+          return `<th class="p-1.5 sm:p-2 border-b dark:border-slate-700 text-[9px] sm:text-[10px] whitespace-nowrap" title="${t}">${shortTitle.substring(0, isMobile ? 12 : 25)}</th>`;
         }).join('')}
       </tr>`;
       
@@ -1212,7 +1114,7 @@
             } else { 
               const bg = pct >= 85 ? '#dcfce7' : pct >= 70 ? '#fef3c7' : '#fee2e2'; 
               const tc = pct >= 85 ? '#065f46' : pct >= 70 ? '#92400e' : '#991b1b'; 
-              hmHtml += `<td class="p-1.5 sm:p-2 font-inter text-[9px] sm:text-[10px] font-bold" style="background:${bg}; color:${tc};">${pct}%</td>`; 
+              hmHtml += `<td class="p-1.5 sm:p-2 font-inter text-[9px] sm:text-[10px] font-bold" style="background:${bg}; color:${tc};" title="${title}: ${pct}%">${pct}%</td>`; 
             }
           }); 
           hmHtml += `</tr>`;
@@ -1256,49 +1158,25 @@
           labels: mKeys.length ? mKeys : ["No Data"],
           datasets: [
             { 
-              label: "5S Score %", 
-              type: 'line',
+              label: "5S Score %", type: 'line',
               data: mKeys.map(m => tMonths[m].s5.length ? parseFloat((tMonths[m].s5.reduce((a,b)=>a+b,0) / tMonths[m].s5.length).toFixed(1)) : 0), 
-              borderColor: "#3b82f6", 
-              backgroundColor: "#3b82f6", 
-              yAxisID: 'y',
-              tension: 0.4,
-              pointRadius: isMobile ? 3 : 5
+              borderColor: "#3b82f6", backgroundColor: "#3b82f6", yAxisID: 'y',
+              tension: 0.4, pointRadius: isMobile ? 3 : 5
             },
             { 
               label: "Safety Open", 
               data: mKeys.map(m => tMonths[m].sOpen), 
-              backgroundColor: "#ef4444", 
-              yAxisID: 'y1',
-              borderRadius: 4
+              backgroundColor: "#ef4444", yAxisID: 'y1', borderRadius: 4
             }
           ]
         },
         options: { 
-          responsive: true, 
-          maintainAspectRatio: false, 
-          plugins: { 
-            legend: { 
-              position: isMobile ? 'bottom' : 'top',
-              labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 11 } }
-            }
-          },
+          responsive: true, maintainAspectRatio: false, 
+          plugins: { legend: { position: isMobile ? 'bottom' : 'top', labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 11 } } } },
           scales: { 
-            y: { 
-              type: 'linear', position: 'left', min: 0, max: 100,
-              grid: { color: getChartColors().grid },
-              ticks: { font: { size: isMobile ? 9 : 11 } }
-            }, 
-            y1: { 
-              type: 'linear', position: 'right', 
-              grid: { drawOnChartArea: false },
-              ticks: { font: { size: isMobile ? 9 : 11 } },
-              beginAtZero: true
-            },
-            x: { 
-              grid: { display: false },
-              ticks: { font: { size: isMobile ? 9 : 11 } }
-            }
+            y: { type: 'linear', position: 'left', min: 0, max: 100, grid: { color: getChartColors().grid }, ticks: { font: { size: isMobile ? 9 : 11 } } }, 
+            y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, ticks: { font: { size: isMobile ? 9 : 11 } }, beginAtZero: true },
+            x: { grid: { display: false }, ticks: { font: { size: isMobile ? 9 : 11 } } }
           } 
         }
       });
