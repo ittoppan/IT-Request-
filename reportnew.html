@@ -20,7 +20,6 @@
     .hover-expand { transition: all 0.3s ease; }
     .hover-expand:hover { -webkit-line-clamp: unset !important; line-clamp: unset !important; }
 
-    /* 📱 Mobile Card Layout */
     @media (max-width: 767px) {
       .responsive-table thead { display: none; }
       .responsive-table tbody, .responsive-table tr, .responsive-table td { display: block; width: 100%; }
@@ -54,9 +53,7 @@
       .responsive-table td a, .responsive-table td span.inline-flex { margin-left: 0; max-width: fit-content; }
     }
 
-    /* 🖥️ Desktop Table Enhancements */
     @media (min-width: 768px) {
-      /* ✅ แก้ไข: เอา max-height ออก ให้แสดงทั้งหมด */
       .table-wrapper {
         overflow: auto;
         border-radius: 0.75rem;
@@ -97,12 +94,8 @@
         background-color: #1e3a5f !important;
       }
       
-      .row-open {
-        border-left: 4px solid #f43f5e !important;
-      }
-      .row-closed {
-        border-left: 4px solid #10b981 !important;
-      }
+      .row-open { border-left: 4px solid #f43f5e !important; }
+      .row-closed { border-left: 4px solid #10b981 !important; }
     }
 
     .table-wrapper::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -112,13 +105,59 @@
     .dark .table-wrapper::-webkit-scrollbar-track { background: #1e293b; }
     .dark .table-wrapper::-webkit-scrollbar-thumb { background: #475569; }
 
+    /* 🎨 Pagination Styles */
+    .pagination-btn {
+      min-width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+      border: 1px solid #e2e8f0;
+      background: white;
+      color: #475569;
+      cursor: pointer;
+    }
+    .pagination-btn:hover:not(:disabled) {
+      background: #f1f5f9;
+      border-color: #003566;
+      color: #003566;
+      transform: translateY(-1px);
+    }
+    .pagination-btn.active {
+      background: linear-gradient(135deg, #003566, #00509d);
+      color: white;
+      border-color: #003566;
+      box-shadow: 0 2px 4px rgba(0,53,102,0.3);
+    }
+    .pagination-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .dark .pagination-btn {
+      background: #1e293b;
+      border-color: #334155;
+      color: #cbd5e1;
+    }
+    .dark .pagination-btn:hover:not(:disabled) {
+      background: #334155;
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    .dark .pagination-btn.active {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border-color: #38bdf8;
+    }
+
     @media print {
-      nav, .no-print, button { display: none !important; }
+      nav, .no-print, button, .pagination-wrapper { display: none !important; }
       body { background: white !important; }
       .table-wrapper { overflow: visible !important; border: none !important; }
       .responsive-table thead { position: static !important; }
       .responsive-table tr { box-shadow: none !important; border: 1px solid #ccc !important; page-break-inside: avoid; }
-      .responsive-table tbody tr:nth-child(even) { background-color: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
@@ -140,6 +179,7 @@
   </nav>
 
   <div class="max-w-[1800px] mx-auto mt-14 space-y-4">
+    <!-- Filter Panel -->
     <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 no-print">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100 mb-3">
         <h3 class="font-bold text-sm md:text-base text-slate-800 flex items-center gap-1"><i class="fas fa-sliders-h text-[#003566]"></i> ตัวกรองข้อมูล</h3>
@@ -189,6 +229,7 @@
       <div class="mt-3 pt-2 border-t border-dashed border-slate-100 flex flex-wrap gap-1.5" id="activeFilters"></div>
     </div>
 
+    <!-- Report Table -->
     <div class="bg-white rounded-2xl p-2 md:p-4 shadow-sm border border-slate-200 overflow-visible w-full">
       
       <div class="border rounded-xl bg-slate-50 mb-3 p-4">
@@ -211,9 +252,6 @@
         <div class="flex flex-wrap gap-1.5">
           <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="exportCSV()"><i class="fas fa-file-csv text-teal-600"></i> Export CSV</button>
           <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="printReport()"><i class="fas fa-print text-indigo-600"></i> พิมพ์</button>
-          <div class="hidden md:flex items-center gap-2 ml-2 pl-2 border-l border-slate-200">
-            <span class="text-[10px] text-slate-500"><i class="fas fa-info-circle"></i> แสดง 50 รายการล่าสุด</span>
-          </div>
         </div>
         <button id="toggleDarkMode" class="bg-white border text-slate-500 w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center shadow-2xs hover:bg-slate-50 transition" onclick="toggleDarkMode()"><i class="fas fa-moon text-[10px] md:text-xs"></i></button>
       </div>
@@ -241,7 +279,20 @@
         </table>
       </div>
 
-      <div id="pagination" class="mt-4 flex flex-wrap items-center justify-center gap-1.5 no-print"></div>
+      <!-- 🎯 Pagination พร้อมปุ่มครบ -->
+      <div class="pagination-wrapper mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 no-print">
+        <!-- ซ้าย: ข้อมูลสรุป -->
+        <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+          <i class="fas fa-table text-[#003566]"></i>
+          <span>
+            แสดง <b id="showingFrom" class="text-[#003566] dark:text-sky-400">0</b>-<b id="showingTo" class="text-[#003566] dark:text-sky-400">0</b> 
+            จากทั้งหมด <b id="totalRecords" class="text-[#003566] dark:text-sky-400">0</b> รายการ
+          </span>
+        </div>
+        
+        <!-- ขวา: ปุ่มเปลี่ยนหน้า -->
+        <div class="flex items-center gap-1" id="pagination"></div>
+      </div>
     </div>
   </div>
 
@@ -249,8 +300,6 @@
     const CONFIG = {
       API_URL: "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec", 
       TZ: "GMT+7",
-      SAFETY_TYPES: ["จป.ว", "คปอ.", "Foreman/Mgr.", "Audit", "Accident/Fire"], 
-      TYPE_5S: "5S",
       AREA_DISPLAY_MAP: { 
         "PRINT": "🖨️ PRINT", "LAMINATE": "📦 LAMINATE", "SOVENTLESS": "🧪 SOVENTLESS", 
         "REWINDER/SLITTER/PACKING": "🔄 REWINDER/SLITTER", "BAG MAKING": "🛍️ BAG MAKING", 
@@ -308,10 +357,11 @@
     let allReportData = []; 
     let currentTypeFilter = 'all'; 
     let currentPage = 1; 
-    const itemsPerPage = 50; // ✅ แสดง 50 รายการ
+    const itemsPerPage = 50; // ✅ 50 รายการต่อหน้า
     let isLoading = false; 
     let currentSort = { key: 'jobId', dir: 'desc' }; 
     let searchTimeout = null;
+    let filteredData = []; // ✅ เก็บข้อมูลที่กรองแล้ว
 
     window.onload = function() {
       document.getElementById('monthFilter').value = ""; 
@@ -344,7 +394,7 @@
     function updateAreaOptions(type) {
       const container = document.getElementById('areaOptions'); 
       let areaKey = type;
-      if (type !== 'all' && type !== CONFIG.TYPE_5S) areaKey = 'safety';
+      if (type !== 'all' && type !== '5S') areaKey = 'safety';
       const areas = AREA_DATA[areaKey] || AREA_DATA['all'];
       container.innerHTML = areas.map(area => `
         <div class="px-3 py-2 text-xs font-semibold cursor-pointer rounded-md flex items-center gap-2 text-slate-700 hover:bg-slate-100 transition" onclick="selectArea('${area.value}', '${area.label}', this)">
@@ -507,15 +557,28 @@
       }
       filtered.sort((a, b) => compareValues(a, b, currentSort.key, currentSort.dir));
       
+      // ✅ เก็บข้อมูลที่กรองแล้วไว้ใช้ pagination
+      filteredData = filtered;
+      
       if (filtered.length === 0) {
         reportContent.innerHTML = `<tr><td colspan="13" class="p-8 text-center text-slate-400 font-medium"><i class="fas fa-search mb-1 text-base block"></i> ไม่พบข้อมูลที่สอดคล้อง</td></tr>`;
         document.getElementById('pagination').innerHTML = ''; 
+        updateShowingInfo(0, 0, 0);
         return;
       }
       
       const totalPages = Math.ceil(filtered.length / itemsPerPage); 
+      
+      // ✅ ป้องกันหน้าเกิน
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+      
       const start = (currentPage - 1) * itemsPerPage;
-      const pageData = filtered.slice(start, start + itemsPerPage);
+      const end = Math.min(start + itemsPerPage, filtered.length);
+      const pageData = filtered.slice(start, end);
+
+      // ✅ อัปเดตข้อมูลแสดง
+      updateShowingInfo(start + 1, end, filtered.length);
 
       reportContent.innerHTML = pageData.map((item, index) => {
         const isClosed = item.status === 'Closed';
@@ -554,23 +617,101 @@
           </tr>
         `;
       }).join('');
+      
       renderPagination(totalPages);
     }
 
+    // ✅ อัปเดตข้อมูล "แสดง X-Y จาก Z รายการ"
+    function updateShowingInfo(from, to, total) {
+      document.getElementById('showingFrom').textContent = from;
+      document.getElementById('showingTo').textContent = to;
+      document.getElementById('totalRecords').textContent = total;
+    }
+
+    // 🎯 Pagination แบบครบปุ่ม
     function renderPagination(totalPages) {
       const container = document.getElementById('pagination'); 
-      // ✅ แสดงจำนวนรายการทั้งหมด
-      container.innerHTML = `
-        <div class="flex items-center gap-3 text-xs text-slate-500">
-          <i class="fas fa-table"></i>
-          <span>แสดง <b class="text-[#003566]">${Math.min(itemsPerPage, allReportData.length)}</b> จากทั้งหมด <b class="text-[#003566]">${allReportData.length}</b> รายการ</span>
-        </div>
-      `;
+      
+      if (totalPages <= 1) { 
+        container.innerHTML = `
+          <span class="text-xs text-slate-500 flex items-center gap-1">
+            <i class="fas fa-check-circle text-emerald-500"></i> 
+            แสดงทั้งหมด ${filteredData.length} รายการ
+          </span>
+        `;
+        return; 
+      }
+
+      let html = '';
+      
+      // ปุ่ม « หน้าแรก
+      html += `<button onclick="goToPage(1)" class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} title="หน้าแรก">
+        <i class="fas fa-angle-double-left"></i>
+      </button>`;
+      
+      // ปุ่ม ‹ ก่อนหน้า
+      html += `<button onclick="goToPage(${currentPage - 1})" class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} title="หน้าก่อนหน้า">
+        <i class="fas fa-angle-left"></i>
+      </button>`;
+      
+      // ตัวเลขหน้า
+      const maxVisiblePages = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+      
+      // แสดง ... ถ้าหน้าแรกห่างจาก startPage
+      if (startPage > 1) {
+        html += `<button onclick="goToPage(1)" class="pagination-btn">1</button>`;
+        if (startPage > 2) {
+          html += `<span class="px-2 text-slate-400">...</span>`;
+        }
+      }
+      
+      // หน้าตัวเลข
+      for (let p = startPage; p <= endPage; p++) {
+        html += `<button onclick="goToPage(${p})" class="pagination-btn ${p === currentPage ? 'active' : ''}">${p}</button>`;
+      }
+      
+      // แสดง ... ถ้าหน้าสุดท้ายห่างจาก endPage
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          html += `<span class="px-2 text-slate-400">...</span>`;
+        }
+        html += `<button onclick="goToPage(${totalPages})" class="pagination-btn">${totalPages}</button>`;
+      }
+      
+      // ปุ่ม ถัดไป ›
+      html += `<button onclick="goToPage(${currentPage + 1})" class="pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} title="หน้าถัดไป">
+        <i class="fas fa-angle-right"></i>
+      </button>`;
+      
+      // ปุ่ม หน้าสุดท้าย »
+      html += `<button onclick="goToPage(${totalPages})" class="pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} title="หน้าสุดท้าย">
+        <i class="fas fa-angle-double-right"></i>
+      </button>`;
+      
+      // ข้อมูลหน้า
+      html += `<span class="ml-2 text-xs text-slate-500 hidden sm:inline">หน้า ${currentPage}/${totalPages}</span>`;
+      
+      container.innerHTML = html;
     }
     
     function goToPage(page) { 
+      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+      if (page < 1 || page > totalPages) return;
+      
       currentPage = page; 
       renderTable();
+      
+      // ✅ Scroll ไปบนสุดของตาราง
+      const tableWrapper = document.querySelector('.table-wrapper');
+      if (tableWrapper) {
+        tableWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
     
     function getDriveThumb(url) { 
@@ -591,12 +732,12 @@
     }
     
     function exportCSV() { 
-      if (!allReportData.length) {
+      if (!filteredData.length) {
         alert('ไม่มีข้อมูลสำหรับ Export');
         return;
       } 
       const headers = ['ลำดับ','ประเภท','พื้นที่','JOB NO.','ปัญหาที่พบ','หมายเหตุ','แนวทางแก้ไข','ผู้รับผิดชอบ','พบ','ครบกำหนด','เสร็จ','สถานะ']; 
-      const rows = allReportData.map((item, idx) => [
+      const rows = filteredData.map((item, idx) => [
         idx+1, 
         item.inspectionType || '', 
         item.area || '', 
