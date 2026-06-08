@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Executive Safety & 5S Dashboard</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Safety & 5S Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -18,23 +20,59 @@
             safety: { light: '#fee2e2', DEFAULT: '#ef4444', dark: '#b91c1c' },
             fiveS: { light: '#dbeafe', DEFAULT: '#3b82f6', dark: '#1d4ed8' },
             darkBg: '#0f172a', darkCard: '#1e293b'
+          },
+          screens: {
+            'xs': '480px',
           }
         }
       }
     }
   </script>
   <style>
-    body { background-color: #f1f5f9; color: #334155; transition: background-color 0.3s, color 0.3s; }
+    body { 
+      background-color: #f1f5f9; 
+      color: #334155; 
+      transition: background-color 0.3s, color 0.3s; 
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
     body.dark { background-color: #0f172a; color: #e2e8f0; }
     
-    .kpi-card { background: #fff; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s; }
-    .dark .kpi-card { background: #1e293b; border-color: #334155; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
-    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    .kpi-card { 
+      background: #fff; 
+      border-radius: 0.75rem; 
+      padding: 0.875rem; 
+      box-shadow: 0 2px 4px -1px rgba(0,0,0,0.05); 
+      border: 1px solid #e2e8f0; 
+      transition: all 0.3s; 
+    }
+    .dark .kpi-card { 
+      background: #1e293b; 
+      border-color: #334155; 
+      box-shadow: 0 2px 4px -1px rgba(0,0,0,0.3); 
+    }
+    @media (min-width: 768px) {
+      .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+      .kpi-card { padding: 1.25rem; border-radius: 1rem; }
+    }
     
-    .tab-btn { padding: 0.75rem 1.5rem; font-weight: 600; font-size: 0.875rem; border-bottom: 3px solid transparent; color: #64748b; transition: all 0.2s; cursor: pointer; }
+    .tab-btn { 
+      padding: 0.625rem 0.75rem; 
+      font-weight: 600; 
+      font-size: 0.75rem; 
+      border-bottom: 3px solid transparent; 
+      color: #64748b; 
+      transition: all 0.2s; 
+      cursor: pointer; 
+      white-space: nowrap;
+      flex: 1;
+      text-align: center;
+    }
+    @media (min-width: 640px) {
+      .tab-btn { padding: 0.75rem 1.5rem; font-size: 0.875rem; flex: none; }
+    }
     .dark .tab-btn { color: #94a3b8; }
-    .tab-btn:hover { color: #0f172a; }
-    .dark .tab-btn:hover { color: #f8fafc; }
+    .tab-btn:active { transform: scale(0.97); }
     
     .tab-btn.active-safety { border-color: #ef4444; color: #ef4444; }
     .tab-btn.active-5s { border-color: #3b82f6; color: #3b82f6; }
@@ -45,6 +83,81 @@
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     .dark ::-webkit-scrollbar-thumb { background: #475569; }
 
+    /* 📱 Mobile Filter Drawer */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .drawer-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    .drawer-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 85%;
+      max-width: 320px;
+      background: white;
+      z-index: 101;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .dark .drawer-panel { background: #1e293b; }
+    .drawer-panel.open {
+      transform: translateX(0);
+    }
+    
+    @media (min-width: 768px) {
+      .drawer-overlay, .drawer-panel { display: none; }
+    }
+
+    /* Mobile bottom sheet alternative */
+    .bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 1rem 1rem 0 0;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 101;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    .dark .bottom-sheet { background: #1e293b; }
+    .bottom-sheet.open { transform: translateY(0); }
+    
+    .bottom-sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: #cbd5e1;
+      border-radius: 2px;
+      margin: 8px auto 12px;
+    }
+
+    /* Touch-friendly buttons */
+    .touch-btn {
+      min-height: 44px;
+      min-width: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Pulse animation */
     @keyframes pulse-ring {
       0% { transform: scale(0.8); opacity: 1; }
       100% { transform: scale(1.5); opacity: 0; }
@@ -57,10 +170,30 @@
       background: #10b981;
       animation: pulse-ring 1.5s infinite;
     }
+
+    /* Safe area for iPhone notch */
+    @supports (padding: max(0px)) {
+      .safe-top { padding-top: max(0.75rem, env(safe-area-inset-top)); }
+      .safe-bottom { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+    }
+
+    /* Mobile KPI number animation */
+    @keyframes count-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .kpi-value {
+      animation: count-up 0.5s ease-out;
+    }
+
+    /* Hide scrollbar on mobile tabs */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden">
 
+  <!-- Loader -->
   <div id="loader" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-[9999] transition-opacity duration-300">
     <div class="bg-white dark:bg-darkCard p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-[90%] text-center border dark:border-slate-700">
       <div class="w-16 h-16 border-4 border-slate-100 dark:border-slate-700 border-t-sky-500 rounded-full animate-spin"></div>
@@ -69,22 +202,78 @@
     </div>
   </div>
 
-  <nav class="bg-[#002548] text-white shrink-0 shadow-lg z-50">
-    <div class="px-4 sm:px-6 flex items-center justify-between py-3">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 bg-sky-500/20 rounded flex items-center justify-center border border-sky-500/30">
-          <i class="fas fa-industry text-sky-400"></i>
+  <!-- 📱 Mobile Filter Drawer Overlay -->
+  <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+  
+  <!-- 📱 Mobile Filter Drawer -->
+  <div id="drawerPanel" class="drawer-panel">
+    <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-[#002548] to-[#004080] text-white flex items-center justify-between">
+      <h2 class="font-bold text-base flex items-center gap-2">
+        <i class="fas fa-filter"></i> ตัวกรองข้อมูล
+      </h2>
+      <button onclick="closeDrawer()" class="touch-btn w-9 h-9 rounded-full bg-white/10 hover:bg-white/20">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="p-4 space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">📅 เลือกเดือน</label>
+        <input type="month" id="monthFilterMobile" onchange="syncMobileFilter('month')" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
+        <button onclick="document.getElementById('monthFilterMobile').value=''; syncMobileFilter('month');" class="text-[11px] text-rose-500 mt-1.5 hover:underline flex items-center gap-1">
+          <i class="fas fa-times-circle"></i> ล้างเดือน (แสดงทั้งหมด)
+        </button>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">📍 แผนก/พื้นที่</label>
+        <select id="deptFilterMobile" onchange="syncMobileFilter('dept')" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
+          <option value="all">-- ทุกแผนก --</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">🟢 สถานะ (Safety)</label>
+        <select id="statusFilterMobile" onchange="syncMobileFilter('status')" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
+          <option value="all">-- ทุกสถานะ --</option>
+          <option value="Open">🔴 Open (ค้างดำเนินการ)</option>
+          <option value="Closed">🟢 Closed (ปิดงานแล้ว)</option>
+        </select>
+      </div>
+      <button onclick="applyMobileFilters()" class="w-full bg-gradient-to-r from-[#003566] to-[#00509d] text-white py-3 rounded-xl font-bold shadow-lg touch-btn">
+        <i class="fas fa-check-circle mr-1"></i> นำไปใช้
+      </button>
+      <button onclick="clearAllFilters()" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-2.5 rounded-xl font-semibold text-sm touch-btn">
+        <i class="fas fa-rotate-left mr-1"></i> ล้างตัวกรองทั้งหมด
+      </button>
+    </div>
+    <div class="p-4 border-t border-slate-200 dark:border-slate-700 text-[10px] text-slate-400 text-center">
+      <div class="relative inline-block w-2 h-2 rounded-full bg-emerald-500 pulse-dot mb-1"></div><br>
+      Synced: <span id="syncTimeMobile" class="font-bold text-slate-500 dark:text-slate-300">Just Now</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="bg-[#002548] text-white shrink-0 shadow-lg z-50 safe-top">
+    <div class="px-3 sm:px-6 flex items-center justify-between py-2.5 sm:py-3">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- 📱 Mobile: Hamburger menu -->
+        <button onclick="openDrawer()" class="md:hidden touch-btn w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center">
+          <i class="fas fa-sliders-h text-sm"></i>
+        </button>
+        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-sky-500/20 rounded flex items-center justify-center border border-sky-500/30">
+          <i class="fas fa-industry text-sky-400 text-sm"></i>
         </div>
         <div>
-          <div class="font-black tracking-widest text-sm font-inter leading-none">EXECUTIVE DASHBOARD</div>
-          <div class="text-[10px] text-sky-200 font-medium mt-0.5">Toppan Industrial KPI System</div>
+          <div class="font-black tracking-widest text-xs sm:text-sm font-inter leading-none">EXECUTIVE DASHBOARD</div>
+          <div class="text-[9px] sm:text-[10px] text-sky-200 font-medium mt-0.5 hidden xs:block">Toppan Industrial KPI System</div>
         </div>
       </div>
-      <div class="flex items-center gap-4 text-sm">
-        <a href="DashNew.html" class="hidden md:block hover:text-sky-300 transition"><i class="fas fa-list-check"></i> Audit List</a>
-        <a href="reportnew.html" class="hidden md:block hover:text-sky-300 transition"><i class="fas fa-tasks"></i> Tracker</a>
-        <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center">
-          <i class="fas fa-moon" id="themeIcon"></i>
+      <div class="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
+        <a href="DashNew.html" class="hidden lg:block hover:text-sky-300 transition"><i class="fas fa-list-check"></i> Audit List</a>
+        <a href="reportnew.html" class="hidden lg:block hover:text-sky-300 transition"><i class="fas fa-tasks"></i> Tracker</a>
+        <button onclick="refreshData()" class="touch-btn w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center" title="Refresh">
+          <i class="fas fa-sync-alt text-xs"></i>
+        </button>
+        <button onclick="toggleDarkMode()" class="touch-btn w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center">
+          <i class="fas fa-moon text-xs" id="themeIcon"></i>
         </button>
       </div>
     </div>
@@ -92,6 +281,7 @@
 
   <div class="flex flex-1 overflow-hidden">
     
+    <!-- 💻 Desktop Sidebar (ซ่อนบนมือถือ) -->
     <aside class="w-64 bg-white dark:bg-darkCard border-r border-slate-200 dark:border-slate-700 hidden md:flex flex-col shrink-0 overflow-y-auto">
       <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
         <h2 class="font-bold text-sm text-slate-700 dark:text-slate-200"><i class="fas fa-filter text-sky-500 mr-2"></i>Global Filters</h2>
@@ -125,210 +315,259 @@
 
     <main class="flex-1 flex flex-col bg-slate-50 dark:bg-[#0f172a] overflow-hidden relative">
       
-      <div class="bg-white dark:bg-darkCard border-b border-slate-200 dark:border-slate-700 shrink-0 overflow-x-auto flex">
-        <button onclick="switchTab('safety')" id="btn-safety" class="tab-btn active-safety flex items-center gap-2 whitespace-nowrap"><i class="fas fa-hard-hat"></i> Safety Dashboard</button>
-        <button onclick="switchTab('5s')" id="btn-5s" class="tab-btn flex items-center gap-2 whitespace-nowrap"><i class="fas fa-broom"></i> 5S Dashboard</button>
-        <button onclick="switchTab('exec')" id="btn-exec" class="tab-btn flex items-center gap-2 whitespace-nowrap"><i class="fas fa-chart-line"></i> Executive Summary</button>
+      <!-- 📱 Mobile: Sticky Tabs -->
+      <div class="bg-white dark:bg-darkCard border-b border-slate-200 dark:border-slate-700 shrink-0 overflow-x-auto flex hide-scrollbar sticky top-0 z-40">
+        <button onclick="switchTab('safety')" id="btn-safety" class="tab-btn active-safety flex items-center justify-center gap-1.5"><i class="fas fa-hard-hat"></i> <span class="hidden xs:inline">Safety</span></button>
+        <button onclick="switchTab('5s')" id="btn-5s" class="tab-btn flex items-center justify-center gap-1.5"><i class="fas fa-broom"></i> <span class="hidden xs:inline">5S</span></button>
+        <button onclick="switchTab('exec')" id="btn-exec" class="tab-btn flex items-center justify-center gap-1.5"><i class="fas fa-chart-line"></i> <span class="hidden xs:inline">Executive</span></button>
       </div>
 
-      <div class="flex-1 overflow-y-auto p-4 sm:p-6" id="tabContent">
+      <!-- 📱 Mobile: Quick Filter Bar -->
+      <div class="md:hidden bg-white dark:bg-darkCard border-b border-slate-200 dark:border-slate-700 px-3 py-2 flex items-center justify-between gap-2 shrink-0">
+        <div class="flex items-center gap-2 flex-1 min-w-0">
+          <button onclick="openDrawer()" class="flex items-center gap-1.5 bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 px-3 py-1.5 rounded-lg text-xs font-semibold border border-sky-200 dark:border-sky-800 touch-btn">
+            <i class="fas fa-filter"></i>
+            <span id="mobileFilterSummary" class="truncate max-w-[120px]">ทุกแผนก</span>
+          </button>
+          <div class="text-[10px] text-slate-500 dark:text-slate-400 hidden xs:block">
+            <span id="mobileDataCount">0</span> รายการ
+          </div>
+        </div>
+        <div class="text-[10px] text-slate-400 flex items-center gap-1">
+          <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+          <span id="syncTimeMobileTop">Live</span>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-3 sm:p-6" id="tabContent">
         
         <!-- 🔴 TAB: SAFETY -->
-        <div id="tab-safety" class="space-y-6">
+        <div id="tab-safety" class="space-y-4 sm:space-y-6">
           <div class="flex justify-between items-end">
             <div>
-              <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fas fa-hard-hat text-rose-500"></i> Safety Risk & Action Plan</h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">วิเคราะห์ปัญหาความปลอดภัยและการตอบสนองต่อความเสี่ยง</p>
+              <h2 class="text-base sm:text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fas fa-hard-hat text-rose-500"></i> 
+                <span>Safety Risk & Action Plan</span>
+              </h2>
+              <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1">วิเคราะห์ปัญหาความปลอดภัยและการตอบสนองต่อความเสี่ยง</p>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- 📱 KPI Cards: 2x2 on mobile, 4x1 on desktop -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
             <div class="kpi-card border-l-4 border-l-slate-400 flex justify-between items-center">
-              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Total Findings</div><div class="text-3xl font-black font-inter text-slate-800 dark:text-white mt-1" id="s_kpiTotal">0</div></div>
-              <i class="fas fa-clipboard-list text-3xl text-slate-200 dark:text-slate-600"></i>
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Total Findings</div>
+                <div class="text-xl sm:text-3xl font-black font-inter text-slate-800 dark:text-white mt-1 kpi-value" id="s_kpiTotal">0</div>
+              </div>
+              <i class="fas fa-clipboard-list text-2xl sm:text-3xl text-slate-200 dark:text-slate-600"></i>
             </div>
             <div class="kpi-card border-l-4 border-l-amber-500 flex justify-between items-center">
-              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Open Issues</div><div class="text-3xl font-black font-inter text-amber-500 mt-1" id="s_kpiOpen">0</div></div>
-              <i class="fas fa-exclamation-circle text-3xl text-amber-100 dark:text-amber-900/50"></i>
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Open Issues</div>
+                <div class="text-xl sm:text-3xl font-black font-inter text-amber-500 mt-1 kpi-value" id="s_kpiOpen">0</div>
+              </div>
+              <i class="fas fa-exclamation-circle text-2xl sm:text-3xl text-amber-100 dark:text-amber-900/50"></i>
             </div>
             <div class="kpi-card border-l-4 border-l-rose-500 flex justify-between items-center">
-              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Overdue Risk</div><div class="text-3xl font-black font-inter text-rose-600 mt-1" id="s_kpiOverdue">0</div></div>
-              <i class="fas fa-skull-crossbones text-3xl text-rose-100 dark:text-rose-900/50"></i>
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Overdue Risk</div>
+                <div class="text-xl sm:text-3xl font-black font-inter text-rose-600 mt-1 kpi-value" id="s_kpiOverdue">0</div>
+              </div>
+              <i class="fas fa-skull-crossbones text-2xl sm:text-3xl text-rose-100 dark:text-rose-900/50"></i>
             </div>
             <div class="kpi-card border-l-4 border-l-emerald-500 flex justify-between items-center">
-              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Closure Rate</div><div class="text-3xl font-black font-inter text-emerald-500 mt-1" id="s_kpiCloseRate">0%</div></div>
-              <i class="fas fa-check-double text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Closure Rate</div>
+                <div class="text-xl sm:text-3xl font-black font-inter text-emerald-500 mt-1 kpi-value" id="s_kpiCloseRate">0%</div>
+              </div>
+              <i class="fas fa-check-double text-2xl sm:text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Charts -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <div class="kpi-card lg:col-span-2 flex flex-col">
-              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Volume & Overdue by Department</h3>
-              <div class="relative flex-1 min-h-[250px] w-full"><canvas id="s_chDept"></canvas></div>
+              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Volume & Overdue by Department</h3>
+              <div class="relative w-full" style="height: 280px;"><canvas id="s_chDept"></canvas></div>
             </div>
             <div class="kpi-card flex flex-col">
-              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Finding Categories (Pareto)</h3>
-              <div class="relative flex-1 min-h-[250px] w-full"><canvas id="s_chCat"></canvas></div>
+              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Finding Categories</h3>
+              <div class="relative w-full" style="height: 280px;"><canvas id="s_chCat"></canvas></div>
             </div>
           </div>
 
           <div class="kpi-card flex flex-col">
-            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">MTTR (Mean Time to Resolution) Trend</h3>
-            <div class="relative w-full h-64"><canvas id="s_chMTTR"></canvas></div>
+            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">MTTR (Mean Time to Resolution) Trend</h3>
+            <div class="relative w-full" style="height: 260px;"><canvas id="s_chMTTR"></canvas></div>
           </div>
         </div>
 
         <!-- 🔵 TAB: 5S -->
-        <div id="tab-5s" class="space-y-6 hidden">
+        <div id="tab-5s" class="space-y-4 sm:space-y-6 hidden">
           <div class="flex justify-between items-end">
             <div>
-              <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fas fa-broom text-blue-500"></i> 5S Analytics Center</h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">ติดตามมาตรฐานพื้นที่และจัดอันดับความเป็นเลิศ</p>
+              <h2 class="text-base sm:text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fas fa-broom text-blue-500"></i> 
+                <span>5S Analytics Center</span>
+              </h2>
+              <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1">ติดตามมาตรฐานพื้นที่และจัดอันดับความเป็นเลิศ</p>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
             <div class="kpi-card border-l-4 border-l-blue-500 flex justify-between items-center">
-              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Average 5S Score</div><div class="text-3xl font-black font-inter text-blue-600 mt-1" id="f_kpiAvg">0%</div></div>
-              <i class="fas fa-star text-3xl text-blue-100 dark:text-blue-900/50"></i>
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Avg 5S Score</div>
+                <div class="text-xl sm:text-3xl font-black font-inter text-blue-600 mt-1 kpi-value" id="f_kpiAvg">0%</div>
+              </div>
+              <i class="fas fa-star text-2xl sm:text-3xl text-blue-100 dark:text-blue-900/50"></i>
             </div>
             <div class="kpi-card border-l-4 border-l-emerald-500 flex justify-between items-center overflow-hidden">
-              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Best Department</div><div class="text-xl font-bold text-emerald-600 mt-2 truncate max-w-[120px]" id="f_kpiBest">-</div></div>
-              <i class="fas fa-trophy text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Best Dept</div>
+                <div class="text-sm sm:text-xl font-bold text-emerald-600 mt-1 truncate" id="f_kpiBest">-</div>
+              </div>
+              <i class="fas fa-trophy text-2xl sm:text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
             </div>
             <div class="kpi-card border-l-4 border-l-rose-500 flex justify-between items-center overflow-hidden">
-              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Needs Improvement</div><div class="text-xl font-bold text-rose-600 mt-2 truncate max-w-[120px]" id="f_kpiWorst">-</div></div>
-              <i class="fas fa-arrow-trend-down text-3xl text-rose-100 dark:text-rose-900/50"></i>
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Worst Dept</div>
+                <div class="text-sm sm:text-xl font-bold text-rose-600 mt-1 truncate" id="f_kpiWorst">-</div>
+              </div>
+              <i class="fas fa-arrow-trend-down text-2xl sm:text-3xl text-rose-100 dark:text-rose-900/50"></i>
             </div>
             <div class="kpi-card border-l-4 border-l-indigo-500 flex justify-between items-center">
-              <div><div class="text-[10px] font-bold text-slate-400 uppercase">Total Audits</div><div class="text-3xl font-black font-inter text-indigo-500 mt-1" id="f_kpiCount">0</div></div>
-              <i class="fas fa-file-signature text-3xl text-indigo-100 dark:text-indigo-900/50"></i>
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Total Audits</div>
+                <div class="text-xl sm:text-3xl font-black font-inter text-indigo-500 mt-1 kpi-value" id="f_kpiCount">0</div>
+              </div>
+              <i class="fas fa-file-signature text-2xl sm:text-3xl text-indigo-100 dark:text-indigo-900/50"></i>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <div class="kpi-card flex flex-col">
-              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">5S Category Radar (By Checklist Section)</h3>
-              <div class="relative flex-1 min-h-[250px] w-full"><canvas id="f_chRadar"></canvas></div>
+              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Category Radar</h3>
+              <div class="relative w-full" style="height: 300px;"><canvas id="f_chRadar"></canvas></div>
             </div>
             <div class="kpi-card lg:col-span-2 flex flex-col">
-              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Department Ranking (Avg Score)</h3>
-              <div class="relative flex-1 min-h-[250px] w-full"><canvas id="f_chRank"></canvas></div>
+              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Department Ranking</h3>
+              <div class="relative w-full" style="height: 300px;"><canvas id="f_chRank"></canvas></div>
             </div>
           </div>
 
           <div class="kpi-card overflow-hidden">
-            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">5S Heatmap Matrix (Area × Section)</h3>
-            <div class="overflow-x-auto">
-              <table class="w-full text-xs border-collapse text-center" id="f_tbHeatmap"></table>
+            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Heatmap Matrix</h3>
+            <div class="overflow-x-auto -mx-3 sm:mx-0">
+              <table class="w-full text-[10px] sm:text-xs border-collapse text-center min-w-[500px]" id="f_tbHeatmap"></table>
             </div>
           </div>
         </div>
 
         <!-- 🟣 TAB: EXEC SUMMARY -->
-        <div id="tab-exec" class="space-y-6 hidden">
+        <div id="tab-exec" class="space-y-4 sm:space-y-6 hidden">
           <div class="flex justify-between items-end">
             <div>
-              <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fas fa-chart-line text-purple-500"></i> Executive Overview</h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">สรุปภาพรวมและแนวโน้มระดับองค์กร (Cross Analysis)</p>
+              <h2 class="text-base sm:text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fas fa-chart-line text-purple-500"></i> 
+                <span>Executive Overview</span>
+              </h2>
+              <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1">สรุปภาพรวมและแนวโน้มระดับองค์กร</p>
             </div>
           </div>
 
           <div class="kpi-card flex flex-col">
-            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Safety vs 5S Trend Analysis (MoM)</h3>
-            <div class="relative w-full h-72"><canvas id="e_chTrend"></canvas></div>
+            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Safety vs 5S Trend (MoM)</h3>
+            <div class="relative w-full" style="height: 280px;"><canvas id="e_chTrend"></canvas></div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <div class="kpi-card overflow-hidden !p-0">
-              <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-rose-50 dark:bg-rose-900/20">
-                <h3 class="text-xs font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-fire"></i> Top 5 Critical Overdue</h3>
+              <div class="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-700 bg-rose-50 dark:bg-rose-900/20">
+                <h3 class="text-[11px] sm:text-xs font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider flex items-center gap-2">
+                  <i class="fas fa-fire"></i> Top 5 Critical Overdue
+                </h3>
               </div>
-              <div class="overflow-x-auto p-4">
-                <table class="w-full text-xs text-left" id="e_tbOverdue"></table>
+              <div class="overflow-x-auto p-3 sm:p-4">
+                <table class="w-full text-[11px] sm:text-xs text-left" id="e_tbOverdue"></table>
               </div>
             </div>
             
             <div class="kpi-card overflow-hidden !p-0">
-              <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-amber-50 dark:bg-amber-900/20">
-                <h3 class="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2"><i class="fas fa-sort-amount-down"></i> Bottom 5 Departments (5S)</h3>
+              <div class="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-700 bg-amber-50 dark:bg-amber-900/20">
+                <h3 class="text-[11px] sm:text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                  <i class="fas fa-sort-amount-down"></i> Bottom 5 Departments (5S)
+                </h3>
               </div>
-              <div class="overflow-x-auto p-4">
-                <table class="w-full text-xs text-left" id="e_tbWorst5S"></table>
+              <div class="overflow-x-auto p-3 sm:p-4">
+                <table class="w-full text-[11px] sm:text-xs text-left" id="e_tbWorst5S"></table>
               </div>
             </div>
           </div>
         </div>
 
       </div>
+
+      <!-- 📱 Mobile: Floating Refresh Button -->
+      <button onclick="refreshData()" class="md:hidden fixed bottom-5 right-5 w-14 h-14 bg-gradient-to-br from-[#003566] to-[#00509d] text-white rounded-full shadow-2xl touch-btn z-40 active:scale-95 transition">
+        <i class="fas fa-sync-alt text-lg"></i>
+      </button>
     </main>
   </div>
 
   <script>
     const API = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
     
-    // ✅ Master Mapping - ตรงกับ Code.gs v3.6 AREA_MAPPING
     const DEPTS = ["PRINT","LAMINATE","SOVENTLESS","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","TOILET","LOCKER","ENGINEERING","OUTSIDE"];
     
     const AREA_MAP = {
-  // ✅ ชื่อภาษาไทยจาก Sheet
-  "แผนก Print": "PRINT",
-  "แผนก Laminate": "LAMINATE",
-  "แผนก Soventless": "SOVENTLESS",
-  "แผนก Solvent": "SOVENTLESS",        // ⚠️ เพิ่ม: ข้อมูลคุณใช้ "แผนก Solvent"
-  "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING",
-  "แผนก Rewinder / Slitter": "REWINDER/SLITTER/PACKING",
-  "แผนก BAG MAKING": "BAG MAKING",
-  "แผนก QA & QC": "QA&QC",
-  "แผนก QA&QC": "QA&QC",
-  "แผนก Warehouse": "WAREHOUSE",
-  "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE",
-  
-  // ✅ ชื่อภาษาอังกฤษ
-  "PRINT": "PRINT",
-  "LAMINATE": "LAMINATE",
-  "SOVENTLESS": "SOVENTLESS",
-  "SOLVENT": "SOVENTLESS",
-  "REWINDER/SLITTER/PACKING": "REWINDER/SLITTER/PACKING",
-  "BAG MAKING": "BAG MAKING",
-  "QA&QC": "QA&QC",
-  "WAREHOUSE": "WAREHOUSE",
-  "OFFICE": "OFFICE",
-  "Office": "OFFICE",
-  "CANTEEN": "CANTEEN",
-  "Canteen": "CANTEEN",
-  "TOILET": "TOILET",
-  "ห้องน้ำ": "TOILET",
-  "LOCKER": "LOCKER",
-  "Locker": "LOCKER",
-  "ห้องล็อกเกอร์": "LOCKER",
-  "ENGINEERING": "ENGINEERING",
-  "EN": "ENGINEERING",
-  "OUTSIDE": "OUTSIDE",
-  "Outside": "OUTSIDE",
-  "Factory": "PRINT"
-};
+      "แผนก Print": "PRINT", "PRINT": "PRINT", "Factory": "PRINT",
+      "แผนก Laminate": "LAMINATE", "LAMINATE": "LAMINATE",
+      "แผนก Soventless": "SOVENTLESS", "SOVENTLESS": "SOVENTLESS", 
+      "แผนก Solvent": "SOVENTLESS", "SOLVENT": "SOVENTLESS",
+      "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING", 
+      "REWINDER/SLITTER/PACKING": "REWINDER/SLITTER/PACKING",
+      "แผนก BAG MAKING": "BAG MAKING", "BAG MAKING": "BAG MAKING",
+      "แผนก QA & QC": "QA&QC", "QA&QC": "QA&QC", "แผนก QA&QC": "QA&QC",
+      "แผนก Warehouse": "WAREHOUSE", "WAREHOUSE": "WAREHOUSE",
+      "Office": "OFFICE", "OFFICE": "OFFICE", "OFFICE ": "OFFICE",
+      "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE", "OUTSIDE": "OUTSIDE", "Outside": "OUTSIDE",
+      "Canteen": "CANTEEN", "CANTEEN": "CANTEEN",
+      "Toilet": "TOILET", "ห้องน้ำ": "TOILET", "TOILET": "TOILET",
+      "Locker": "LOCKER", "ห้องล็อกเกอร์": "LOCKER", "LOCKER": "LOCKER",
+      "EN": "ENGINEERING", "ENGINEERING": "ENGINEERING"
+    };
     
     let globalRaw = { ins: [], jobs: [] }; 
     let filteredData = { ins: [], jobs: [] };
     let currentTab = 'safety';
     let charts = {};
     let isDarkMode = false;
+    let isMobile = window.innerWidth < 768;
 
-    // ✅ Helper: Normalize area
+    // ✅ Detect mobile
+    function updateMobileFlag() {
+      isMobile = window.innerWidth < 768;
+    }
+    window.addEventListener('resize', () => {
+      updateMobileFlag();
+      // Re-render charts on resize for responsive
+      clearTimeout(window._resizeTimer);
+      window._resizeTimer = setTimeout(() => renderCurrentTab(), 300);
+    });
+
     function normalizeArea(area) {
       if (!area) return "OFFICE";
       const trimmed = String(area).trim();
       return AREA_MAP[trimmed] || AREA_MAP[trimmed.toUpperCase()] || trimmed.toUpperCase();
     }
 
-    // ✅ Helper: Check if inspection is 5S
     function is5SType(type) {
       const t = String(type || "").toUpperCase().trim();
       return t === "5S" || t === "5ส";
     }
 
-    // ✅ Helper: Get chart colors based on theme
     function getChartColors() {
       return {
         text: isDarkMode ? '#94a3b8' : '#64748b',
@@ -346,84 +585,162 @@
       renderCurrentTab();
     }
 
-    // 🚀 Robust Date Parser (แก้ timezone bug)
- // 🚀 Robust Date Parser - รองรับทั้ง US (M/D/YYYY) และ EU (D/M/YYYY) format
-function parseDateObj(dateStr) {
-  if (!dateStr || dateStr === "-" || dateStr === "") return null;
-  
-  // Date object จาก API
-  if (dateStr instanceof Date) {
-    return isNaN(dateStr.getTime()) ? null : dateStr;
-  }
-  
-  // Timestamp number
-  if (typeof dateStr === 'number') {
-    const d = new Date(dateStr);
-    return isNaN(d.getTime()) ? null : d;
-  }
-  
-  const str = String(dateStr).trim();
-  if (!str) return null;
-  
-  // ✅ รองรับ ISO format (YYYY-MM-DD) โดยตรง
-  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
-    const d = new Date(str);
-    if (!isNaN(d.getTime())) return d;
-  }
-  
-  // ✅ รองรับ dd/MM/yyyy ที่ Code.gs v3.6 return
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
-    const [d, m, y] = str.split('/').map(n => parseInt(n, 10));
-    return new Date(y, m - 1, d);
-  }
-  
-  // ✅ รองรับ M/D/YYYY H:MM:SS หรือ MM/DD/YYYY (US format จาก Sheet)
-  const parts = str.split(/[\/\-\sT:]+/).filter(p => p && p.length > 0);
-  if (parts.length >= 3) {
-    const nums = parts.slice(0, 3).map(p => parseInt(p, 10));
-    if (nums.some(n => isNaN(n))) return null;
-    const [p0, p1, p2] = nums;
-    
-    // YYYY-MM-DD (year อยู่หน้า)
-    if (p0 > 31) return new Date(p0, p1 - 1, p2);
-    
-    // DD/MM/YYYY หรือ MM/DD/YYYY (year อยู่หลัง)
-    if (p2 > 31) {
-      // ถ้า p0 > 12 → p0 เป็นวันแน่ๆ → DD/MM/YYYY
-      if (p0 > 12) return new Date(p2, p1 - 1, p0);
-      // ถ้า p1 > 12 → p1 เป็นวันแน่ๆ → MM/DD/YYYY
-      if (p1 > 12) return new Date(p2, p0 - 1, p1);
-      // ถ้าทั้งคู่ <= 12 → เดาเป็น MM/DD/YYYY (US format จาก Google Sheet)
-      return new Date(p2, p0 - 1, p1);
+    function parseDateObj(dateStr) {
+      if (!dateStr || dateStr === "-" || dateStr === "") return null;
+      if (dateStr instanceof Date) return isNaN(dateStr.getTime()) ? null : dateStr;
+      if (typeof dateStr === 'number') {
+        const d = new Date(dateStr);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      const str = String(dateStr).trim();
+      if (!str) return null;
+      if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+        const d = new Date(str);
+        if (!isNaN(d.getTime())) return d;
+      }
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+        const [d, m, y] = str.split('/').map(n => parseInt(n, 10));
+        return new Date(y, m - 1, d);
+      }
+      const parts = str.split(/[\/\-\sT:]+/).filter(p => p && p.length > 0);
+      if (parts.length >= 3) {
+        const nums = parts.slice(0, 3).map(p => parseInt(p, 10));
+        if (nums.some(n => isNaN(n))) return null;
+        const [p0, p1, p2] = nums;
+        if (p0 > 31) return new Date(p0, p1 - 1, p2);
+        if (p2 > 31) {
+          if (p0 > 12) return new Date(p2, p1 - 1, p0);
+          if (p1 > 12) return new Date(p2, p0 - 1, p1);
+          return new Date(p2, p0 - 1, p1);
+        }
+        return new Date(p2 + 2000, p1 - 1, p0);
+      }
+      return null;
     }
-    
-    // ไม่มี year ชัดเจน (DD/MM/YY)
-    return new Date(p2 + 2000, p1 - 1, p0);
-  }
-  
-  return null;
-}
 
-    // ✅ Format date to YYYY-MM for month comparison
     function toYearMonth(d) {
       if (!d) return null;
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     }
 
+    function normalizeJob(j) {
+      return {
+        jobId: j.jobId || j.jobNo || j.id || "",
+        area: normalizeArea(j.area),
+        problem: j.problem || j.issue || j.description || "",
+        remark: j.remark || j.note || "",
+        picBefore: j.picBefore || j.before || "",
+        picAfter: j.picAfter || j.after || "",
+        status: j.status || "Open",
+        dateFound: j.dateFound || j.foundDate || j.date || j.createdAt || "",
+        dueDate: j.dueDate || j.deadline || j.due || "",
+        finishDate: j.finishDate || j.closedDate || j.closeDate || j.finish || "",
+        picName: j.picName || j.assignee || "",
+        correctiveAction: j.correctiveAction || j.solution || "",
+        inspector: j.inspector || j.foundBy || "",
+        inspectionType: j.inspectionType || j.type || "จป.ว"
+      };
+    }
+
+    function normalizeInspection(i) {
+      return {
+        ...i,
+        area: normalizeArea(i.area),
+        inspectionType: i.inspectionType || i.type || "Safety",
+        timestamp: i.timestamp || i.date || i.datetime || "",
+        score: i.score || { percent: 0 }
+      };
+    }
+
+    // 📱 Mobile Drawer Functions
+    function openDrawer() {
+      document.getElementById('drawerOverlay').classList.add('open');
+      document.getElementById('drawerPanel').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawerOverlay').classList.remove('open');
+      document.getElementById('drawerPanel').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function syncMobileFilter(type) {
+      // Sync mobile filter values to desktop filter values
+      if (type === 'month') {
+        document.getElementById('monthFilter').value = document.getElementById('monthFilterMobile').value;
+      } else if (type === 'dept') {
+        document.getElementById('deptFilter').value = document.getElementById('deptFilterMobile').value;
+      } else if (type === 'status') {
+        document.getElementById('statusFilter').value = document.getElementById('statusFilterMobile').value;
+      }
+    }
+
+    function applyMobileFilters() {
+      syncMobileFilter('month');
+      syncMobileFilter('dept');
+      syncMobileFilter('status');
+      applyFilters();
+      updateMobileFilterSummary();
+      closeDrawer();
+    }
+
+    function clearAllFilters() {
+      document.getElementById('monthFilter').value = "";
+      document.getElementById('deptFilter').value = "all";
+      document.getElementById('statusFilter').value = "all";
+      document.getElementById('monthFilterMobile').value = "";
+      document.getElementById('deptFilterMobile').value = "all";
+      document.getElementById('statusFilterMobile').value = "all";
+      applyFilters();
+      updateMobileFilterSummary();
+      closeDrawer();
+    }
+
+    function updateMobileFilterSummary() {
+      const dept = document.getElementById('deptFilter').value;
+      const month = document.getElementById('monthFilter').value;
+      let summary = 'ทุกแผนก';
+      if (dept !== 'all') summary = dept;
+      if (month) {
+        const [y, m] = month.split('-');
+        const monthNames = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+        summary += ` · ${monthNames[parseInt(m)-1]}/${y.slice(2)}`;
+      }
+      document.getElementById('mobileFilterSummary').textContent = summary;
+      document.getElementById('mobileDataCount').textContent = filteredData.jobs.length + filteredData.ins.length;
+    }
+
+    async function refreshData() {
+      const btn = event?.target?.closest('button');
+      if (btn) {
+        const icon = btn.querySelector('i');
+        icon.classList.add('animate-spin');
+        setTimeout(() => icon.classList.remove('animate-spin'), 1000);
+      }
+      await loadData();
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
+      updateMobileFlag();
       Chart.defaults.font.family = "'Prompt', sans-serif";
       
-      // Sync initial dark mode
       isDarkMode = document.documentElement.classList.contains('dark');
       document.getElementById('themeIcon').className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
       Chart.defaults.color = isDarkMode ? '#94a3b8' : '#64748b';
       Chart.defaults.borderColor = isDarkMode ? '#334155' : '#e2e8f0';
       
-      const el = document.getElementById("deptFilter"); 
-      DEPTS.forEach(d => el.add(new Option(d, d))); 
+      // Populate both desktop and mobile dropdowns
+      const elDesktop = document.getElementById("deptFilter");
+      const elMobile = document.getElementById("deptFilterMobile");
+      DEPTS.forEach(d => {
+        elDesktop.add(new Option(d, d));
+        elMobile.add(new Option(d, d));
+      });
       
-      const now = new Date();
-      document.getElementById("monthFilter").value = toYearMonth(now);
+      // Default: no month filter (show all)
+      document.getElementById("monthFilter").value = "";
+      document.getElementById("monthFilterMobile").value = "";
       
       loadData();
     });
@@ -436,32 +753,28 @@ function parseDateObj(dateStr) {
         if (!dashRes.ok) throw new Error(`Dashboard API HTTP ${dashRes.status}`);
         const dash = await dashRes.json();
         
-        loaderStatus.textContent = "Fetching Action Plan...";
+        loaderStatus.textContent = "Fetching Action Plan Data...";
         const jobsRes = await fetch(`${API}?action=getReport`);
         if (!jobsRes.ok) throw new Error(`Report API HTTP ${jobsRes.status}`);
-        const jobs = await jobsRes.json();
+        const jobsRaw = await jobsRes.json();
         
-        // ✅ Normalize data
         const rawIns = (dash.details || []);
-        const rawJobs = Array.isArray(jobs) ? jobs : (jobs.data || jobs.report || []);
+        let rawJobs = [];
+        if (Array.isArray(jobsRaw)) rawJobs = jobsRaw;
+        else if (jobsRaw && jobsRaw.data) rawJobs = jobsRaw.data;
+        else if (jobsRaw && jobsRaw.report) rawJobs = jobsRaw.report;
         
-        globalRaw.ins = rawIns.map(d => ({ 
-          ...d, 
-          area: normalizeArea(d.area),
-          inspectionType: d.inspectionType || "Safety"
-        }));
-        
-        globalRaw.jobs = rawJobs.map(j => ({ 
-          ...j, 
-          area: normalizeArea(j.area),
-          inspectionType: j.inspectionType || j.type || "จป.ว"
-        })); 
+        globalRaw.ins = rawIns.map(normalizeInspection);
+        globalRaw.jobs = rawJobs.map(normalizeJob); 
         
         applyFilters();
-        document.getElementById('syncTime').textContent = new Date().toLocaleTimeString('th-TH');
+        const now = new Date().toLocaleTimeString('th-TH');
+        document.getElementById('syncTime').textContent = now;
+        document.getElementById('syncTimeMobile').textContent = now;
+        document.getElementById('syncTimeMobileTop').textContent = now;
       } catch (err) { 
-        console.error("Fetch Error:", err);
-        alert("❌ เกิดข้อผิดพลาดในการโหลดข้อมูล: " + err.message + "\nกรุณารีเฟรชหน้าเว็บ"); 
+        console.error("❌ Fetch Error:", err);
+        alert("❌ เกิดข้อผิดพลาดในการโหลดข้อมูล: " + err.message); 
       } finally { 
         document.getElementById("loader").style.opacity = "0"; 
         setTimeout(() => document.getElementById("loader").classList.add("hidden"), 300); 
@@ -492,6 +805,7 @@ function parseDateObj(dateStr) {
         return true;
       });
 
+      if (isMobile) updateMobileFilterSummary();
       renderCurrentTab();
     }
 
@@ -504,6 +818,8 @@ function parseDateObj(dateStr) {
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
       document.getElementById(`btn-${tabId}`).classList.add(`active-${tabId}`);
       renderCurrentTab();
+      // Scroll to top on tab change
+      document.getElementById('tabContent').scrollTop = 0;
     }
 
     function mkChart(id, cfg) { 
@@ -522,7 +838,8 @@ function parseDateObj(dateStr) {
     // 🔴 TAB: SAFETY
     // =====================================
     function processSafetyTab() {
-      let kpiTotal = filteredData.jobs.length;
+      const jobs = filteredData.jobs;
+      let kpiTotal = jobs.length;
       let kpiClosed = 0, kpiOverdue = 0; 
       let mttrSum = 0, mttrCount = 0;
       
@@ -531,8 +848,9 @@ function parseDateObj(dateStr) {
       const catData = {};
       const mttrTrend = {};
       const now = new Date();
+      now.setHours(0,0,0,0);
 
-      filteredData.jobs.forEach(j => {
+      jobs.forEach(j => {
         const area = j.area;
         if (!deptData[area]) return;
         
@@ -541,78 +859,100 @@ function parseDateObj(dateStr) {
         const dDue = parseDateObj(j.dueDate);
         const dFinish = parseDateObj(j.finishDate);
 
-        if (isClosed) { 
-          kpiClosed++; 
-          deptData[area].closed++; 
-        } else { 
-          deptData[area].open++; 
-        }
+        if (isClosed) { kpiClosed++; deptData[area].closed++; } 
+        else { deptData[area].open++; }
         
-        // Overdue = Open + ผ่าน due date
-        if (!isClosed && dDue && now > dDue) { 
-          kpiOverdue++; 
-          deptData[area].overdue++; 
-        }
+        if (!isClosed && dDue && now > dDue) { kpiOverdue++; deptData[area].overdue++; }
         
-        // MTTR = Average days from Found to Finish (เฉพาะงานที่ปิดแล้ว)
         if (isClosed && dFound && dFinish) {
           const days = Math.max(1, Math.floor((dFinish.getTime() - dFound.getTime()) / 86400000));
-          mttrSum += days; 
-          mttrCount++;
+          mttrSum += days; mttrCount++;
           const ym = toYearMonth(dFinish);
-          if (!mttrTrend[ym]) mttrTrend[ym] = { s:0, c:0 };
-          mttrTrend[ym].s += days; 
-          mttrTrend[ym].c++;
+          if (ym) {
+            if (!mttrTrend[ym]) mttrTrend[ym] = { s:0, c:0 };
+            mttrTrend[ym].s += days; mttrTrend[ym].c++;
+          }
         }
 
-        // Categorize by section title (จากปัญหา เช่น "[5S] 1. เครื่องจักร: ...")
         let cat = "General Risk";
         const prob = String(j.problem || "");
         const matchBracket = prob.match(/^\[([^\]]+)\]/);
-        if (matchBracket) {
-          cat = matchBracket[1];
-        } else {
-          // ลองจับ section title เช่น "1. สถานที่ทำงาน"
+        if (matchBracket) cat = matchBracket[1];
+        else {
           const matchSection = prob.match(/^(\d+\.\s*[^\d:]+)/);
           if (matchSection) cat = matchSection[1].trim();
         }
         catData[cat] = (catData[cat] || 0) + 1;
       });
 
-      const openOnly = kpiTotal - kpiClosed - kpiOverdue;
+      const openOnly = Math.max(0, kpiTotal - kpiClosed - kpiOverdue);
       document.getElementById('s_kpiTotal').innerText = kpiTotal;
-      document.getElementById('s_kpiOpen').innerText = Math.max(0, openOnly);
+      document.getElementById('s_kpiOpen').innerText = openOnly;
       document.getElementById('s_kpiOverdue').innerText = kpiOverdue;
       document.getElementById('s_kpiCloseRate').innerText = kpiTotal > 0 ? Math.round((kpiClosed/kpiTotal)*100) + "%" : "0%";
 
-      // Chart: Dept Volume (Stacked Bar)
+      if (kpiTotal === 0) {
+        showEmptyState('s_chDept', '📋 ไม่พบข้อมูล Action Plan');
+        showEmptyState('s_chCat', 'ไม่มีข้อมูลหมวดปัญหา');
+        showEmptyState('s_chMTTR', 'ไม่มีข้อมูล MTTR');
+        return;
+      }
+
+      // 📱 Mobile: Short labels
+      const labels = DEPTS.map(d => {
+        if (isMobile) {
+          const short = {
+            "PRINT": "PRINT", "LAMINATE": "LAM", "SOVENTLESS": "SOL",
+            "REWINDER/SLITTER/PACKING": "R/S/P", "BAG MAKING": "BAG",
+            "QA&QC": "QA", "WAREHOUSE": "WH", "OFFICE": "OFF",
+            "CANTEEN": "CAN", "TOILET": "TOL", "LOCKER": "LCK",
+            "ENGINEERING": "ENG", "OUTSIDE": "OUT"
+          };
+          return short[d] || d.substring(0, 4);
+        }
+        return d.length > 10 ? d.substring(0,10) + '…' : d;
+      });
+
       mkChart("s_chDept", {
         type: "bar",
         data: {
-          labels: DEPTS.map(d => d.length > 10 ? d.substring(0,10) + '…' : d),
+          labels: labels,
           datasets: [
             { label: "Closed", data: DEPTS.map(d => deptData[d].closed), backgroundColor: "#10b981" },
-            { label: "Open (On Time)", data: DEPTS.map(d => Math.max(0, deptData[d].open - deptData[d].overdue)), backgroundColor: "#f59e0b" },
+            { label: "Open", data: DEPTS.map(d => Math.max(0, deptData[d].open - deptData[d].overdue)), backgroundColor: "#f59e0b" },
             { label: "Overdue", data: DEPTS.map(d => deptData[d].overdue), backgroundColor: "#ef4444" }
           ]
         },
         options: { 
           responsive: true, 
           maintainAspectRatio: false, 
-          plugins: { legend: { position: 'top' } },
+          plugins: { 
+            legend: { 
+              position: isMobile ? 'bottom' : 'top',
+              labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 11 } }
+            } 
+          },
           scales: { 
-            x: { stacked: true, grid: { color: getChartColors().grid } }, 
-            y: { stacked: true, grid: { color: getChartColors().grid }, beginAtZero: true } 
+            x: { 
+              stacked: true, 
+              grid: { display: false },
+              ticks: { font: { size: isMobile ? 8 : 10 }, maxRotation: isMobile ? 45 : 0 }
+            }, 
+            y: { 
+              stacked: true, 
+              grid: { color: getChartColors().grid }, 
+              beginAtZero: true,
+              ticks: { font: { size: isMobile ? 9 : 11 } }
+            } 
           } 
         }
       });
 
-      // Chart: Categories (Doughnut)
       const cKeys = Object.keys(catData).sort((a,b)=>catData[b]-catData[a]).slice(0,6);
       mkChart("s_chCat", {
         type: "doughnut",
         data: { 
-          labels: cKeys, 
+          labels: cKeys.map(k => k.length > 20 ? k.substring(0, 20) + '…' : k), 
           datasets: [{ 
             data: cKeys.map(k => catData[k]), 
             backgroundColor: ["#f43f5e", "#f97316", "#eab308", "#84cc16", "#06b6d4", "#8b5cf6"] 
@@ -621,17 +961,16 @@ function parseDateObj(dateStr) {
         options: { 
           responsive: true, 
           maintainAspectRatio: false, 
-          cutout: '70%', 
+          cutout: isMobile ? '55%' : '70%', 
           plugins: { 
             legend: { 
-              position: 'right', 
-              labels: { boxWidth: 12, font: { size: 10 } } 
+              position: isMobile ? 'bottom' : 'right', 
+              labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 10 }, padding: isMobile ? 8 : 5 } 
             } 
           } 
         }
       });
 
-      // Chart: MTTR Trend (Line)
       const mKeys = Object.keys(mttrTrend).sort();
       mkChart("s_chMTTR", {
         type: "line",
@@ -644,31 +983,48 @@ function parseDateObj(dateStr) {
             backgroundColor: "rgba(14, 165, 233, 0.1)", 
             fill: true, 
             tension: 0.4,
-            pointRadius: 4,
+            pointRadius: isMobile ? 3 : 4,
             pointHoverRadius: 6
           }] 
         },
         options: { 
           responsive: true, 
           maintainAspectRatio: false, 
-          plugins: { legend: { display: false } },
+          plugins: { 
+            legend: { display: false },
+            tooltip: { enabled: true }
+          },
           scales: {
             y: { 
               beginAtZero: true, 
               grid: { color: getChartColors().grid },
-              title: { display: true, text: 'Days' }
+              ticks: { font: { size: isMobile ? 9 : 11 } }
             },
-            x: { grid: { color: getChartColors().grid } }
+            x: { 
+              grid: { display: false },
+              ticks: { font: { size: isMobile ? 9 : 11 } }
+            }
           }
         }
       });
+    }
+
+    function showEmptyState(canvasId, message) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const parent = canvas.parentElement;
+      parent.innerHTML = `
+        <div class="flex flex-col items-center justify-center h-full text-slate-400 dark:text-slate-500 py-8">
+          <i class="fas fa-inbox text-3xl sm:text-4xl mb-3"></i>
+          <div class="text-xs sm:text-sm font-semibold text-center">${message}</div>
+        </div>
+      `;
     }
 
     // =====================================
     // 🔵 TAB: 5S
     // =====================================
     function process5STab() {
-      // ✅ Filter เฉพาะ 5S
       const data5S = filteredData.ins.filter(i => is5SType(i.inspectionType));
       const scores5S = data5S.map(i => parseFloat(i.score?.percent)).filter(p => !isNaN(p));
       const avg5S = scores5S.length ? Math.round(scores5S.reduce((a, b) => a + b, 0) / scores5S.length) : 0;
@@ -676,36 +1032,25 @@ function parseDateObj(dateStr) {
       document.getElementById("f_kpiAvg").textContent = avg5S + "%";
       document.getElementById("f_kpiCount").textContent = data5S.length;
 
-      // ✅ Group by Area
       const dScore = {}; 
       DEPTS.forEach(d => dScore[d] = []);
-      
-      // ✅ Collect unique section titles จาก fullChecklist (ไม่ต้องใช้ modulo)
-      const sectionStats = {}; // { "1. เครื่องจักร": { s: 0, m: 0 } }
-      const deptHm = {}; // { area: { "1. เครื่องจักร": { s:0, m:0 } } }
-      
-      DEPTS.forEach(d => { 
-        deptHm[d] = {}; 
-      });
+      const sectionStats = {};
+      const deptHm = {};
+      DEPTS.forEach(d => { deptHm[d] = {}; });
 
       data5S.forEach(i => {
         const area = i.area; 
         if (dScore[area]) dScore[area].push(parseFloat(i.score?.percent || 0));
         
-        // อ่าน section titles จาก fullChecklist (เก็บในรูปแบบ { sections: [...] } หลังบ้าน)
         const sections = i.sectionsScore || i.fullChecklist?.sections;
         
         if (Array.isArray(sections)) {
           sections.forEach(sec => {
             const title = String(sec.title || "").trim();
             if (!title) return;
-            
-            // Aggregate overall per section title
             if (!sectionStats[title]) sectionStats[title] = { s: 0, m: 0 };
             sectionStats[title].s += (sec.earned || 0);
             sectionStats[title].m += (sec.max || 0);
-            
-            // Aggregate per area × section
             if (deptHm[area]) {
               if (!deptHm[area][title]) deptHm[area][title] = { s: 0, m: 0 };
               deptHm[area][title].s += (sec.earned || 0);
@@ -713,18 +1058,15 @@ function parseDateObj(dateStr) {
             }
           });
         } else if (i.fullChecklist && typeof i.fullChecklist === 'object') {
-          // Fallback: parse จาก key `5s_s0_q0`, `5s_s1_q0` โดยนับตาม section index
           Object.entries(i.fullChecklist).forEach(([k, v]) => {
             const match = k.match(/^5s_s(\d+)_q(\d+)$/);
             if (match) {
               const sIdx = parseInt(match[1]);
               const sectionTitle = `Section ${sIdx + 1}`;
-              
               if (!sectionStats[sectionTitle]) sectionStats[sectionTitle] = { s: 0, m: 0 };
               let val = v === "ดี" ? 2 : v === "พอใช้" ? 1 : 0;
               sectionStats[sectionTitle].m += 2;
               sectionStats[sectionTitle].s += val;
-              
               if (deptHm[area]) {
                 if (!deptHm[area][sectionTitle]) deptHm[area][sectionTitle] = { s: 0, m: 0 };
                 deptHm[area][sectionTitle].m += 2;
@@ -735,7 +1077,6 @@ function parseDateObj(dateStr) {
         }
       });
 
-      // Rank departments
       const lbData = []; 
       Object.keys(dScore).forEach(d => { 
         if (dScore[d].length > 0) {
@@ -750,95 +1091,135 @@ function parseDateObj(dateStr) {
       document.getElementById("f_kpiBest").textContent = lbData.length > 0 ? lbData[0].name : "-";
       document.getElementById("f_kpiWorst").textContent = lbData.length > 0 ? lbData[lbData.length - 1].name : "-";
 
-      // ✅ Radar Chart: ใช้ section titles จริง (ไม่เกิน 10 หมวด)
       const sortedSections = Object.entries(sectionStats)
         .filter(([k, v]) => v.m > 0)
         .map(([k, v]) => ({ title: k, pct: Math.round((v.s / v.m) * 100) }))
-        .slice(0, 10); // Limit to 10 for readability
+        .slice(0, isMobile ? 6 : 10);
       
-      mkChart("f_chRadar", { 
-        type: "radar", 
-        data: { 
-          labels: sortedSections.map(s => {
-            // ตัดชื่อให้สั้นลง (เอาแค่ส่วนหลัง . ถ้ามี)
-            const parts = s.title.split('.');
-            return parts.length > 1 ? parts.slice(1).join('.').trim().substring(0, 20) : s.title.substring(0, 20);
-          }), 
-          datasets: [{ 
-            label: "Score %", 
-            data: sortedSections.map(s => s.pct), 
-            backgroundColor: "rgba(59, 130, 246, 0.2)", 
-            borderColor: "#3b82f6",
-            pointBackgroundColor: "#3b82f6"
-          }] 
-        }, 
-        options: { 
-          responsive: true, 
-          maintainAspectRatio: false, 
-          scales: {
-            r: { 
-              min: 0, 
-              max: 100,
-              grid: { color: getChartColors().grid },
-              angleLines: { color: getChartColors().grid },
-              pointLabels: { font: { size: 9 } }
-            }
-          },
-          plugins: { legend: { display: false } }
-        } 
-      });
-
-      // Rank Bar
-      mkChart("f_chRank", {
-        type: "bar",
-        data: { 
-          labels: lbData.map(l => l.name.length > 12 ? l.name.substring(0,12) + '…' : l.name), 
-          datasets: [{ 
-            label: "Avg Score %", 
-            data: lbData.map(l => l.score), 
-            backgroundColor: lbData.map(l => l.score >= 85 ? '#10b981' : l.score >= 70 ? '#f59e0b' : '#ef4444'),
-            borderRadius: 4 
-          }] 
-        },
-        options: { 
-          responsive: true, 
-          maintainAspectRatio: false, 
-          indexAxis: 'y',
-          scales: { 
-            x: { min: 0, max: 100, grid: { color: getChartColors().grid } },
-            y: { grid: { display: false } }
+      if (sortedSections.length === 0) {
+        showEmptyState('f_chRadar', 'ไม่มีข้อมูล 5S');
+      } else {
+        mkChart("f_chRadar", { 
+          type: "radar", 
+          data: { 
+            labels: sortedSections.map(s => {
+              const parts = s.title.split('.');
+              const short = parts.length > 1 ? parts.slice(1).join('.').trim() : s.title;
+              return short.substring(0, isMobile ? 12 : 20);
+            }), 
+            datasets: [{ 
+              label: "Score %", 
+              data: sortedSections.map(s => s.pct), 
+              backgroundColor: "rgba(59, 130, 246, 0.2)", 
+              borderColor: "#3b82f6",
+              pointBackgroundColor: "#3b82f6",
+              pointRadius: isMobile ? 2 : 3
+            }] 
           }, 
-          plugins: { legend: { display: false } } 
-        }
-      });
+          options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            scales: {
+              r: { 
+                min: 0, max: 100,
+                grid: { color: getChartColors().grid },
+                angleLines: { color: getChartColors().grid },
+                pointLabels: { font: { size: isMobile ? 8 : 10 } },
+                ticks: { font: { size: 8 }, stepSize: 25 }
+              }
+            },
+            plugins: { legend: { display: false } }
+          } 
+        });
+      }
 
-      // Heatmap Table
+      if (lbData.length === 0) {
+        showEmptyState('f_chRank', 'ไม่มีข้อมูล Ranking');
+      } else {
+        mkChart("f_chRank", {
+          type: "bar",
+          data: { 
+            labels: lbData.map(l => {
+              if (isMobile) {
+                const short = {
+                  "PRINT": "PRINT", "LAMINATE": "LAM", "SOVENTLESS": "SOL",
+                  "REWINDER/SLITTER/PACKING": "R/S/P", "BAG MAKING": "BAG",
+                  "QA&QC": "QA", "WAREHOUSE": "WH", "OFFICE": "OFF",
+                  "CANTEEN": "CAN", "TOILET": "TOL", "LOCKER": "LCK",
+                  "ENGINEERING": "ENG", "OUTSIDE": "OUT"
+                };
+                return short[l.name] || l.name.substring(0, 5);
+              }
+              return l.name.length > 12 ? l.name.substring(0,12) + '…' : l.name;
+            }), 
+            datasets: [{ 
+              label: "Avg Score %", 
+              data: lbData.map(l => l.score), 
+              backgroundColor: lbData.map(l => l.score >= 85 ? '#10b981' : l.score >= 70 ? '#f59e0b' : '#ef4444'),
+              borderRadius: 4 
+            }] 
+          },
+          options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            indexAxis: isMobile ? 'x' : 'y',
+            scales: { 
+              x: { 
+                min: 0, max: 100, 
+                grid: { color: getChartColors().grid },
+                ticks: { font: { size: isMobile ? 8 : 10 }, maxRotation: isMobile ? 45 : 0 }
+              },
+              y: { 
+                grid: { display: !isMobile },
+                ticks: { font: { size: isMobile ? 9 : 11 } }
+              }
+            }, 
+            plugins: { legend: { display: false } } 
+          }
+        });
+      }
+
+      // Heatmap
       const sectionTitles = Object.keys(sectionStats).sort();
-      let hmHtml = `<tr class="bg-slate-100 dark:bg-slate-800"><th class="p-2 border-b dark:border-slate-700 text-left sticky left-0 bg-slate-100 dark:bg-slate-800">Area</th>${sectionTitles.map(t => {
-        const parts = t.split('.');
-        const shortTitle = parts.length > 1 ? parts.slice(1).join('.').trim() : t;
-        return `<th class="p-2 border-b dark:border-slate-700 text-[10px] whitespace-nowrap">${shortTitle.substring(0, 25)}</th>`;
-      }).join('')}</tr>`;
+      let hmHtml = `<tr class="bg-slate-100 dark:bg-slate-800">
+        <th class="p-1.5 sm:p-2 border-b dark:border-slate-700 text-left sticky left-0 bg-slate-100 dark:bg-slate-800 text-[10px] sm:text-xs">Area</th>
+        ${sectionTitles.map(t => {
+          const parts = t.split('.');
+          const shortTitle = parts.length > 1 ? parts.slice(1).join('.').trim() : t;
+          return `<th class="p-1.5 sm:p-2 border-b dark:border-slate-700 text-[9px] sm:text-[10px] whitespace-nowrap">${shortTitle.substring(0, isMobile ? 12 : 25)}</th>`;
+        }).join('')}
+      </tr>`;
       
+      let hasHeatmapData = false;
       DEPTS.forEach(d => {
         if (dScore[d] && dScore[d].length > 0) {
-          hmHtml += `<tr class="border-b dark:border-slate-700"><td class="p-2 font-bold text-slate-700 dark:text-slate-300 truncate max-w-[100px] sticky left-0 bg-white dark:bg-darkCard">${d}</td>`;
+          hasHeatmapData = true;
+          const shortD = isMobile ? ({
+            "PRINT": "PRINT", "LAMINATE": "LAM", "SOVENTLESS": "SOL",
+            "REWINDER/SLITTER/PACKING": "R/S/P", "BAG MAKING": "BAG",
+            "QA&QC": "QA", "WAREHOUSE": "WH", "OFFICE": "OFF",
+            "CANTEEN": "CAN", "TOILET": "TOL", "LOCKER": "LCK",
+            "ENGINEERING": "ENG", "OUTSIDE": "OUT"
+          }[d] || d.substring(0, 5)) : d;
+          
+          hmHtml += `<tr class="border-b dark:border-slate-700">
+            <td class="p-1.5 sm:p-2 font-bold text-slate-700 dark:text-slate-300 sticky left-0 bg-white dark:bg-darkCard text-[10px] sm:text-xs">${shortD}</td>`;
           sectionTitles.forEach(title => {
             const cell = (deptHm[d] && deptHm[d][title]) || { s: 0, m: 0 };
             const pct = cell.m > 0 ? Math.round((cell.s / cell.m) * 100) : null;
             if (pct === null) {
-              hmHtml += `<td class="p-2 text-slate-300">-</td>`;
+              hmHtml += `<td class="p-1.5 sm:p-2 text-slate-300 text-[10px]">-</td>`;
             } else { 
               const bg = pct >= 85 ? '#dcfce7' : pct >= 70 ? '#fef3c7' : '#fee2e2'; 
               const tc = pct >= 85 ? '#065f46' : pct >= 70 ? '#92400e' : '#991b1b'; 
-              hmHtml += `<td class="p-2 font-inter text-[10px] font-bold" style="background:${bg}; color:${tc};">${pct}%</td>`; 
+              hmHtml += `<td class="p-1.5 sm:p-2 font-inter text-[9px] sm:text-[10px] font-bold" style="background:${bg}; color:${tc};">${pct}%</td>`; 
             }
           }); 
           hmHtml += `</tr>`;
         }
       }); 
       
-      document.getElementById("f_tbHeatmap").innerHTML = sectionTitles.length === 0 
+      document.getElementById("f_tbHeatmap").innerHTML = !hasHeatmapData
         ? '<tr><td colspan="10" class="p-4 text-center text-slate-400">ไม่มีข้อมูล 5S</td></tr>' 
         : hmHtml;
     }
@@ -847,16 +1228,14 @@ function parseDateObj(dateStr) {
     // 🟣 TAB: EXEC SUMMARY
     // =====================================
     function processExecTab() {
-      // 1. Cross Trend (ใช้ globalRaw เพื่อแสดงแนวโน้มไม่จำกัด filter เดือน)
       const tMonths = {};
       
       globalRaw.ins.filter(i => is5SType(i.inspectionType)).forEach(i => {
         const d = parseDateObj(i.timestamp);
         if (d) { 
           const ym = toYearMonth(d); 
-          if (!tMonths[ym]) tMonths[ym] = { s5: [], sOpen: 0, total: 0 }; 
+          if (!tMonths[ym]) tMonths[ym] = { s5: [], sOpen: 0 }; 
           tMonths[ym].s5.push(parseFloat(i.score?.percent || 0)); 
-          tMonths[ym].total++;
         }
       });
       
@@ -864,7 +1243,7 @@ function parseDateObj(dateStr) {
         const d = parseDateObj(j.dateFound);
         if (d) { 
           const ym = toYearMonth(d); 
-          if (!tMonths[ym]) tMonths[ym] = { s5: [], sOpen: 0, total: 0 }; 
+          if (!tMonths[ym]) tMonths[ym] = { s5: [], sOpen: 0 }; 
           if (j.status !== 'Closed') tMonths[ym].sOpen++; 
         }
       });
@@ -877,18 +1256,17 @@ function parseDateObj(dateStr) {
           labels: mKeys.length ? mKeys : ["No Data"],
           datasets: [
             { 
-              label: "5S Avg Score %", 
+              label: "5S Score %", 
               type: 'line',
               data: mKeys.map(m => tMonths[m].s5.length ? parseFloat((tMonths[m].s5.reduce((a,b)=>a+b,0) / tMonths[m].s5.length).toFixed(1)) : 0), 
               borderColor: "#3b82f6", 
               backgroundColor: "#3b82f6", 
               yAxisID: 'y',
               tension: 0.4,
-              pointRadius: 5,
-              pointHoverRadius: 7
+              pointRadius: isMobile ? 3 : 5
             },
             { 
-              label: "Safety Open Issues", 
+              label: "Safety Open", 
               data: mKeys.map(m => tMonths[m].sOpen), 
               backgroundColor: "#ef4444", 
               yAxisID: 'y1',
@@ -899,29 +1277,32 @@ function parseDateObj(dateStr) {
         options: { 
           responsive: true, 
           maintainAspectRatio: false, 
-          plugins: { legend: { position: 'top' } },
+          plugins: { 
+            legend: { 
+              position: isMobile ? 'bottom' : 'top',
+              labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 11 } }
+            }
+          },
           scales: { 
             y: { 
-              type: 'linear', 
-              position: 'left', 
-              min: 0, 
-              max: 100,
+              type: 'linear', position: 'left', min: 0, max: 100,
               grid: { color: getChartColors().grid },
-              title: { display: true, text: '5S Score (%)', color: '#3b82f6' }
+              ticks: { font: { size: isMobile ? 9 : 11 } }
             }, 
             y1: { 
-              type: 'linear', 
-              position: 'right', 
+              type: 'linear', position: 'right', 
               grid: { drawOnChartArea: false },
-              title: { display: true, text: 'Open Issues', color: '#ef4444' },
+              ticks: { font: { size: isMobile ? 9 : 11 } },
               beginAtZero: true
             },
-            x: { grid: { color: getChartColors().grid } }
+            x: { 
+              grid: { display: false },
+              ticks: { font: { size: isMobile ? 9 : 11 } }
+            }
           } 
         }
       });
 
-      // 2. Top Critical Overdue (Table)
       const overdues = filteredData.jobs
         .filter(j => j.status !== 'Closed' && parseDateObj(j.dueDate) && parseDateObj(j.dueDate) < new Date())
         .sort((a,b) => parseDateObj(a.dueDate) - parseDateObj(b.dueDate))
@@ -929,23 +1310,22 @@ function parseDateObj(dateStr) {
       
       document.getElementById("e_tbOverdue").innerHTML = `
         <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500">
-          <tr><th class="p-2">Job ID</th><th class="p-2">Area</th><th class="p-2">Due Date</th><th class="p-2">Days Over</th></tr>
+          <tr><th class="p-2 text-[10px] sm:text-xs">Job ID</th><th class="p-2 text-[10px] sm:text-xs">Area</th><th class="p-2 text-[10px] sm:text-xs">Due</th><th class="p-2 text-[10px] sm:text-xs">Days</th></tr>
         </thead>
         <tbody class="divide-y dark:divide-slate-700">
           ${overdues.length ? overdues.map(o => {
             const due = parseDateObj(o.dueDate);
             const daysOver = Math.floor((new Date() - due) / 86400000);
             return `<tr class="hover:bg-rose-50 dark:hover:bg-rose-900/20">
-              <td class="p-2 font-mono text-rose-600 font-bold text-[10px]">${o.jobId}</td>
-              <td class="p-2 font-bold text-[11px]">${o.area}</td>
-              <td class="p-2 text-rose-500 text-[11px]">${o.dueDate}</td>
-              <td class="p-2 font-bold text-rose-700 text-[11px]">+${daysOver} วัน</td>
+              <td class="p-2 font-mono text-rose-600 font-bold text-[9px] sm:text-[10px]">${o.jobId}</td>
+              <td class="p-2 font-bold text-[10px] sm:text-[11px]">${o.area}</td>
+              <td class="p-2 text-rose-500 text-[10px] sm:text-[11px]">${o.dueDate}</td>
+              <td class="p-2 font-bold text-rose-700 text-[10px] sm:text-[11px]">+${daysOver}d</td>
             </tr>`;
-          }).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400">✅ No Overdue Issues</td></tr>'}
+          }).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400 text-xs">✅ No Overdue Issues</td></tr>'}
         </tbody>
       `;
 
-      // 3. Worst 5S Areas (Table)
       const dScore = {};
       filteredData.ins.filter(i => is5SType(i.inspectionType)).forEach(i => {
         if (!dScore[i.area]) dScore[i.area] = []; 
@@ -966,17 +1346,17 @@ function parseDateObj(dateStr) {
       
       document.getElementById("e_tbWorst5S").innerHTML = `
         <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500">
-          <tr><th class="p-2">Rank</th><th class="p-2">Area</th><th class="p-2">Audits</th><th class="p-2 text-right">Score</th></tr>
+          <tr><th class="p-2 text-[10px] sm:text-xs">#</th><th class="p-2 text-[10px] sm:text-xs">Area</th><th class="p-2 text-[10px] sm:text-xs">Audits</th><th class="p-2 text-right text-[10px] sm:text-xs">Score</th></tr>
         </thead>
         <tbody class="divide-y dark:divide-slate-700">
           ${bList.length ? bList.slice(0,5).map((o,i) => `
             <tr class="hover:bg-amber-50 dark:hover:bg-amber-900/20">
-              <td class="p-2 font-bold text-slate-400">#${i+1}</td>
-              <td class="p-2 font-bold text-[11px]">${o.name}</td>
-              <td class="p-2 text-[11px]">${o.count}</td>
-              <td class="p-2 text-right font-inter font-bold ${o.score < 70 ? 'text-rose-600' : o.score < 85 ? 'text-amber-600' : 'text-emerald-600'}">${o.score}%</td>
+              <td class="p-2 font-bold text-slate-400 text-[10px] sm:text-xs">#${i+1}</td>
+              <td class="p-2 font-bold text-[10px] sm:text-[11px]">${o.name}</td>
+              <td class="p-2 text-[10px] sm:text-[11px]">${o.count}</td>
+              <td class="p-2 text-right font-inter font-bold text-[10px] sm:text-xs ${o.score < 70 ? 'text-rose-600' : o.score < 85 ? 'text-amber-600' : 'text-emerald-600'}">${o.score}%</td>
             </tr>
-          `).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400">No 5S Data</td></tr>'}
+          `).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400 text-xs">No 5S Data</td></tr>'}
         </tbody>
       `;
     }
