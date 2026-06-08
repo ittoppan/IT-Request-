@@ -56,9 +56,8 @@
 
     /* 🖥️ Desktop Table Enhancements */
     @media (min-width: 768px) {
-      /* Sticky Header */
+      /* ✅ แก้ไข: เอา max-height ออก ให้แสดงทั้งหมด */
       .table-wrapper {
-        max-height: calc(100vh - 380px);
         overflow: auto;
         border-radius: 0.75rem;
         border: 1px solid #e2e8f0;
@@ -79,7 +78,6 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       }
       
-      /* Zebra Striping */
       .responsive-table tbody tr:nth-child(even) {
         background-color: #f8fafc;
       }
@@ -87,7 +85,6 @@
         background-color: #1a2332;
       }
       
-      /* Row Hover */
       .responsive-table tbody tr {
         transition: all 0.2s;
       }
@@ -100,7 +97,6 @@
         background-color: #1e3a5f !important;
       }
       
-      /* Open row highlight */
       .row-open {
         border-left: 4px solid #f43f5e !important;
       }
@@ -109,7 +105,6 @@
       }
     }
 
-    /* Custom Scrollbar */
     .table-wrapper::-webkit-scrollbar { width: 8px; height: 8px; }
     .table-wrapper::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
     .table-wrapper::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
@@ -120,7 +115,7 @@
     @media print {
       nav, .no-print, button { display: none !important; }
       body { background: white !important; }
-      .table-wrapper { max-height: none !important; overflow: visible !important; border: none !important; }
+      .table-wrapper { overflow: visible !important; border: none !important; }
       .responsive-table thead { position: static !important; }
       .responsive-table tr { box-shadow: none !important; border: 1px solid #ccc !important; page-break-inside: avoid; }
       .responsive-table tbody tr:nth-child(even) { background-color: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -145,7 +140,6 @@
   </nav>
 
   <div class="max-w-[1800px] mx-auto mt-14 space-y-4">
-    <!-- Filter Panel -->
     <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 no-print">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100 mb-3">
         <h3 class="font-bold text-sm md:text-base text-slate-800 flex items-center gap-1"><i class="fas fa-sliders-h text-[#003566]"></i> ตัวกรองข้อมูล</h3>
@@ -195,10 +189,8 @@
       <div class="mt-3 pt-2 border-t border-dashed border-slate-100 flex flex-wrap gap-1.5" id="activeFilters"></div>
     </div>
 
-    <!-- 📊 Report Table (กว้างขึ้น) -->
     <div class="bg-white rounded-2xl p-2 md:p-4 shadow-sm border border-slate-200 overflow-visible w-full">
       
-      <!-- Header -->
       <div class="border rounded-xl bg-slate-50 mb-3 p-4">
         <div class="flex flex-wrap md:flex-nowrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
@@ -215,19 +207,17 @@
         </div>
       </div>
 
-      <!-- Toolbar -->
       <div class="flex flex-wrap items-center justify-between gap-2 mb-4 bg-slate-50/50 p-2 rounded-xl border border-slate-100 no-print">
         <div class="flex flex-wrap gap-1.5">
           <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="exportCSV()"><i class="fas fa-file-csv text-teal-600"></i> Export CSV</button>
           <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="printReport()"><i class="fas fa-print text-indigo-600"></i> พิมพ์</button>
           <div class="hidden md:flex items-center gap-2 ml-2 pl-2 border-l border-slate-200">
-            <span class="text-[10px] text-slate-500"><i class="fas fa-info-circle"></i> เลื่อนดูตารางแนวนอน/แนวตั้งได้</span>
+            <span class="text-[10px] text-slate-500"><i class="fas fa-info-circle"></i> แสดง 50 รายการล่าสุด</span>
           </div>
         </div>
         <button id="toggleDarkMode" class="bg-white border text-slate-500 w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center shadow-2xs hover:bg-slate-50 transition" onclick="toggleDarkMode()"><i class="fas fa-moon text-[10px] md:text-xs"></i></button>
       </div>
 
-      <!-- 📊 TABLE WRAPPER (Scrollable) -->
       <div class="table-wrapper w-full">
         <table class="responsive-table w-full text-xs md:text-[13px] text-left border-collapse break-words" style="min-width: 1500px;">
           <thead>
@@ -318,7 +308,7 @@
     let allReportData = []; 
     let currentTypeFilter = 'all'; 
     let currentPage = 1; 
-    const itemsPerPage = 50; 
+    const itemsPerPage = 50; // ✅ แสดง 50 รายการ
     let isLoading = false; 
     let currentSort = { key: 'jobId', dir: 'desc' }; 
     let searchTimeout = null;
@@ -535,7 +525,6 @@
           ? `<a href="resolveNew.html?jobid=${encodeURIComponent(item.jobId)}" class="inline-flex items-center justify-center gap-1 bg-rose-500 hover:bg-rose-600 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px] shadow-sm transition whitespace-nowrap"><i class="fas fa-wrench"></i> แก้ไข</a>`
           : `<span class="inline-flex items-center justify-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap"><i class="fas fa-check-circle"></i> ปิดแล้ว</span>`;
         
-        // 🖼️ รูปภาพใหญ่ขึ้น
         const imgBefore = item.picBefore && item.picBefore !== "-" 
           ? `<img src="${getDriveThumb(item.picBefore)}" class="w-[70px] h-[55px] rounded-lg object-cover cursor-pointer hover:scale-110 hover:shadow-lg border-2 border-slate-200 shadow-sm transition mx-auto" onclick="window.open('${escapeHtml(item.picBefore)}')" title="คลิกดูภาพเต็ม">`
           : `<span class="text-slate-300 italic text-[11px]">ไม่มีรูป</span>`;
@@ -555,13 +544,13 @@
             <td data-label="ภาพ After" class="p-2.5 text-center align-middle border-r border-slate-100">${imgAfter}</td>
             <td data-label="พื้นที่/แผนก" class="p-2.5 align-middle font-bold text-slate-700 border-r border-slate-100 whitespace-nowrap">${escapeHtml(displayArea)}</td>
             <td data-label="Job No." class="p-2.5 align-middle font-semibold text-sky-700 border-r border-slate-100 font-mono text-[11px] whitespace-nowrap">${escapeHtml(item.jobId)}</td>
-            <td data-label="ปัญหาที่ตรวจพบ" class="p-2.5 align-middle font-medium text-slate-800 border-r border-slate-100 leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${escapeHtml(item.remark || '-')}</div></td>
+            <td data-label="ปัญหาที่ตรวจพบ" class="p-2.5 align-middle font-medium text-slate-800 border-r border-slate-100 leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${escapeHtml(item.problem || '-')}</div></td>
             <td data-label="แนวทางแก้ไข" class="p-2.5 align-middle text-slate-600 border-r border-slate-100 leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span class="text-slate-300">-</span>'}</div></td>
             <td data-label="ผู้รับผิดชอบ" class="p-2.5 text-center align-middle font-medium border-r border-slate-100 whitespace-nowrap">${item.picName ? escapeHtml(item.picName) : '<span class="text-slate-300">-</span>'}</td>
             <td data-label="วันที่พบ" class="p-2.5 text-center align-middle text-slate-500 border-r border-slate-100 whitespace-nowrap text-[11px]">${item.dateFound || '-'}</td>
             <td data-label="กำหนดเสร็จ" class="p-2.5 text-center align-middle font-bold text-rose-600 border-r border-slate-100 whitespace-nowrap text-[11px]">${item.dueDate || '-'}</td>
             <td data-label="ปิดงาน" class="p-2.5 text-center align-middle font-semibold border-r border-slate-100 whitespace-nowrap text-[11px]">${item.finishDate && item.finishDate !== "-" ? `<span class="text-emerald-600">${item.finishDate}</span>` : '<span class="text-slate-300">-</span>'}</td>
-            <td data-label="หัวข้อ" class="p-2.5 align-middle text-slate-500 text-[11px] leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${item.remark && item.remark !== '-' ? escapeHtml(item.problem) : '<span class="text-slate-300">-</span>'}</div></td>
+            <td data-label="หมายเหตุ" class="p-2.5 align-middle text-slate-500 text-[11px] leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${item.remark && item.remark !== '-' ? escapeHtml(item.remark) : '<span class="text-slate-300">-</span>'}</div></td>
           </tr>
         `;
       }).join('');
@@ -570,16 +559,19 @@
 
     function renderPagination(totalPages) {
       const container = document.getElementById('pagination'); 
-      if (totalPages <= 1) { container.innerHTML = ''; return; }
-      let html = `<button onclick="goToPage(1)" class="px-2 py-1 md:px-3 md:py-1.5 text-[10px] md:text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-medium border transition disabled:opacity-40" ${currentPage === 1 ? 'disabled' : ''}>«</button>`;
-      for (let p = Math.max(1, currentPage - 2); p <= Math.min(totalPages, currentPage + 2); p++) {
-        html += `<button onclick="goToPage(${p})" class="px-2.5 py-1 md:px-3.5 md:py-1.5 text-[10px] md:text-xs border rounded-lg font-bold transition ${p === currentPage ? 'bg-[#003566] text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}">${p}</button>`;
-      }
-      html += `<button onclick="goToPage(${totalPages})" class="px-2 py-1 md:px-3 md:py-1.5 text-[10px] md:text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-medium border transition disabled:opacity-40" ${currentPage === totalPages ? 'disabled' : ''}>»</button>`;
-      container.innerHTML = html;
+      // ✅ แสดงจำนวนรายการทั้งหมด
+      container.innerHTML = `
+        <div class="flex items-center gap-3 text-xs text-slate-500">
+          <i class="fas fa-table"></i>
+          <span>แสดง <b class="text-[#003566]">${Math.min(itemsPerPage, allReportData.length)}</b> จากทั้งหมด <b class="text-[#003566]">${allReportData.length}</b> รายการ</span>
+        </div>
+      `;
     }
     
-    function goToPage(page) { currentPage = page; renderTable(); }
+    function goToPage(page) { 
+      currentPage = page; 
+      renderTable();
+    }
     
     function getDriveThumb(url) { 
       if (!url || url === "-") return ""; 
