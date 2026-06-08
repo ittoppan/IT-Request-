@@ -11,13 +11,16 @@
     body { font-family: 'Sarabun', sans-serif; }
     .dark { background-color: #0f172a; color: #f8fafc; }
     .dark .bg-white { background-color: #1e293b !important; color: #f8fafc !important; }
+    .dark .bg-slate-50 { background-color: #0f172a !important; }
     .dark .border { border-color: #334155 !important; }
     .dark select, .dark input { background-color: #334155 !important; color: white !important; border-color: #475569 !important; }
+    .dark .divide-y > :not([hidden]) ~ :not([hidden]) { border-color: #334155; }
     .type-btn.active { border-color: #003566 !important; background-color: #e6f0fa !important; color: #003566 !important; }
     .dark .type-btn.active { border-color: #38bdf8 !important; background-color: #0c4a6e !important; color: #38bdf8 !important; }
     .hover-expand { transition: all 0.3s ease; }
     .hover-expand:hover { -webkit-line-clamp: unset !important; line-clamp: unset !important; }
 
+    /* 📱 Mobile Card Layout */
     @media (max-width: 767px) {
       .responsive-table thead { display: none; }
       .responsive-table tbody, .responsive-table tr, .responsive-table td { display: block; width: 100%; }
@@ -47,21 +50,87 @@
         margin-bottom: 0.25rem;
       }
       .dark .responsive-table td::before { color: #38bdf8; }
-      .responsive-table td img { width: 100% !important; max-width: 250px; height: auto !important; margin: 0; }
+      .responsive-table td img { width: 100% !important; max-width: 280px; height: auto !important; margin: 0; }
       .responsive-table td a, .responsive-table td span.inline-flex { margin-left: 0; max-width: fit-content; }
     }
+
+    /* 🖥️ Desktop Table Enhancements */
+    @media (min-width: 768px) {
+      /* Sticky Header */
+      .table-wrapper {
+        max-height: calc(100vh - 380px);
+        overflow: auto;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+      }
+      .dark .table-wrapper { border-color: #334155; }
+      
+      .responsive-table thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      
+      .responsive-table thead th {
+        position: sticky;
+        top: 0;
+        background: linear-gradient(to right, #002548, #003566);
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      
+      /* Zebra Striping */
+      .responsive-table tbody tr:nth-child(even) {
+        background-color: #f8fafc;
+      }
+      .dark .responsive-table tbody tr:nth-child(even) {
+        background-color: #1a2332;
+      }
+      
+      /* Row Hover */
+      .responsive-table tbody tr {
+        transition: all 0.2s;
+      }
+      .responsive-table tbody tr:hover {
+        background-color: #e0f2fe !important;
+        transform: scale(1.001);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+      .dark .responsive-table tbody tr:hover {
+        background-color: #1e3a5f !important;
+      }
+      
+      /* Open row highlight */
+      .row-open {
+        border-left: 4px solid #f43f5e !important;
+      }
+      .row-closed {
+        border-left: 4px solid #10b981 !important;
+      }
+    }
+
+    /* Custom Scrollbar */
+    .table-wrapper::-webkit-scrollbar { width: 8px; height: 8px; }
+    .table-wrapper::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+    .table-wrapper::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+    .table-wrapper::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    .dark .table-wrapper::-webkit-scrollbar-track { background: #1e293b; }
+    .dark .table-wrapper::-webkit-scrollbar-thumb { background: #475569; }
 
     @media print {
       nav, .no-print, button { display: none !important; }
       body { background: white !important; }
+      .table-wrapper { max-height: none !important; overflow: visible !important; border: none !important; }
+      .responsive-table thead { position: static !important; }
       .responsive-table tr { box-shadow: none !important; border: 1px solid #ccc !important; page-break-inside: avoid; }
+      .responsive-table tbody tr:nth-child(even) { background-color: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 p-2 md:p-6 min-h-screen">
 
   <nav class="bg-[#003566] text-white fixed top-0 left-0 right-0 z-50 shadow-md no-print">
-    <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between py-3 gap-3">
+    <div class="max-w-[1800px] mx-auto px-4 flex flex-wrap items-center justify-between py-3 gap-3">
       <div class="flex items-center gap-2">
         <i class="fas fa-shield-halved text-xl text-sky-400"></i>
         <span class="font-bold tracking-wide text-sm md:text-base">TOPPAN SAFETY & 5S</span>
@@ -75,7 +144,8 @@
     </div>
   </nav>
 
-  <div class="max-w-7xl mx-auto mt-14 space-y-4">
+  <div class="max-w-[1800px] mx-auto mt-14 space-y-4">
+    <!-- Filter Panel -->
     <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 no-print">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100 mb-3">
         <h3 class="font-bold text-sm md:text-base text-slate-800 flex items-center gap-1"><i class="fas fa-sliders-h text-[#003566]"></i> ตัวกรองข้อมูล</h3>
@@ -125,8 +195,10 @@
       <div class="mt-3 pt-2 border-t border-dashed border-slate-100 flex flex-wrap gap-1.5" id="activeFilters"></div>
     </div>
 
-    <div class="bg-white rounded-2xl p-2 md:p-4 shadow-sm border border-slate-200 overflow-hidden w-full">
+    <!-- 📊 Report Table (กว้างขึ้น) -->
+    <div class="bg-white rounded-2xl p-2 md:p-4 shadow-sm border border-slate-200 overflow-visible w-full">
       
+      <!-- Header -->
       <div class="border rounded-xl bg-slate-50 mb-3 p-4">
         <div class="flex flex-wrap md:flex-nowrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
@@ -143,31 +215,36 @@
         </div>
       </div>
 
+      <!-- Toolbar -->
       <div class="flex flex-wrap items-center justify-between gap-2 mb-4 bg-slate-50/50 p-2 rounded-xl border border-slate-100 no-print">
         <div class="flex flex-wrap gap-1.5">
           <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="exportCSV()"><i class="fas fa-file-csv text-teal-600"></i> Export CSV</button>
           <button class="bg-white hover:bg-slate-50 border border-slate-200 px-2 md:px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-2xs transition" onclick="printReport()"><i class="fas fa-print text-indigo-600"></i> พิมพ์</button>
+          <div class="hidden md:flex items-center gap-2 ml-2 pl-2 border-l border-slate-200">
+            <span class="text-[10px] text-slate-500"><i class="fas fa-info-circle"></i> เลื่อนดูตารางแนวนอน/แนวตั้งได้</span>
+          </div>
         </div>
         <button id="toggleDarkMode" class="bg-white border text-slate-500 w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center shadow-2xs hover:bg-slate-50 transition" onclick="toggleDarkMode()"><i class="fas fa-moon text-[10px] md:text-xs"></i></button>
       </div>
 
-      <div class="w-full md:rounded-xl md:border md:border-slate-200">
-        <table class="responsive-table w-full text-[11px] md:text-xs text-left border-collapse md:table-fixed break-words">
-          <thead class="hidden md:table-header-group">
+      <!-- 📊 TABLE WRAPPER (Scrollable) -->
+      <div class="table-wrapper w-full">
+        <table class="responsive-table w-full text-xs md:text-[13px] text-left border-collapse break-words" style="min-width: 1500px;">
+          <thead>
             <tr class="bg-gradient-to-r from-[#002548] to-[#003566] text-white">
-              <th class="p-2 text-center font-bold border border-slate-700 w-[4%] cursor-pointer" onclick="sortTable('jobId')">ลำดับ</th>
-              <th class="p-2 text-center font-bold border border-slate-700 w-[5%]">ประเภท</th>
-              <th class="p-2 text-center font-bold border border-slate-700 w-[6%]">Before</th>
-              <th class="p-2 text-center font-bold border border-slate-700 w-[6%]">After</th>
-              <th class="p-2 font-bold border border-slate-700 w-[8%] cursor-pointer" onclick="sortTable('area')">พื้นที่</th>
-              <th class="p-2 font-bold border border-slate-700 w-[8%] cursor-pointer" onclick="sortTable('jobId')">Job No.</th>
-              <th class="p-2 font-bold border border-slate-700 w-[16%]">ปัญหาที่ตรวจพบ</th>
-              <th class="p-2 font-bold border border-slate-700 w-[16%]">แนวทางแก้ไขปัญหา</th>
-              <th class="p-2 text-center font-bold border border-slate-700 w-[7%]">ผู้รับผิดชอบ</th>
-              <th class="p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('dateFound')">วันที่พบ</th>
-              <th class="p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('dueDate')">กำหนดเสร็จ</th>
-              <th class="p-2 text-center font-bold border border-slate-700 w-[6%] cursor-pointer" onclick="sortTable('finishDate')">ปิดงาน</th>
-              <th class="p-2 font-bold border border-slate-700 w-[6%]">หมายเหตุ</th>
+              <th class="p-2.5 text-center font-bold border-r border-slate-600 whitespace-nowrap">ลำดับ</th>
+              <th class="p-2.5 text-center font-bold border-r border-slate-600 whitespace-nowrap">ประเภท</th>
+              <th class="p-2.5 text-center font-bold border-r border-slate-600 whitespace-nowrap">Before</th>
+              <th class="p-2.5 text-center font-bold border-r border-slate-600 whitespace-nowrap">After</th>
+              <th class="p-2.5 font-bold border-r border-slate-600 whitespace-nowrap cursor-pointer hover:bg-white/10" onclick="sortTable('area')">พื้นที่ <i class="fas fa-sort text-[9px] ml-1 opacity-60"></i></th>
+              <th class="p-2.5 font-bold border-r border-slate-600 whitespace-nowrap cursor-pointer hover:bg-white/10" onclick="sortTable('jobId')">Job No. <i class="fas fa-sort text-[9px] ml-1 opacity-60"></i></th>
+              <th class="p-2.5 font-bold border-r border-slate-600 whitespace-nowrap min-w-[220px]">ปัญหาที่ตรวจพบ</th>
+              <th class="p-2.5 font-bold border-r border-slate-600 whitespace-nowrap min-w-[220px]">แนวทางแก้ไขปัญหา</th>
+              <th class="p-2.5 text-center font-bold border-r border-slate-600 whitespace-nowrap">ผู้รับผิดชอบ</th>
+              <th class="p-2.5 text-center font-bold border-r border-slate-600 whitespace-nowrap cursor-pointer hover:bg-white/10" onclick="sortTable('dateFound')">วันที่พบ <i class="fas fa-sort text-[9px] ml-1 opacity-60"></i></th>
+              <th class="p-2.5 text-center font-bold border-r border-slate-600 whitespace-nowrap cursor-pointer hover:bg-white/10" onclick="sortTable('dueDate')">กำหนดเสร็จ <i class="fas fa-sort text-[9px] ml-1 opacity-60"></i></th>
+              <th class="p-2.5 text-center font-bold border-r border-slate-600 whitespace-nowrap cursor-pointer hover:bg-white/10" onclick="sortTable('finishDate')">ปิดงาน <i class="fas fa-sort text-[9px] ml-1 opacity-60"></i></th>
+              <th class="p-2.5 font-bold whitespace-nowrap min-w-[180px]">หมายเหตุ</th>
             </tr>
           </thead>
           <tbody id="reportContent" class="divide-y divide-slate-200 bg-white"></tbody>
@@ -193,8 +270,9 @@
       },
       AREA_ALIAS: { 
         "แผนก Print": "PRINT", "แผนก Laminate": "LAMINATE", "แผนก Soventless": "SOVENTLESS", 
+        "แผนก Solvent": "SOVENTLESS", "SOLVENT": "SOVENTLESS",
         "แผนก Rewinder / Slitter / Packing": "REWINDER/SLITTER/PACKING", "แผนก BAG MAKING": "BAG MAKING", 
-        "แผนก QA & QC": "QA&QC", "แผนก Warehouse": "WAREHOUSE", "Office": "OFFICE", 
+        "แผนก QA & QC": "QA&QC", "แผนก QA&QC": "QA&QC", "แผนก Warehouse": "WAREHOUSE", "Office": "OFFICE", "OFFICE ": "OFFICE",
         "Canteen": "CANTEEN", "Toilet": "TOILET", "ห้องน้ำ": "TOILET", 
         "Locker": "LOCKER", "ห้องล็อกเกอร์": "LOCKER", "EN": "ENGINEERING", 
         "พื้นที่รอบบริเวณโรงงาน": "OUTSIDE" 
@@ -354,7 +432,6 @@
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json(); 
         
-        // ✅ รองรับทั้ง array ตรงๆ และ object {status, data}
         if (Array.isArray(data)) {
           allReportData = data;
         } else if (data && Array.isArray(data.data)) {
@@ -415,7 +492,6 @@
       
       let filtered = [...allReportData];
       
-      // ✅ กรองตามประเภทการตรวจ (ใช้ inspectionType จาก API)
       if (currentTypeFilter !== 'all') {
         filtered = filtered.filter(item => {
           const t = String(item.inspectionType || item.type || "").trim();
@@ -453,37 +529,39 @@
 
       reportContent.innerHTML = pageData.map((item, index) => {
         const isClosed = item.status === 'Closed';
+        const rowClass = isClosed ? 'row-closed' : 'row-open';
         
         const actionBtn = !isClosed 
-          ? `<a href="resolveNew.html?jobid=${encodeURIComponent(item.jobId)}" class="flex items-center justify-center gap-1 bg-rose-500 hover:bg-rose-600 text-white font-bold px-1 py-1 md:px-2 md:py-1.5 rounded text-[8px] md:text-[10px] shadow-sm transition w-full mx-auto"><i class="fas fa-wrench"></i> <span class="hidden md:inline">แก้ไข</span></a>`
-          : `<span class="flex items-center justify-center gap-1 text-emerald-600 bg-emerald-50 border border-emerald-200 px-1 py-1 md:px-2 md:py-1.5 rounded text-[8px] md:text-[10px] font-bold w-full mx-auto"><i class="fas fa-check"></i> <span class="hidden md:inline">ปิดแล้ว</span></span>`;
+          ? `<a href="resolveNew.html?jobid=${encodeURIComponent(item.jobId)}" class="inline-flex items-center justify-center gap-1 bg-rose-500 hover:bg-rose-600 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px] shadow-sm transition whitespace-nowrap"><i class="fas fa-wrench"></i> แก้ไข</a>`
+          : `<span class="inline-flex items-center justify-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap"><i class="fas fa-check-circle"></i> ปิดแล้ว</span>`;
         
+        // 🖼️ รูปภาพใหญ่ขึ้น
         const imgBefore = item.picBefore && item.picBefore !== "-" 
-          ? `<img src="${getDriveThumb(item.picBefore)}" class="w-[30px] h-[25px] md:w-[50px] md:h-[40px] mx-auto rounded object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picBefore)}')">`
-          : `<span class="text-slate-400 italic text-[8px] md:text-[10px]">ไม่มีรูป</span>`;
+          ? `<img src="${getDriveThumb(item.picBefore)}" class="w-[70px] h-[55px] rounded-lg object-cover cursor-pointer hover:scale-110 hover:shadow-lg border-2 border-slate-200 shadow-sm transition mx-auto" onclick="window.open('${escapeHtml(item.picBefore)}')" title="คลิกดูภาพเต็ม">`
+          : `<span class="text-slate-300 italic text-[11px]">ไม่มีรูป</span>`;
         
         const imgAfter = item.picAfter && item.picAfter !== "-"
-          ? `<img src="${getDriveThumb(item.picAfter)}" class="w-[30px] h-[25px] md:w-[50px] md:h-[40px] mx-auto rounded object-cover cursor-pointer hover:scale-105 border border-slate-200 shadow-sm transition" onclick="window.open('${escapeHtml(item.picAfter)}')">`
-          : (isClosed ? `<span class="text-slate-400 italic text-[8px] md:text-[10px]">-</span>` : actionBtn);
+          ? `<img src="${getDriveThumb(item.picAfter)}" class="w-[70px] h-[55px] rounded-lg object-cover cursor-pointer hover:scale-110 hover:shadow-lg border-2 border-slate-200 shadow-sm transition mx-auto" onclick="window.open('${escapeHtml(item.picAfter)}')" title="คลิกดูภาพเต็ม">`
+          : (isClosed ? `<span class="text-slate-300 italic text-[11px]">-</span>` : actionBtn);
         
-        const typeColor = item.inspectionType === '5S' ? 'bg-emerald-600' : item.inspectionType === 'Audit' ? 'bg-sky-600' : 'bg-[#003566]';
+        const typeColor = item.inspectionType === '5S' ? 'bg-emerald-600' : item.inspectionType === 'Audit' ? 'bg-sky-600' : item.inspectionType === 'คปอ.' ? 'bg-indigo-600' : 'bg-[#003566]';
         const displayArea = CONFIG.AREA_DISPLAY_MAP[CONFIG.AREA_ALIAS[item.area] || item.area] || item.area || '-';
 
         return `
-          <tr class="${!isClosed ? 'bg-rose-50/40 hover:bg-rose-50/70' : 'hover:bg-slate-50/70'} transition">
-            <td data-label="ลำดับ" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle font-semibold text-slate-700 md:border border-slate-200">${start + index + 1}</td>
-            <td data-label="ประเภท" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle md:border border-slate-200"><span class="px-1 py-0.5 md:px-2 md:py-1 text-[8px] md:text-[10px] font-bold rounded-full text-white ${typeColor}">${escapeHtml(item.inspectionType || '-')}</span></td>
-            <td data-label="ภาพ Before" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle md:border border-slate-200">${imgBefore}</td>
-            <td data-label="ภาพ After" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle md:border border-slate-200">${imgAfter}</td>
-            <td data-label="พื้นที่/แผนก" class="px-1 py-2 md:px-2 md:py-3 align-middle font-bold text-slate-700 md:border border-slate-200">${escapeHtml(displayArea)}</td>
-            <td data-label="Job No." class="px-1 py-2 md:px-2 md:py-3 align-middle font-semibold text-sky-700 md:border border-slate-200 font-mono">${escapeHtml(item.jobId)}</td>
-            <td data-label="ปัญหาที่ตรวจพบ" class="px-1 py-2 md:px-2 md:py-3 align-middle font-medium text-slate-800 md:border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${escapeHtml(item.problem || '-')}</div></td>
-            <td data-label="แนวทางแก้ไข" class="px-1 py-2 md:px-2 md:py-3 align-middle text-slate-600 md:border border-slate-200 leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span class="text-slate-300">-</span>'}</div></td>
-            <td data-label="ผู้รับผิดชอบ" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle font-medium md:border border-slate-200">${item.picName ? escapeHtml(item.picName) : '<span class="text-slate-300">-</span>'}</td>
-            <td data-label="วันที่พบ" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle text-slate-500 md:border border-slate-200">${item.dateFound || '-'}</td>
-            <td data-label="กำหนดเสร็จ" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle font-bold text-rose-600 md:border border-slate-200">${item.dueDate || '-'}</td>
-            <td data-label="ปิดงาน" class="px-1 py-2 md:px-2 md:py-3 md:text-center align-middle font-semibold md:border border-slate-200">${item.finishDate && item.finishDate !== "-" ? `<span class="text-emerald-600">${item.finishDate}</span>` : '<span class="text-slate-300">-</span>'}</td>
-            <td data-label="หมายเหตุ" class="px-1 py-2 md:px-2 md:py-3 align-middle text-slate-500 md:border border-slate-200 text-[8px] md:text-[10px] leading-tight"><div class="line-clamp-2 hover-expand overflow-hidden cursor-default">${item.remark && item.remark !== '-' ? escapeHtml(item.remark) : '<span class="text-slate-300">-</span>'}</div></td>
+          <tr class="${rowClass} ${!isClosed ? 'bg-rose-50/30' : 'bg-white'} hover:bg-sky-50/50 transition">
+            <td data-label="ลำดับ" class="p-2.5 text-center align-middle font-semibold text-slate-700 border-r border-slate-100">${start + index + 1}</td>
+            <td data-label="ประเภท" class="p-2.5 text-center align-middle border-r border-slate-100"><span class="px-2 py-1 text-[10px] font-bold rounded-full text-white ${typeColor} whitespace-nowrap">${escapeHtml(item.inspectionType || '-')}</span></td>
+            <td data-label="ภาพ Before" class="p-2.5 text-center align-middle border-r border-slate-100">${imgBefore}</td>
+            <td data-label="ภาพ After" class="p-2.5 text-center align-middle border-r border-slate-100">${imgAfter}</td>
+            <td data-label="พื้นที่/แผนก" class="p-2.5 align-middle font-bold text-slate-700 border-r border-slate-100 whitespace-nowrap">${escapeHtml(displayArea)}</td>
+            <td data-label="Job No." class="p-2.5 align-middle font-semibold text-sky-700 border-r border-slate-100 font-mono text-[11px] whitespace-nowrap">${escapeHtml(item.jobId)}</td>
+            <td data-label="ปัญหาที่ตรวจพบ" class="p-2.5 align-middle font-medium text-slate-800 border-r border-slate-100 leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${escapeHtml(item.problem || '-')}</div></td>
+            <td data-label="แนวทางแก้ไข" class="p-2.5 align-middle text-slate-600 border-r border-slate-100 leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span class="text-slate-300">-</span>'}</div></td>
+            <td data-label="ผู้รับผิดชอบ" class="p-2.5 text-center align-middle font-medium border-r border-slate-100 whitespace-nowrap">${item.picName ? escapeHtml(item.picName) : '<span class="text-slate-300">-</span>'}</td>
+            <td data-label="วันที่พบ" class="p-2.5 text-center align-middle text-slate-500 border-r border-slate-100 whitespace-nowrap text-[11px]">${item.dateFound || '-'}</td>
+            <td data-label="กำหนดเสร็จ" class="p-2.5 text-center align-middle font-bold text-rose-600 border-r border-slate-100 whitespace-nowrap text-[11px]">${item.dueDate || '-'}</td>
+            <td data-label="ปิดงาน" class="p-2.5 text-center align-middle font-semibold border-r border-slate-100 whitespace-nowrap text-[11px]">${item.finishDate && item.finishDate !== "-" ? `<span class="text-emerald-600">${item.finishDate}</span>` : '<span class="text-slate-300">-</span>'}</td>
+            <td data-label="หมายเหตุ" class="p-2.5 align-middle text-slate-500 text-[11px] leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${item.remark && item.remark !== '-' ? escapeHtml(item.remark) : '<span class="text-slate-300">-</span>'}</div></td>
           </tr>
         `;
       }).join('');
