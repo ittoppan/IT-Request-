@@ -555,13 +555,13 @@
             <td data-label="ภาพ After" class="p-2.5 text-center align-middle border-r border-slate-100">${imgAfter}</td>
             <td data-label="พื้นที่/แผนก" class="p-2.5 align-middle font-bold text-slate-700 border-r border-slate-100 whitespace-nowrap">${escapeHtml(displayArea)}</td>
             <td data-label="Job No." class="p-2.5 align-middle font-semibold text-sky-700 border-r border-slate-100 font-mono text-[11px] whitespace-nowrap">${escapeHtml(item.jobId)}</td>
-            <td data-label="ปัญหาที่ตรวจพบ" class="p-2.5 align-middle font-medium text-slate-800 border-r border-slate-100 leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${escapeHtml(item.problem || '-')}</div></td>
+            <td data-label="ปัญหาที่ตรวจพบ" class="p-2.5 align-middle font-medium text-slate-800 border-r border-slate-100 leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${escapeHtml(item.remark || '-')}</div></td>
             <td data-label="แนวทางแก้ไข" class="p-2.5 align-middle text-slate-600 border-r border-slate-100 leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${item.correctiveAction ? escapeHtml(item.correctiveAction) : '<span class="text-slate-300">-</span>'}</div></td>
             <td data-label="ผู้รับผิดชอบ" class="p-2.5 text-center align-middle font-medium border-r border-slate-100 whitespace-nowrap">${item.picName ? escapeHtml(item.picName) : '<span class="text-slate-300">-</span>'}</td>
             <td data-label="วันที่พบ" class="p-2.5 text-center align-middle text-slate-500 border-r border-slate-100 whitespace-nowrap text-[11px]">${item.dateFound || '-'}</td>
             <td data-label="กำหนดเสร็จ" class="p-2.5 text-center align-middle font-bold text-rose-600 border-r border-slate-100 whitespace-nowrap text-[11px]">${item.dueDate || '-'}</td>
             <td data-label="ปิดงาน" class="p-2.5 text-center align-middle font-semibold border-r border-slate-100 whitespace-nowrap text-[11px]">${item.finishDate && item.finishDate !== "-" ? `<span class="text-emerald-600">${item.finishDate}</span>` : '<span class="text-slate-300">-</span>'}</td>
-            <td data-label="หมายเหตุ" class="p-2.5 align-middle text-slate-500 text-[11px] leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${item.remark && item.remark !== '-' ? escapeHtml(item.remark) : '<span class="text-slate-300">-</span>'}</div></td>
+            <td data-label="หัวข้อ" class="p-2.5 align-middle text-slate-500 text-[11px] leading-relaxed"><div class="line-clamp-3 hover-expand overflow-hidden cursor-default">${item.remark && item.remark !== '-' ? escapeHtml(item.problem) : '<span class="text-slate-300">-</span>'}</div></td>
           </tr>
         `;
       }).join('');
