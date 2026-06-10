@@ -274,7 +274,6 @@
 
       <div class="flex-1 overflow-y-auto p-3 sm:p-6" id="tabContent">
         
-        <!-- 🔴 TAB: SAFETY -->
         <div id="tab-safety" class="space-y-4 sm:space-y-6">
           <div class="flex justify-between items-end">
             <div>
@@ -308,7 +307,6 @@
               </div>
               <i class="fas fa-skull-crossbones text-2xl sm:text-3xl text-rose-100 dark:text-rose-900/50"></i>
             </div>
-            <!-- ✅ แก้ไข: Closure Rate → Closed (จำนวน) -->
             <div class="kpi-card border-l-4 border-l-emerald-500 flex justify-between items-center">
               <div class="min-w-0 flex-1">
                 <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Closed</div>
@@ -335,7 +333,6 @@
           </div>
         </div>
 
-        <!-- 🔵 TAB: 5S -->
         <div id="tab-5s" class="space-y-4 sm:space-y-6 hidden">
           <div class="flex justify-between items-end">
             <div>
@@ -343,7 +340,7 @@
                 <i class="fas fa-broom text-blue-500"></i> 
                 <span>5S Analytics Center</span>
               </h2>
-              <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1">ติดตามมาตรฐานพื้นที่และจัดอันดับความเป็นเลิศ</p>
+              <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1">วิเคราะห์คะแนนประเมินเชิงลึกระดับหมวดหมู่ S1-S5</p>
             </div>
           </div>
 
@@ -380,7 +377,7 @@
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <div class="kpi-card flex flex-col">
-              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Category Radar (Section จริง)</h3>
+              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Category Radar (S1-S5)</h3>
               <div class="relative w-full" style="height: 300px;"><canvas id="f_chRadar"></canvas></div>
             </div>
             <div class="kpi-card lg:col-span-2 flex flex-col">
@@ -390,14 +387,13 @@
           </div>
 
           <div class="kpi-card overflow-hidden">
-            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Heatmap Matrix (Section จริง)</h3>
+            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Heatmap Matrix (S1-S5)</h3>
             <div class="overflow-x-auto -mx-3 sm:mx-0">
               <table class="w-full text-[10px] sm:text-xs border-collapse text-center min-w-[500px]" id="f_tbHeatmap"></table>
             </div>
           </div>
         </div>
 
-        <!-- 🟣 TAB: EXEC SUMMARY -->
         <div id="tab-exec" class="space-y-4 sm:space-y-6 hidden">
           <div class="flex justify-between items-end">
             <div>
@@ -468,6 +464,95 @@
       "Toilet": "TOILET", "ห้องน้ำ": "TOILET", "TOILET": "TOILET",
       "Locker": "LOCKER", "ห้องล็อกเกอร์": "LOCKER", "LOCKER": "LOCKER",
       "EN": "ENGINEERING", "ENGINEERING": "ENGINEERING"
+    };
+
+    // ===================================================================
+    // 📋 MASTER 5S CATEGORY CHECKLIST (For S1-S5 Calculation)
+    // ===================================================================
+    const FACTORY_5S_SECTIONS = [
+      { title: "1. เครื่องจักร", qs: [{q: "ทำความสะอาดเครื่องจักร...", category: "S3"}, {q: "ตีเส้นกำหนดจุด...", category: "S2"}, {q: "ก่อนทำงาน...", category: "S4"}] },
+      { title: "2. เครื่องมือ", qs: [{q: "กำหนดตำแหน่งวาง...", category: "S2"}, {q: "หลังจากนำเครื่องมือ...", category: "S5"}, {q: "เก็บวางเครื่องมือ...", category: "S2"}, {q: "กำหนดผู้รับผิดชอบ...", category: "S4"}] },
+      { title: "3. การจัดวางวัตถุดิบและผลิตภัณฑ์กึ่งสำเร็จรูป และสำเร็จรูป", qs: [{q: "วางในจุดงาน...", category: "S2"}, {q: "ควบคุมตามจัดวางตามหลัก FIFO", category: "S2"}, {q: "มีสถานะป้ายชี้บ่ง", category: "S2"}] },
+      { title: "4. โต๊ะทำงาน /ลิ้นชัก (Production)", qs: [{q: "ความสะอาดของโต๊ะทำงาน...", category: "S3"}, {q: "ความเป็นระเบียบ...", category: "S2"}, {q: "ลิ้นชักใส่เอกสาร...", category: "S4"}] },
+      { title: "5. การจัดเก็บเอกสาร", qs: [{q: "ในตู้เอกสารต้องเรียงเป็นระเบียบ...", category: "S2"}, {q: "หน้าตู้จะต้องระบุรายชื่อ...", category: "S2"}] },
+      { title: "6. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [{q: "ไม่มีเศษขยะ / เศษกระดาษ...", category: "S3"}, {q: "ไม่มีคราบสี...", category: "S3"}, {q: "กำหนดเวลาทำความสะอาด...", category: "S4"}] },
+      { title: "7. สภาพแวดล้อมทั่วไป", qs: [{q: "มีสิ่งของที่ไม่จำเป็น...", category: "S1"}, {q: "ถังขยะอยู่ในตำแหน่งที่เหมาะสม...", category: "S2"}, {q: "มีการกำหนดที่วางอุปกรณ์...", category: "S4"}] },
+      { title: "8. การตรวจสุขลักษณะส่วนบุคคล", qs: [{q: "พนักงานต้องแต่งกาย...", category: "S4"}, {q: "พนักงานต้องมีสุขลักษณะ...", category: "S4"}, {q: "พนักงานต้องมีสุขภาพ...", category: "S4"}] },
+      { title: "9. ความตระหนัก ความสำเร็จ ผลงาน", qs: [{q: "มีความตระหนักในการทำกิจกรรม...", category: "S5"}, {q: "มีการนำเสนอเรื่องราวความสำเร็จ...", category: "S5"}, {q: "นำ 3 ส แรกมาใช้...", category: "S5"}, {q: "มีการแสดง KPI...", category: "S5"}] }
+    ];
+
+    const OFFICE_5S_SECTIONS = [
+      { title: "1. โต๊ะทำงาน", qs: [{q: "ความสะอาดของโต๊ะ...", category: "S3"}, {q: "ความเป็นระเบียบ...", category: "S2"}, {q: "กำหนดจำนวนอุปกรณ์...", category: "S4"}, {q: "ตะกร้าเอกสาร...", category: "S2"}] },
+      { title: "2. ลิ้นชัก", qs: [{q: "ลิ้นชักที่ 1...", category: "S2"}, {q: "ลิ้นชักที่ 2...", category: "S2"}, {q: "ลิ้นชักที่ 3...", category: "S2"}] },
+      { title: "3. การจัดเก็บเอกสาร", qs: [{q: "ในตู้เอกสารเรียงเป็นระเบียบ...", category: "S2"}, {q: "หน้าตู้ระบุรายชื่อ...", category: "S2"}] },
+      { title: "4. เครื่องคอมพิวเตอร์", qs: [{q: "จัดวางคอมพิวเตอร์...", category: "S2"}, {q: "ไม่ติดกระดาษโน๊ต...", category: "S2"}, {q: "จัดเก็บสายไฟ...", category: "S2"}] },
+      { title: "5. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [{q: "ไม่มีเศษขยะ...", category: "S3"}, {q: "ไม่วางสิ่งกีดขวางทางเดิน", category: "S2"}, {q: "กำหนดเวลาทำความสะอาด...", category: "S4"}, {q: "ไม่เปิดประตูค้างไว้...", category: "S4"}] },
+      { title: "6. สภาพแวดล้อมทั่วไป", qs: [{q: "มีสิ่งของที่ไม่จำเป็น...", category: "S1"}, {q: "ถังขยะอยู่ในตำแหน่งที่เหมาะสม...", category: "S2"}, {q: "มีการกำหนดที่วางอุปกรณ์...", category: "S4"}, {q: "ควบคุมสิ่งแวดล้อมภายในแผนก...", category: "S4"}] },
+      { title: "7. ห้องประชุม", qs: [{q: "เก็บโต๊ะและเก้าอี้...", category: "S5"}, {q: "ไม่มีเศษขยะ...", category: "S3"}, {q: "ห้องประชุมต้องพร้อมใช้งานอยู่เสมอ", category: "S2"}] },
+      { title: "8. การตรวจสุขลักษณะส่วนบุคคล", qs: [{q: "พนักงานต้องแต่งกาย...", category: "S4"}, {q: "พนักงานต้องมีสุขลักษณะ...", category: "S4"}, {q: "พนักงานต้องมีสุขภาพ...", category: "S4"}] },
+      { title: "9. ความตระหนัก ความสำเร็จ ผลงาน", qs: [{q: "มีความตระหนัก...", category: "S5"}, {q: "มีการนำเสนอ...", category: "S5"}, {q: "นำ 3 ส แรกมาใช้...", category: "S5"}, {q: "มีการแสดง KPI...", category: "S5"}] }
+    ];
+
+    const CANTEEN_5S_SECTIONS = [
+      { title: "1. ห้องอาหาร (CANTEEN)", qs: [{q: "โต๊ะอาหารและเก้าอี้...", category: "S3"}, {q: "ชั้นวางอาหารต้องสะอาด...", category: "S2"}, {q: "ไม่มีเศษขยะ...", category: "S3"}, {q: "ถังขยะอยู่ในตำแหน่งที่เหมาะสม...", category: "S2"}] },
+      { title: "2. ห้องกาแฟ", qs: [{q: "ทำความสะอาดอ่างล้างภาชนะ...", category: "S4"}, {q: "แบ่งแยกอุปกรณ์...", category: "S2"}, {q: "จัดวางสิ่งของ แยกตามชนิด...", category: "S2"}] },
+      { title: "3. ทางเข้า (AIR SHOWER)", qs: [{q: "ทำความสะอาดอ่างล้างมือ...", category: "S3"}, {q: "ไม่มีเศษขยะ...", category: "S3"}, {q: "ชั้นวางรองเท้า...", category: "S2"}] }
+    ];
+
+    const TOILET_5S_SECTIONS = [
+      { title: "1. ห้องสุขา (ชาย,หญิง)", qs: [{q: "ทำความสะอาดอ่างล้างหน้า...", category: "S3"}, {q: "กระดาษชำระ...", category: "S4"}] }
+    ];
+
+    const LOCKER_5S_SECTIONS = [
+      { title: "1. LOCKER (เสื้อผ้าชาย,หญิง)", qs: [{q: "ป้ายไม่ชำรุด...", category: "S2"}, {q: "หลังตู้ต้องสะอาด...", category: "S3"}, {q: "ไม่มีเศษขยะ...", category: "S3"}] },
+      { title: "2. LOCKER (รองเท้า)", qs: [{q: "ป้ายไม่ชำรุด...", category: "S2"}, {q: "ห้ามนำอาหาร...", category: "S4"}] }
+    ];
+
+    const QAQC_5S_SECTIONS = [
+      { title: "1. โต๊ะทำงาน", qs: [{q: "ความสะอาดของโต๊ะ...", category: "S3"}, {q: "ความเป็นระเบียบ...", category: "S2"}, {q: "การกำหนดจำนวนอุปกรณ์...", category: "S4"}] },
+      { title: "2. ลิ้นชัก", qs: [{q: "ลิ้นชักที่ 1...", category: "S2"}, {q: "ลิ้นชักที่ 2...", category: "S2"}, {q: "ลิ้นชักที่ 3...", category: "S2"}, {q: "ลิ้นชักกลางใส่เอกสาร", category: "S2"}] },
+      { title: "3. การจัดเก็บเอกสาร", qs: [{q: "ในตู้เอกสารเรียงเป็นระเบียบ...", category: "S2"}, {q: "หน้าตู้ระบุรายชื่อ...", category: "S2"}] },
+      { title: "4. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [{q: "ไม่มีเศษขยะ...", category: "S3"}, {q: "ไม่วางสิ่งกีดขวางทางเดิน", category: "S2"}, {q: "กำหนดเวลาทำความสะอาด...", category: "S4"}] },
+      { title: "5. เครื่องคอมพิวเตอร์", qs: [{q: "จัดวางคอมพิวเตอร์...", category: "S2"}, {q: "ไม่ติดกระดาษโน๊ต...", category: "S2"}, {q: "จัดเก็บสายไฟ...", category: "S2"}, {q: "ไม่เปิดประตูค้างไว้...", category: "S4"}] },
+      { title: "6. เครื่องมือและอุปกรณ์", qs: [{q: "กำหนดตำแหน่งวางของเครื่องมือ...", category: "S2"}, {q: "หลังจากนำเครื่องมือไปใช้...", category: "S5"}, {q: "เก็บวางเครื่องมือและอุปกรณ์...", category: "S2"}, {q: "กำหนดผู้รับผิดชอบให้ชัดเจน", category: "S4"}, {q: "ควบคุมสิ่งแวดล้อมภายในแผนก...", category: "S4"}] },
+      { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [{q: "พนักงานต้องแต่งกาย...", category: "S4"}, {q: "พนักงานต้องมีสุขลักษณะ...", category: "S4"}, {q: "พนักงานต้องมีสุขภาพ...", category: "S4"}] },
+      { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: [{q: "มีความตระหนัก...", category: "S5"}, {q: "มีการนำเสนอ...", category: "S5"}, {q: "นำ 3 ส แรกมาใช้...", category: "S5"}, {q: "มีการแสดง KPI...", category: "S5"}] }
+    ];
+
+    const ENGINEERING_5S_SECTIONS = [
+      { title: "1. โต๊ะทำงาน", qs: [{q: "ความสะอาด...", category: "S3"}, {q: "ความเป็นระเบียบ...", category: "S2"}, {q: "การกำหนดจำนวนอุปกรณ์...", category: "S4"}] },
+      { title: "2. ลิ้นชัก", qs: [{q: "ลิ้นชักที่ 1...", category: "S2"}, {q: "ลิ้นชักที่ 2...", category: "S2"}, {q: "ลิ้นชักที่ 3...", category: "S2"}] },
+      { title: "3. การจัดเก็บเอกสาร", qs: [{q: "แฟ้มเอกสารทุกแฟ้มสันแฟ้มจะต้องใช้ Font...", category: "S4"}, {q: "เอกสารต้องเรียงเป็นระเบียบ...", category: "S2"}, {q: "หน้าตู้จะต้องระบุรายชื่อ...", category: "S2"}] },
+      { title: "4. เครื่องมือ", qs: [{q: "กำหนดตำแหน่งวางของเครื่องมือ...", category: "S2"}, {q: "หลังจากนำเครื่องมือไปใช้...", category: "S5"}, {q: "เก็บวางอย่างเป็นระเบียบ...", category: "S2"}, {q: "ส่วนประกอบ / ชิ้นส่วนขนาดเล็ก...", category: "S2"}] },
+      { title: "5. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [{q: "ไม่มีเศษขยะ...", category: "S3"}, {q: "ไม่วางสิ่งของกีดขวางทางเดิน", category: "S2"}, {q: "กำหนดเวลาทำความสะอาด...", category: "S4"}, {q: "ไม่เปิดประตูค้างไว้...", category: "S4"}] },
+      { title: "6. สภาพแวดล้อมทั่วไป", qs: [{q: "มีสิ่งของที่ไม่จำเป็น...", category: "S1"}, {q: "ถังขยะอยู่ในตำแหน่ง...", category: "S2"}, {q: "และมีป้ายชี้บ่ง...", category: "S2"}, {q: "มีการกำหนดที่วางอุปกรณ์...", category: "S4"}, {q: "ควบคุมสิ่งแวดล้อมภายในแผนก...", category: "S4"}] },
+      { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [{q: "พนักงานต้องแต่งกาย...", category: "S4"}, {q: "พนักงานต้องมีสุขลักษณะ...", category: "S4"}, {q: "พนักงานต้องมีสุขภาพ...", category: "S4"}] },
+      { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: [{q: "มีความตระหนัก...", category: "S5"}, {q: "มีการนำเสนอ...", category: "S5"}, {q: "นำ 3 ส แรกมาใช้...", category: "S5"}, {q: "มีการแสดง KPI...", category: "S5"}] }
+    ];
+
+    const OUTSIDE_5S_SECTIONS = [
+      { title: "1. พื้นที่โดยรอบบริษัท", qs: [{q: "มีเศษตกหล่นตามทางเดิน...", category: "S3"}, {q: "หญ้าขึ้นรก...", category: "S3"}, {q: "สายยางใช้แล้วเก็บเป็นระเบียบ...", category: "S2"}, {q: "อุปกรณ์กำจัดสัตว์พาหะ...", category: "S4"}, {q: "รอบรั้วโรงงานมีรอยชำรุด...", category: "S4"}] },
+      { title: "2. โรงเก็บขยะ", qs: [{q: "มีการจัดเรียงถังเป็นระเบียบ...", category: "S2"}, {q: "แยกชนิดขยะให้ชัดเจน...", category: "S2"}, {q: "ขยะต้องไม่ล้นออกมา...", category: "S4"}, {q: "ถังเก็บสารเคมีอันตรายต้องไม่ล้น", category: "S4"}] },
+      { title: "3. ป้อมยาม", qs: [{q: "จัดเก็บเอกสารเรียบร้อย...", category: "S2"}, {q: "อุปกรณ์ต่างๆ สามารถหยิบใช้ได้สะดวก", category: "S2"}, {q: "การกำหนดจำนวนอุปกรณ์...", category: "S4"}] },
+      { title: "4. ห้องสุขา (ป้อมรปภ.)", qs: [{q: "ทำความสะอาดกระจก...", category: "S3"}, {q: "กระดาษชำระ...", category: "S4"}] },
+      { title: "5. สภาพแวดล้อมทั่วไป", qs: [{q: "ไม่มีสิ่งของที่ไม่จำเป็น", category: "S1"}, {q: "ถังขยะอยู่ในตำแหน่งที่เหมาะสม...", category: "S2"}, {q: "มีการกำหนดที่วางอุปกรณ์ทำความสะอาด", category: "S4"}] },
+      { title: "6. ถังแก๊ส/ถังก๊าซ", qs: [{q: "ระบุป้ายชี้บ่งให้ชัดเจน", category: "S2"}, {q: "เก็บถังในลักษณะตั้งตรง...", category: "S4"}, {q: "ไม่วางสิ่งของที่ไม่จำเป็นรอบๆ...", category: "S1"}] },
+      { title: "7. โรงจอดรถ", qs: [{q: "จอดรถเป็นระเบียบ...", category: "S2"}, {q: "หลังคา พื้น ที่กั้น มีสภาพปกติ...", category: "S4"}] }
+    ];
+
+    const CHECKLIST_5S = {
+      "PRINT": { sections: FACTORY_5S_SECTIONS }, 
+      "LAMINATE": { sections: FACTORY_5S_SECTIONS },
+      "REWINDER/SLITTER/PACKING": { sections: FACTORY_5S_SECTIONS }, 
+      "BAG MAKING": { sections: FACTORY_5S_SECTIONS },
+      "WAREHOUSE": { sections: FACTORY_5S_SECTIONS },
+      "OFFICE": { sections: OFFICE_5S_SECTIONS },
+      "CANTEEN": { sections: CANTEEN_5S_SECTIONS },
+      "TOILET": { sections: TOILET_5S_SECTIONS },
+      "LOCKER": { sections: LOCKER_5S_SECTIONS },
+      "QA&QC": { sections: QAQC_5S_SECTIONS },
+      "ENGINEERING": { sections: ENGINEERING_5S_SECTIONS },
+      "OUTSIDE": { sections: OUTSIDE_5S_SECTIONS }
     };
     
     let globalRaw = { ins: [], jobs: [] }; 
@@ -550,7 +635,6 @@
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     }
 
-    // ✅ แก้ไข: parse sectionsScore จาก JSON string
     function normalizeInspection(i) {
       let sectionsScore = i.sectionsScore;
       if (typeof sectionsScore === 'string') {
@@ -689,12 +773,6 @@
         globalRaw.ins = rawIns.map(normalizeInspection);
         globalRaw.jobs = rawJobs.map(normalizeJob); 
         
-        // ✅ Debug: ดู sectionsScore
-        const sample5S = globalRaw.ins.find(i => is5SType(i.inspectionType));
-        if (sample5S) {
-          console.log("📊 Sample 5S sectionsScore:", sample5S.sectionsScore);
-        }
-        
         applyFilters();
         const now = new Date().toLocaleTimeString('th-TH');
         document.getElementById('syncTime').textContent = now;
@@ -816,7 +894,6 @@
       document.getElementById('s_kpiTotal').innerText = kpiTotal;
       document.getElementById('s_kpiOpen').innerText = openOnly;
       document.getElementById('s_kpiOverdue').innerText = kpiOverdue;
-      // ✅ แก้ไข: แสดงจำนวน Closed แทน %
       document.getElementById('s_kpiClosed').innerText = kpiClosed;
 
       if (kpiTotal === 0) {
@@ -909,7 +986,7 @@
     }
 
     // =====================================
-    // 🔵 TAB: 5S (✅ ใช้ Section จริง)
+    // 🔵 TAB: 5S (Radar & Heatmap S1-S5)
     // =====================================
     function process5STab() {
       const data5S = filteredData.ins.filter(i => is5SType(i.inspectionType));
@@ -922,54 +999,30 @@
       const dScore = {}; 
       DEPTS.forEach(d => dScore[d] = []);
       
-      // ✅ เก็บ section stats ตามชื่อจริงจาก sectionsScore
-      const sectionStats = {};
+      const s5Keys = ["S1", "S2", "S3", "S4", "S5"];
+      const s5Labels = { S1: "S1 สะสาง", S2: "S2 สะดวก", S3: "S3 สะอาด", S4: "S4 มาตรฐาน", S5: "S5 สร้างนิสัย" };
+      const s5Overall = { S1: {s:0, m:0}, S2: {s:0, m:0}, S3: {s:0, m:0}, S4: {s:0, m:0}, S5: {s:0, m:0} };
       const deptHm = {};
-      DEPTS.forEach(d => { deptHm[d] = {}; });
+      DEPTS.forEach(d => {
+        deptHm[d] = { S1: {s:0, m:0}, S2: {s:0, m:0}, S3: {s:0, m:0}, S4: {s:0, m:0}, S5: {s:0, m:0} };
+      });
 
       data5S.forEach(i => {
         const area = i.area; 
         if (dScore[area]) dScore[area].push(parseFloat(i.score?.percent || 0));
         
-        // ✅ ใช้ sectionsScore จาก API (ที่มี title จริง เช่น "1. เครื่องจักร")
-        const sections = i.sectionsScore;
-        
-        if (Array.isArray(sections) && sections.length > 0) {
-          sections.forEach(sec => {
-            const title = String(sec.title || "").trim();
-            if (!title) return;
-            
-            const earned = parseFloat(sec.earned) || 0;
-            const max = parseFloat(sec.max) || 0;
-            
-            if (!sectionStats[title]) sectionStats[title] = { s: 0, m: 0 };
-            sectionStats[title].s += earned;
-            sectionStats[title].m += max;
-            
-            if (deptHm[area]) {
-              if (!deptHm[area][title]) deptHm[area][title] = { s: 0, m: 0 };
-              deptHm[area][title].s += earned;
-              deptHm[area][title].m += max;
-            }
-          });
-        } 
-        // Fallback: อ่านจาก fullChecklist ถ้าไม่มี sectionsScore
-        else if (i.fullChecklist && typeof i.fullChecklist === 'object') {
-          Object.entries(i.fullChecklist).forEach(([k, v]) => {
-            const match = k.match(/^5s_s(\d+)_q(\d+)$/);
-            if (match) {
-              const sIdx = parseInt(match[1]);
-              const sectionTitle = `Section ${sIdx + 1}`;
-              if (!sectionStats[sectionTitle]) sectionStats[sectionTitle] = { s: 0, m: 0 };
-              let val = v === "ดี" ? 2 : v === "พอใช้" ? 1 : 0;
-              sectionStats[sectionTitle].m += 2;
-              sectionStats[sectionTitle].s += val;
-              if (deptHm[area]) {
-                if (!deptHm[area][sectionTitle]) deptHm[area][sectionTitle] = { s: 0, m: 0 };
-                deptHm[area][sectionTitle].m += 2;
-                deptHm[area][sectionTitle].s += val;
+        const areaData = CHECKLIST_5S[area] || CHECKLIST_5S["OFFICE"];
+        if (areaData && areaData.sections && i.fullChecklist && typeof i.fullChecklist === 'object') {
+          areaData.sections.forEach((sec, sIdx) => {
+            sec.qs.forEach((qObj, qIdx) => {
+              const cat = typeof qObj === 'string' ? 'S2' : (qObj.category || 'S2');
+              const val = i.fullChecklist[`5s_s${sIdx}_q${qIdx}`];
+              if (val) {
+                const score = val === "ดี" ? 2 : val === "พอใช้" ? 1 : 0;
+                if (s5Overall[cat]) { s5Overall[cat].m += 2; s5Overall[cat].s += score; }
+                if (deptHm[area] && deptHm[area][cat]) { deptHm[area][cat].m += 2; deptHm[area][cat].s += score; }
               }
-            }
+            });
           });
         }
       });
@@ -977,10 +1030,7 @@
       const lbData = []; 
       Object.keys(dScore).forEach(d => { 
         if (dScore[d].length > 0) {
-          lbData.push({ 
-            name: d, 
-            score: Math.round(dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length) 
-          }); 
+          lbData.push({ name: d, score: Math.round(dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length) }); 
         }
       });
       lbData.sort((a,b) => b.score - a.score);
@@ -988,32 +1038,22 @@
       document.getElementById("f_kpiBest").textContent = lbData.length > 0 ? lbData[0].name : "-";
       document.getElementById("f_kpiWorst").textContent = lbData.length > 0 ? lbData[lbData.length - 1].name : "-";
 
-      // ✅ Radar Chart: ใช้ชื่อ Section จริง
-      const sortedSections = Object.entries(sectionStats)
-        .filter(([k, v]) => v.m > 0)
-        .map(([k, v]) => ({ title: k, pct: Math.round((v.s / v.m) * 100) }))
-        .sort((a, b) => b.pct - a.pct)
-        .slice(0, isMobile ? 6 : 10);
+      const radarData = s5Keys.map(k => s5Overall[k].m > 0 ? Math.round((s5Overall[k].s / s5Overall[k].m) * 100) : 0);
       
-      if (sortedSections.length === 0) {
-        showEmptyState('f_chRadar', 'ไม่มีข้อมูล 5S<br><small class="text-[10px]">กรุณาตรวจสอบว่า Code.gs ถูก Deploy ใหม่แล้ว</small>');
+      if (data5S.length === 0) {
+        showEmptyState('f_chRadar', 'ไม่มีข้อมูล 5S');
       } else {
         mkChart("f_chRadar", { 
           type: "radar", 
           data: { 
-            labels: sortedSections.map(s => {
-              // ตัดชื่อให้สั้น: "1. เครื่องจักร" → "เครื่องจักร"
-              const parts = s.title.split('.');
-              const short = parts.length > 1 ? parts.slice(1).join('.').trim() : s.title;
-              return short.substring(0, isMobile ? 15 : 25);
-            }), 
+            labels: Object.values(s5Labels), 
             datasets: [{ 
               label: "Score %", 
-              data: sortedSections.map(s => s.pct), 
+              data: radarData, 
               backgroundColor: "rgba(59, 130, 246, 0.2)", 
               borderColor: "#3b82f6",
               pointBackgroundColor: "#3b82f6",
-              pointRadius: isMobile ? 2 : 3,
+              pointRadius: isMobile ? 3 : 4,
               borderWidth: 2
             }] 
           }, 
@@ -1025,20 +1065,10 @@
                 grid: { color: getChartColors().grid },
                 angleLines: { color: getChartColors().grid },
                 pointLabels: { font: { size: isMobile ? 9 : 11 }, color: getChartColors().text },
-                ticks: { font: { size: 8 }, stepSize: 25, backdropColor: 'transparent' }
+                ticks: { font: { size: 8 }, stepSize: 20, backdropColor: 'transparent' }
               }
             },
-            plugins: { 
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: (ctx) => {
-                    const sec = sortedSections[ctx.dataIndex];
-                    return `${sec.title}: ${sec.pct}%`;
-                  }
-                }
-              }
-            }
+            plugins: { legend: { display: false } } 
           } 
         });
       }
@@ -1081,15 +1111,9 @@
         });
       }
 
-      // ✅ Heatmap: ใช้ชื่อ Section จริง
-      const sectionTitles = Object.keys(sectionStats).sort();
       let hmHtml = `<tr class="bg-slate-100 dark:bg-slate-800">
         <th class="p-1.5 sm:p-2 border-b dark:border-slate-700 text-left sticky left-0 bg-slate-100 dark:bg-slate-800 text-[10px] sm:text-xs">Area</th>
-        ${sectionTitles.map(t => {
-          const parts = t.split('.');
-          const shortTitle = parts.length > 1 ? parts.slice(1).join('.').trim() : t;
-          return `<th class="p-1.5 sm:p-2 border-b dark:border-slate-700 text-[9px] sm:text-[10px] whitespace-nowrap" title="${t}">${shortTitle.substring(0, isMobile ? 12 : 25)}</th>`;
-        }).join('')}
+        ${s5Keys.map(k => `<th class="p-1.5 sm:p-2 border-b dark:border-slate-700 text-[9px] sm:text-[10px] whitespace-nowrap" title="${s5Labels[k]}">${k}</th>`).join('')}
       </tr>`;
       
       let hasHeatmapData = false;
@@ -1106,15 +1130,15 @@
           
           hmHtml += `<tr class="border-b dark:border-slate-700">
             <td class="p-1.5 sm:p-2 font-bold text-slate-700 dark:text-slate-300 sticky left-0 bg-white dark:bg-darkCard text-[10px] sm:text-xs">${shortD}</td>`;
-          sectionTitles.forEach(title => {
-            const cell = (deptHm[d] && deptHm[d][title]) || { s: 0, m: 0 };
+          s5Keys.forEach(k => {
+            const cell = deptHm[d][k];
             const pct = cell.m > 0 ? Math.round((cell.s / cell.m) * 100) : null;
             if (pct === null) {
               hmHtml += `<td class="p-1.5 sm:p-2 text-slate-300 text-[10px]">-</td>`;
             } else { 
               const bg = pct >= 85 ? '#dcfce7' : pct >= 70 ? '#fef3c7' : '#fee2e2'; 
               const tc = pct >= 85 ? '#065f46' : pct >= 70 ? '#92400e' : '#991b1b'; 
-              hmHtml += `<td class="p-1.5 sm:p-2 font-inter text-[9px] sm:text-[10px] font-bold" style="background:${bg}; color:${tc};" title="${title}: ${pct}%">${pct}%</td>`; 
+              hmHtml += `<td class="p-1.5 sm:p-2 font-inter text-[9px] sm:text-[10px] font-bold" style="background:${bg}; color:${tc};" title="${s5Labels[k]}: ${pct}%">${pct}%</td>`; 
             }
           }); 
           hmHtml += `</tr>`;
@@ -1122,7 +1146,7 @@
       }); 
       
       document.getElementById("f_tbHeatmap").innerHTML = !hasHeatmapData
-        ? '<tr><td colspan="10" class="p-4 text-center text-slate-400">ไม่มีข้อมูล 5S</td></tr>' 
+        ? '<tr><td colspan="6" class="p-4 text-center text-slate-400">ไม่มีข้อมูล 5S</td></tr>' 
         : hmHtml;
     }
 
