@@ -110,6 +110,15 @@
       display: inline-flex; align-items: center; justify-content: center;
     }
 
+    @media print {
+      nav, aside, .drawer-overlay, .drawer-panel, .hide-scrollbar,
+      .md\:hidden, button { display: none !important; }
+      body, body.dark { background: #fff !important; color: #000 !important; }
+      .kpi-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; break-inside: avoid; }
+      #tabContent { overflow: visible !important; height: auto !important; }
+      main { overflow: visible !important; }
+    }
+
     @keyframes pulse-ring {
       0% { transform: scale(0.8); opacity: 1; }
       100% { transform: scale(1.5); opacity: 0; }
@@ -205,6 +214,12 @@
       <div class="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
         <a href="DashNew.html" class="hidden lg:block hover:text-sky-300 transition"><i class="fas fa-list-check"></i> Audit List</a>
         <a href="reportnew.html" class="hidden lg:block hover:text-sky-300 transition"><i class="fas fa-tasks"></i> Tracker</a>
+        <button onclick="exportCurrentCSV()" class="touch-btn w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center" title="Export CSV">
+          <i class="fas fa-file-csv text-xs"></i>
+        </button>
+        <button onclick="window.print()" class="touch-btn w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center" title="Print / PDF">
+          <i class="fas fa-print text-xs"></i>
+        </button>
         <button onclick="refreshData()" class="touch-btn w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center" title="Refresh">
           <i class="fas fa-sync-alt text-xs"></i>
         </button>
@@ -316,6 +331,14 @@
             </div>
           </div>
 
+          <div id="s_insight" class="hidden rounded-xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/20 p-3 sm:p-4">
+            <div class="flex items-center gap-2 mb-2 text-rose-700 dark:text-rose-300">
+              <i class="fas fa-lightbulb"></i>
+              <h3 class="text-[11px] sm:text-xs font-bold uppercase tracking-wider">Auto Insight - Safety</h3>
+            </div>
+            <ul id="s_insightList" class="space-y-1.5 text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 list-none"></ul>
+          </div>
+
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <div class="kpi-card lg:col-span-2 flex flex-col">
               <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Volume & Overdue by Department</h3>
@@ -327,9 +350,26 @@
             </div>
           </div>
 
-          <div class="kpi-card flex flex-col">
-            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">MTTR (Mean Time to Resolution) Trend</h3>
-            <div class="relative w-full" style="height: 260px;"><canvas id="s_chMTTR"></canvas></div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div class="kpi-card flex flex-col">
+              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">MTTR (Mean Time to Resolution) Trend</h3>
+              <div class="relative w-full" style="height: 260px;"><canvas id="s_chMTTR"></canvas></div>
+            </div>
+            <div class="kpi-card flex flex-col">
+              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Open Issue Aging (วันที่ค้าง)</h3>
+              <div class="relative w-full" style="height: 260px;"><canvas id="s_chAging"></canvas></div>
+            </div>
+          </div>
+
+          <div class="kpi-card overflow-hidden !p-0">
+            <div class="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-700 bg-amber-50 dark:bg-amber-900/20">
+              <h3 class="text-[11px] sm:text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                <i class="fas fa-rotate"></i> Repeat Findings (ปัญหาเดิมที่พบซ้ำ)
+              </h3>
+            </div>
+            <div class="overflow-x-auto p-3 sm:p-4">
+              <table class="w-full text-[11px] sm:text-xs text-left" id="s_tbRepeat"></table>
+            </div>
           </div>
         </div>
 
@@ -386,6 +426,25 @@
             </div>
           </div>
 
+          <div id="f_insight" class="hidden rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4">
+            <div class="flex items-center gap-2 mb-2 text-blue-700 dark:text-blue-300">
+              <i class="fas fa-lightbulb"></i>
+              <h3 class="text-[11px] sm:text-xs font-bold uppercase tracking-wider">Auto Insight - 5S</h3>
+            </div>
+            <ul id="f_insightList" class="space-y-1.5 text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 list-none"></ul>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div class="kpi-card lg:col-span-2 flex flex-col">
+              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Score Trend by Category (MoM)</h3>
+              <div class="relative w-full" style="height: 280px;"><canvas id="f_chTrend"></canvas></div>
+            </div>
+            <div class="kpi-card flex flex-col">
+              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Score Distribution</h3>
+              <div class="relative w-full" style="height: 280px;"><canvas id="f_chDist"></canvas></div>
+            </div>
+          </div>
+
           <div class="kpi-card overflow-hidden">
             <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Heatmap Matrix (S1-S5)</h3>
             <div class="overflow-x-auto -mx-3 sm:mx-0">
@@ -405,8 +464,47 @@
             </div>
           </div>
 
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+            <div class="kpi-card border-l-4 border-l-purple-500 flex justify-between items-center">
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Closure Rate</div>
+                <div class="text-xl sm:text-3xl font-black font-inter text-purple-600 mt-1" id="e_kpiClosure">0%</div>
+              </div>
+              <i class="fas fa-circle-check text-2xl sm:text-3xl text-purple-100 dark:text-purple-900/50"></i>
+            </div>
+            <div class="kpi-card border-l-4 border-l-rose-500 flex justify-between items-center">
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Overdue Rate</div>
+                <div class="text-xl sm:text-3xl font-black font-inter text-rose-600 mt-1" id="e_kpiOverdueRate">0%</div>
+              </div>
+              <i class="fas fa-triangle-exclamation text-2xl sm:text-3xl text-rose-100 dark:text-rose-900/50"></i>
+            </div>
+            <div class="kpi-card border-l-4 border-l-blue-500 flex justify-between items-center">
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">5S Avg (All)</div>
+                <div class="text-xl sm:text-3xl font-black font-inter text-blue-600 mt-1" id="e_kpi5S">0%</div>
+              </div>
+              <i class="fas fa-star text-2xl sm:text-3xl text-blue-100 dark:text-blue-900/50"></i>
+            </div>
+            <div class="kpi-card border-l-4 border-l-emerald-500 flex justify-between items-center">
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">5S Forecast (Next)</div>
+                <div class="text-xl sm:text-3xl font-black font-inter text-emerald-600 mt-1" id="e_kpiForecast">-</div>
+              </div>
+              <i class="fas fa-arrow-trend-up text-2xl sm:text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
+            </div>
+          </div>
+
+          <div id="e_insight" class="hidden rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20 p-3 sm:p-4">
+            <div class="flex items-center gap-2 mb-2 text-purple-700 dark:text-purple-300">
+              <i class="fas fa-wand-magic-sparkles"></i>
+              <h3 class="text-[11px] sm:text-xs font-bold uppercase tracking-wider">Executive Summary - Auto Generated</h3>
+            </div>
+            <ul id="e_insightList" class="space-y-1.5 text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 list-none"></ul>
+          </div>
+
           <div class="kpi-card flex flex-col">
-            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Safety vs 5S Trend (MoM)</h3>
+            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Safety vs 5S Trend (MoM) + Forecast</h3>
             <div class="relative w-full" style="height: 280px;"><canvas id="e_chTrend"></canvas></div>
           </div>
 
@@ -515,7 +613,7 @@
       { title: "4. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [{q: "ไม่มีเศษขยะ...", category: "S3"}, {q: "ไม่วางสิ่งกีดขวางทางเดิน", category: "S2"}, {q: "กำหนดเวลาทำความสะอาด...", category: "S4"}] },
       { title: "5. เครื่องคอมพิวเตอร์", qs: [{q: "จัดวางคอมพิวเตอร์...", category: "S2"}, {q: "ไม่ติดกระดาษโน๊ต...", category: "S2"}, {q: "จัดเก็บสายไฟ...", category: "S2"}, {q: "ไม่เปิดประตูค้างไว้...", category: "S4"}] },
       { title: "6. เครื่องมือและอุปกรณ์", qs: [{q: "กำหนดตำแหน่งวางของเครื่องมือ...", category: "S2"}, {q: "หลังจากนำเครื่องมือไปใช้...", category: "S5"}, {q: "เก็บวางเครื่องมือและอุปกรณ์...", category: "S2"}, {q: "กำหนดผู้รับผิดชอบให้ชัดเจน", category: "S4"}, {q: "ควบคุมสิ่งแวดล้อมภายในแผนก...", category: "S4"}] },
-      { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [{q: "พนักงานต้องแต่งกาย...", category: "S4"}, {q: "พนักงานต้องมีสุขลักษณะ...", category: "S4"}, {q: "พนักงานต้องมีสุขภาพ...", category: "S4"}] },
+      { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [{q: "พนักงานต้องแต่งกาย...", category: "S4"}, {q: "พนักงานต้องมีสุขลักษณะ...", category: "S4"}, {q: "พนักง��นต้องมีสุขภาพ...", category: "S4"}] },
       { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: [{q: "มีความตระหนัก...", category: "S5"}, {q: "มีการนำเสนอ...", category: "S5"}, {q: "นำ 3 ส แรกมาใช้...", category: "S5"}, {q: "มีการแสดง KPI...", category: "S5"}] }
     ];
 
@@ -586,6 +684,82 @@
         grid: isDarkMode ? '#334155' : '#e2e8f0',
         bg: isDarkMode ? '#1e293b' : '#ffffff'
       };
+    }
+
+    // ---- Analysis helpers ----
+    // Linear regression forecast for the next point from a numeric series
+    function linForecast(values) {
+      const pts = values.map((v, i) => [i, v]).filter(p => !isNaN(p[1]));
+      const n = pts.length;
+      if (n < 2) return n === 1 ? pts[0][1] : null;
+      const sx = pts.reduce((a, p) => a + p[0], 0);
+      const sy = pts.reduce((a, p) => a + p[1], 0);
+      const sxy = pts.reduce((a, p) => a + p[0] * p[1], 0);
+      const sxx = pts.reduce((a, p) => a + p[0] * p[0], 0);
+      const denom = (n * sxx - sx * sx);
+      if (denom === 0) return sy / n;
+      const slope = (n * sxy - sx * sy) / denom;
+      const intercept = (sy - slope * sx) / n;
+      return slope * n + intercept;
+    }
+
+    function trendArrow(curr, prev) {
+      if (prev == null || curr == null) return '';
+      const diff = curr - prev;
+      if (Math.abs(diff) < 0.5) return '<span class="text-slate-400">→ ทรงตัว</span>';
+      return diff > 0
+        ? `<span class="text-emerald-500 font-bold">▲ +${diff.toFixed(1)}</span>`
+        : `<span class="text-rose-500 font-bold">▼ ${diff.toFixed(1)}</span>`;
+    }
+
+    function renderInsights(containerId, listId, items) {
+      const box = document.getElementById(containerId);
+      const list = document.getElementById(listId);
+      if (!box || !list) return;
+      if (!items.length) { box.classList.add('hidden'); return; }
+      box.classList.remove('hidden');
+      list.innerHTML = items.map(t => `<li class="flex items-start gap-2"><i class="fas fa-caret-right mt-0.5 opacity-60"></i><span>${t}</span></li>`).join('');
+    }
+
+    // Build a normalized "fingerprint" of a finding to detect repeats
+    function findingKey(problem) {
+      return String(problem || '')
+        .replace(/^\[[^\]]+\]/, '')
+        .replace(/[0-9./\-]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase()
+        .slice(0, 40);
+    }
+
+    function downloadCSV(filename, rows) {
+      const csv = rows.map(r => r.map(c => {
+        const s = String(c == null ? '' : c).replace(/"/g, '""');
+        return /[",\n]/.test(s) ? `"${s}"` : s;
+      }).join(',')).join('\n');
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+
+    function exportCurrentCSV() {
+      const stamp = new Date().toISOString().slice(0, 10);
+      if (currentTab === '5s') {
+        const rows = [["Area", "Inspection Type", "Date", "Score %"]];
+        filteredData.ins.filter(i => is5SType(i.inspectionType)).forEach(i => {
+          rows.push([i.area, i.inspectionType, i.timestamp, i.score?.percent ?? '']);
+        });
+        downloadCSV(`5S_audits_${stamp}.csv`, rows);
+      } else {
+        const rows = [["Job ID", "Area", "Problem", "Status", "Date Found", "Due Date", "Finish Date", "PIC", "Inspector"]];
+        filteredData.jobs.forEach(j => {
+          rows.push([j.jobId, j.area, j.problem, j.status, j.dateFound, j.dueDate, j.finishDate, j.picName, j.inspector]);
+        });
+        downloadCSV(`safety_actionplan_${stamp}.csv`, rows);
+      }
     }
 
     function toggleDarkMode() {
@@ -852,6 +1026,9 @@
       DEPTS.forEach(d => deptData[d] = { open:0, closed:0, overdue:0 });
       const catData = {};
       const mttrTrend = {};
+      const agingBuckets = { "0-7 วัน": 0, "8-30 วัน": 0, "31-60 วัน": 0, "60+ วัน": 0 };
+      const repeatMap = {};
+      const picMap = {};
       const now = new Date();
       now.setHours(0,0,0,0);
 
@@ -868,6 +1045,22 @@
         else { deptData[area].open++; }
         
         if (!isClosed && dDue && now > dDue) { kpiOverdue++; deptData[area].overdue++; }
+
+        // Aging of open issues (days since found)
+        if (!isClosed && dFound) {
+          const age = Math.max(0, Math.floor((now.getTime() - dFound.getTime()) / 86400000));
+          if (age <= 7) agingBuckets["0-7 วัน"]++;
+          else if (age <= 30) agingBuckets["8-30 วัน"]++;
+          else if (age <= 60) agingBuckets["31-60 วัน"]++;
+          else agingBuckets["60+ วัน"]++;
+        }
+
+        // PIC workload (open only)
+        if (!isClosed && j.picName) {
+          if (!picMap[j.picName]) picMap[j.picName] = { open: 0, overdue: 0 };
+          picMap[j.picName].open++;
+          if (dDue && now > dDue) picMap[j.picName].overdue++;
+        }
         
         if (isClosed && dFound && dFinish) {
           const days = Math.max(1, Math.floor((dFinish.getTime() - dFound.getTime()) / 86400000));
@@ -888,6 +1081,15 @@
           if (matchSection) cat = matchSection[1].trim();
         }
         catData[cat] = (catData[cat] || 0) + 1;
+
+        // Repeat findings: same normalized problem in same area
+        const fk = findingKey(j.problem);
+        if (fk) {
+          const rk = area + '||' + fk;
+          if (!repeatMap[rk]) repeatMap[rk] = { area, sample: prob.slice(0, 60), count: 0, open: 0 };
+          repeatMap[rk].count++;
+          if (!isClosed) repeatMap[rk].open++;
+        }
       });
 
       const openOnly = Math.max(0, kpiTotal - kpiClosed - kpiOverdue);
@@ -900,6 +1102,9 @@
         showEmptyState('s_chDept', '📋 ไม่พบข้อมูล Action Plan');
         showEmptyState('s_chCat', 'ไม่มีข้อมูลหมวดปัญหา');
         showEmptyState('s_chMTTR', 'ไม่มีข้อมูล MTTR');
+        showEmptyState('s_chAging', 'ไม่มีข้อมูล Aging');
+        document.getElementById('s_insight').classList.add('hidden');
+        document.getElementById('s_tbRepeat').innerHTML = '<tr><td class="p-4 text-center text-slate-400 text-xs">ไม่มีข้อมูล</td></tr>';
         return;
       }
 
@@ -971,6 +1176,73 @@
           }
         }
       });
+
+      // ---- Open Issue Aging chart ----
+      const agingKeys = Object.keys(agingBuckets);
+      const agingTotal = agingKeys.reduce((a, k) => a + agingBuckets[k], 0);
+      if (agingTotal === 0) {
+        showEmptyState('s_chAging', '✅ ไม่มีงานค้าง');
+      } else {
+        mkChart("s_chAging", {
+          type: "bar",
+          data: {
+            labels: agingKeys,
+            datasets: [{
+              label: "Open Issues",
+              data: agingKeys.map(k => agingBuckets[k]),
+              backgroundColor: ["#22c55e", "#eab308", "#f97316", "#ef4444"],
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: getChartColors().grid }, ticks: { precision: 0, font: { size: isMobile ? 9 : 11 } } },
+              x: { grid: { display: false }, ticks: { font: { size: isMobile ? 9 : 11 } } }
+            }
+          }
+        });
+      }
+
+      // ---- Repeat Findings table ----
+      const repeats = Object.values(repeatMap)
+        .filter(r => r.count >= 2)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 6);
+      document.getElementById('s_tbRepeat').innerHTML = `
+        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500">
+          <tr><th class="p-2 text-[10px] sm:text-xs">Area</th><th class="p-2 text-[10px] sm:text-xs">ปัญหา</th><th class="p-2 text-center text-[10px] sm:text-xs">พบซ้ำ</th><th class="p-2 text-center text-[10px] sm:text-xs">ยังเปิด</th></tr>
+        </thead>
+        <tbody class="divide-y dark:divide-slate-700">
+          ${repeats.length ? repeats.map(r => `
+            <tr class="hover:bg-amber-50 dark:hover:bg-amber-900/20">
+              <td class="p-2 font-bold text-[10px] sm:text-[11px]">${r.area}</td>
+              <td class="p-2 text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-300">${r.sample}…</td>
+              <td class="p-2 text-center font-bold text-amber-600 text-[10px] sm:text-xs">${r.count}×</td>
+              <td class="p-2 text-center font-bold ${r.open > 0 ? 'text-rose-600' : 'text-emerald-600'} text-[10px] sm:text-xs">${r.open}</td>
+            </tr>`).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400 text-xs">✅ ไม่พบปัญหาที่เกิดซ้ำ</td></tr>'}
+        </tbody>
+      `;
+
+      // ---- Auto insights ----
+      const closeRate = kpiTotal ? Math.round((kpiClosed / kpiTotal) * 100) : 0;
+      const avgMttr = mttrCount ? (mttrSum / mttrCount).toFixed(1) : null;
+      const worstDept = DEPTS
+        .map(d => ({ d, open: deptData[d].open, overdue: deptData[d].overdue }))
+        .sort((a, b) => (b.overdue - a.overdue) || (b.open - a.open))[0];
+      const topCat = Object.keys(catData).sort((a, b) => catData[b] - catData[a])[0];
+      const busiestPic = Object.entries(picMap).sort((a, b) => b[1].open - a[1].open)[0];
+
+      const sInsights = [];
+      sInsights.push(`อัตราการปิดงาน (Closure Rate) อยู่ที่ <b>${closeRate}%</b> — ปิดแล้ว ${kpiClosed} จาก ${kpiTotal} รายการ`);
+      if (kpiOverdue > 0) sInsights.push(`มีงาน <b class="text-rose-600">เกินกำหนด ${kpiOverdue} รายการ</b>${worstDept && worstDept.overdue > 0 ? ` โดยกระจุกตัวที่แผนก <b>${worstDept.d}</b> (${worstDept.overdue} งาน)` : ''} ควรเร่งติดตาม`);
+      if (avgMttr) sInsights.push(`ใช้เวลาปิดงานเฉลี่ย (MTTR) <b>${avgMttr} วัน</b> ต่อรายการ`);
+      if (agingBuckets["60+ วัน"] > 0) sInsights.push(`มีงานค้างนานเกิน <b class="text-rose-600">60 วัน จำนวน ${agingBuckets["60+ วัน"]} รายการ</b> ถือเป็นความเสี่ยงสูง`);
+      if (topCat) sInsights.push(`หมวดปัญหาที่พบบ่อยที่สุดคือ <b>${topCat}</b> (${catData[topCat]} ครั้ง)`);
+      if (repeats.length) sInsights.push(`พบปัญหาเดิมเกิดซ้ำ <b class="text-amber-600">${repeats.length} ประเด็น</b> — ควรหาสาเหตุรากเหง้า (Root Cause)`);
+      if (busiestPic) sInsights.push(`ผู้รับผิดชอบที่มีงานค้างมากที่สุด: <b>${busiestPic[0]}</b> (${busiestPic[1].open} งาน${busiestPic[1].overdue ? `, เกินกำหนด ${busiestPic[1].overdue}` : ''})`);
+      renderInsights('s_insight', 's_insightList', sInsights);
     }
 
     function showEmptyState(canvasId, message) {
@@ -1006,10 +1278,24 @@
       DEPTS.forEach(d => {
         deptHm[d] = { S1: {s:0, m:0}, S2: {s:0, m:0}, S3: {s:0, m:0}, S4: {s:0, m:0}, S5: {s:0, m:0} };
       });
+      const f5Trend = {};
+      const f5Dist = { good: 0, fair: 0, poor: 0 };
 
       data5S.forEach(i => {
         const area = i.area; 
         if (dScore[area]) dScore[area].push(parseFloat(i.score?.percent || 0));
+
+        const pct = parseFloat(i.score?.percent || 0);
+        if (pct >= 85) f5Dist.good++;
+        else if (pct >= 70) f5Dist.fair++;
+        else f5Dist.poor++;
+
+        const dObj = parseDateObj(i.timestamp);
+        const ym = dObj ? toYearMonth(dObj) : null;
+        if (ym) {
+          if (!f5Trend[ym]) f5Trend[ym] = { S1:{s:0,m:0},S2:{s:0,m:0},S3:{s:0,m:0},S4:{s:0,m:0},S5:{s:0,m:0}, all:[] };
+          f5Trend[ym].all.push(pct);
+        }
         
         const areaData = CHECKLIST_5S[area] || CHECKLIST_5S["OFFICE"];
         if (areaData && areaData.sections && i.fullChecklist && typeof i.fullChecklist === 'object') {
@@ -1021,6 +1307,7 @@
                 const score = val === "ดี" ? 2 : val === "พอใช้" ? 1 : 0;
                 if (s5Overall[cat]) { s5Overall[cat].m += 2; s5Overall[cat].s += score; }
                 if (deptHm[area] && deptHm[area][cat]) { deptHm[area][cat].m += 2; deptHm[area][cat].s += score; }
+                if (ym && f5Trend[ym][cat]) { f5Trend[ym][cat].m += 2; f5Trend[ym][cat].s += score; }
               }
             });
           });
@@ -1148,6 +1435,72 @@
       document.getElementById("f_tbHeatmap").innerHTML = !hasHeatmapData
         ? '<tr><td colspan="6" class="p-4 text-center text-slate-400">ไม่มีข้อมูล 5S</td></tr>' 
         : hmHtml;
+
+      // ---- 5S Category Trend (MoM) ----
+      const fmKeys = Object.keys(f5Trend).sort().slice(-6);
+      const catColors = { S1: "#ef4444", S2: "#f59e0b", S3: "#10b981", S4: "#3b82f6", S5: "#8b5cf6" };
+      if (fmKeys.length === 0) {
+        showEmptyState('f_chTrend', 'ไม่มีข้อมูลแนวโน้ม');
+      } else {
+        mkChart("f_chTrend", {
+          type: "line",
+          data: {
+            labels: fmKeys,
+            datasets: s5Keys.map(k => ({
+              label: k,
+              data: fmKeys.map(m => f5Trend[m][k].m > 0 ? Math.round((f5Trend[m][k].s / f5Trend[m][k].m) * 100) : null),
+              borderColor: catColors[k], backgroundColor: catColors[k],
+              tension: 0.4, spanGaps: true, pointRadius: isMobile ? 2 : 3, borderWidth: 2
+            }))
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: isMobile ? 'bottom' : 'top', labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 11 } } } },
+            scales: {
+              y: { min: 0, max: 100, grid: { color: getChartColors().grid }, ticks: { font: { size: isMobile ? 9 : 11 } } },
+              x: { grid: { display: false }, ticks: { font: { size: isMobile ? 9 : 11 } } }
+            }
+          }
+        });
+      }
+
+      // ---- Score distribution ----
+      const distTotal = f5Dist.good + f5Dist.fair + f5Dist.poor;
+      if (distTotal === 0) {
+        showEmptyState('f_chDist', 'ไม่มีข้อมูล');
+      } else {
+        mkChart("f_chDist", {
+          type: "doughnut",
+          data: {
+            labels: ["ดี (≥85%)", "พอใช้ (70-84%)", "ต้องปรับปรุง (<70%)"],
+            datasets: [{ data: [f5Dist.good, f5Dist.fair, f5Dist.poor], backgroundColor: ["#10b981", "#f59e0b", "#ef4444"] }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, cutout: isMobile ? '55%' : '65%',
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 10 }, padding: 8 } } }
+          }
+        });
+      }
+
+      // ---- Auto insights (5S) ----
+      const f5Insights = [];
+      if (data5S.length > 0) {
+        const catScores = s5Keys.map(k => ({ k, label: s5Labels[k], v: s5Overall[k].m > 0 ? Math.round((s5Overall[k].s / s5Overall[k].m) * 100) : null }))
+          .filter(c => c.v != null);
+        if (catScores.length) {
+          const weakest = catScores.slice().sort((a, b) => a.v - b.v)[0];
+          const strongest = catScores.slice().sort((a, b) => b.v - a.v)[0];
+          f5Insights.push(`หมวดที่ต้องปรับปรุงเร่งด่วนคือ <b class="text-rose-600">${weakest.label} (${weakest.v}%)</b> ขณะที่ <b class="text-emerald-600">${strongest.label} (${strongest.v}%)</b> ทำได้ดีที่สุด`);
+        }
+        f5Insights.push(`คะแนนเฉลี่ยรวม <b>${avg5S}%</b> จากการตรวจ ${data5S.length} ครั้ง — แผนกดีที่สุด: <b>${lbData.length ? lbData[0].name : '-'}</b>, ต่ำสุด: <b>${lbData.length ? lbData[lbData.length-1].name : '-'}</b>`);
+        if (f5Dist.poor > 0) f5Insights.push(`มีการตรวจที่ได้คะแนน <b class="text-rose-600">ต่ำกว่า 70% จำนวน ${f5Dist.poor} ครั้ง</b> (${Math.round(f5Dist.poor/distTotal*100)}% ของทั้งหมด)`);
+        if (fmKeys.length >= 2) {
+          const allTrend = fmKeys.map(m => { const a = f5Trend[m].all; return a.length ? a.reduce((x,y)=>x+y,0)/a.length : null; });
+          const last = allTrend[allTrend.length-1], prev = allTrend[allTrend.length-2];
+          if (last != null && prev != null) f5Insights.push(`แนวโน้มคะแนนเดือนล่าสุดเทียบเดือนก่อน: ${trendArrow(last, prev)} จุด`);
+        }
+      }
+      renderInsights('f_insight', 'f_insightList', f5Insights);
     }
 
     // =====================================
@@ -1175,21 +1528,42 @@
       });
 
       const mKeys = Object.keys(tMonths).sort().slice(-6);
-      
+
+      // 5S monthly averages + forecast for next month
+      const s5Series = mKeys.map(m => tMonths[m].s5.length ? parseFloat((tMonths[m].s5.reduce((a,b)=>a+b,0) / tMonths[m].s5.length).toFixed(1)) : null);
+      const openSeries = mKeys.map(m => tMonths[m].sOpen);
+      const s5Valid = s5Series.filter(v => v != null);
+      const fc = linForecast(s5Valid);
+      const forecastVal = fc == null ? null : Math.max(0, Math.min(100, Math.round(fc)));
+
+      // Forecast label appended after the last real month
+      const trendLabels = mKeys.slice();
+      const fcS5Data = s5Series.slice();
+      if (forecastVal != null && mKeys.length >= 2) {
+        trendLabels.push('Forecast');
+        fcS5Data.push(forecastVal);
+      }
+
       mkChart("e_chTrend", {
         type: "bar",
         data: {
-          labels: mKeys.length ? mKeys : ["No Data"],
+          labels: trendLabels.length ? trendLabels : ["No Data"],
           datasets: [
             { 
               label: "5S Score %", type: 'line',
-              data: mKeys.map(m => tMonths[m].s5.length ? parseFloat((tMonths[m].s5.reduce((a,b)=>a+b,0) / tMonths[m].s5.length).toFixed(1)) : 0), 
+              data: (forecastVal != null && mKeys.length >= 2) ? [...s5Series, null] : s5Series,
               borderColor: "#3b82f6", backgroundColor: "#3b82f6", yAxisID: 'y',
-              tension: 0.4, pointRadius: isMobile ? 3 : 5
+              tension: 0.4, spanGaps: true, pointRadius: isMobile ? 3 : 5
+            },
+            {
+              label: "5S Forecast", type: 'line',
+              data: (forecastVal != null && mKeys.length >= 2) ? [...s5Series.map((_, i) => i === s5Series.length - 1 ? s5Series[i] : null), forecastVal] : [],
+              borderColor: "#10b981", backgroundColor: "#10b981", borderDash: [6, 4], yAxisID: 'y',
+              tension: 0.4, spanGaps: true, pointRadius: isMobile ? 3 : 5, pointStyle: 'rectRot'
             },
             { 
               label: "Safety Open", 
-              data: mKeys.map(m => tMonths[m].sOpen), 
+              data: (forecastVal != null && mKeys.length >= 2) ? [...openSeries, null] : openSeries, 
               backgroundColor: "#ef4444", yAxisID: 'y1', borderRadius: 4
             }
           ]
@@ -1261,6 +1635,38 @@
           `).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400 text-xs">No 5S Data</td></tr>'}
         </tbody>
       `;
+
+      // ---- Exec KPIs ----
+      const allJobs = filteredData.jobs;
+      const totalJobs = allJobs.length;
+      const closedJobs = allJobs.filter(j => j.status === 'Closed').length;
+      const nowD = new Date();
+      const overdueJobs = allJobs.filter(j => j.status !== 'Closed' && parseDateObj(j.dueDate) && parseDateObj(j.dueDate) < nowD).length;
+      const closureRate = totalJobs ? Math.round((closedJobs / totalJobs) * 100) : 0;
+      const overdueRate = totalJobs ? Math.round((overdueJobs / totalJobs) * 100) : 0;
+      const all5S = filteredData.ins.filter(i => is5SType(i.inspectionType)).map(i => parseFloat(i.score?.percent || 0)).filter(v => !isNaN(v));
+      const avg5SAll = all5S.length ? Math.round(all5S.reduce((a,b)=>a+b,0) / all5S.length) : 0;
+
+      document.getElementById('e_kpiClosure').textContent = closureRate + '%';
+      document.getElementById('e_kpiOverdueRate').textContent = overdueRate + '%';
+      document.getElementById('e_kpi5S').textContent = avg5SAll + '%';
+      document.getElementById('e_kpiForecast').textContent = forecastVal != null ? forecastVal + '%' : '-';
+
+      // ---- Exec auto summary ----
+      const eInsights = [];
+      const lastReal = s5Valid.length ? s5Valid[s5Valid.length - 1] : null;
+      eInsights.push(`อัตราการปิดงาน Safety โดยรวม <b>${closureRate}%</b> และมีงานเกินกำหนด <b class="${overdueRate > 20 ? 'text-rose-600' : 'text-amber-600'}">${overdueRate}%</b> ของทั้งหมด`);
+      eInsights.push(`คะแนน 5S เฉลี่ยปัจจุบัน <b class="${avg5SAll >= 85 ? 'text-emerald-600' : avg5SAll >= 70 ? 'text-amber-600' : 'text-rose-600'}">${avg5SAll}%</b>`);
+      if (forecastVal != null && lastReal != null) {
+        const dir = forecastVal >= lastReal ? 'มีแนวโน้มดีขึ้น' : 'มีแนวโน้มลดลง ควรเฝ้าระวัง';
+        eInsights.push(`คาดการณ์คะแนน 5S เดือนถัดไปอยู่ที่ราว <b>${forecastVal}%</b> (${dir}) — อ้างอิงแนวโน้มเชิงเส้น ${s5Valid.length} เดือนล่าสุด`);
+      }
+      if (overdueJobs > 0) eInsights.push(`มีงานเกินกำหนดค้างอยู่ <b class="text-rose-600">${overdueJobs} รายการ</b> ที่ต้องเร่งปิดในรอบถัดไป`);
+      if (bList.length) {
+        const worst = bList[0];
+        if (worst.score < 85) eInsights.push(`แผนกที่ควรให้ความสำคัญด้าน 5S มากที่สุดคือ <b>${worst.name} (${worst.score}%)</b>`);
+      }
+      renderInsights('e_insight', 'e_insightList', eInsights);
     }
   </script>
 </body>
