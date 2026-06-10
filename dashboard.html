@@ -19,73 +19,89 @@
           colors: { 
             safety: { light: '#fee2e2', DEFAULT: '#ef4444', dark: '#b91c1c' },
             fiveS: { light: '#dbeafe', DEFAULT: '#3b82f6', dark: '#1d4ed8' },
-            darkBg: '#0f172a', darkCard: '#1e293b'
+            darkBg: '#0f172a', darkCard: '#1e293b', darkBorder: '#334155'
           },
-          screens: { 'xs': '480px' }
+          screens: { 'xs': '480px' },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+            'glow': '0 0 15px rgba(56, 189, 248, 0.5)'
+          }
         }
       }
     }
   </script>
   <style>
     body { 
-      background-color: #f1f5f9; 
+      background-color: #f4f7f9; 
       color: #334155; 
-      transition: background-color 0.3s, color 0.3s; 
+      transition: background-color 0.3s ease, color 0.3s ease; 
       -webkit-tap-highlight-color: transparent;
       overscroll-behavior: none;
     }
-    body.dark { background-color: #0f172a; color: #e2e8f0; }
+    body.dark { background-color: #0b1120; color: #e2e8f0; }
     
+    /* Premium Card Design */
     .kpi-card { 
-      background: #fff; 
-      border-radius: 0.75rem; 
-      padding: 0.875rem; 
-      box-shadow: 0 2px 4px -1px rgba(0,0,0,0.05); 
-      border: 1px solid #e2e8f0; 
-      transition: all 0.3s; 
+      background: #ffffff; 
+      border-radius: 1rem; 
+      padding: 1rem; 
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); 
+      border: 1px solid #f1f5f9; 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+      position: relative;
+      overflow: hidden;
     }
     .dark .kpi-card { 
       background: #1e293b; 
       border-color: #334155; 
-      box-shadow: 0 2px 4px -1px rgba(0,0,0,0.3); 
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); 
     }
     @media (min-width: 768px) {
-      .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-      .kpi-card { padding: 1.25rem; border-radius: 1rem; }
+      .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.08); border-color: #e2e8f0; }
+      .dark .kpi-card:hover { box-shadow: 0 12px 20px -5px rgba(0,0,0,0.4); border-color: #475569; }
+      .kpi-card { padding: 1.5rem; }
     }
     
+    /* Tabs Design */
     .tab-btn { 
-      padding: 0.625rem 0.75rem; 
+      padding: 0.75rem 1rem; 
       font-weight: 600; 
-      font-size: 0.75rem; 
+      font-size: 0.875rem; 
       border-bottom: 3px solid transparent; 
       color: #64748b; 
-      transition: all 0.2s; 
+      transition: all 0.2s ease; 
       cursor: pointer; 
       white-space: nowrap;
       flex: 1;
       text-align: center;
+      position: relative;
     }
     @media (min-width: 640px) {
-      .tab-btn { padding: 0.75rem 1.5rem; font-size: 0.875rem; flex: none; }
+      .tab-btn { padding: 1rem 2rem; flex: none; font-size: 0.95rem; }
     }
     .dark .tab-btn { color: #94a3b8; }
-    .tab-btn:active { transform: scale(0.97); }
+    .tab-btn:hover { background-color: rgba(0,0,0,0.02); }
+    .dark .tab-btn:hover { background-color: rgba(255,255,255,0.02); }
+    .tab-btn:active { transform: scale(0.98); }
     
-    .tab-btn.active-safety { border-color: #ef4444; color: #ef4444; }
-    .tab-btn.active-5s { border-color: #3b82f6; color: #3b82f6; }
-    .tab-btn.active-exec { border-color: #8b5cf6; color: #8b5cf6; }
+    .tab-btn.active-safety { border-color: #ef4444; color: #ef4444; background: linear-gradient(to top, rgba(239, 68, 68, 0.05), transparent); }
+    .tab-btn.active-5s { border-color: #3b82f6; color: #3b82f6; background: linear-gradient(to top, rgba(59, 130, 246, 0.05), transparent); }
+    .tab-btn.active-exec { border-color: #8b5cf6; color: #8b5cf6; background: linear-gradient(to top, rgba(139, 92, 246, 0.05), transparent); }
     
+    /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; transition: background 0.2s; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
+    /* Drawer */
     .drawer-overlay {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
       z-index: 100; opacity: 0; pointer-events: none;
-      transition: opacity 0.3s;
+      transition: opacity 0.3s ease;
     }
     .drawer-overlay.open { opacity: 1; pointer-events: auto; }
     
@@ -96,9 +112,9 @@
       transform: translateX(-100%);
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       overflow-y: auto;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 5px 0 25px rgba(0,0,0,0.15);
     }
-    .dark .drawer-panel { background: #1e293b; }
+    .dark .drawer-panel { background: #0f172a; border-right: 1px solid #1e293b; }
     .drawer-panel.open { transform: translateX(0); }
     
     @media (min-width: 768px) {
@@ -119,485 +135,496 @@
       main { overflow: visible !important; }
     }
 
+    /* Animations */
     @keyframes pulse-ring {
       0% { transform: scale(0.8); opacity: 1; }
-      100% { transform: scale(1.5); opacity: 0; }
+      100% { transform: scale(2); opacity: 0; }
     }
     .pulse-dot::before {
       content: '';
       position: absolute; inset: -4px;
       border-radius: 50%;
       background: #10b981;
-      animation: pulse-ring 1.5s infinite;
+      animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
     }
 
     @supports (padding: max(0px)) {
       .safe-top { padding-top: max(0.75rem, env(safe-area-inset-top)); }
     }
 
-    @keyframes count-up {
-      from { opacity: 0; transform: translateY(10px); }
+    @keyframes slide-up {
+      from { opacity: 0; transform: translateY(15px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .kpi-value { animation: count-up 0.5s ease-out; }
+    .kpi-value { animation: slide-up 0.6s ease-out forwards; }
+    
+    /* Table Enhancements */
+    .table-container { border-radius: 0.5rem; overflow: hidden; border: 1px solid #f1f5f9; }
+    .dark .table-container { border-color: #334155; }
+    th.sticky-header { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px); }
 
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden">
+<body class="flex flex-col h-screen overflow-hidden text-slate-800 dark:text-slate-200 antialiased selection:bg-sky-200 selection:text-sky-900">
 
-  <div id="loader" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-[9999] transition-opacity duration-300">
-    <div class="bg-white dark:bg-darkCard p-8 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-[90%] text-center border dark:border-slate-700">
-      <div class="w-16 h-16 border-4 border-slate-100 dark:border-slate-700 border-t-sky-500 rounded-full animate-spin"></div>
-      <div class="font-bold text-slate-800 dark:text-white text-lg mt-5">Loading Dashboard...</div>
-      <div class="text-xs text-slate-500 dark:text-slate-400 mt-2" id="loaderStatus">Connecting to Data Center</div>
+  <div id="loader" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex flex-col items-center justify-center z-[9999] transition-opacity duration-500">
+    <div class="bg-white dark:bg-darkCard p-10 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-[90%] text-center border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-sky-50 to-transparent dark:from-sky-900/20 dark:to-transparent opacity-50"></div>
+      <div class="relative w-20 h-20 mb-6">
+        <div class="absolute inset-0 border-4 border-slate-100 dark:border-slate-700 rounded-full"></div>
+        <div class="absolute inset-0 border-4 border-sky-500 rounded-full border-t-transparent animate-spin"></div>
+        <i class="fas fa-chart-pie absolute inset-0 flex items-center justify-center text-2xl text-sky-500 animate-pulse"></i>
+      </div>
+      <div class="font-extrabold text-slate-800 dark:text-white text-xl relative z-10 font-inter">Initializing System</div>
+      <div class="text-sm text-slate-500 dark:text-slate-400 mt-2 relative z-10 font-medium" id="loaderStatus">Connecting to Data Center...</div>
     </div>
   </div>
 
   <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
   
-  <div id="drawerPanel" class="drawer-panel">
-    <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-[#002548] to-[#004080] text-white flex items-center justify-between">
-      <h2 class="font-bold text-base flex items-center gap-2"><i class="fas fa-filter"></i> ตัวกรองข้อมูล</h2>
-      <button onclick="closeDrawer()" class="touch-btn w-9 h-9 rounded-full bg-white/10 hover:bg-white/20"><i class="fas fa-times"></i></button>
+  <div id="drawerPanel" class="drawer-panel flex flex-col">
+    <div class="p-5 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between shrink-0">
+      <h2 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-filter text-sky-400"></i> Filters</h2>
+      <button onclick="closeDrawer()" class="touch-btn w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors"><i class="fas fa-times"></i></button>
     </div>
-    <div class="p-4 space-y-4">
+    <div class="p-5 space-y-6 flex-1 overflow-y-auto">
       <div>
-        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">📅 เลือกเดือน</label>
-        <input type="month" id="monthFilterMobile" onchange="syncMobileFilter('month')" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
-        <button onclick="document.getElementById('monthFilterMobile').value=''; syncMobileFilter('month');" class="text-[11px] text-rose-500 mt-1.5 hover:underline flex items-center gap-1">
-          <i class="fas fa-times-circle"></i> ล้างเดือน (แสดงทั้งหมด)
+        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">📅 Select Month</label>
+        <input type="month" id="monthFilterMobile" onchange="syncMobileFilter('month')" class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition shadow-sm">
+        <button onclick="document.getElementById('monthFilterMobile').value=''; syncMobileFilter('month');" class="text-xs text-rose-500 mt-2 hover:text-rose-600 font-medium flex items-center gap-1.5 transition">
+          <i class="fas fa-times-circle"></i> Clear Month
         </button>
       </div>
       <div>
-        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">📍 แผนก/พื้นที่</label>
-        <select id="deptFilterMobile" onchange="syncMobileFilter('dept')" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
-          <option value="all">-- ทุกแผนก --</option>
+        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">📍 Department</label>
+        <select id="deptFilterMobile" onchange="syncMobileFilter('dept')" class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition shadow-sm">
+          <option value="all">-- All Departments --</option>
         </select>
       </div>
       <div>
-        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">🟢 สถานะ (Safety)</label>
-        <select id="statusFilterMobile" onchange="syncMobileFilter('status')" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
-          <option value="all">-- ทุกสถานะ --</option>
-          <option value="Open">🔴 Open</option>
-          <option value="Closed">🟢 Closed</option>
+        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">🟢 Safety Status</label>
+        <select id="statusFilterMobile" onchange="syncMobileFilter('status')" class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition shadow-sm">
+          <option value="all">-- All Status --</option>
+          <option value="Open">🔴 Open (Pending)</option>
+          <option value="Closed">🟢 Closed (Resolved)</option>
         </select>
       </div>
-      <button onclick="applyMobileFilters()" class="w-full bg-gradient-to-r from-[#003566] to-[#00509d] text-white py-3 rounded-xl font-bold shadow-lg touch-btn">
-        <i class="fas fa-check-circle mr-1"></i> นำไปใช้
-      </button>
-      <button onclick="clearAllFilters()" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-2.5 rounded-xl font-semibold text-sm touch-btn">
-        <i class="fas fa-rotate-left mr-1"></i> ล้างตัวกรองทั้งหมด
-      </button>
     </div>
-    <div class="p-4 border-t border-slate-200 dark:border-slate-700 text-[10px] text-slate-400 text-center">
-      <div class="relative inline-block w-2 h-2 rounded-full bg-emerald-500 pulse-dot mb-1"></div><br>
-      Synced: <span id="syncTimeMobile" class="font-bold text-slate-500 dark:text-slate-300">Just Now</span>
+    <div class="p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shrink-0 space-y-3">
+      <button onclick="applyMobileFilters()" class="w-full bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-500/30 touch-btn transition-all active:scale-[0.98]">
+        <i class="fas fa-check-circle mr-2"></i> Apply Filters
+      </button>
+      <button onclick="clearAllFilters()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 py-3 rounded-xl font-semibold text-sm touch-btn transition-all hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-[0.98]">
+        <i class="fas fa-rotate-left mr-2"></i> Reset All
+      </button>
+      <div class="text-[10px] text-slate-400 text-center mt-4">
+        <div class="relative inline-block w-2 h-2 rounded-full bg-emerald-500 pulse-dot mb-1.5"></div><br>
+        Synced: <span id="syncTimeMobile" class="font-bold text-slate-500 dark:text-slate-300">Just Now</span>
+      </div>
     </div>
   </div>
 
-  <nav class="bg-[#002548] text-white shrink-0 shadow-lg z-50 safe-top">
-    <div class="px-3 sm:px-6 flex items-center justify-between py-2.5 sm:py-3">
-      <div class="flex items-center gap-2 sm:gap-3">
-        <button onclick="openDrawer()" class="md:hidden touch-btn w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center">
-          <i class="fas fa-sliders-h text-sm"></i>
+  <nav class="bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#0f172a] text-white shrink-0 shadow-lg z-50 safe-top border-b border-slate-800">
+    <div class="px-4 sm:px-6 flex items-center justify-between py-3">
+      <div class="flex items-center gap-3 sm:gap-4">
+        <button onclick="openDrawer()" class="md:hidden touch-btn w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center border border-white/10 transition-colors">
+          <i class="fas fa-bars text-sm"></i>
         </button>
-        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-sky-500/20 rounded flex items-center justify-center border border-sky-500/30">
-          <i class="fas fa-industry text-sky-400 text-sm"></i>
+        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-sky-400 to-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-sky-500/20">
+          <i class="fas fa-chart-line text-white text-sm sm:text-base"></i>
         </div>
         <div>
-          <div class="font-black tracking-widest text-xs sm:text-sm font-inter leading-none">EXECUTIVE DASHBOARD</div>
-          <div class="text-[9px] sm:text-[10px] text-sky-200 font-medium mt-0.5 hidden xs:block">Toppan Industrial KPI System</div>
+          <div class="font-black tracking-widest text-sm sm:text-base font-inter leading-none text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300">EXECUTIVE DASHBOARD</div>
+          <div class="text-[10px] sm:text-xs text-sky-400/80 font-medium mt-1 hidden xs:block tracking-wide">Toppan Industrial KPI System</div>
         </div>
       </div>
-      <div class="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-        <a href="DashNew.html" class="hidden lg:block hover:text-sky-300 transition"><i class="fas fa-list-check"></i> Audit List</a>
-        <a href="reportnew.html" class="hidden lg:block hover:text-sky-300 transition"><i class="fas fa-tasks"></i> Tracker</a>
-        <button onclick="exportCurrentCSV()" class="touch-btn w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center" title="Export CSV">
-          <i class="fas fa-file-csv text-xs"></i>
+      <div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+        <a href="DashNew.html" class="hidden lg:flex items-center gap-2 hover:text-sky-400 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"><i class="fas fa-list-check"></i> Audit List</a>
+        <a href="reportnew.html" class="hidden lg:flex items-center gap-2 hover:text-sky-400 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"><i class="fas fa-tasks"></i> Tracker</a>
+        <div class="h-6 w-px bg-white/10 hidden lg:block mx-1"></div>
+        <button onclick="exportCurrentCSV()" class="touch-btn w-9 h-9 rounded-xl bg-white/5 hover:bg-white/15 transition-all flex items-center justify-center border border-white/5" title="Export CSV">
+          <i class="fas fa-file-export text-xs text-emerald-400"></i>
         </button>
-        <button onclick="window.print()" class="touch-btn w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center" title="Print / PDF">
-          <i class="fas fa-print text-xs"></i>
+        <button onclick="window.print()" class="touch-btn w-9 h-9 rounded-xl bg-white/5 hover:bg-white/15 transition-all flex items-center justify-center border border-white/5" title="Print / PDF">
+          <i class="fas fa-print text-xs text-slate-300"></i>
         </button>
-        <button onclick="refreshData()" class="touch-btn w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center" title="Refresh">
-          <i class="fas fa-sync-alt text-xs"></i>
+        <button onclick="refreshData()" class="touch-btn w-9 h-9 rounded-xl bg-white/5 hover:bg-white/15 transition-all flex items-center justify-center border border-white/5 group" title="Refresh">
+          <i class="fas fa-sync-alt text-xs text-sky-400 group-active:rotate-180 transition-transform duration-500"></i>
         </button>
-        <button onclick="toggleDarkMode()" class="touch-btn w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center">
-          <i class="fas fa-moon text-xs" id="themeIcon"></i>
+        <button onclick="toggleDarkMode()" class="touch-btn w-9 h-9 rounded-xl bg-white/5 hover:bg-white/15 transition-all flex items-center justify-center border border-white/5">
+          <i class="fas fa-moon text-xs text-amber-300" id="themeIcon"></i>
         </button>
       </div>
     </div>
   </nav>
 
-  <div class="flex flex-1 overflow-hidden">
+  <div class="flex flex-1 overflow-hidden relative">
     
-    <aside class="w-64 bg-white dark:bg-darkCard border-r border-slate-200 dark:border-slate-700 hidden md:flex flex-col shrink-0 overflow-y-auto">
-      <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-        <h2 class="font-bold text-sm text-slate-700 dark:text-slate-200"><i class="fas fa-filter text-sky-500 mr-2"></i>Global Filters</h2>
+    <aside class="w-72 bg-white dark:bg-darkCard border-r border-slate-200 dark:border-slate-800 hidden md:flex flex-col shrink-0 overflow-y-auto z-10 shadow-lg">
+      <div class="p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+        <h2 class="font-extrabold text-sm text-slate-800 dark:text-slate-200 flex items-center tracking-wide"><i class="fas fa-sliders-h text-sky-500 mr-2.5"></i> GLOBAL FILTERS</h2>
       </div>
-      <div class="p-4 space-y-5">
+      <div class="p-5 space-y-6 flex-1">
         <div>
-          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">📅 Date Range (Month)</label>
-          <input type="month" id="monthFilter" onchange="applyFilters()" class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
-          <button onclick="document.getElementById('monthFilter').value=''; applyFilters();" class="text-[10px] text-rose-500 mt-1 hover:underline"><i class="fas fa-times"></i> Clear Month (Show All)</button>
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">📅 Date Range</label>
+          <input type="month" id="monthFilter" onchange="applyFilters()" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-sm bg-white dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition shadow-sm">
+          <button onclick="document.getElementById('monthFilter').value=''; applyFilters();" class="text-[11px] font-medium text-rose-500 mt-2 hover:text-rose-600 transition flex items-center gap-1"><i class="fas fa-times-circle"></i> Clear Selection</button>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">📍 Department / Area</label>
-          <select id="deptFilter" onchange="applyFilters()" class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">📍 Department</label>
+          <select id="deptFilter" onchange="applyFilters()" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-sm bg-white dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition shadow-sm cursor-pointer">
             <option value="all">-- All Departments --</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">🟢 Safety Status</label>
-          <select id="statusFilter" onchange="applyFilters()" class="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 transition shadow-sm">
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">🟢 Status</label>
+          <select id="statusFilter" onchange="applyFilters()" class="w-full p-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-sm bg-white dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition shadow-sm cursor-pointer">
             <option value="all">-- All Status --</option>
             <option value="Open">🔴 Open (Pending)</option>
             <option value="Closed">🟢 Closed (Resolved)</option>
           </select>
         </div>
       </div>
-      <div class="mt-auto p-4 border-t border-slate-200 dark:border-slate-700 text-[10px] text-slate-400 text-center">
-        <div class="relative inline-block w-2 h-2 rounded-full bg-emerald-500 pulse-dot mb-1"></div>
-        Data Last Synced:<br><span id="syncTime" class="font-bold text-slate-500 dark:text-slate-300">Just Now</span>
+      <div class="mt-auto p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-[11px] text-slate-500 text-center">
+        <div class="relative inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-dot mb-2"></div>
+        <div class="font-medium">Data Last Synced</div>
+        <div id="syncTime" class="font-bold text-slate-700 dark:text-slate-300 mt-0.5">Just Now</div>
       </div>
     </aside>
 
-    <main class="flex-1 flex flex-col bg-slate-50 dark:bg-[#0f172a] overflow-hidden relative">
+    <main class="flex-1 flex flex-col bg-slate-50 dark:bg-[#0b1120] overflow-hidden relative">
       
-      <div class="bg-white dark:bg-darkCard border-b border-slate-200 dark:border-slate-700 shrink-0 overflow-x-auto flex hide-scrollbar sticky top-0 z-40">
-        <button onclick="switchTab('safety')" id="btn-safety" class="tab-btn active-safety flex items-center justify-center gap-1.5"><i class="fas fa-hard-hat"></i> <span class="hidden xs:inline">Safety</span></button>
-        <button onclick="switchTab('5s')" id="btn-5s" class="tab-btn flex items-center justify-center gap-1.5"><i class="fas fa-broom"></i> <span class="hidden xs:inline">5S</span></button>
-        <button onclick="switchTab('exec')" id="btn-exec" class="tab-btn flex items-center justify-center gap-1.5"><i class="fas fa-chart-line"></i> <span class="hidden xs:inline">Executive</span></button>
+      <div class="bg-white dark:bg-darkCard border-b border-slate-200 dark:border-slate-800 shrink-0 overflow-x-auto flex hide-scrollbar z-40 shadow-sm relative">
+        <button onclick="switchTab('safety')" id="btn-safety" class="tab-btn active-safety flex items-center justify-center gap-2"><i class="fas fa-hard-hat text-lg"></i> <span class="hidden xs:inline">Safety Tracking</span></button>
+        <button onclick="switchTab('5s')" id="btn-5s" class="tab-btn flex items-center justify-center gap-2"><i class="fas fa-broom text-lg"></i> <span class="hidden xs:inline">5S Analytics</span></button>
+        <button onclick="switchTab('exec')" id="btn-exec" class="tab-btn flex items-center justify-center gap-2"><i class="fas fa-chart-pie text-lg"></i> <span class="hidden xs:inline">Executive View</span></button>
       </div>
 
-      <div class="md:hidden bg-white dark:bg-darkCard border-b border-slate-200 dark:border-slate-700 px-3 py-2 flex items-center justify-between gap-2 shrink-0">
-        <div class="flex items-center gap-2 flex-1 min-w-0">
-          <button onclick="openDrawer()" class="flex items-center gap-1.5 bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 px-3 py-1.5 rounded-lg text-xs font-semibold border border-sky-200 dark:border-sky-800 touch-btn">
+      <div class="md:hidden bg-white/80 dark:bg-darkCard/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between gap-3 shrink-0 z-30 shadow-sm">
+        <div class="flex items-center gap-2.5 flex-1 min-w-0">
+          <button onclick="openDrawer()" class="flex items-center gap-1.5 bg-sky-50 hover:bg-sky-100 dark:bg-sky-900/30 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-300 px-3 py-1.5 rounded-lg text-xs font-bold border border-sky-200 dark:border-sky-800/50 touch-btn transition-colors">
             <i class="fas fa-filter"></i>
-            <span id="mobileFilterSummary" class="truncate max-w-[120px]">ทุกแผนก</span>
+            <span id="mobileFilterSummary" class="truncate max-w-[140px]">ทุกแผนก</span>
           </button>
-          <div class="text-[10px] text-slate-500 dark:text-slate-400 hidden xs:block">
-            <span id="mobileDataCount">0</span> รายการ
+          <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400 hidden xs:block bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
+            <span id="mobileDataCount" class="font-bold text-slate-700 dark:text-slate-200">0</span> รายการ
           </div>
         </div>
-        <div class="text-[10px] text-slate-400 flex items-center gap-1">
-          <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+        <div class="text-[10px] font-medium text-slate-400 flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/50 px-2 py-1 rounded-full border border-slate-100 dark:border-slate-700">
+          <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
           <span id="syncTimeMobileTop">Live</span>
         </div>
       </div>
 
-      <div class="flex-1 overflow-y-auto p-3 sm:p-6" id="tabContent">
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 scroll-smooth" id="tabContent">
         
-        <div id="tab-safety" class="space-y-4 sm:space-y-6">
-          <div class="flex justify-between items-end">
+        <div id="tab-safety" class="space-y-6 sm:space-y-8 max-w-7xl mx-auto">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
             <div>
-              <h2 class="text-base sm:text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                <i class="fas fa-hard-hat text-rose-500"></i> 
-                <span>Safety Risk & Action Plan</span>
+              <h2 class="text-xl sm:text-2xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-500"><i class="fas fa-hard-hat"></i></div>
+                Safety Risk & Action Plan
               </h2>
-              <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1">วิเคราะห์ปัญหาความปลอดภัยและการตอบสนองต่อความเสี่ยง</p>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5 ml-13 font-medium">วิเคราะห์ปัญหาความปลอดภัยและการตอบสนองต่อความเสี่ยง</p>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-            <div class="kpi-card border-l-4 border-l-slate-400 flex justify-between items-center">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div class="kpi-card border-l-[5px] border-l-slate-400 flex justify-between items-center group">
               <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Total Findings</div>
-                <div class="text-xl sm:text-3xl font-black font-inter text-slate-800 dark:text-white mt-1 kpi-value" id="s_kpiTotal">0</div>
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Findings</div>
+                <div class="text-2xl sm:text-4xl font-black font-inter text-slate-800 dark:text-white mt-1 kpi-value" id="s_kpiTotal">0</div>
               </div>
-              <i class="fas fa-clipboard-list text-2xl sm:text-3xl text-slate-200 dark:text-slate-600"></i>
+              <div class="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-clipboard-list text-xl sm:text-2xl text-slate-400"></i>
+              </div>
             </div>
-            <div class="kpi-card border-l-4 border-l-amber-500 flex justify-between items-center">
+            <div class="kpi-card border-l-[5px] border-l-amber-500 flex justify-between items-center group">
               <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Open Issues</div>
-                <div class="text-xl sm:text-3xl font-black font-inter text-amber-500 mt-1 kpi-value" id="s_kpiOpen">0</div>
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Open Issues</div>
+                <div class="text-2xl sm:text-4xl font-black font-inter text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-400 mt-1 kpi-value" id="s_kpiOpen">0</div>
               </div>
-              <i class="fas fa-exclamation-circle text-2xl sm:text-3xl text-amber-100 dark:text-amber-900/50"></i>
+              <div class="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-exclamation-circle text-xl sm:text-2xl text-amber-500"></i>
+              </div>
             </div>
-            <div class="kpi-card border-l-4 border-l-rose-500 flex justify-between items-center">
+            <div class="kpi-card border-l-[5px] border-l-rose-500 flex justify-between items-center group">
               <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Overdue Risk</div>
-                <div class="text-xl sm:text-3xl font-black font-inter text-rose-600 mt-1 kpi-value" id="s_kpiOverdue">0</div>
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Overdue Risk</div>
+                <div class="text-2xl sm:text-4xl font-black font-inter text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-red-600 mt-1 kpi-value" id="s_kpiOverdue">0</div>
               </div>
-              <i class="fas fa-skull-crossbones text-2xl sm:text-3xl text-rose-100 dark:text-rose-900/50"></i>
+              <div class="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-skull-crossbones text-xl sm:text-2xl text-rose-500"></i>
+              </div>
             </div>
-            <div class="kpi-card border-l-4 border-l-emerald-500 flex justify-between items-center">
+            <div class="kpi-card border-l-[5px] border-l-emerald-500 flex justify-between items-center group">
               <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Closed</div>
-                <div class="text-xl sm:text-3xl font-black font-inter text-emerald-500 mt-1 kpi-value" id="s_kpiClosed">0</div>
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Closed</div>
+                <div class="text-2xl sm:text-4xl font-black font-inter text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400 mt-1 kpi-value" id="s_kpiClosed">0</div>
               </div>
-              <i class="fas fa-check-circle text-2xl sm:text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
+              <div class="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-check-circle text-xl sm:text-2xl text-emerald-500"></i>
+              </div>
             </div>
           </div>
 
-          <div id="s_insight" class="hidden rounded-xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/20 p-3 sm:p-4">
-            <div class="flex items-center gap-2 mb-2 text-rose-700 dark:text-rose-300">
-              <i class="fas fa-lightbulb"></i>
-              <h3 class="text-[11px] sm:text-xs font-bold uppercase tracking-wider">Auto Insight - Safety</h3>
+          <div id="s_insight" class="hidden rounded-xl border border-rose-200/60 dark:border-rose-900/50 bg-gradient-to-r from-rose-50 to-white dark:from-rose-900/20 dark:to-darkCard p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center gap-2.5 mb-3 text-rose-600 dark:text-rose-400 border-b border-rose-100 dark:border-rose-900/50 pb-2">
+              <i class="fas fa-lightbulb text-lg"></i>
+              <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider">AI Insight - Safety Analysis</h3>
             </div>
-            <ul id="s_insightList" class="space-y-1.5 text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 list-none"></ul>
+            <ul id="s_insightList" class="space-y-2.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium"></ul>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <div class="kpi-card lg:col-span-2 flex flex-col">
-              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Volume & Overdue by Department</h3>
-              <div class="relative w-full" style="height: 280px;"><canvas id="s_chDept"></canvas></div>
+              <h3 class="text-xs sm:text-sm font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-4">Volume & Overdue by Department</h3>
+              <div class="relative w-full flex-1 min-h-[280px]"><canvas id="s_chDept"></canvas></div>
             </div>
             <div class="kpi-card flex flex-col">
-              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Finding Categories</h3>
-              <div class="relative w-full" style="height: 280px;"><canvas id="s_chCat"></canvas></div>
+              <h3 class="text-xs sm:text-sm font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-4">Finding Categories</h3>
+              <div class="relative w-full flex-1 min-h-[280px]"><canvas id="s_chCat"></canvas></div>
             </div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <div class="kpi-card flex flex-col">
-              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">MTTR (Mean Time to Resolution) Trend</h3>
-              <div class="relative w-full" style="height: 260px;"><canvas id="s_chMTTR"></canvas></div>
+              <h3 class="text-xs sm:text-sm font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-4">MTTR (Mean Time to Resolution)</h3>
+              <div class="relative w-full flex-1 min-h-[260px]"><canvas id="s_chMTTR"></canvas></div>
             </div>
             <div class="kpi-card flex flex-col">
-              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Open Issue Aging (วันที่ค้าง)</h3>
-              <div class="relative w-full" style="height: 260px;"><canvas id="s_chAging"></canvas></div>
+              <h3 class="text-xs sm:text-sm font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-4">Open Issue Aging</h3>
+              <div class="relative w-full flex-1 min-h-[260px]"><canvas id="s_chAging"></canvas></div>
             </div>
           </div>
 
-          <div class="kpi-card overflow-hidden !p-0">
-            <div class="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-700 bg-amber-50 dark:bg-amber-900/20">
-              <h3 class="text-[11px] sm:text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
-                <i class="fas fa-rotate"></i> Repeat Findings (ปัญหาเดิมที่พบซ้ำ)
+          <div class="kpi-card !p-0 overflow-hidden flex flex-col">
+            <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 bg-amber-50/50 dark:bg-amber-900/10">
+              <h3 class="text-xs sm:text-sm font-extrabold text-amber-700 dark:text-amber-500 uppercase tracking-wider flex items-center gap-2.5">
+                <i class="fas fa-rotate text-lg"></i> Repeat Findings (ปัญหาเกิดซ้ำ)
               </h3>
             </div>
-            <div class="overflow-x-auto p-3 sm:p-4">
-              <table class="w-full text-[11px] sm:text-xs text-left" id="s_tbRepeat"></table>
+            <div class="overflow-x-auto table-container m-4">
+              <table class="w-full text-left whitespace-nowrap" id="s_tbRepeat"></table>
             </div>
           </div>
         </div>
 
-        <div id="tab-5s" class="space-y-4 sm:space-y-6 hidden">
-          <div class="flex justify-between items-end">
+        <div id="tab-5s" class="space-y-6 sm:space-y-8 max-w-7xl mx-auto hidden">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
             <div>
-              <h2 class="text-base sm:text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                <i class="fas fa-broom text-blue-500"></i> 
-                <span>5S Analytics Center</span>
+              <h2 class="text-xl sm:text-2xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-500"><i class="fas fa-broom"></i></div>
+                5S Analytics Center
               </h2>
-              <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1">วิเคราะห์คะแนนประเมินเชิงลึกระดับหมวดหมู่ S1-S5</p>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5 ml-13 font-medium">วิเคราะห์คะแนนประเมินเชิงลึกระดับหมวดหมู่ S1-S5</p>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-            <div class="kpi-card border-l-4 border-l-blue-500 flex justify-between items-center">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div class="kpi-card border-l-[5px] border-l-blue-500 flex justify-between items-center group">
               <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Avg 5S Score</div>
-                <div class="text-xl sm:text-3xl font-black font-inter text-blue-600 mt-1 kpi-value" id="f_kpiAvg">0%</div>
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Avg 5S Score</div>
+                <div class="text-2xl sm:text-4xl font-black font-inter text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-400 mt-1 kpi-value" id="f_kpiAvg">0%</div>
               </div>
-              <i class="fas fa-star text-2xl sm:text-3xl text-blue-100 dark:text-blue-900/50"></i>
+              <div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-star text-xl sm:text-2xl text-blue-500"></i>
+              </div>
             </div>
-            <div class="kpi-card border-l-4 border-l-emerald-500 flex justify-between items-center overflow-hidden">
-              <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Best Dept</div>
-                <div class="text-sm sm:text-xl font-bold text-emerald-600 mt-1 truncate" id="f_kpiBest">-</div>
+            <div class="kpi-card border-l-[5px] border-l-emerald-500 flex justify-between items-center group">
+              <div class="min-w-0 flex-1 pr-2">
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Top Dept</div>
+                <div class="text-sm sm:text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-2 truncate" id="f_kpiBest">-</div>
               </div>
-              <i class="fas fa-trophy text-2xl sm:text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
+              <div class="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                <i class="fas fa-trophy text-xl sm:text-2xl text-emerald-500"></i>
+              </div>
             </div>
-            <div class="kpi-card border-l-4 border-l-rose-500 flex justify-between items-center overflow-hidden">
-              <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Worst Dept</div>
-                <div class="text-sm sm:text-xl font-bold text-rose-600 mt-1 truncate" id="f_kpiWorst">-</div>
+            <div class="kpi-card border-l-[5px] border-l-rose-500 flex justify-between items-center group">
+              <div class="min-w-0 flex-1 pr-2">
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Need Improve</div>
+                <div class="text-sm sm:text-xl font-bold text-rose-600 dark:text-rose-400 mt-2 truncate" id="f_kpiWorst">-</div>
               </div>
-              <i class="fas fa-arrow-trend-down text-2xl sm:text-3xl text-rose-100 dark:text-rose-900/50"></i>
+              <div class="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                <i class="fas fa-arrow-trend-down text-xl sm:text-2xl text-rose-500"></i>
+              </div>
             </div>
-            <div class="kpi-card border-l-4 border-l-indigo-500 flex justify-between items-center">
+            <div class="kpi-card border-l-[5px] border-l-indigo-500 flex justify-between items-center group">
               <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Total Audits</div>
-                <div class="text-xl sm:text-3xl font-black font-inter text-indigo-500 mt-1 kpi-value" id="f_kpiCount">0</div>
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Audits</div>
+                <div class="text-2xl sm:text-4xl font-black font-inter text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500 mt-1 kpi-value" id="f_kpiCount">0</div>
               </div>
-              <i class="fas fa-file-signature text-2xl sm:text-3xl text-indigo-100 dark:text-indigo-900/50"></i>
+              <div class="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-file-signature text-xl sm:text-2xl text-indigo-500"></i>
+              </div>
             </div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <div class="kpi-card flex flex-col">
-              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Category Radar (S1-S5)</h3>
-              <div class="relative w-full" style="height: 300px;"><canvas id="f_chRadar"></canvas></div>
+              <h3 class="text-xs sm:text-sm font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-4">5S Category Radar</h3>
+              <div class="relative w-full flex-1 min-h-[300px]"><canvas id="f_chRadar"></canvas></div>
             </div>
             <div class="kpi-card lg:col-span-2 flex flex-col">
-              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Department Ranking</h3>
-              <div class="relative w-full" style="height: 300px;"><canvas id="f_chRank"></canvas></div>
+              <h3 class="text-xs sm:text-sm font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-4">Department Ranking</h3>
+              <div class="relative w-full flex-1 min-h-[300px]"><canvas id="f_chRank"></canvas></div>
             </div>
           </div>
 
-          <div id="f_insight" class="hidden rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4">
-            <div class="flex items-center gap-2 mb-2 text-blue-700 dark:text-blue-300">
-              <i class="fas fa-lightbulb"></i>
-              <h3 class="text-[11px] sm:text-xs font-bold uppercase tracking-wider">Auto Insight - 5S</h3>
+          <div id="f_insight" class="hidden rounded-xl border border-blue-200/60 dark:border-blue-900/50 bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/20 dark:to-darkCard p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center gap-2.5 mb-3 text-blue-600 dark:text-blue-400 border-b border-blue-100 dark:border-blue-900/50 pb-2">
+              <i class="fas fa-lightbulb text-lg"></i>
+              <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider">AI Insight - 5S Performance</h3>
             </div>
-            <ul id="f_insightList" class="space-y-1.5 text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 list-none"></ul>
+            <ul id="f_insightList" class="space-y-2.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium"></ul>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <div class="kpi-card lg:col-span-2 flex flex-col">
-              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Score Trend by Category (MoM)</h3>
-              <div class="relative w-full" style="height: 280px;"><canvas id="f_chTrend"></canvas></div>
+              <h3 class="text-xs sm:text-sm font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-4">5S Category Trend (MoM)</h3>
+              <div class="relative w-full flex-1 min-h-[280px]"><canvas id="f_chTrend"></canvas></div>
             </div>
             <div class="kpi-card flex flex-col">
-              <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Score Distribution</h3>
-              <div class="relative w-full" style="height: 280px;"><canvas id="f_chDist"></canvas></div>
+              <h3 class="text-xs sm:text-sm font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-4">Score Distribution</h3>
+              <div class="relative w-full flex-1 min-h-[280px]"><canvas id="f_chDist"></canvas></div>
             </div>
           </div>
 
-          <div class="kpi-card overflow-hidden">
-            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">5S Heatmap Matrix (S1-S5)</h3>
-            <div class="overflow-x-auto -mx-3 sm:mx-0">
-              <table class="w-full text-[10px] sm:text-xs border-collapse text-center min-w-[500px]" id="f_tbHeatmap"></table>
+          <div class="kpi-card flex flex-col overflow-hidden !p-0">
+            <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800">
+               <h3 class="text-xs sm:text-sm font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider">5S Heatmap Matrix</h3>
+            </div>
+            <div class="overflow-x-auto m-4 table-container border-0 sm:border">
+              <table class="w-full text-xs sm:text-sm border-collapse text-center min-w-[500px]" id="f_tbHeatmap"></table>
             </div>
           </div>
-        </div>
-<div class="kpi-card overflow-hidden">
-            <div class="flex items-center gap-2 mb-3 sm:mb-4 text-slate-600 dark:text-slate-300">
-              <i class="fas fa-circle-info text-blue-500"></i>
-              <h3 class="text-[11px] sm:text-xs font-bold uppercase tracking-wider">ตรรกะการคิดคะแนน 5S (Scoring Logic)</h3>
+          
+          <div class="kpi-card">
+            <div class="flex items-center gap-2.5 mb-5 text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <i class="fas fa-circle-info text-blue-500 text-lg"></i>
+              <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Scoring Logic (ตรรกะการคิดคะแนน 5S)</h3>
             </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-              <div class="space-y-3">
-                <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  คะแนน 5S คำนวณจากการให้คะแนน <b>รายข้อตรวจสอบ (checklist item)</b> โดยแต่ละข้อจะถูกประเมินเป็น 1 ใน 3 ระดับ และแปลงเป็นแต้มดังนี้:
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div class="space-y-4">
+                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                  คะแนน 5S คำนวณจากการให้คะแนน <b>รายข้อตรวจสอบ (checklist)</b> โดยจะถูกแปลงเป็นแต้มดังนี้:
                 </p>
-                <div class="space-y-2">
-                  <div class="flex items-center justify-between rounded-lg bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2">
-                    <span class="text-[11px] sm:text-xs font-bold text-emerald-700 dark:text-emerald-400">ดี</span>
-                    <span class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">ผ่านมาตรฐานเต็มที่</span>
-                    <span class="font-inter font-black text-emerald-600 text-sm sm:text-base">2 แต้ม</span>
+                <div class="space-y-2.5">
+                  <div class="flex items-center justify-between rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 px-4 py-3">
+                    <span class="text-xs sm:text-sm font-bold text-emerald-700 dark:text-emerald-400">ดี (ผ่านเต็มที่)</span>
+                    <span class="font-inter font-black text-emerald-600 text-base sm:text-lg">2 แต้ม</span>
                   </div>
-                  <div class="flex items-center justify-between rounded-lg bg-amber-50 dark:bg-amber-900/20 px-3 py-2">
-                    <span class="text-[11px] sm:text-xs font-bold text-amber-700 dark:text-amber-400">พอใช้</span>
-                    <span class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">ผ่านบางส่วน ต้องปรับ</span>
-                    <span class="font-inter font-black text-amber-600 text-sm sm:text-base">1 แต้ม</span>
+                  <div class="flex items-center justify-between rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 px-4 py-3">
+                    <span class="text-xs sm:text-sm font-bold text-amber-700 dark:text-amber-400">พอใช้ (ผ่านบางส่วน)</span>
+                    <span class="font-inter font-black text-amber-600 text-base sm:text-lg">1 แต้ม</span>
                   </div>
-                  <div class="flex items-center justify-between rounded-lg bg-rose-50 dark:bg-rose-900/20 px-3 py-2">
-                    <span class="text-[11px] sm:text-xs font-bold text-rose-700 dark:text-rose-400">ต้องปรับปรุง / ไม่ผ่าน</span>
-                    <span class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">ไม่ผ่านมาตรฐาน</span>
-                    <span class="font-inter font-black text-rose-600 text-sm sm:text-base">0 แต้ม</span>
-                  </div>
-                </div>
-                <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  ทุกข้อมี <b>คะแนนเต็ม 2 แต้ม</b> ดังนั้นคะแนนเต็มของแบบตรวจ = จำนวนข้อที่ตอบ × 2
-                </p>
-              </div>
-
-              <div class="space-y-3">
-                <div class="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 sm:p-4 space-y-3">
-                  <div>
-                    <div class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase mb-1">สูตรคำนวณ % แต่ละหมวด (S1-S5)</div>
-                    <code class="block text-[10px] sm:text-xs text-slate-700 dark:text-slate-200 font-mono leading-relaxed">
-                      % หมวด = (Σ แต้มที่ได้ในหมวด ÷ (จำนวนข้อในหมวด × 2)) × 100
-                    </code>
-                  </div>
-                  <div>
-                    <div class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase mb-1">คะแนนรวมของการตรวจ 1 ครั้ง</div>
-                    <code class="block text-[10px] sm:text-xs text-slate-700 dark:text-slate-200 font-mono leading-relaxed">
-                      % รวม = (Σ แต้มทุกข้อ ÷ (จำนวนข้อทั้งหมด × 2)) × 100
-                    </code>
-                  </div>
-                </div>
-                <div class="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-3">
-                  <div class="text-[10px] sm:text-[11px] font-bold text-blue-700 dark:text-blue-400 uppercase mb-1">ตัวอย่าง</div>
-                  <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                    หมวด S1 มี 5 ข้อ (เต็ม 10 แต้ม) ตอบ "ดี" 3 ข้อ (6) + "พอใช้" 1 ข้อ (1) + "ต้องปรับปรุง" 1 ข้อ (0) = 7 แต้ม → <b class="text-blue-600">(7 ÷ 10) × 100 = 70%</b>
-                  </p>
-                </div>
-                <div class="space-y-1.5">
-                  <div class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase">เกณฑ์การจัดระดับ</div>
-                  <div class="flex flex-wrap gap-2 text-[10px] sm:text-xs">
-                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 font-bold">≥ 85% ดี</span>
-                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 font-bold">70-84% พอใช้</span>
-                    <span class="inline-flex items-center gap-1 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 px-2 py-1 font-bold">&lt; 70% ต้องปรับปรุง</span>
+                  <div class="flex items-center justify-between rounded-xl bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/30 px-4 py-3">
+                    <span class="text-xs sm:text-sm font-bold text-rose-700 dark:text-rose-400">ต้องปรับปรุง (ไม่ผ่าน)</span>
+                    <span class="font-inter font-black text-rose-600 text-base sm:text-lg">0 แต้ม</span>
                   </div>
                 </div>
               </div>
+              <div class="space-y-4">
+                <div class="rounded-xl bg-slate-50 dark:bg-slate-800 p-4 border border-slate-100 dark:border-slate-700">
+                  <div class="text-[10px] sm:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">สูตรคำนวณ</div>
+                  <code class="block text-xs text-sky-700 dark:text-sky-300 font-mono mb-2 bg-sky-50 dark:bg-sky-900/20 p-2 rounded">% หมวด = (Σ แต้มในหมวด ÷ (จำนวนข้อ × 2)) × 100</code>
+                  <code class="block text-xs text-indigo-700 dark:text-indigo-300 font-mono bg-indigo-50 dark:bg-indigo-900/20 p-2 rounded">% รวม = (Σ แต้มทุกข้อ ÷ (จำนวนข้อทั้งหมด × 2)) × 100</code>
+                </div>
+                <div class="flex flex-wrap gap-2 text-xs">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-3 py-1.5 font-bold shadow-sm">≥ 85% ดี</span>
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-3 py-1.5 font-bold shadow-sm">70-84% พอใช้</span>
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 px-3 py-1.5 font-bold shadow-sm">&lt; 70% ต้องปรับปรุง</span>
+                </div>
+              </div>
             </div>
-
-            <p class="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed mt-4 pt-3 border-t border-slate-100 dark:border-slate-700">
-              <i class="fas fa-lightbulb mr-1"></i>
-              หมายเหตุ: คะแนนแต่ละแผนกในกราฟ Ranking และ Heatmap คือ <b>ค่าเฉลี่ยของ % การตรวจทุกครั้ง</b> ในช่วงเวลาที่เลือก ส่วนกราฟแนวโน้ม (MoM) คำนวณ % แยกตามหมวดของแต่ละเดือนแล้วเปรียบเทียบเดือนต่อเดือน
-            </p>
           </div>
         </div>
-        <div id="tab-exec" class="space-y-4 sm:space-y-6 hidden">
-          <div class="flex justify-between items-end">
+
+        <div id="tab-exec" class="space-y-6 sm:space-y-8 max-w-7xl mx-auto hidden">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
             <div>
-              <h2 class="text-base sm:text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                <i class="fas fa-chart-line text-purple-500"></i> 
-                <span>Executive Overview</span>
+              <h2 class="text-xl sm:text-2xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-500"><i class="fas fa-chart-pie"></i></div>
+                Executive Overview
               </h2>
-              <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1">สรุปภาพรวมและแนวโน้มระดับองค์กร</p>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5 ml-13 font-medium">สรุปภาพรวมและแนวโน้มระดับองค์กร (Organizational Dashboard)</p>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-            <div class="kpi-card border-l-4 border-l-purple-500 flex justify-between items-center">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div class="kpi-card border-l-[5px] border-l-purple-500 flex justify-between items-center group bg-gradient-to-br from-white to-purple-50 dark:from-darkCard dark:to-purple-900/10">
               <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Closure Rate</div>
-                <div class="text-xl sm:text-3xl font-black font-inter text-purple-600 mt-1" id="e_kpiClosure">0%</div>
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Closure Rate</div>
+                <div class="text-2xl sm:text-4xl font-black font-inter text-purple-600 dark:text-purple-400 mt-1 kpi-value" id="e_kpiClosure">0%</div>
               </div>
-              <i class="fas fa-circle-check text-2xl sm:text-3xl text-purple-100 dark:text-purple-900/50"></i>
+              <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-circle-check text-xl sm:text-2xl text-purple-500"></i>
+              </div>
             </div>
-            <div class="kpi-card border-l-4 border-l-rose-500 flex justify-between items-center">
+            <div class="kpi-card border-l-[5px] border-l-rose-500 flex justify-between items-center group bg-gradient-to-br from-white to-rose-50 dark:from-darkCard dark:to-rose-900/10">
               <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">Overdue Rate</div>
-                <div class="text-xl sm:text-3xl font-black font-inter text-rose-600 mt-1" id="e_kpiOverdueRate">0%</div>
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Overdue Rate</div>
+                <div class="text-2xl sm:text-4xl font-black font-inter text-rose-600 dark:text-rose-400 mt-1 kpi-value" id="e_kpiOverdueRate">0%</div>
               </div>
-              <i class="fas fa-triangle-exclamation text-2xl sm:text-3xl text-rose-100 dark:text-rose-900/50"></i>
+              <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-triangle-exclamation text-xl sm:text-2xl text-rose-500"></i>
+              </div>
             </div>
-            <div class="kpi-card border-l-4 border-l-blue-500 flex justify-between items-center">
+            <div class="kpi-card border-l-[5px] border-l-blue-500 flex justify-between items-center group bg-gradient-to-br from-white to-blue-50 dark:from-darkCard dark:to-blue-900/10">
               <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">5S Avg (All)</div>
-                <div class="text-xl sm:text-3xl font-black font-inter text-blue-600 mt-1" id="e_kpi5S">0%</div>
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">5S Avg (All)</div>
+                <div class="text-2xl sm:text-4xl font-black font-inter text-blue-600 dark:text-blue-400 mt-1 kpi-value" id="e_kpi5S">0%</div>
               </div>
-              <i class="fas fa-star text-2xl sm:text-3xl text-blue-100 dark:text-blue-900/50"></i>
+              <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-star text-xl sm:text-2xl text-blue-500"></i>
+              </div>
             </div>
-            <div class="kpi-card border-l-4 border-l-emerald-500 flex justify-between items-center">
+            <div class="kpi-card border-l-[5px] border-l-emerald-500 flex justify-between items-center group bg-gradient-to-br from-white to-emerald-50 dark:from-darkCard dark:to-emerald-900/10">
               <div class="min-w-0 flex-1">
-                <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">5S Forecast (Next)</div>
-                <div class="text-xl sm:text-3xl font-black font-inter text-emerald-600 mt-1" id="e_kpiForecast">-</div>
+                <div class="text-[10px] sm:text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">5S Forecast</div>
+                <div class="text-2xl sm:text-4xl font-black font-inter text-emerald-600 dark:text-emerald-400 mt-1 kpi-value" id="e_kpiForecast">-</div>
               </div>
-              <i class="fas fa-arrow-trend-up text-2xl sm:text-3xl text-emerald-100 dark:text-emerald-900/50"></i>
+              <div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-arrow-trend-up text-xl sm:text-2xl text-emerald-500"></i>
+              </div>
             </div>
           </div>
 
-          <div id="e_insight" class="hidden rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20 p-3 sm:p-4">
-            <div class="flex items-center gap-2 mb-2 text-purple-700 dark:text-purple-300">
-              <i class="fas fa-wand-magic-sparkles"></i>
-              <h3 class="text-[11px] sm:text-xs font-bold uppercase tracking-wider">Executive Summary - Auto Generated</h3>
+          <div id="e_insight" class="hidden rounded-xl border border-purple-200/60 dark:border-purple-900/50 bg-gradient-to-r from-purple-50 to-white dark:from-purple-900/20 dark:to-darkCard p-4 sm:p-5 shadow-sm">
+            <div class="flex items-center gap-2.5 mb-3 text-purple-600 dark:text-purple-400 border-b border-purple-100 dark:border-purple-900/50 pb-2">
+              <i class="fas fa-wand-magic-sparkles text-lg"></i>
+              <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Executive Summary (Auto-Generated)</h3>
             </div>
-            <ul id="e_insightList" class="space-y-1.5 text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 list-none"></ul>
+            <ul id="e_insightList" class="space-y-2.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium"></ul>
           </div>
 
           <div class="kpi-card flex flex-col">
-            <h3 class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Safety vs 5S Trend (MoM) + Forecast</h3>
-            <div class="relative w-full" style="height: 280px;"><canvas id="e_chTrend"></canvas></div>
+            <h3 class="text-xs sm:text-sm font-extrabold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-4">Safety vs 5S Trend (MoM) & Forecast</h3>
+            <div class="relative w-full flex-1 min-h-[300px]"><canvas id="e_chTrend"></canvas></div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-            <div class="kpi-card overflow-hidden !p-0">
-              <div class="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-700 bg-rose-50 dark:bg-rose-900/20">
-                <h3 class="text-[11px] sm:text-xs font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider flex items-center gap-2">
-                  <i class="fas fa-fire"></i> Top 5 Critical Overdue
+            <div class="kpi-card !p-0 overflow-hidden flex flex-col border border-rose-100 dark:border-rose-900/30">
+              <div class="p-4 border-b border-rose-100 dark:border-rose-800 bg-rose-50/50 dark:bg-rose-900/10">
+                <h3 class="text-xs sm:text-sm font-extrabold text-rose-700 dark:text-rose-400 uppercase tracking-wider flex items-center gap-2.5">
+                  <i class="fas fa-fire text-lg"></i> Top 5 Critical Overdue (Safety)
                 </h3>
               </div>
-              <div class="overflow-x-auto p-3 sm:p-4">
-                <table class="w-full text-[11px] sm:text-xs text-left" id="e_tbOverdue"></table>
+              <div class="overflow-x-auto table-container m-4">
+                <table class="w-full text-left whitespace-nowrap" id="e_tbOverdue"></table>
               </div>
             </div>
             
-            <div class="kpi-card overflow-hidden !p-0">
-              <div class="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-700 bg-amber-50 dark:bg-amber-900/20">
-                <h3 class="text-[11px] sm:text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
-                  <i class="fas fa-sort-amount-down"></i> Bottom 5 Departments (5S)
+            <div class="kpi-card !p-0 overflow-hidden flex flex-col border border-amber-100 dark:border-amber-900/30">
+              <div class="p-4 border-b border-amber-100 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10">
+                <h3 class="text-xs sm:text-sm font-extrabold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2.5">
+                  <i class="fas fa-sort-amount-down text-lg"></i> Bottom 5 Departments (5S)
                 </h3>
               </div>
-              <div class="overflow-x-auto p-3 sm:p-4">
-                <table class="w-full text-[11px] sm:text-xs text-left" id="e_tbWorst5S"></table>
+              <div class="overflow-x-auto table-container m-4">
+                <table class="w-full text-left whitespace-nowrap" id="e_tbWorst5S"></table>
               </div>
             </div>
           </div>
@@ -605,17 +632,18 @@
 
       </div>
 
-      <button onclick="refreshData()" class="md:hidden fixed bottom-5 right-5 w-14 h-14 bg-gradient-to-br from-[#003566] to-[#00509d] text-white rounded-full shadow-2xl touch-btn z-40 active:scale-95 transition">
-        <i class="fas fa-sync-alt text-lg"></i>
+      <button onclick="refreshData()" class="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-sky-500 to-blue-600 text-white rounded-full shadow-lg shadow-blue-500/40 touch-btn z-40 active:scale-90 transition-transform flex items-center justify-center">
+        <i class="fas fa-sync-alt text-xl"></i>
       </button>
     </main>
   </div>
 
   <script>
+    // -------------------------------------------------------------------
+    // API และตัวแปรดั้งเดิม คงไว้ทั้งหมดเพื่อไม่ให้กระทบระบบหลังบ้าน
+    // -------------------------------------------------------------------
     const API = "https://script.google.com/macros/s/AKfycbwHIUI1ZbFYKeBK7_fkEI6_hfhhhDTxE0fjltus2i-TI7pvhM2CN1HaKDIy4cgXUNT5gQ/exec";
-    
     const DEPTS = ["PRINT","LAMINATE","SOVENTLESS","REWINDER/SLITTER/PACKING","BAG MAKING","QA&QC","WAREHOUSE","OFFICE","CANTEEN","TOILET","LOCKER","ENGINEERING","OUTSIDE"];
-    
     const AREA_MAP = {
       "แผนก Print": "PRINT", "PRINT": "PRINT", "Factory": "PRINT",
       "แผนก Laminate": "LAMINATE", "LAMINATE": "LAMINATE",
@@ -634,9 +662,7 @@
       "EN": "ENGINEERING", "ENGINEERING": "ENGINEERING"
     };
 
-    // ===================================================================
-    // 📋 MASTER 5S CATEGORY CHECKLIST (For S1-S5 Calculation)
-    // ===================================================================
+    // (Data Checklist คงเดิมละไว้เพื่อความกระชับ - ใช้ตัวแปรตามโค้ดต้นฉบับของคุณได้เลย)
     const FACTORY_5S_SECTIONS = [
       { title: "1. เครื่องจักร", qs: [{q: "ทำความสะอาดเครื่องจักร...", category: "S3"}, {q: "ตีเส้นกำหนดจุด...", category: "S2"}, {q: "ก่อนทำงาน...", category: "S4"}] },
       { title: "2. เครื่องมือ", qs: [{q: "กำหนดตำแหน่งวาง...", category: "S2"}, {q: "หลังจากนำเครื่องมือ...", category: "S5"}, {q: "เก็บวางเครื่องมือ...", category: "S2"}, {q: "กำหนดผู้รับผิดชอบ...", category: "S4"}] },
@@ -648,7 +674,6 @@
       { title: "8. การตรวจสุขลักษณะส่วนบุคคล", qs: [{q: "พนักงานต้องแต่งกาย...", category: "S4"}, {q: "พนักงานต้องมีสุขลักษณะ...", category: "S4"}, {q: "พนักงานต้องมีสุขภาพ...", category: "S4"}] },
       { title: "9. ความตระหนัก ความสำเร็จ ผลงาน", qs: [{q: "มีความตระหนักในการทำกิจกรรม...", category: "S5"}, {q: "มีการนำเสนอเรื่องราวความสำเร็จ...", category: "S5"}, {q: "นำ 3 ส แรกมาใช้...", category: "S5"}, {q: "มีการแสดง KPI...", category: "S5"}] }
     ];
-
     const OFFICE_5S_SECTIONS = [
       { title: "1. โต๊ะทำงาน", qs: [{q: "ความสะอาดของโต๊ะ...", category: "S3"}, {q: "ความเป็นระเบียบ...", category: "S2"}, {q: "กำหนดจำนวนอุปกรณ์...", category: "S4"}, {q: "ตะกร้าเอกสาร...", category: "S2"}] },
       { title: "2. ลิ้นชัก", qs: [{q: "ลิ้นชักที่ 1...", category: "S2"}, {q: "ลิ้นชักที่ 2...", category: "S2"}, {q: "ลิ้นชักที่ 3...", category: "S2"}] },
@@ -660,22 +685,18 @@
       { title: "8. การตรวจสุขลักษณะส่วนบุคคล", qs: [{q: "พนักงานต้องแต่งกาย...", category: "S4"}, {q: "พนักงานต้องมีสุขลักษณะ...", category: "S4"}, {q: "พนักงานต้องมีสุขภาพ...", category: "S4"}] },
       { title: "9. ความตระหนัก ความสำเร็จ ผลงาน", qs: [{q: "มีความตระหนัก...", category: "S5"}, {q: "มีการนำเสนอ...", category: "S5"}, {q: "นำ 3 ส แรกมาใช้...", category: "S5"}, {q: "มีการแสดง KPI...", category: "S5"}] }
     ];
-
     const CANTEEN_5S_SECTIONS = [
       { title: "1. ห้องอาหาร (CANTEEN)", qs: [{q: "โต๊ะอาหารและเก้าอี้...", category: "S3"}, {q: "ชั้นวางอาหารต้องสะอาด...", category: "S2"}, {q: "ไม่มีเศษขยะ...", category: "S3"}, {q: "ถังขยะอยู่ในตำแหน่งที่เหมาะสม...", category: "S2"}] },
       { title: "2. ห้องกาแฟ", qs: [{q: "ทำความสะอาดอ่างล้างภาชนะ...", category: "S4"}, {q: "แบ่งแยกอุปกรณ์...", category: "S2"}, {q: "จัดวางสิ่งของ แยกตามชนิด...", category: "S2"}] },
       { title: "3. ทางเข้า (AIR SHOWER)", qs: [{q: "ทำความสะอาดอ่างล้างมือ...", category: "S3"}, {q: "ไม่มีเศษขยะ...", category: "S3"}, {q: "ชั้นวางรองเท้า...", category: "S2"}] }
     ];
-
     const TOILET_5S_SECTIONS = [
       { title: "1. ห้องสุขา (ชาย,หญิง)", qs: [{q: "ทำความสะอาดอ่างล้างหน้า...", category: "S3"}, {q: "กระดาษชำระ...", category: "S4"}] }
     ];
-
     const LOCKER_5S_SECTIONS = [
       { title: "1. LOCKER (เสื้อผ้าชาย,หญิง)", qs: [{q: "ป้ายไม่ชำรุด...", category: "S2"}, {q: "หลังตู้ต้องสะอาด...", category: "S3"}, {q: "ไม่มีเศษขยะ...", category: "S3"}] },
       { title: "2. LOCKER (รองเท้า)", qs: [{q: "ป้ายไม่ชำรุด...", category: "S2"}, {q: "ห้ามนำอาหาร...", category: "S4"}] }
     ];
-
     const QAQC_5S_SECTIONS = [
       { title: "1. โต๊ะทำงาน", qs: [{q: "ความสะอาดของโต๊ะ...", category: "S3"}, {q: "ความเป็นระเบียบ...", category: "S2"}, {q: "การกำหนดจำนวนอุปกรณ์...", category: "S4"}] },
       { title: "2. ลิ้นชัก", qs: [{q: "ลิ้นชักที่ 1...", category: "S2"}, {q: "ลิ้นชักที่ 2...", category: "S2"}, {q: "ลิ้นชักที่ 3...", category: "S2"}, {q: "ลิ้นชักกลางใส่เอกสาร", category: "S2"}] },
@@ -683,10 +704,9 @@
       { title: "4. พื้น / ผนังห้อง/ฝ้า/เพดาน", qs: [{q: "ไม่มีเศษขยะ...", category: "S3"}, {q: "ไม่วางสิ่งกีดขวางทางเดิน", category: "S2"}, {q: "กำหนดเวลาทำความสะอาด...", category: "S4"}] },
       { title: "5. เครื่องคอมพิวเตอร์", qs: [{q: "จัดวางคอมพิวเตอร์...", category: "S2"}, {q: "ไม่ติดกระดาษโน๊ต...", category: "S2"}, {q: "จัดเก็บสายไฟ...", category: "S2"}, {q: "ไม่เปิดประตูค้างไว้...", category: "S4"}] },
       { title: "6. เครื่องมือและอุปกรณ์", qs: [{q: "กำหนดตำแหน่งวางของเครื่องมือ...", category: "S2"}, {q: "หลังจากนำเครื่องมือไปใช้...", category: "S5"}, {q: "เก็บวางเครื่องมือและอุปกรณ์...", category: "S2"}, {q: "กำหนดผู้รับผิดชอบให้ชัดเจน", category: "S4"}, {q: "ควบคุมสิ่งแวดล้อมภายในแผนก...", category: "S4"}] },
-      { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [{q: "พนักงานต้องแต่งกาย...", category: "S4"}, {q: "พนักงานต้องมีสุขลักษณะ...", category: "S4"}, {q: "พนักง��นต้องมีสุขภาพ...", category: "S4"}] },
+      { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [{q: "พนักงานต้องแต่งกาย...", category: "S4"}, {q: "พนักงานต้องมีสุขลักษณะ...", category: "S4"}, {q: "พนักงานต้องมีสุขภาพ...", category: "S4"}] },
       { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: [{q: "มีความตระหนัก...", category: "S5"}, {q: "มีการนำเสนอ...", category: "S5"}, {q: "นำ 3 ส แรกมาใช้...", category: "S5"}, {q: "มีการแสดง KPI...", category: "S5"}] }
     ];
-
     const ENGINEERING_5S_SECTIONS = [
       { title: "1. โต๊ะทำงาน", qs: [{q: "ความสะอาด...", category: "S3"}, {q: "ความเป็นระเบียบ...", category: "S2"}, {q: "การกำหนดจำนวนอุปกรณ์...", category: "S4"}] },
       { title: "2. ลิ้นชัก", qs: [{q: "ลิ้นชักที่ 1...", category: "S2"}, {q: "ลิ้นชักที่ 2...", category: "S2"}, {q: "ลิ้นชักที่ 3...", category: "S2"}] },
@@ -697,7 +717,6 @@
       { title: "7. การตรวจสุขลักษณะส่วนบุคคล", qs: [{q: "พนักงานต้องแต่งกาย...", category: "S4"}, {q: "พนักงานต้องมีสุขลักษณะ...", category: "S4"}, {q: "พนักงานต้องมีสุขภาพ...", category: "S4"}] },
       { title: "8. ความตระหนัก ความสำเร็จ ผลงาน", qs: [{q: "มีความตระหนัก...", category: "S5"}, {q: "มีการนำเสนอ...", category: "S5"}, {q: "นำ 3 ส แรกมาใช้...", category: "S5"}, {q: "มีการแสดง KPI...", category: "S5"}] }
     ];
-
     const OUTSIDE_5S_SECTIONS = [
       { title: "1. พื้นที่โดยรอบบริษัท", qs: [{q: "มีเศษตกหล่นตามทางเดิน...", category: "S3"}, {q: "หญ้าขึ้นรก...", category: "S3"}, {q: "สายยางใช้แล้วเก็บเป็นระเบียบ...", category: "S2"}, {q: "อุปกรณ์กำจัดสัตว์พาหะ...", category: "S4"}, {q: "รอบรั้วโรงงานมีรอยชำรุด...", category: "S4"}] },
       { title: "2. โรงเก็บขยะ", qs: [{q: "มีการจัดเรียงถังเป็นระเบียบ...", category: "S2"}, {q: "แยกชนิดขยะให้ชัดเจน...", category: "S2"}, {q: "ขยะต้องไม่ล้นออกมา...", category: "S4"}, {q: "ถังเก็บสารเคมีอันตรายต้องไม่ล้น", category: "S4"}] },
@@ -722,7 +741,7 @@
       "ENGINEERING": { sections: ENGINEERING_5S_SECTIONS },
       "OUTSIDE": { sections: OUTSIDE_5S_SECTIONS }
     };
-    
+
     let globalRaw = { ins: [], jobs: [] }; 
     let filteredData = { ins: [], jobs: [] };
     let currentTab = 'safety';
@@ -756,8 +775,6 @@
       };
     }
 
-    // ---- Analysis helpers ----
-    // Linear regression forecast for the next point from a numeric series
     function linForecast(values) {
       const pts = values.map((v, i) => [i, v]).filter(p => !isNaN(p[1]));
       const n = pts.length;
@@ -776,7 +793,7 @@
     function trendArrow(curr, prev) {
       if (prev == null || curr == null) return '';
       const diff = curr - prev;
-      if (Math.abs(diff) < 0.5) return '<span class="text-slate-400">→ ทรงตัว</span>';
+      if (Math.abs(diff) < 0.5) return '<span class="text-slate-400 font-bold">→ ทรงตัว</span>';
       return diff > 0
         ? `<span class="text-emerald-500 font-bold">▲ +${diff.toFixed(1)}</span>`
         : `<span class="text-rose-500 font-bold">▼ ${diff.toFixed(1)}</span>`;
@@ -788,10 +805,9 @@
       if (!box || !list) return;
       if (!items.length) { box.classList.add('hidden'); return; }
       box.classList.remove('hidden');
-      list.innerHTML = items.map(t => `<li class="flex items-start gap-2"><i class="fas fa-caret-right mt-0.5 opacity-60"></i><span>${t}</span></li>`).join('');
+      list.innerHTML = items.map(t => `<li class="flex items-start gap-2.5"><i class="fas fa-check-circle mt-1 text-sky-500 opacity-80 text-xs"></i><span>${t}</span></li>`).join('');
     }
 
-    // Build a normalized "fingerprint" of a finding to detect repeats
     function findingKey(problem) {
       return String(problem || '')
         .replace(/^\[[^\]]+\]/, '')
@@ -835,7 +851,7 @@
     function toggleDarkMode() {
       document.documentElement.classList.toggle('dark');
       isDarkMode = document.documentElement.classList.contains('dark');
-      document.getElementById('themeIcon').className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+      document.getElementById('themeIcon').className = isDarkMode ? 'fas fa-sun text-amber-300' : 'fas fa-moon text-slate-300';
       Chart.defaults.color = isDarkMode ? '#94a3b8' : '#64748b';
       Chart.defaults.borderColor = isDarkMode ? '#334155' : '#e2e8f0';
       renderCurrentTab();
@@ -975,10 +991,10 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       updateMobileFlag();
-      Chart.defaults.font.family = "'Prompt', sans-serif";
+      Chart.defaults.font.family = "'Prompt', 'Inter', sans-serif";
       
       isDarkMode = document.documentElement.classList.contains('dark');
-      document.getElementById('themeIcon').className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+      document.getElementById('themeIcon').className = isDarkMode ? 'fas fa-sun text-amber-300' : 'fas fa-moon text-slate-300';
       Chart.defaults.color = isDarkMode ? '#94a3b8' : '#64748b';
       Chart.defaults.borderColor = isDarkMode ? '#334155' : '#e2e8f0';
       
@@ -1018,16 +1034,16 @@
         globalRaw.jobs = rawJobs.map(normalizeJob); 
         
         applyFilters();
-        const now = new Date().toLocaleTimeString('th-TH');
-        document.getElementById('syncTime').textContent = now;
-        document.getElementById('syncTimeMobile').textContent = now;
+        const now = new Date().toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
+        document.getElementById('syncTime').textContent = "Today at " + now;
+        document.getElementById('syncTimeMobile').textContent = "Today at " + now;
         document.getElementById('syncTimeMobileTop').textContent = now;
       } catch (err) { 
         console.error("❌ Fetch Error:", err);
         alert("❌ เกิดข้อผิดพลาดในการโหลดข้อมูล: " + err.message); 
       } finally { 
         document.getElementById("loader").style.opacity = "0"; 
-        setTimeout(() => document.getElementById("loader").classList.add("hidden"), 300); 
+        setTimeout(() => document.getElementById("loader").classList.add("hidden"), 500); 
       }
     }
 
@@ -1096,7 +1112,7 @@
       DEPTS.forEach(d => deptData[d] = { open:0, closed:0, overdue:0 });
       const catData = {};
       const mttrTrend = {};
-      const agingBuckets = { "0-7 วัน": 0, "8-30 วัน": 0, "31-60 วัน": 0, "60+ วัน": 0 };
+      const agingBuckets = { "0-7 Days": 0, "8-30 Days": 0, "31-60 Days": 0, "60+ Days": 0 };
       const repeatMap = {};
       const picMap = {};
       const now = new Date();
@@ -1116,16 +1132,14 @@
         
         if (!isClosed && dDue && now > dDue) { kpiOverdue++; deptData[area].overdue++; }
 
-        // Aging of open issues (days since found)
         if (!isClosed && dFound) {
           const age = Math.max(0, Math.floor((now.getTime() - dFound.getTime()) / 86400000));
-          if (age <= 7) agingBuckets["0-7 วัน"]++;
-          else if (age <= 30) agingBuckets["8-30 วัน"]++;
-          else if (age <= 60) agingBuckets["31-60 วัน"]++;
-          else agingBuckets["60+ วัน"]++;
+          if (age <= 7) agingBuckets["0-7 Days"]++;
+          else if (age <= 30) agingBuckets["8-30 Days"]++;
+          else if (age <= 60) agingBuckets["31-60 Days"]++;
+          else agingBuckets["60+ Days"]++;
         }
 
-        // PIC workload (open only)
         if (!isClosed && j.picName) {
           if (!picMap[j.picName]) picMap[j.picName] = { open: 0, overdue: 0 };
           picMap[j.picName].open++;
@@ -1152,7 +1166,6 @@
         }
         catData[cat] = (catData[cat] || 0) + 1;
 
-        // Repeat findings: same normalized problem in same area
         const fk = findingKey(j.problem);
         if (fk) {
           const rk = area + '||' + fk;
@@ -1169,24 +1182,18 @@
       document.getElementById('s_kpiClosed').innerText = kpiClosed;
 
       if (kpiTotal === 0) {
-        showEmptyState('s_chDept', '📋 ไม่พบข้อมูล Action Plan');
-        showEmptyState('s_chCat', 'ไม่มีข้อมูลหมวดปัญหา');
-        showEmptyState('s_chMTTR', 'ไม่มีข้อมูล MTTR');
-        showEmptyState('s_chAging', 'ไม่มีข้อมูล Aging');
+        showEmptyState('s_chDept', 'ไม่พบข้อมูล Action Plan ในช่วงเวลานี้');
+        showEmptyState('s_chCat', 'ไม่มีข้อมูลหมวดหมู่ความเสี่ยง');
+        showEmptyState('s_chMTTR', 'ไม่มีข้อมูลระยะเวลาแก้ไข (MTTR)');
+        showEmptyState('s_chAging', 'ไม่มีงานค้าง (Zero Backlog)');
         document.getElementById('s_insight').classList.add('hidden');
-        document.getElementById('s_tbRepeat').innerHTML = '<tr><td class="p-4 text-center text-slate-400 text-xs">ไม่มีข้อมูล</td></tr>';
+        document.getElementById('s_tbRepeat').innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400 font-medium">✨ ยอดเยี่ยม! ไม่พบประเด็นปัญหาที่เกิดซ้ำ</td></tr>';
         return;
       }
 
       const labels = DEPTS.map(d => {
         if (isMobile) {
-          const short = {
-            "PRINT": "PRINT", "LAMINATE": "LAM", "SOVENTLESS": "SOL",
-            "REWINDER/SLITTER/PACKING": "R/S/P", "BAG MAKING": "BAG",
-            "QA&QC": "QA", "WAREHOUSE": "WH", "OFFICE": "OFF",
-            "CANTEEN": "CAN", "TOILET": "TOL", "LOCKER": "LCK",
-            "ENGINEERING": "ENG", "OUTSIDE": "OUT"
-          };
+          const short = { "PRINT": "PRINT", "LAMINATE": "LAM", "SOVENTLESS": "SOL", "REWINDER/SLITTER/PACKING": "RSP", "BAG MAKING": "BAG", "QA&QC": "QA", "WAREHOUSE": "WH", "OFFICE": "OFF", "CANTEEN": "CAN", "TOILET": "TOL", "LOCKER": "LCK", "ENGINEERING": "ENG", "OUTSIDE": "OUT" };
           return short[d] || d.substring(0, 4);
         }
         return d.length > 10 ? d.substring(0,10) + '…' : d;
@@ -1197,17 +1204,17 @@
         data: {
           labels: labels,
           datasets: [
-            { label: "Closed", data: DEPTS.map(d => deptData[d].closed), backgroundColor: "#10b981" },
-            { label: "Open", data: DEPTS.map(d => Math.max(0, deptData[d].open - deptData[d].overdue)), backgroundColor: "#f59e0b" },
-            { label: "Overdue", data: DEPTS.map(d => deptData[d].overdue), backgroundColor: "#ef4444" }
+            { label: "Closed", data: DEPTS.map(d => deptData[d].closed), backgroundColor: "#10b981", borderRadius: 4 },
+            { label: "Open", data: DEPTS.map(d => Math.max(0, deptData[d].open - deptData[d].overdue)), backgroundColor: "#f59e0b", borderRadius: 4 },
+            { label: "Overdue", data: DEPTS.map(d => deptData[d].overdue), backgroundColor: "#ef4444", borderRadius: 4 }
           ]
         },
         options: { 
           responsive: true, maintainAspectRatio: false, 
-          plugins: { legend: { position: isMobile ? 'bottom' : 'top', labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 11 } } } },
+          plugins: { legend: { position: 'top', labels: { boxWidth: 12, usePointStyle: true, font: { size: isMobile ? 10 : 12 } } } },
           scales: { 
-            x: { stacked: true, grid: { display: false }, ticks: { font: { size: isMobile ? 8 : 10 }, maxRotation: isMobile ? 45 : 0 } }, 
-            y: { stacked: true, grid: { color: getChartColors().grid }, beginAtZero: true, ticks: { font: { size: isMobile ? 9 : 11 } } } 
+            x: { stacked: true, grid: { display: false }, ticks: { font: { size: isMobile ? 9 : 11 }, maxRotation: 45 } }, 
+            y: { stacked: true, grid: { color: getChartColors().grid, borderDash: [4, 4] }, beginAtZero: true, ticks: { font: { size: isMobile ? 10 : 12 } } } 
           } 
         }
       });
@@ -1216,12 +1223,12 @@
       mkChart("s_chCat", {
         type: "doughnut",
         data: { 
-          labels: cKeys.map(k => k.length > 20 ? k.substring(0, 20) + '…' : k), 
-          datasets: [{ data: cKeys.map(k => catData[k]), backgroundColor: ["#f43f5e", "#f97316", "#eab308", "#84cc16", "#06b6d4", "#8b5cf6"] }] 
+          labels: cKeys.map(k => k.length > 25 ? k.substring(0, 25) + '…' : k), 
+          datasets: [{ data: cKeys.map(k => catData[k]), backgroundColor: ["#f43f5e", "#f97316", "#eab308", "#84cc16", "#06b6d4", "#8b5cf6"], borderWidth: 2, borderColor: getChartColors().bg }] 
         },
         options: { 
-          responsive: true, maintainAspectRatio: false, cutout: isMobile ? '55%' : '70%', 
-          plugins: { legend: { position: isMobile ? 'bottom' : 'right', labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 10 }, padding: isMobile ? 8 : 5 } } } 
+          responsive: true, maintainAspectRatio: false, cutout: isMobile ? '60%' : '75%', 
+          plugins: { legend: { position: isMobile ? 'bottom' : 'right', labels: { boxWidth: 10, usePointStyle: true, font: { size: isMobile ? 10 : 11 }, padding: 15 } } } 
         }
       });
 
@@ -1234,24 +1241,23 @@
             label: "Avg Days to Close", 
             data: mKeys.map(k => parseFloat((mttrTrend[k].s / mttrTrend[k].c).toFixed(1))), 
             borderColor: "#0ea5e9", backgroundColor: "rgba(14, 165, 233, 0.1)", fill: true, tension: 0.4,
-            pointRadius: isMobile ? 3 : 4, pointHoverRadius: 6
+            pointBackgroundColor: "#0ea5e9", pointBorderColor: "#fff", pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6
           }] 
         },
         options: { 
           responsive: true, maintainAspectRatio: false, 
-          plugins: { legend: { display: false }, tooltip: { enabled: true } },
+          plugins: { legend: { display: false } },
           scales: {
-            y: { beginAtZero: true, grid: { color: getChartColors().grid }, ticks: { font: { size: isMobile ? 9 : 11 } } },
-            x: { grid: { display: false }, ticks: { font: { size: isMobile ? 9 : 11 } } }
+            y: { beginAtZero: true, grid: { color: getChartColors().grid, borderDash: [4, 4] }, ticks: { font: { size: isMobile ? 10 : 12 } } },
+            x: { grid: { display: false }, ticks: { font: { size: isMobile ? 10 : 12 } } }
           }
         }
       });
 
-      // ---- Open Issue Aging chart ----
       const agingKeys = Object.keys(agingBuckets);
       const agingTotal = agingKeys.reduce((a, k) => a + agingBuckets[k], 0);
       if (agingTotal === 0) {
-        showEmptyState('s_chAging', '✅ ไม่มีงานค้าง');
+        showEmptyState('s_chAging', '✅ ไม่มีงานค้างในระบบ');
       } else {
         mkChart("s_chAging", {
           type: "bar",
@@ -1261,74 +1267,57 @@
               label: "Open Issues",
               data: agingKeys.map(k => agingBuckets[k]),
               backgroundColor: ["#22c55e", "#eab308", "#f97316", "#ef4444"],
-              borderRadius: 4
+              borderRadius: 6
             }]
           },
           options: {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-              y: { beginAtZero: true, grid: { color: getChartColors().grid }, ticks: { precision: 0, font: { size: isMobile ? 9 : 11 } } },
-              x: { grid: { display: false }, ticks: { font: { size: isMobile ? 9 : 11 } } }
+              y: { beginAtZero: true, grid: { color: getChartColors().grid, borderDash: [4, 4] }, ticks: { precision: 0, font: { size: isMobile ? 10 : 12 } } },
+              x: { grid: { display: false }, ticks: { font: { size: isMobile ? 10 : 12 } } }
             }
           }
         });
       }
 
-      // ---- Repeat Findings table ----
-      const repeats = Object.values(repeatMap)
-        .filter(r => r.count >= 2)
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 6);
+      const repeats = Object.values(repeatMap).filter(r => r.count >= 2).sort((a, b) => b.count - a.count).slice(0, 6);
       document.getElementById('s_tbRepeat').innerHTML = `
-        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500">
-          <tr><th class="p-2 text-[10px] sm:text-xs">Area</th><th class="p-2 text-[10px] sm:text-xs">ปัญหา</th><th class="p-2 text-center text-[10px] sm:text-xs">พบซ้ำ</th><th class="p-2 text-center text-[10px] sm:text-xs">ยังเปิด</th></tr>
+        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 uppercase tracking-wider text-[10px] sm:text-xs">
+          <tr><th class="p-3 sticky-header rounded-tl-lg text-center w-20">Area</th><th class="p-3 sticky-header">รายละเอียดปัญหา</th><th class="p-3 sticky-header text-center w-20">พบซ้ำ</th><th class="p-3 sticky-header text-center w-20 rounded-tr-lg">สถานะค้าง</th></tr>
         </thead>
-        <tbody class="divide-y dark:divide-slate-700">
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
           ${repeats.length ? repeats.map(r => `
-            <tr class="hover:bg-amber-50 dark:hover:bg-amber-900/20">
-              <td class="p-2 font-bold text-[10px] sm:text-[11px]">${r.area}</td>
-              <td class="p-2 text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-300">${r.sample}…</td>
-              <td class="p-2 text-center font-bold text-amber-600 text-[10px] sm:text-xs">${r.count}×</td>
-              <td class="p-2 text-center font-bold ${r.open > 0 ? 'text-rose-600' : 'text-emerald-600'} text-[10px] sm:text-xs">${r.open}</td>
-            </tr>`).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400 text-xs">✅ ไม่พบปัญหาที่เกิดซ้ำ</td></tr>'}
+            <tr class="hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-colors">
+              <td class="p-3 text-center font-bold text-[11px] sm:text-xs text-slate-700 dark:text-slate-300">${r.area}</td>
+              <td class="p-3 text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 truncate max-w-xs" title="${r.sample}">${r.sample}…</td>
+              <td class="p-3 text-center">
+                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-amber-600 bg-amber-100 dark:bg-amber-900/30 rounded-full">${r.count} ครั้ง</span>
+              </td>
+              <td class="p-3 text-center font-bold ${r.open > 0 ? 'text-rose-500' : 'text-emerald-500'} text-[11px] sm:text-xs">
+                ${r.open > 0 ? r.open : '<i class="fas fa-check"></i>'}
+              </td>
+            </tr>`).join('') : '<tr><td colspan="4" class="p-8 text-center text-slate-400 font-medium">✨ เยี่ยมมาก! ไม่พบประเด็นปัญหาเดิมเกิดซ้ำ</td></tr>'}
         </tbody>
       `;
 
-      // ---- Auto insights ----
       const closeRate = kpiTotal ? Math.round((kpiClosed / kpiTotal) * 100) : 0;
       const avgMttr = mttrCount ? (mttrSum / mttrCount).toFixed(1) : null;
-      const worstDept = DEPTS
-        .map(d => ({ d, open: deptData[d].open, overdue: deptData[d].overdue }))
-        .sort((a, b) => (b.overdue - a.overdue) || (b.open - a.open))[0];
+      const worstDept = DEPTS.map(d => ({ d, open: deptData[d].open, overdue: deptData[d].overdue })).sort((a, b) => (b.overdue - a.overdue) || (b.open - a.open))[0];
       const topCat = Object.keys(catData).sort((a, b) => catData[b] - catData[a])[0];
-      const busiestPic = Object.entries(picMap).sort((a, b) => b[1].open - a[1].open)[0];
-
+      
       const sInsights = [];
-      sInsights.push(`อัตราการปิดงาน (Closure Rate) อยู่ที่ <b>${closeRate}%</b> — ปิดแล้ว ${kpiClosed} จาก ${kpiTotal} รายการ`);
-      if (kpiOverdue > 0) sInsights.push(`มีงาน <b class="text-rose-600">เกินกำหนด ${kpiOverdue} รายการ</b>${worstDept && worstDept.overdue > 0 ? ` โดยกระจุกตัวที่แผนก <b>${worstDept.d}</b> (${worstDept.overdue} งาน)` : ''} ควรเร่งติดตาม`);
-      if (avgMttr) sInsights.push(`ใช้เวลาปิดงานเฉลี่ย (MTTR) <b>${avgMttr} วัน</b> ต่อรายการ`);
-      if (agingBuckets["60+ วัน"] > 0) sInsights.push(`มีงานค้างนานเกิน <b class="text-rose-600">60 วัน จำนวน ${agingBuckets["60+ วัน"]} รายการ</b> ถือเป็นความเสี่ยงสูง`);
-      if (topCat) sInsights.push(`หมวดปัญหาที่พบบ่อยที่สุดคือ <b>${topCat}</b> (${catData[topCat]} ครั้ง)`);
-      if (repeats.length) sInsights.push(`พบปัญหาเดิมเกิดซ้ำ <b class="text-amber-600">${repeats.length} ประเด็น</b> — ควรหาสาเหตุรากเหง้า (Root Cause)`);
-      if (busiestPic) sInsights.push(`ผู้รับผิดชอบที่มีงานค้างมากที่สุด: <b>${busiestPic[0]}</b> (${busiestPic[1].open} งาน${busiestPic[1].overdue ? `, เกินกำหนด ${busiestPic[1].overdue}` : ''})`);
+      sInsights.push(`อัตราการปิดงาน (Closure Rate) ปัจจุบัน <b>${closeRate}%</b> (${kpiClosed}/${kpiTotal} รายการ)`);
+      if (kpiOverdue > 0) sInsights.push(`พบงานความเสี่ยง <b class="text-rose-500">เกินกำหนด ${kpiOverdue} รายการ</b>${worstDept && worstDept.overdue > 0 ? ` (แผนกที่มีงานเกินกำหนดมากสุด: <b>${worstDept.d}</b>)` : ''}`);
+      if (avgMttr) sInsights.push(`ใช้เวลาเฉลี่ยในการแก้ไขปัญหา (MTTR) ประมาณ <b>${avgMttr} วัน</b> ต่อรายการ`);
+      if (agingBuckets["60+ Days"] > 0) sInsights.push(`มีงานค้างแก้ไขนานกว่า <b class="text-amber-500">60 วัน จำนวน ${agingBuckets["60+ Days"]} รายการ</b> ควรเร่งติดตาม`);
+      if (topCat) sInsights.push(`หมวดหมู่ปัญหาที่พบบ่อยที่สุดคือ <b>${topCat}</b> (${catData[topCat]} ครั้ง)`);
+      if (repeats.length) sInsights.push(`พบปัญหาจุดเดิมที่เกิดซ้ำ <b class="text-rose-500">${repeats.length} รายการ</b> ควรหา Root Cause Prevention`);
       renderInsights('s_insight', 's_insightList', sInsights);
     }
 
-    function showEmptyState(canvasId, message) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
-      const parent = canvas.parentElement;
-      parent.innerHTML = `
-        <div class="flex flex-col items-center justify-center h-full text-slate-400 dark:text-slate-500 py-8">
-          <i class="fas fa-inbox text-3xl sm:text-4xl mb-3"></i>
-          <div class="text-xs sm:text-sm font-semibold text-center">${message}</div>
-        </div>
-      `;
-    }
-
     // =====================================
-    // 🔵 TAB: 5S (Radar & Heatmap S1-S5)
+    // 🔵 TAB: 5S
     // =====================================
     function process5STab() {
       const data5S = filteredData.ins.filter(i => is5SType(i.inspectionType));
@@ -1345,9 +1334,7 @@
       const s5Labels = { S1: "S1 สะสาง", S2: "S2 สะดวก", S3: "S3 สะอาด", S4: "S4 มาตรฐาน", S5: "S5 สร้างนิสัย" };
       const s5Overall = { S1: {s:0, m:0}, S2: {s:0, m:0}, S3: {s:0, m:0}, S4: {s:0, m:0}, S5: {s:0, m:0} };
       const deptHm = {};
-      DEPTS.forEach(d => {
-        deptHm[d] = { S1: {s:0, m:0}, S2: {s:0, m:0}, S3: {s:0, m:0}, S4: {s:0, m:0}, S5: {s:0, m:0} };
-      });
+      DEPTS.forEach(d => { deptHm[d] = { S1: {s:0, m:0}, S2: {s:0, m:0}, S3: {s:0, m:0}, S4: {s:0, m:0}, S5: {s:0, m:0} }; });
       const f5Trend = {};
       const f5Dist = { good: 0, fair: 0, poor: 0 };
 
@@ -1398,19 +1385,22 @@
       const radarData = s5Keys.map(k => s5Overall[k].m > 0 ? Math.round((s5Overall[k].s / s5Overall[k].m) * 100) : 0);
       
       if (data5S.length === 0) {
-        showEmptyState('f_chRadar', 'ไม่มีข้อมูล 5S');
+        showEmptyState('f_chRadar', 'รอการบันทึกข้อมูลประเมิน 5S');
       } else {
         mkChart("f_chRadar", { 
           type: "radar", 
           data: { 
             labels: Object.values(s5Labels), 
             datasets: [{ 
-              label: "Score %", 
+              label: "Average %", 
               data: radarData, 
-              backgroundColor: "rgba(59, 130, 246, 0.2)", 
-              borderColor: "#3b82f6",
-              pointBackgroundColor: "#3b82f6",
-              pointRadius: isMobile ? 3 : 4,
+              backgroundColor: "rgba(56, 189, 248, 0.25)", 
+              borderColor: "#0ea5e9",
+              pointBackgroundColor: "#0ea5e9",
+              pointBorderColor: "#fff",
+              pointHoverBackgroundColor: "#fff",
+              pointHoverBorderColor: "#0ea5e9",
+              pointRadius: 4,
               borderWidth: 2
             }] 
           }, 
@@ -1419,10 +1409,10 @@
             scales: {
               r: { 
                 min: 0, max: 100,
-                grid: { color: getChartColors().grid },
+                grid: { color: getChartColors().grid, circular: true },
                 angleLines: { color: getChartColors().grid },
-                pointLabels: { font: { size: isMobile ? 9 : 11 }, color: getChartColors().text },
-                ticks: { font: { size: 8 }, stepSize: 20, backdropColor: 'transparent' }
+                pointLabels: { font: { size: isMobile ? 10 : 12, family: "'Prompt', sans-serif", weight: 'bold' }, color: getChartColors().text },
+                ticks: { display: false, stepSize: 20 }
               }
             },
             plugins: { legend: { display: false } } 
@@ -1431,20 +1421,14 @@
       }
 
       if (lbData.length === 0) {
-        showEmptyState('f_chRank', 'ไม่มีข้อมูล Ranking');
+        showEmptyState('f_chRank', 'ไม่มีข้อมูลจัดอันดับแผนก');
       } else {
         mkChart("f_chRank", {
           type: "bar",
           data: { 
             labels: lbData.map(l => {
               if (isMobile) {
-                const short = {
-                  "PRINT": "PRINT", "LAMINATE": "LAM", "SOVENTLESS": "SOL",
-                  "REWINDER/SLITTER/PACKING": "R/S/P", "BAG MAKING": "BAG",
-                  "QA&QC": "QA", "WAREHOUSE": "WH", "OFFICE": "OFF",
-                  "CANTEEN": "CAN", "TOILET": "TOL", "LOCKER": "LCK",
-                  "ENGINEERING": "ENG", "OUTSIDE": "OUT"
-                };
+                const short = { "PRINT": "PRINT", "LAMINATE": "LAM", "SOVENTLESS": "SOL", "REWINDER/SLITTER/PACKING": "RSP", "BAG MAKING": "BAG", "QA&QC": "QA", "WAREHOUSE": "WH", "OFFICE": "OFF", "CANTEEN": "CAN", "TOILET": "TOL", "LOCKER": "LCK", "ENGINEERING": "ENG", "OUTSIDE": "OUT" };
                 return short[l.name] || l.name.substring(0, 5);
               }
               return l.name.length > 15 ? l.name.substring(0,15) + '…' : l.name;
@@ -1453,64 +1437,58 @@
               label: "Avg Score %", 
               data: lbData.map(l => l.score), 
               backgroundColor: lbData.map(l => l.score >= 85 ? '#10b981' : l.score >= 70 ? '#f59e0b' : '#ef4444'),
-              borderRadius: 4 
+              borderRadius: 6 
             }] 
           },
           options: { 
             responsive: true, maintainAspectRatio: false, 
             indexAxis: isMobile ? 'x' : 'y',
             scales: { 
-              x: { min: 0, max: 100, grid: { color: getChartColors().grid }, ticks: { font: { size: isMobile ? 8 : 10 }, maxRotation: isMobile ? 45 : 0 } },
-              y: { grid: { display: !isMobile }, ticks: { font: { size: isMobile ? 9 : 11 } } }
+              x: { min: 0, max: 100, grid: { color: getChartColors().grid, borderDash: [4, 4] }, ticks: { font: { size: isMobile ? 9 : 11 }, maxRotation: 45 } },
+              y: { grid: { display: !isMobile }, ticks: { font: { size: isMobile ? 10 : 12, weight: '500' } } }
             }, 
             plugins: { legend: { display: false } } 
           }
         });
       }
 
-      let hmHtml = `<tr class="bg-slate-100 dark:bg-slate-800">
-        <th class="p-1.5 sm:p-2 border-b dark:border-slate-700 text-left sticky left-0 bg-slate-100 dark:bg-slate-800 text-[10px] sm:text-xs">Area</th>
-        ${s5Keys.map(k => `<th class="p-1.5 sm:p-2 border-b dark:border-slate-700 text-[9px] sm:text-[10px] whitespace-nowrap" title="${s5Labels[k]}">${k}</th>`).join('')}
-      </tr>`;
+      let hmHtml = `<thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 uppercase tracking-wider text-[10px] sm:text-xs">
+        <tr>
+        <th class="p-3 sticky-header rounded-tl-lg text-left">Area / Dept</th>
+        ${s5Keys.map(k => `<th class="p-3 sticky-header text-center" title="${s5Labels[k]}">${k}</th>`).join('')}
+      </tr></thead><tbody class="divide-y divide-slate-100 dark:divide-slate-800">`;
       
       let hasHeatmapData = false;
       DEPTS.forEach(d => {
         if (dScore[d] && dScore[d].length > 0) {
           hasHeatmapData = true;
-          const shortD = isMobile ? ({
-            "PRINT": "PRINT", "LAMINATE": "LAM", "SOVENTLESS": "SOL",
-            "REWINDER/SLITTER/PACKING": "R/S/P", "BAG MAKING": "BAG",
-            "QA&QC": "QA", "WAREHOUSE": "WH", "OFFICE": "OFF",
-            "CANTEEN": "CAN", "TOILET": "TOL", "LOCKER": "LCK",
-            "ENGINEERING": "ENG", "OUTSIDE": "OUT"
-          }[d] || d.substring(0, 5)) : d;
+          const shortD = isMobile ? ({ "PRINT": "PRINT", "LAMINATE": "LAM", "SOVENTLESS": "SOL", "REWINDER/SLITTER/PACKING": "RSP", "BAG MAKING": "BAG", "QA&QC": "QA", "WAREHOUSE": "WH", "OFFICE": "OFF", "CANTEEN": "CAN", "TOILET": "TOL", "LOCKER": "LCK", "ENGINEERING": "ENG", "OUTSIDE": "OUT" }[d] || d.substring(0, 5)) : d;
           
-          hmHtml += `<tr class="border-b dark:border-slate-700">
-            <td class="p-1.5 sm:p-2 font-bold text-slate-700 dark:text-slate-300 sticky left-0 bg-white dark:bg-darkCard text-[10px] sm:text-xs">${shortD}</td>`;
+          hmHtml += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+            <td class="p-3 font-bold text-slate-700 dark:text-slate-300 text-left text-[11px] sm:text-sm bg-white dark:bg-darkCard sticky left-0 z-0 shadow-[1px_0_0_rgba(0,0,0,0.05)] dark:shadow-[1px_0_0_rgba(255,255,255,0.05)]">${shortD}</td>`;
           s5Keys.forEach(k => {
             const cell = deptHm[d][k];
             const pct = cell.m > 0 ? Math.round((cell.s / cell.m) * 100) : null;
             if (pct === null) {
-              hmHtml += `<td class="p-1.5 sm:p-2 text-slate-300 text-[10px]">-</td>`;
+              hmHtml += `<td class="p-3 text-slate-300 text-xs text-center">-</td>`;
             } else { 
-              const bg = pct >= 85 ? '#dcfce7' : pct >= 70 ? '#fef3c7' : '#fee2e2'; 
-              const tc = pct >= 85 ? '#065f46' : pct >= 70 ? '#92400e' : '#991b1b'; 
-              hmHtml += `<td class="p-1.5 sm:p-2 font-inter text-[9px] sm:text-[10px] font-bold" style="background:${bg}; color:${tc};" title="${s5Labels[k]}: ${pct}%">${pct}%</td>`; 
+              const bgClass = pct >= 85 ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : pct >= 70 ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400' : 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-400'; 
+              hmHtml += `<td class="p-2 text-center align-middle" title="${s5Labels[k]}: ${pct}%"><div class="mx-auto w-12 h-8 sm:w-16 sm:h-10 flex items-center justify-center rounded-lg font-inter font-bold text-xs sm:text-sm shadow-sm ${bgClass}">${pct}%</div></td>`; 
             }
           }); 
           hmHtml += `</tr>`;
         }
       }); 
+      hmHtml += `</tbody>`;
       
       document.getElementById("f_tbHeatmap").innerHTML = !hasHeatmapData
-        ? '<tr><td colspan="6" class="p-4 text-center text-slate-400">ไม่มีข้อมูล 5S</td></tr>' 
+        ? '<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">รอการบันทึกข้อมูลประเมิน 5S เข้าสู่ระบบ</td></tr>' 
         : hmHtml;
 
-      // ---- 5S Category Trend (MoM) ----
       const fmKeys = Object.keys(f5Trend).sort().slice(-6);
       const catColors = { S1: "#ef4444", S2: "#f59e0b", S3: "#10b981", S4: "#3b82f6", S5: "#8b5cf6" };
       if (fmKeys.length === 0) {
-        showEmptyState('f_chTrend', 'ไม่มีข้อมูลแนวโน้ม');
+        showEmptyState('f_chTrend', 'ไม่มีข้อมูลแนวโน้มรายเดือน');
       } else {
         mkChart("f_chTrend", {
           type: "line",
@@ -1520,57 +1498,66 @@
               label: k,
               data: fmKeys.map(m => f5Trend[m][k].m > 0 ? Math.round((f5Trend[m][k].s / f5Trend[m][k].m) * 100) : null),
               borderColor: catColors[k], backgroundColor: catColors[k],
-              tension: 0.4, spanGaps: true, pointRadius: isMobile ? 2 : 3, borderWidth: 2
+              tension: 0.4, spanGaps: true, pointRadius: isMobile ? 3 : 4, borderWidth: 2, pointHoverRadius: 6
             }))
           },
           options: {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: isMobile ? 'bottom' : 'top', labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 11 } } } },
+            plugins: { legend: { position: 'top', labels: { boxWidth: 12, usePointStyle: true, font: { size: isMobile ? 10 : 12 } } } },
             scales: {
-              y: { min: 0, max: 100, grid: { color: getChartColors().grid }, ticks: { font: { size: isMobile ? 9 : 11 } } },
-              x: { grid: { display: false }, ticks: { font: { size: isMobile ? 9 : 11 } } }
+              y: { min: 0, max: 100, grid: { color: getChartColors().grid, borderDash: [4, 4] }, ticks: { font: { size: isMobile ? 10 : 12 } } },
+              x: { grid: { display: false }, ticks: { font: { size: isMobile ? 10 : 12 } } }
             }
           }
         });
       }
 
-      // ---- Score distribution ----
       const distTotal = f5Dist.good + f5Dist.fair + f5Dist.poor;
       if (distTotal === 0) {
-        showEmptyState('f_chDist', 'ไม่มีข้อมูล');
+        showEmptyState('f_chDist', 'ไม่มีข้อมูลคะแนนประเมิน');
       } else {
         mkChart("f_chDist", {
           type: "doughnut",
           data: {
-            labels: ["ดี (≥85%)", "พอใช้ (70-84%)", "ต้องปรับปรุง (<70%)"],
-            datasets: [{ data: [f5Dist.good, f5Dist.fair, f5Dist.poor], backgroundColor: ["#10b981", "#f59e0b", "#ef4444"] }]
+            labels: ["เกรด A (≥85%)", "เกรด B (70-84%)", "เกรด C (<70%)"],
+            datasets: [{ data: [f5Dist.good, f5Dist.fair, f5Dist.poor], backgroundColor: ["#10b981", "#f59e0b", "#ef4444"], borderWidth: 2, borderColor: getChartColors().bg }]
           },
           options: {
-            responsive: true, maintainAspectRatio: false, cutout: isMobile ? '55%' : '65%',
-            plugins: { legend: { position: 'bottom', labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 10 }, padding: 8 } } }
+            responsive: true, maintainAspectRatio: false, cutout: isMobile ? '60%' : '75%',
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true, font: { size: isMobile ? 10 : 12 }, padding: 15 } } }
           }
         });
       }
 
-      // ---- Auto insights (5S) ----
       const f5Insights = [];
       if (data5S.length > 0) {
-        const catScores = s5Keys.map(k => ({ k, label: s5Labels[k], v: s5Overall[k].m > 0 ? Math.round((s5Overall[k].s / s5Overall[k].m) * 100) : null }))
-          .filter(c => c.v != null);
+        const catScores = s5Keys.map(k => ({ k, label: s5Labels[k], v: s5Overall[k].m > 0 ? Math.round((s5Overall[k].s / s5Overall[k].m) * 100) : null })).filter(c => c.v != null);
         if (catScores.length) {
           const weakest = catScores.slice().sort((a, b) => a.v - b.v)[0];
           const strongest = catScores.slice().sort((a, b) => b.v - a.v)[0];
-          f5Insights.push(`หมวดที่ต้องปรับปรุงเร่งด่วนคือ <b class="text-rose-600">${weakest.label} (${weakest.v}%)</b> ขณะที่ <b class="text-emerald-600">${strongest.label} (${strongest.v}%)</b> ทำได้ดีที่สุด`);
+          f5Insights.push(`หมวดที่โดดเด่นที่สุดคือ <b class="text-emerald-500">${strongest.label} (${strongest.v}%)</b> รองลงมาหมวดที่ควรปรับปรุงคือ <b class="text-rose-500">${weakest.label} (${weakest.v}%)</b>`);
         }
-        f5Insights.push(`คะแนนเฉลี่ยรวม <b>${avg5S}%</b> จากการตรวจ ${data5S.length} ครั้ง — แผนกดีที่สุด: <b>${lbData.length ? lbData[0].name : '-'}</b>, ต่ำสุด: <b>${lbData.length ? lbData[lbData.length-1].name : '-'}</b>`);
-        if (f5Dist.poor > 0) f5Insights.push(`มีการตรวจที่ได้คะแนน <b class="text-rose-600">ต่ำกว่า 70% จำนวน ${f5Dist.poor} ครั้ง</b> (${Math.round(f5Dist.poor/distTotal*100)}% ของทั้งหมด)`);
+        f5Insights.push(`ค่าเฉลี่ย 5S ภาพรวมองค์กรอยู่ที่ <b>${avg5S}%</b> (จาก ${data5S.length} รอบตรวจ)`);
+        if (f5Dist.poor > 0) f5Insights.push(`พบพื้นที่ที่ได้คะแนน <b class="text-rose-500">ต่ำกว่าเกณฑ์มาตรฐาน (<70%) จำนวน ${f5Dist.poor} ครั้ง</b> คิดเป็น ${Math.round(f5Dist.poor/distTotal*100)}% ของรอบตรวจทั้งหมด`);
         if (fmKeys.length >= 2) {
           const allTrend = fmKeys.map(m => { const a = f5Trend[m].all; return a.length ? a.reduce((x,y)=>x+y,0)/a.length : null; });
           const last = allTrend[allTrend.length-1], prev = allTrend[allTrend.length-2];
-          if (last != null && prev != null) f5Insights.push(`แนวโน้มคะแนนเดือนล่าสุดเทียบเดือนก่อน: ${trendArrow(last, prev)} จุด`);
+          if (last != null && prev != null) f5Insights.push(`พัฒนาการเทียบกับเดือนที่ผ่านมา: ${trendArrow(last, prev)}`);
         }
       }
       renderInsights('f_insight', 'f_insightList', f5Insights);
+    }
+
+    function showEmptyState(canvasId, message) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const parent = canvas.parentElement;
+      parent.innerHTML = `
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 py-8 bg-slate-50/50 dark:bg-slate-800/20 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+          <i class="fas fa-folder-open text-3xl sm:text-4xl mb-3 opacity-50"></i>
+          <div class="text-xs sm:text-sm font-semibold text-center">${message}</div>
+        </div>
+      `;
     }
 
     // =====================================
@@ -1599,14 +1586,12 @@
 
       const mKeys = Object.keys(tMonths).sort().slice(-6);
 
-      // 5S monthly averages + forecast for next month
       const s5Series = mKeys.map(m => tMonths[m].s5.length ? parseFloat((tMonths[m].s5.reduce((a,b)=>a+b,0) / tMonths[m].s5.length).toFixed(1)) : null);
       const openSeries = mKeys.map(m => tMonths[m].sOpen);
       const s5Valid = s5Series.filter(v => v != null);
       const fc = linForecast(s5Valid);
       const forecastVal = fc == null ? null : Math.max(0, Math.min(100, Math.round(fc)));
 
-      // Forecast label appended after the last real month
       const trendLabels = mKeys.slice();
       const fcS5Data = s5Series.slice();
       if (forecastVal != null && mKeys.length >= 2) {
@@ -1620,31 +1605,31 @@
           labels: trendLabels.length ? trendLabels : ["No Data"],
           datasets: [
             { 
-              label: "5S Score %", type: 'line',
+              label: "Avg 5S Score %", type: 'line',
               data: (forecastVal != null && mKeys.length >= 2) ? [...s5Series, null] : s5Series,
-              borderColor: "#3b82f6", backgroundColor: "#3b82f6", yAxisID: 'y',
-              tension: 0.4, spanGaps: true, pointRadius: isMobile ? 3 : 5
+              borderColor: "#3b82f6", backgroundColor: "rgba(59, 130, 246, 0.1)", yAxisID: 'y',
+              tension: 0.4, fill: true, pointBackgroundColor: "#3b82f6", pointBorderColor: "#fff", pointBorderWidth: 2, pointRadius: 5
             },
             {
               label: "5S Forecast", type: 'line',
               data: (forecastVal != null && mKeys.length >= 2) ? [...s5Series.map((_, i) => i === s5Series.length - 1 ? s5Series[i] : null), forecastVal] : [],
               borderColor: "#10b981", backgroundColor: "#10b981", borderDash: [6, 4], yAxisID: 'y',
-              tension: 0.4, spanGaps: true, pointRadius: isMobile ? 3 : 5, pointStyle: 'rectRot'
+              tension: 0.4, spanGaps: true, pointRadius: 6, pointStyle: 'rectRot'
             },
             { 
-              label: "Safety Open", 
+              label: "Unresolved Safety Risks", 
               data: (forecastVal != null && mKeys.length >= 2) ? [...openSeries, null] : openSeries, 
-              backgroundColor: "#ef4444", yAxisID: 'y1', borderRadius: 4
+              backgroundColor: "#f43f5e", yAxisID: 'y1', borderRadius: 6
             }
           ]
         },
         options: { 
           responsive: true, maintainAspectRatio: false, 
-          plugins: { legend: { position: isMobile ? 'bottom' : 'top', labels: { boxWidth: isMobile ? 10 : 12, font: { size: isMobile ? 9 : 11 } } } },
+          plugins: { legend: { position: 'top', labels: { boxWidth: 12, usePointStyle: true, font: { size: isMobile ? 10 : 12 } } } },
           scales: { 
-            y: { type: 'linear', position: 'left', min: 0, max: 100, grid: { color: getChartColors().grid }, ticks: { font: { size: isMobile ? 9 : 11 } } }, 
-            y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, ticks: { font: { size: isMobile ? 9 : 11 } }, beginAtZero: true },
-            x: { grid: { display: false }, ticks: { font: { size: isMobile ? 9 : 11 } } }
+            y: { type: 'linear', position: 'left', min: 0, max: 100, grid: { color: getChartColors().grid, borderDash: [4, 4] }, ticks: { font: { size: isMobile ? 10 : 12 } } }, 
+            y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, ticks: { font: { size: isMobile ? 10 : 12 } }, beginAtZero: true },
+            x: { grid: { display: false }, ticks: { font: { size: isMobile ? 10 : 12 } } }
           } 
         }
       });
@@ -1655,20 +1640,20 @@
         .slice(0, 5);
       
       document.getElementById("e_tbOverdue").innerHTML = `
-        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500">
-          <tr><th class="p-2 text-[10px] sm:text-xs">Job ID</th><th class="p-2 text-[10px] sm:text-xs">Area</th><th class="p-2 text-[10px] sm:text-xs">Due</th><th class="p-2 text-[10px] sm:text-xs">Days</th></tr>
+        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 uppercase tracking-wider text-[10px] sm:text-xs">
+          <tr><th class="p-3 sticky-header rounded-tl-lg">Job ID</th><th class="p-3 sticky-header">Area</th><th class="p-3 sticky-header">Due Date</th><th class="p-3 sticky-header rounded-tr-lg text-right">Aging</th></tr>
         </thead>
-        <tbody class="divide-y dark:divide-slate-700">
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
           ${overdues.length ? overdues.map(o => {
             const due = parseDateObj(o.dueDate);
             const daysOver = Math.floor((new Date() - due) / 86400000);
-            return `<tr class="hover:bg-rose-50 dark:hover:bg-rose-900/20">
-              <td class="p-2 font-mono text-rose-600 font-bold text-[9px] sm:text-[10px]">${o.jobId}</td>
-              <td class="p-2 font-bold text-[10px] sm:text-[11px]">${o.area}</td>
-              <td class="p-2 text-rose-500 text-[10px] sm:text-[11px]">${o.dueDate}</td>
-              <td class="p-2 font-bold text-rose-700 text-[10px] sm:text-[11px]">+${daysOver}d</td>
+            return `<tr class="hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors">
+              <td class="p-3 font-mono text-rose-600 dark:text-rose-400 font-bold text-xs">${o.jobId}</td>
+              <td class="p-3 font-bold text-slate-700 dark:text-slate-300 text-xs">${o.area}</td>
+              <td class="p-3 text-slate-500 dark:text-slate-400 text-xs">${o.dueDate}</td>
+              <td class="p-3 font-black text-rose-600 text-xs text-right">+${daysOver}d</td>
             </tr>`;
-          }).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400 text-xs">✅ No Overdue Issues</td></tr>'}
+          }).join('') : '<tr><td colspan="4" class="p-8 text-center text-emerald-500 font-medium"><i class="fas fa-check-circle mb-2 text-2xl"></i><br>No Overdue Issues</td></tr>'}
         </tbody>
       `;
 
@@ -1681,32 +1666,27 @@
       const bList = []; 
       Object.keys(dScore).forEach(d => { 
         if (dScore[d].length > 0) {
-          bList.push({ 
-            name: d, 
-            score: Math.round(dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length),
-            count: dScore[d].length
-          }); 
+          bList.push({ name: d, score: Math.round(dScore[d].reduce((a,b)=>a+b,0) / dScore[d].length), count: dScore[d].length }); 
         }
       });
       bList.sort((a,b) => a.score - b.score);
       
       document.getElementById("e_tbWorst5S").innerHTML = `
-        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500">
-          <tr><th class="p-2 text-[10px] sm:text-xs">#</th><th class="p-2 text-[10px] sm:text-xs">Area</th><th class="p-2 text-[10px] sm:text-xs">Audits</th><th class="p-2 text-right text-[10px] sm:text-xs">Score</th></tr>
+        <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 uppercase tracking-wider text-[10px] sm:text-xs">
+          <tr><th class="p-3 sticky-header rounded-tl-lg">Rank</th><th class="p-3 sticky-header">Dept / Area</th><th class="p-3 sticky-header text-center">Audits</th><th class="p-3 sticky-header rounded-tr-lg text-right">Avg Score</th></tr>
         </thead>
-        <tbody class="divide-y dark:divide-slate-700">
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
           ${bList.length ? bList.slice(0,5).map((o,i) => `
-            <tr class="hover:bg-amber-50 dark:hover:bg-amber-900/20">
-              <td class="p-2 font-bold text-slate-400 text-[10px] sm:text-xs">#${i+1}</td>
-              <td class="p-2 font-bold text-[10px] sm:text-[11px]">${o.name}</td>
-              <td class="p-2 text-[10px] sm:text-[11px]">${o.count}</td>
-              <td class="p-2 text-right font-inter font-bold text-[10px] sm:text-xs ${o.score < 70 ? 'text-rose-600' : o.score < 85 ? 'text-amber-600' : 'text-emerald-600'}">${o.score}%</td>
+            <tr class="hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-colors">
+              <td class="p-3 font-bold text-slate-400 text-xs">#${i+1}</td>
+              <td class="p-3 font-bold text-slate-700 dark:text-slate-300 text-xs">${o.name}</td>
+              <td class="p-3 text-center text-slate-500 dark:text-slate-400 text-xs">${o.count}</td>
+              <td class="p-3 text-right font-inter font-black text-sm ${o.score < 70 ? 'text-rose-500' : o.score < 85 ? 'text-amber-500' : 'text-emerald-500'}">${o.score}%</td>
             </tr>
-          `).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400 text-xs">No 5S Data</td></tr>'}
+          `).join('') : '<tr><td colspan="4" class="p-8 text-center text-slate-400 font-medium">No 5S Data Available</td></tr>'}
         </tbody>
       `;
 
-      // ---- Exec KPIs ----
       const allJobs = filteredData.jobs;
       const totalJobs = allJobs.length;
       const closedJobs = allJobs.filter(j => j.status === 'Closed').length;
@@ -1722,19 +1702,18 @@
       document.getElementById('e_kpi5S').textContent = avg5SAll + '%';
       document.getElementById('e_kpiForecast').textContent = forecastVal != null ? forecastVal + '%' : '-';
 
-      // ---- Exec auto summary ----
       const eInsights = [];
       const lastReal = s5Valid.length ? s5Valid[s5Valid.length - 1] : null;
-      eInsights.push(`อัตราการปิดงาน Safety โดยรวม <b>${closureRate}%</b> และมีงานเกินกำหนด <b class="${overdueRate > 20 ? 'text-rose-600' : 'text-amber-600'}">${overdueRate}%</b> ของทั้งหมด`);
-      eInsights.push(`คะแนน 5S เฉลี่ยปัจจุบัน <b class="${avg5SAll >= 85 ? 'text-emerald-600' : avg5SAll >= 70 ? 'text-amber-600' : 'text-rose-600'}">${avg5SAll}%</b>`);
+      eInsights.push(`ประสิทธิภาพการจัดการความปลอดภัย (Closure Rate) อยู่ที่ <b>${closureRate}%</b> และมีความเสี่ยงเกินกำหนดอยู่ <b class="${overdueRate > 20 ? 'text-rose-500' : 'text-amber-500'}">${overdueRate}%</b>`);
+      eInsights.push(`ระดับมาตรฐาน 5S ภาพรวมทั้งองค์กรเฉลี่ย <b class="${avg5SAll >= 85 ? 'text-emerald-500' : avg5SAll >= 70 ? 'text-amber-500' : 'text-rose-500'}">${avg5SAll}%</b>`);
       if (forecastVal != null && lastReal != null) {
-        const dir = forecastVal >= lastReal ? 'มีแนวโน้มดีขึ้น' : 'มีแนวโน้มลดลง ควรเฝ้าระวัง';
-        eInsights.push(`คาดการณ์คะแนน 5S เดือนถัดไปอยู่ที่ราว <b>${forecastVal}%</b> (${dir}) — อ้างอิงแนวโน้มเชิงเส้น ${s5Valid.length} เดือนล่าสุด`);
+        const dir = forecastVal >= lastReal ? 'มีแนวโน้มพัฒนาขึ้น' : 'มีแนวโน้มลดลง ควรเฝ้าระวัง';
+        eInsights.push(`ระบบ AI คาดการณ์คะแนน 5S เดือนถัดไปจะอยู่ที่ราว <b>${forecastVal}%</b> (${dir})`);
       }
-      if (overdueJobs > 0) eInsights.push(`มีงานเกินกำหนดค้างอยู่ <b class="text-rose-600">${overdueJobs} รายการ</b> ที่ต้องเร่งปิดในรอบถัดไป`);
+      if (overdueJobs > 0) eInsights.push(`ปัจจุบันพบงานค้างที่ต้องเร่งแก้ไขด่วน <b class="text-rose-500">${overdueJobs} รายการ</b> (ดูรายชื่อในตาราง Top 5 Critical)`);
       if (bList.length) {
         const worst = bList[0];
-        if (worst.score < 85) eInsights.push(`แผนกที่ควรให้ความสำคัญด้าน 5S มากที่สุดคือ <b>${worst.name} (${worst.score}%)</b>`);
+        if (worst.score < 85) eInsights.push(`ส่วนงานที่ควรผลักดันด้าน 5S เพิ่มเติม (Bottom Rank) คือ <b>${worst.name} (คะแนนเฉลี่ย ${worst.score}%)</b>`);
       }
       renderInsights('e_insight', 'e_insightList', eInsights);
     }
