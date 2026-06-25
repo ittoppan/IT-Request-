@@ -747,6 +747,42 @@ driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
                 document.getElementById('detailJobType').textContent = currentJobType === 'IT' ? 'เลขงานแจ้งซ่อม' : 'เลขงานซ่อม';
                 document.getElementById('detailJobId').textContent = job.jobId || 'N/A';
                 
+                // --- ส่วนเช็คการประเมินดาว (เพิ่มใหม่) ---
+                let evaluationHtml = '';
+                if (job.status === 'เสร็จสิ้น') {
+                    // สมมติว่าคะแนนถูกเก็บไว้ใน job.details.satisfaction_score (คุณต้องแน่ใจว่า Apps Script ดึงมาด้วย)
+                    const score = job.details?.satisfaction_score || job.details?.satisfactionscore || 0;
+                    
+                    if (score == 0 || !score) {
+                        // ยังไม่ได้ประเมิน -> แสดงปุ่มประเมิน
+                        evaluationHtml = `
+                            <div class="mt-6 border-t pt-6 text-center">
+                                <div class="bg-blue-50 rounded-xl p-6 border border-blue-100 shadow-sm">
+                                    <h4 class="text-lg font-bold text-blue-800 mb-2"><i class="fas fa-clipboard-check mr-2"></i>งานซ่อมเสร็จสิ้นแล้ว!</h4>
+                                    <p class="text-sm text-gray-600 mb-4">รบกวนสละเวลาประเมินความพึงพอใจ เพื่อนำไปพัฒนาการบริการครับ</p>
+                                    <button onclick="openEvaluationModal('${job.jobId}')" class="px-6 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-full shadow transition transform hover:-translate-y-1">
+                                        <i class="fas fa-star mr-1"></i> ประเมินผลงานซ่อม
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // ประเมินแล้ว -> แสดงผลดาว
+                        const stars = '<i class="fas fa-star text-yellow-400"></i>'.repeat(score) + '<i class="fas fa-star text-gray-300"></i>'.repeat(5 - score);
+                        const comment = job.details?.satisfaction_comment || job.details?.satisfactioncomment || 'ไม่มีความคิดเห็นเพิ่มเติม';
+                        evaluationHtml = `
+                            <div class="mt-6 border-t pt-6">
+                                <h4 class="text-md font-semibold text-gray-800 mb-3"><i class="fas fa-star text-yellow-500 mr-2"></i>ผลการประเมินของคุณ</h4>
+                                <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                                    <div class="text-xl mb-2">${stars}</div>
+                                    <p class="text-sm text-gray-600 italic">"${comment}"</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                // ------------------------------------
+
                 jobDetailsContainer.innerHTML = `
                     <div class="p-6 space-y-6">
                         ${createStatusSummaryHtml(job)}
@@ -764,26 +800,23 @@ driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
                         </div>
                         
                         ${createTypeSpecificHtml(job)}
-                        
                         ${createImageGalleryHtml(job)}
-                        
                         ${createProgressNotesHtml(job)}
-                        
                         ${createAdditionalInfoHtml(job)}
+                        
+                        ${evaluationHtml}
                     </div>
                 `;
                 
                 // เปิดใช้งาน Lightbox สำหรับรูปภาพ
-                lightbox.option({
-                    'resizeDuration': 200,
-                    'wrapAround': true,
-                    'alwaysShowNavOnTouchDevices': true
-                });
+                if(typeof lightbox !== 'undefined') {
+                    lightbox.option({
+                        'resizeDuration': 200,
+                        'wrapAround': true,
+                        'alwaysShowNavOnTouchDevices': true
+                    });
+                }
             }
-            
-            /**
-             * สร้าง HTML สำหรับสรุปสถานะงาน
-             */
             function createStatusSummaryHtml(job) {
                 const statusInfo = getStatusInfo(job.status || job.jobStatus);
                 const priorityInfo = getPriorityInfo(job.urgency || job.priority);
@@ -1346,13 +1379,115 @@ driveUrls: toArray(job.images?.driveUrls || job.googleDriveUrls)
             });
             
             backBtn.addEventListener('click', goBack);
-            
+            // ฟังก์ชันเรียกหน้าต่างประเมินคะแนน (Modal)
+            window.openEvaluationModal = function(jobId) {
+                Swal.fire({
+                    title: 'ประเมินความพึงพอใจ',
+                    html: `
+                        <p class="text-sm text-gray-500 mb-4">งานซ่อมหมายเลข: <span class="font-mono font-bold text-blue-600">${jobId}</span></p>
+                        <div class="flex justify-center space-x-2 mb-5 text-4xl cursor-pointer" id="starRating" data-score="0">
+                            <i class="fas fa-star text-gray-300 transition-colors duration-200" data-value="1"></i>
+                            <i class="fas fa-star text-gray-300 transition-colors duration-200" data-value="2"></i>
+                            <i class="fas fa-star text-gray-300 transition-colors duration-200" data-value="3"></i>
+                            <i class="fas fa-star text-gray-300 transition-colors duration-200" data-value="4"></i>
+                            <i class="fas fa-star text-gray-300 transition-colors duration-200" data-value="5"></i>
+                        </div>
+                        <textarea id="evalComment" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" rows="3" placeholder="ข้อเสนอแนะเพิ่มเติม (ถ้ามี)..."></textarea>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'บันทึกการประเมิน',
+                    cancelButtonText: 'ยกเลิก',
+                    confirmButtonColor: '#3B82F6',
+                    didOpen: () => {
+                        // ระบบ Hover และ Click ดาว
+                        let selectedScore = 0;
+                        const stars = document.querySelectorAll('#starRating i');
+                        const ratingContainer = document.getElementById('starRating');
+
+                        stars.forEach(star => {
+                            // เมื่อเอาเมาส์ชี้
+                            star.addEventListener('mouseover', (e) => {
+                                const hoverValue = parseInt(e.target.getAttribute('data-value'));
+                                stars.forEach((s, index) => {
+                                    if (index < hoverValue) s.classList.add('text-yellow-400');
+                                    else s.classList.remove('text-yellow-400');
+                                });
+                            });
+                            // เมื่อเอาเมาส์ออก
+                            star.addEventListener('mouseout', () => {
+                                stars.forEach((s, index) => {
+                                    if (index < selectedScore) s.classList.add('text-yellow-400');
+                                    else s.classList.remove('text-yellow-400');
+                                });
+                            });
+                            // เมื่อคลิก
+                            star.addEventListener('click', (e) => {
+                                selectedScore = parseInt(e.target.getAttribute('data-value'));
+                                ratingContainer.setAttribute('data-score', selectedScore);
+                                stars.forEach((s, index) => {
+                                    if (index < selectedScore) {
+                                        s.classList.remove('text-gray-300');
+                                        s.classList.add('text-yellow-400');
+                                    } else {
+                                        s.classList.remove('text-yellow-400');
+                                        s.classList.add('text-gray-300');
+                                    }
+                                });
+                            });
+                        });
+                    },
+                    preConfirm: () => {
+                        const score = document.getElementById('starRating').getAttribute('data-score');
+                        if (score == 0) {
+                            Swal.showValidationMessage('กรุณาเลือกคะแนนดาวอย่างน้อย 1 ดาวครับ');
+                            return false;
+                        }
+                        return {
+                            score: score,
+                            comment: document.getElementById('evalComment').value
+                        }
+                    }
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                        
+                        try {
+                            const payload = { 
+                                action: 'evaluateJob', 
+                                jobId: jobId, 
+                                score: result.value.score, 
+                                comment: result.value.comment, 
+                                formType: currentJobType 
+                            };
+                            
+                            const res = await fetch(scriptUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                body: JSON.stringify(payload)
+                            });
+                            
+                            const data = await res.json();
+                            if (data.status === 'success') {
+                                Swal.fire({ icon: 'success', title: 'ประเมินสำเร็จ!', text: 'ขอบคุณสำหรับความคิดเห็นครับ', timer: 2000, showConfirmButton: false });
+                                loadRepairJobs(); // โหลดหน้าใหม่เพื่ออัปเดตดาว
+                            } else {
+                                Swal.fire('เกิดข้อผิดพลาด', data.message, 'error');
+                            }
+                        } catch (error) {
+                            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+                        }
+                    }
+                });
+            };
             // เริ่มต้นแอปพลิเคชัน
             window.onload = function() {
                 initializeLiff();
                 setupSearch();
             };
         });
+
+
+
     </script>
 </body>
 </html>
